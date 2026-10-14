@@ -1,158 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { VibeId, VibeConfig } from '../types/theme';
 
-export const DEFAULT_VIBE: VibeId = 'botanical-zen';
+export const DEFAULT_VIBE: VibeId = 'nordic-studio';
 const STORAGE_KEY = 'readers_hub_vibe';
 
 export const VIBES: Record<VibeId, VibeConfig> = {
-  'dark-academia': {
-    id: 'dark-academia',
-    name: 'Grand Archive',
-    tagline: 'Candlelit Library & Leather',
-    concept: 'Ancient midnight library with velvet, mahogany, and brass accents',
-    description: 'Deep espresso walnut background (#120E0A), aged leather surfaces (#1C1611), antique brass accents (#D4AF37), crimson bookmark ribbon (#8B1E24), and warm parchment text (#EAE0D5).',
-    mode: 'dark',
-    colors: {
-      bg: '#120E0A',
-      card: '#1C1611',
-      cardSubtle: '#241C15',
-      cardHover: '#2A2119',
-      border: '#3A2E21',
-      borderSubtle: '#2E2319',
-      ink: '#EAE0D5',
-      inkSecondary: '#C2B5A5',
-      inkMuted: '#8C7D6E',
-      accent: '#D4AF37',
-      accentHover: '#C49F2F',
-      accentSubtle: 'rgba(212, 175, 55, 0.15)',
-      secondary: '#8B1E24',
-      secondaryHover: '#A8252C',
-      secondarySubtle: 'rgba(139, 30, 36, 0.18)',
-      badgeBg: '#2E2218',
-      badgeText: '#D4AF37',
-      ambientGlow: 'radial-gradient(900px 500px at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 70%)',
-    },
-    typography: {
-      uiFont: 'Inter, sans-serif',
-      quoteFont: 'Cormorant Garamond, serif',
-      description: 'Classical literary serif with antique gold accents and candlelit parchment warmth',
-    },
-    surfaceFeel: 'Aged Leather, double-lined vintage borders & Polished Mahogany',
-    swatches: ['#120E0A', '#1C1611', '#D4AF37', '#8B1E24'],
-  },
-  'deep-orbit': {
-    id: 'deep-orbit',
-    name: 'Deep Orbit',
-    tagline: 'Sci-Fi Holo-Deck & Cosmic Glass',
-    concept: 'Reading aboard a quiet starship observatory overlooking a nebula. Sleek, futuristic, and luminous.',
-    description: 'Void Black-Blue background (#05070E), Frosted Holo-Glass cards (rgba(15, 23, 42, 0.55)), Cyan bioluminescent teal (#00F5D4), Nebula Violet (#7B2CBF), and Starlight White text (#F0F6FC).',
-    mode: 'dark',
-    colors: {
-      bg: '#05070E',
-      card: 'rgba(15, 23, 42, 0.65)',
-      cardSubtle: 'rgba(30, 41, 59, 0.55)',
-      cardHover: 'rgba(30, 41, 59, 0.8)',
-      border: 'rgba(0, 245, 212, 0.22)',
-      borderSubtle: 'rgba(0, 245, 212, 0.12)',
-      ink: '#F0F6FC',
-      inkSecondary: '#94A3B8',
-      inkMuted: '#64748B',
-      accent: '#00F5D4',
-      accentHover: '#00D4B8',
-      accentSubtle: 'rgba(0, 245, 212, 0.15)',
-      secondary: '#7B2CBF',
-      secondaryHover: '#9D4EDD',
-      secondarySubtle: 'rgba(123, 44, 191, 0.2)',
-      badgeBg: 'rgba(0, 245, 212, 0.12)',
-      badgeText: '#00F5D4',
-      ambientGlow: 'radial-gradient(900px 500px at 70% 0%, rgba(0, 245, 212, 0.12) 0%, transparent 70%), radial-gradient(700px 400px at 20% 80%, rgba(123, 44, 191, 0.1) 0%, transparent 60%)',
-    },
-    typography: {
-      uiFont: 'Space Grotesk, sans-serif',
-      quoteFont: 'JetBrains Mono, monospace',
-      description: 'Monospace telemetry typography with orbital cyan accents',
-    },
-    surfaceFeel: 'Frosted Holo-Glass with backdrop blur and orbital ring glow',
-    swatches: ['#05070E', 'rgba(15, 23, 42, 0.7)', '#00F5D4', '#7B2CBF'],
-  },
-  'lofi-cafe': {
-    id: 'lofi-cafe',
-    name: 'Rainy Tokyo Café',
-    tagline: 'Cozy Lo-Fi & Neon Dusk',
-    concept: 'Sitting by a rain-streaked window at night in a quiet indie bookstore café with warm lamps.',
-    description: 'Midnight Indigo-Slate (#161925), Warm Dusk Purple (#212536), Matcha Green (#80ED99), Warm Amber Lamp (#FF9F1C), and Sakura Pink (#FF758F).',
-    mode: 'dark',
-    colors: {
-      bg: '#161925',
-      card: '#212536',
-      cardSubtle: '#2A2F45',
-      cardHover: '#333954',
-      border: '#343B54',
-      borderSubtle: '#2B3147',
-      ink: '#F8F9FA',
-      inkSecondary: '#C5CBD8',
-      inkMuted: '#8E96AB',
-      accent: '#80ED99',
-      accentHover: '#57CC99',
-      accentSubtle: 'rgba(128, 237, 153, 0.16)',
-      secondary: '#FF9F1C',
-      secondaryHover: '#F77F00',
-      secondarySubtle: 'rgba(255, 159, 28, 0.18)',
-      badgeBg: 'rgba(128, 237, 153, 0.14)',
-      badgeText: '#80ED99',
-      ambientGlow: 'radial-gradient(900px 500px at 20% 0%, rgba(255, 159, 28, 0.1) 0%, transparent 65%), radial-gradient(700px 400px at 80% 80%, rgba(128, 237, 153, 0.08) 0%, transparent 60%)',
-    },
-    typography: {
-      uiFont: 'Inter, sans-serif',
-      quoteFont: 'Playfair Display, serif',
-      description: 'Soft expressive serif with cozy neon dusk warmth',
-    },
-    surfaceFeel: 'Soft, extra-rounded tactile cards (rounded-3xl) and pulsing vinyl timer animation',
-    swatches: ['#161925', '#212536', '#80ED99', '#FF9F1C'],
-  },
-  'botanical-zen': {
-    id: 'botanical-zen',
-    name: 'Solar Punk Botanical',
-    tagline: 'Sunlit Greenhouse Sanctuary',
-    concept: 'Reading in a sunlit glass conservatory surrounded by plants and natural wood.',
-    description: 'Soft Moss/Mist background (#EEF2EB), Frosted Sunlight White cards (rgba(255, 255, 255, 0.85)), Deep Forest Green text (#1B3B2B), Sunbeam Gold (#F4A261), and Leaf Emerald (#40916C).',
-    mode: 'light',
-    isDefault: true,
-    colors: {
-      bg: '#EEF2EB',
-      card: 'rgba(255, 255, 255, 0.88)',
-      cardSubtle: 'rgba(240, 245, 238, 0.8)',
-      cardHover: '#FFFFFF',
-      border: '#CBD5C0',
-      borderSubtle: '#DDE5D4',
-      ink: '#1B3B2B',
-      inkSecondary: '#3C664F',
-      inkMuted: '#688F78',
-      accent: '#40916C',
-      accentHover: '#2D6A4F',
-      accentSubtle: 'rgba(64, 145, 108, 0.14)',
-      secondary: '#F4A261',
-      secondaryHover: '#E76F51',
-      secondarySubtle: 'rgba(244, 162, 97, 0.18)',
-      badgeBg: 'rgba(64, 145, 108, 0.12)',
-      badgeText: '#2D6A4F',
-      ambientGlow: 'radial-gradient(900px 500px at 50% 0%, rgba(244, 162, 97, 0.12) 0%, transparent 65%), radial-gradient(700px 400px at 80% 50%, rgba(64, 145, 108, 0.08) 0%, transparent 60%)',
-    },
-    typography: {
-      uiFont: 'Inter, sans-serif',
-      quoteFont: 'Playfair Display, serif',
-      description: 'Organic serif typography with natural sunlit freshness',
-    },
-    surfaceFeel: 'Organic asymmetric borders, soft green-tinted shadows, and calm breathing timer ring',
-    swatches: ['#EEF2EB', '#FFFFFF', '#40916C', '#F4A261'],
-  },
   'nordic-studio': {
     id: 'nordic-studio',
     name: 'Nordic Studio',
     tagline: 'Clean, Airy, Daylight Minimal',
-    concept: 'Scandinavian reading lounges. Calm, hyper-legible, and distraction-free.',
-    description: 'Warm Alabaster background (#FBFBF9), Pure White elevated cards (#FFFFFF), Crisp Stone borders (#E6E4DD), Deep Charcoal text (#18181B).',
+    concept: 'Inspired by Kinfolk Magazine, Notion, and Scandinavian reading lounges. Calm, hyper-legible, and distraction-free.',
+    description: 'Warm Alabaster background (#FBFBF9), Pure White elevated cards (#FFFFFF), Crisp Stone borders (#E6E4DD), Deep Charcoal text (#18181B), Botanical Sage Green (#2D6A4F) and Soft Terracotta (#E07A5F).',
     mode: 'light',
+    isDefault: true,
     colors: {
       bg: '#FBFBF9',
       card: '#FFFFFF',
@@ -185,7 +45,7 @@ export const VIBES: Record<VibeId, VibeConfig> = {
     id: 'midnight-library',
     name: 'Midnight Library',
     tagline: 'Archival Serenity & Banker’s Lamp',
-    concept: 'Deep obsidian vaults, quiet sanctuary, and luminous emerald desk lamps.',
+    concept: 'Deep obsidian vaults, quiet sanctuary, and luminous emerald desk lamps for immersive night reading.',
     description: 'Inky midnight slate paired with banker’s lamp emerald and warm amber reading glow.',
     mode: 'dark',
     colors: {
@@ -215,6 +75,41 @@ export const VIBES: Record<VibeId, VibeConfig> = {
     },
     surfaceFeel: 'OLED-friendly dark cards, subtle neon edges, warm candlelight glow',
     swatches: ['#0B0F17', '#131926', '#10B981', '#F59E0B'],
+  },
+  'dark-academia': {
+    id: 'dark-academia',
+    name: 'Dark Academia',
+    tagline: 'Leather, Espresso & Candlelight',
+    concept: 'Ancient Oxford library with velvet, weathered oak, brass, and candlelight warmth.',
+    description: 'Deep espresso walnut background (#120E0A), aged leather surfaces (#1C1611), antique brass accents (#D4AF37), and crimson bookmark touches.',
+    mode: 'dark',
+    colors: {
+      bg: '#120E0A',
+      card: '#1C1611',
+      cardSubtle: '#241C15',
+      cardHover: '#2A2119',
+      border: '#3A2E21',
+      borderSubtle: '#2E2319',
+      ink: '#EAE0D5',
+      inkSecondary: '#C2B5A5',
+      inkMuted: '#8C7D6E',
+      accent: '#D4AF37',
+      accentHover: '#C49F2F',
+      accentSubtle: 'rgba(212, 175, 55, 0.15)',
+      secondary: '#8B1E24',
+      secondaryHover: '#A8252C',
+      secondarySubtle: 'rgba(139, 30, 36, 0.18)',
+      badgeBg: '#2E2218',
+      badgeText: '#D4AF37',
+      ambientGlow: 'radial-gradient(900px 500px at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 70%)',
+    },
+    typography: {
+      uiFont: 'Plus Jakarta Sans',
+      quoteFont: 'Lora',
+      description: 'Classical literary serif with antique gold accents and candlelit parchment warmth',
+    },
+    surfaceFeel: 'Aged Leather, double-lined vintage borders & Polished Mahogany',
+    swatches: ['#120E0A', '#1C1611', '#D4AF37', '#8B1E24'],
   },
   'sepia-manuscript': {
     id: 'sepia-manuscript',
@@ -281,7 +176,7 @@ export const VIBES: Record<VibeId, VibeConfig> = {
     typography: {
       uiFont: 'Plus Jakarta Sans',
       quoteFont: 'Newsreader',
-      description: 'Monospaced/Geometric Sans × Clean Contemplative Serif',
+      description: 'Clean Geometric Sans × Contemplative Literary Serif',
     },
     surfaceFeel: 'Clean architectural line work, river stone serenity, crisp contrast',
     swatches: ['#F3F3F1', '#FAFAF9', '#2B3A42', '#C2410C'],
@@ -321,23 +216,127 @@ export const VIBES: Record<VibeId, VibeConfig> = {
     surfaceFeel: 'Futuristic glassmorphism, glowing accents, hyper-contrast reading',
     swatches: ['#0A0912', '#131122', '#06B6D4', '#F43F5E'],
   },
+  'botanical-zen': {
+    id: 'botanical-zen',
+    name: 'Botanical Greenhouse',
+    tagline: 'Sunlit Greenhouse Sanctuary',
+    concept: 'Morning reading in a lush plant conservatory surrounded by ferns and sunlight.',
+    description: 'Calm herbal sage green (#40916C), terracotta warmth (#F4A261), soft linen cards (#FFFFFF), and natural leaf text.',
+    mode: 'light',
+    isDefault: false,
+    colors: {
+      bg: '#EEF2EB',
+      card: '#FFFFFF',
+      cardSubtle: '#F4F7F2',
+      cardHover: '#EBF1E8',
+      border: '#CBD5C0',
+      borderSubtle: '#DFE6D7',
+      ink: '#1B3B2B',
+      inkSecondary: '#496253',
+      inkMuted: '#7B9485',
+      accent: '#40916C',
+      accentHover: '#337959',
+      accentSubtle: 'rgba(64, 145, 108, 0.14)',
+      secondary: '#F4A261',
+      secondaryHover: '#E76F51',
+      secondarySubtle: 'rgba(244, 162, 97, 0.18)',
+      badgeBg: '#E2ECE4',
+      badgeText: '#1B3B2B',
+      ambientGlow: 'radial-gradient(900px 500px at 50% 0%, rgba(244, 162, 97, 0.1) 0%, transparent 65%), radial-gradient(700px 400px at 80% 50%, rgba(64, 145, 108, 0.08) 0%, transparent 60%)',
+    },
+    typography: {
+      uiFont: 'Plus Jakarta Sans',
+      quoteFont: 'Newsreader',
+      description: 'Organic typography with natural sunlit freshness',
+    },
+    surfaceFeel: 'Organic borders, soft green-tinted shadows, and calm breathing aura',
+    swatches: ['#EEF2EB', '#FFFFFF', '#40916C', '#F4A261'],
+  },
+  'deep-orbit': {
+    id: 'deep-orbit',
+    name: 'Deep Orbit',
+    tagline: 'Sci-Fi Holo-Deck & Cosmic Glass',
+    concept: 'Reading aboard a quiet starship observatory overlooking a nebula. Sleek, futuristic, and luminous.',
+    description: 'Void Black-Blue background (#05070E), Frosted Holo-Glass cards, Cyan bioluminescent teal (#00F5D4), Nebula Violet (#7B2CBF).',
+    mode: 'dark',
+    colors: {
+      bg: '#05070E',
+      card: '#0F172A',
+      cardSubtle: '#1E293B',
+      cardHover: '#283548',
+      border: 'rgba(0, 245, 212, 0.22)',
+      borderSubtle: 'rgba(0, 245, 212, 0.12)',
+      ink: '#F0F6FC',
+      inkSecondary: '#94A3B8',
+      inkMuted: '#64748B',
+      accent: '#00F5D4',
+      accentHover: '#00D4B8',
+      accentSubtle: 'rgba(0, 245, 212, 0.15)',
+      secondary: '#7B2CBF',
+      secondaryHover: '#9D4EDD',
+      secondarySubtle: 'rgba(123, 44, 191, 0.22)',
+      badgeBg: 'rgba(0, 245, 212, 0.12)',
+      badgeText: '#00F5D4',
+      ambientGlow: 'radial-gradient(900px 500px at 70% 0%, rgba(0, 245, 212, 0.12) 0%, transparent 70%), radial-gradient(700px 400px at 20% 80%, rgba(123, 44, 191, 0.1) 0%, transparent 60%)',
+    },
+    typography: {
+      uiFont: 'Plus Jakarta Sans',
+      quoteFont: 'Lora',
+      description: 'Digital Modern Sans × Cosmic Manuscript Serif',
+    },
+    surfaceFeel: 'Holographic glass borders, bioluminescent telemetry and cyber glow',
+    swatches: ['#05070E', '#0F172A', '#00F5D4', '#7B2CBF'],
+  },
+  'lofi-cafe': {
+    id: 'lofi-cafe',
+    name: 'Rainy Tokyo Café',
+    tagline: 'Cozy Lo-Fi & Neon Dusk',
+    concept: 'A warm corner booth in a rainy Shibuya café with steaming coffee and lo-fi beats.',
+    description: 'Neon Midnight Slate (#161925), Warm Coffee Vellum (#212536), Matcha Neon Green (#80ED99), Tangerine Glow (#FF9F1C).',
+    mode: 'dark',
+    colors: {
+      bg: '#161925',
+      card: '#212536',
+      cardSubtle: '#2C3147',
+      cardHover: '#353B55',
+      border: '#30364F',
+      borderSubtle: '#2A2E44',
+      ink: '#F8F9FA',
+      inkSecondary: '#C4CAD8',
+      inkMuted: '#7E88A1',
+      accent: '#80ED99',
+      accentHover: '#6FD887',
+      accentSubtle: 'rgba(128, 237, 153, 0.15)',
+      secondary: '#FF9F1C',
+      secondaryHover: '#FFAE3E',
+      secondarySubtle: 'rgba(255, 159, 28, 0.2)',
+      badgeBg: '#2C3147',
+      badgeText: '#80ED99',
+      ambientGlow: 'radial-gradient(circle at 80% 20%, rgba(255, 159, 28, 0.15) 0%, transparent 50%), radial-gradient(circle at 20% 80%, rgba(128, 237, 153, 0.12) 0%, transparent 55%)',
+    },
+    typography: {
+      uiFont: 'Plus Jakarta Sans',
+      quoteFont: 'Newsreader',
+      description: 'Warm Modern Sans × Cozy Literary Serif',
+    },
+    surfaceFeel: 'Tactile coffee shop cards, rainy mist glow and cozy retro-modern accents',
+    swatches: ['#161925', '#212536', '#80ED99', '#FF9F1C'],
+  },
 };
 
-export const VIBE_DEFINITIONS = VIBES;
-
-export interface ThemeContextValue {
+interface ThemeContextValue {
   vibe: VibeId;
+  theme: VibeId;
   vibeConfig: VibeConfig;
   allVibes: VibeConfig[];
   setVibe: (id: VibeId) => void;
+  setTheme: (id: VibeId) => void;
   isPopoverOpen: boolean;
   setPopoverOpen: (open: boolean) => void;
-  togglePopover: () => void;
   openPopover: () => void;
   closePopover: () => void;
+  togglePopover: () => void;
 }
-
-export type ThemeContextType = ThemeContextValue;
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -368,9 +367,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else {
       root.classList.remove('dark');
     }
-
-    // Broadcast theme change for ambient background audio pairing
-    window.dispatchEvent(new CustomEvent('readers-hub-theme-changed', { detail: { theme: vibeId } }));
   };
 
   const setVibe = (id: VibeId) => {
@@ -392,16 +388,25 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     applyVibeToDocument(vibe);
   }, [vibe]);
 
+  // Ensure default theme (Nordic Studio) is strictly at the top of options
+  const allVibes = Object.values(VIBES).sort((a, b) => {
+    if (a.isDefault) return -1;
+    if (b.isDefault) return 1;
+    return 0;
+  });
+
   const value: ThemeContextValue = {
     vibe,
+    theme: vibe,
     vibeConfig: VIBES[vibe] || VIBES[DEFAULT_VIBE],
-    allVibes: Object.values(VIBES),
+    allVibes,
     setVibe,
+    setTheme: setVibe,
     isPopoverOpen,
     setPopoverOpen,
-    togglePopover,
     openPopover,
     closePopover,
+    togglePopover,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

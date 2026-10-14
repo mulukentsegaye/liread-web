@@ -3,11 +3,325 @@
 @tailwind utilities;
 
 /* ==============================================================================
-   READERS HUB - 4 IMMERSIVE WEBSITE VIBES DESIGN SYSTEM
+   READERS HUB - MULTI-THEME VIBE DESIGN SYSTEM
    ============================================================================== */
 
-/* 1. SOLAR PUNK BOTANICAL (botanical-zen / default) */
-:root, [data-theme="botanical-zen"], [data-theme="nordic-studio"] {
+/* 1. DEFAULT VIBE: NORDIC STUDIO (nordic-studio)
+   Concept: Inspired by Kinfolk Magazine, Notion, and Scandinavian reading lounges.
+   Calm, hyper-legible, and distraction-free. */
+:root,
+[data-theme="nordic-studio"] {
+  --vibe-bg: #FBFBF9;
+  --vibe-card: #FFFFFF;
+  --vibe-card-subtle: #F4F3EE;
+  --vibe-card-hover: #F8F7F2;
+  --vibe-border: #E6E4DD;
+  --vibe-border-subtle: #EDECE7;
+  --vibe-ink: #18181B;
+  --vibe-ink-secondary: #52525B;
+  --vibe-ink-muted: #71717A;
+  --vibe-accent: #2D6A4F;
+  --vibe-accent-hover: #22533D;
+  --vibe-accent-text: #FFFFFF;
+  --vibe-accent-subtle: #EBF2ED;
+  --vibe-secondary: #E07A5F;
+  --vibe-secondary-hover: #CD674C;
+  --vibe-secondary-text: #FFFFFF;
+  --vibe-secondary-subtle: #FAF0ED;
+  --vibe-badge-bg: #EBF2ED;
+  --vibe-badge-text: #2D6A4F;
+  --vibe-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+  --vibe-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --vibe-ambient-gradient: radial-gradient(1100px 600px at 50% -10%, rgba(45, 106, 79, 0.04) 0%, rgba(224, 122, 95, 0.03) 50%, transparent 85%);
+
+  /* Universal Component Tokens */
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(255, 255, 255, 0.92);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #EBF2ED;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: solid 1.5px #E6E4DD;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #FFFFFF;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #E07A5F;
+  --accent-glow: 0 10px 25px -5px rgba(45, 106, 79, 0.12);
+  --timer-glow: radial-gradient(circle, rgba(45, 106, 79, 0.16) 0%, rgba(224, 122, 95, 0.08) 50%, transparent 75%);
+  --font-heading: 'Newsreader', 'Lora', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1.5rem;
+  --quote-bg: #F4F3EE;
+  --backdrop-blur: blur(12px);
+  --chart-bar-primary: #2D6A4F;
+  --chart-bar-today: #18181B;
+  color-scheme: light;
+}
+
+/* 2. MIDNIGHT LIBRARY (midnight-library) */
+[data-theme="midnight-library"] {
+  --vibe-bg: #0B0F17;
+  --vibe-card: #131926;
+  --vibe-card-subtle: #1B2335;
+  --vibe-card-hover: #1E273A;
+  --vibe-border: #232D42;
+  --vibe-border-subtle: #2E3A54;
+  --vibe-ink: #F1F5F9;
+  --vibe-ink-secondary: #CBD5E1;
+  --vibe-ink-muted: #94A3B8;
+  --vibe-accent: #10B981;
+  --vibe-accent-hover: #059669;
+  --vibe-accent-text: #FFFFFF;
+  --vibe-accent-subtle: rgba(16, 185, 129, 0.14);
+  --vibe-secondary: #F59E0B;
+  --vibe-secondary-hover: #D97706;
+  --vibe-secondary-text: #FFFFFF;
+  --vibe-secondary-subtle: rgba(245, 158, 11, 0.14);
+  --vibe-badge-bg: rgba(16, 185, 129, 0.16);
+  --vibe-badge-text: #34D399;
+  --vibe-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5);
+  --vibe-shadow-elevated: 0 20px 35px -8px rgba(0, 0, 0, 0.6);
+  --vibe-ambient-gradient: radial-gradient(900px 500px at 70% 0%, rgba(16, 185, 129, 0.09) 0%, transparent 70%), radial-gradient(700px 400px at 15% 20%, rgba(245, 158, 11, 0.05) 0%, transparent 60%);
+
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(19, 25, 38, 0.9);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #1B2335;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: solid 1.5px #232D42;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #0B0F17;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #F59E0B;
+  --accent-glow: 0 0 25px rgba(16, 185, 129, 0.2);
+  --timer-glow: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(245, 158, 11, 0.1) 45%, transparent 75%);
+  --font-heading: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1.5rem;
+  --quote-bg: #131926;
+  --backdrop-blur: blur(12px);
+  --chart-bar-primary: #10B981;
+  --chart-bar-today: #F1F5F9;
+  color-scheme: dark;
+}
+
+/* 3. GRAND ARCHIVE (dark-academia) */
+[data-theme="dark-academia"] {
+  --vibe-bg: #120e0a;
+  --vibe-card: #1c1611;
+  --vibe-card-subtle: #241c15;
+  --vibe-card-hover: #2a2119;
+  --vibe-border: #3a2e21;
+  --vibe-border-subtle: #2e2319;
+  --vibe-ink: #eae0d5;
+  --vibe-ink-secondary: #c2b5a5;
+  --vibe-ink-muted: #8c7d6e;
+  --vibe-accent: #d4af37;
+  --vibe-accent-hover: #c49f2f;
+  --vibe-accent-subtle: rgba(212, 175, 55, 0.15);
+  --vibe-secondary: #8b1e24;
+  --vibe-secondary-hover: #a8252c;
+  --vibe-secondary-subtle: rgba(139, 30, 36, 0.18);
+  --vibe-badge-bg: #2e2218;
+  --vibe-badge-text: #d4af37;
+  --vibe-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.6);
+  --vibe-shadow-elevated: 0 16px 35px -4px rgba(212, 175, 55, 0.12);
+  --vibe-ambient-gradient: radial-gradient(900px 500px at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(28, 22, 17, 0.94);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #2e231b;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: double 4px #3a2e21;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #120e0a;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #c8323b;
+  --accent-glow: 0 0 30px rgba(212, 175, 55, 0.18);
+  --timer-glow: radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, rgba(139, 30, 36, 0.1) 45%, transparent 70%);
+  --font-heading: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1rem;
+  --quote-bg: #221b14;
+  --backdrop-blur: blur(10px);
+  --chart-bar-primary: #8c7d6e;
+  --chart-bar-today: #d4af37;
+  color-scheme: dark;
+}
+
+/* 4. SEPIA MANUSCRIPT (sepia-manuscript) */
+[data-theme="sepia-manuscript"] {
+  --vibe-bg: #F6F1E9;
+  --vibe-card: #FDFBF7;
+  --vibe-card-subtle: #EEE7DC;
+  --vibe-card-hover: #E7DFD2;
+  --vibe-border: #DFD4C3;
+  --vibe-border-subtle: #E9E0D3;
+  --vibe-ink: #2D2319;
+  --vibe-ink-secondary: #574737;
+  --vibe-ink-muted: #7C6C5D;
+  --vibe-accent: #B86221;
+  --vibe-accent-hover: #984D14;
+  --vibe-accent-subtle: #EFE3D3;
+  --vibe-secondary: #5B7052;
+  --vibe-secondary-hover: #475940;
+  --vibe-secondary-subtle: #E7ECE6;
+  --vibe-badge-bg: #EFE3D3;
+  --vibe-badge-text: #B86221;
+  --vibe-shadow: 0 4px 20px -4px rgba(78, 52, 29, 0.07);
+  --vibe-shadow-elevated: 0 10px 25px -5px rgba(78, 52, 29, 0.1);
+  --vibe-ambient-gradient: radial-gradient(1000px 500px at 50% 0%, rgba(184, 98, 33, 0.05) 0%, rgba(91, 112, 82, 0.03) 50%, transparent 70%);
+
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(253, 251, 247, 0.9);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #EFE3D3;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: solid 1.5px #DFD4C3;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #FFFFFF;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #B86221;
+  --accent-glow: 0 10px 25px -5px rgba(184, 98, 33, 0.12);
+  --timer-glow: radial-gradient(circle, rgba(184, 98, 33, 0.16) 0%, transparent 70%);
+  --font-heading: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1.5rem;
+  --quote-bg: #EEE7DC;
+  --backdrop-blur: blur(12px);
+  --chart-bar-primary: #B86221;
+  --chart-bar-today: #2D2319;
+  color-scheme: light;
+}
+
+/* 5. KYOTO MINIMALIST (kyoto-minimalist) */
+[data-theme="kyoto-minimalist"] {
+  --vibe-bg: #F3F3F1;
+  --vibe-card: #FAFAF9;
+  --vibe-card-subtle: #E7E7E3;
+  --vibe-card-hover: #EEEEEC;
+  --vibe-border: #D5D5CF;
+  --vibe-border-subtle: #E0E0DC;
+  --vibe-ink: #121314;
+  --vibe-ink-secondary: #3B3E43;
+  --vibe-ink-muted: #696C73;
+  --vibe-accent: #2B3A42;
+  --vibe-accent-hover: #1B252B;
+  --vibe-accent-subtle: #E4E9EC;
+  --vibe-secondary: #C2410C;
+  --vibe-secondary-hover: #9A3412;
+  --vibe-secondary-subtle: #FAECE7;
+  --vibe-badge-bg: #E4E9EC;
+  --vibe-badge-text: #2B3A42;
+  --vibe-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.04);
+  --vibe-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
+  --vibe-ambient-gradient: radial-gradient(900px 500px at 50% 0%, rgba(43, 58, 66, 0.05) 0%, transparent 75%);
+
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(250, 250, 249, 0.9);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #E4E9EC;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: solid 1.5px #D5D5CF;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #FFFFFF;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #C2410C;
+  --accent-glow: 0 10px 25px -5px rgba(43, 58, 66, 0.1);
+  --timer-glow: radial-gradient(circle, rgba(43, 58, 66, 0.15) 0%, transparent 70%);
+  --font-heading: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1.5rem;
+  --quote-bg: #E7E7E3;
+  --backdrop-blur: blur(12px);
+  --chart-bar-primary: #2B3A42;
+  --chart-bar-today: #121314;
+  color-scheme: light;
+}
+
+/* 6. CYBER CODEX (cyber-codex) */
+[data-theme="cyber-codex"] {
+  --vibe-bg: #0A0912;
+  --vibe-card: #131122;
+  --vibe-card-subtle: #1D1933;
+  --vibe-card-hover: #24203E;
+  --vibe-border: #2E2750;
+  --vibe-border-subtle: #3B3266;
+  --vibe-ink: #F1F3FB;
+  --vibe-ink-secondary: #CBD0E8;
+  --vibe-ink-muted: #968DB8;
+  --vibe-accent: #06B6D4;
+  --vibe-accent-hover: #0891B2;
+  --vibe-accent-subtle: rgba(6, 182, 212, 0.14);
+  --vibe-secondary: #F43F5E;
+  --vibe-secondary-hover: #E11D48;
+  --vibe-secondary-subtle: rgba(244, 63, 94, 0.14);
+  --vibe-badge-bg: rgba(6, 182, 212, 0.16);
+  --vibe-badge-text: #22D3EE;
+  --vibe-shadow: 0 8px 30px -4px rgba(6, 182, 212, 0.15);
+  --vibe-shadow-elevated: 0 20px 35px -8px rgba(6, 182, 212, 0.22);
+  --vibe-ambient-gradient: radial-gradient(800px 500px at 75% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 70%), radial-gradient(700px 400px at 15% 20%, rgba(244, 63, 94, 0.08) 0%, transparent 60%);
+
+  --bg-app: var(--vibe-bg);
+  --bg-surface: var(--vibe-card);
+  --bg-surface-glass: rgba(19, 17, 34, 0.9);
+  --bg-surface-accent: var(--vibe-card-subtle);
+  --bg-surface-active: #1D1933;
+  --border-subtle: var(--vibe-border);
+  --border-accent: var(--vibe-accent);
+  --border-quote: solid 1.5px #2E2750;
+  --text-primary: var(--vibe-ink);
+  --text-secondary: var(--vibe-ink-secondary);
+  --text-muted: var(--vibe-ink-muted);
+  --accent-primary: var(--vibe-accent);
+  --accent-primary-hover: var(--vibe-accent-hover);
+  --accent-primary-fg: #0A0912;
+  --accent-secondary: var(--vibe-secondary);
+  --accent-heart: #F43F5E;
+  --accent-glow: 0 0 25px rgba(6, 182, 212, 0.25);
+  --timer-glow: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(244, 63, 94, 0.12) 50%, transparent 75%);
+  --font-heading: 'Lora', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-quote: 1.5rem;
+  --quote-bg: #131122;
+  --backdrop-blur: blur(12px);
+  --chart-bar-primary: #06B6D4;
+  --chart-bar-today: #F1F3FB;
+  color-scheme: dark;
+}
+
+/* 7. SOLAR PUNK BOTANICAL (botanical-zen) */
+[data-theme="botanical-zen"] {
   --vibe-bg: #eef2eb;
   --vibe-card: rgba(255, 255, 255, 0.92);
   --vibe-card-subtle: #f4f7f2;
@@ -27,8 +341,8 @@
   --vibe-badge-text: #1b3b2b;
   --vibe-shadow: 0 4px 20px -2px rgba(64, 145, 108, 0.08);
   --vibe-shadow-elevated: 0 12px 30px -4px rgba(64, 145, 108, 0.15);
+  --vibe-ambient-gradient: radial-gradient(900px 500px at 50% 0%, rgba(244, 162, 97, 0.1) 0%, transparent 65%);
 
-  /* Component specific tokens */
   --bg-app: var(--vibe-bg);
   --bg-surface: var(--vibe-card);
   --bg-surface-glass: rgba(255, 255, 255, 0.85);
@@ -56,57 +370,7 @@
   --chart-bar-today: #1b3b2b;
 }
 
-/* 2. GRAND ARCHIVE (dark-academia) - Candlelit Library & Leather */
-[data-theme="dark-academia"] {
-  --vibe-bg: #120e0a;
-  --vibe-card: #1c1611;
-  --vibe-card-subtle: #241c15;
-  --vibe-card-hover: #2a2119;
-  --vibe-border: #3a2e21;
-  --vibe-border-subtle: #2e2319;
-  --vibe-ink: #eae0d5;
-  --vibe-ink-secondary: #c2b5a5;
-  --vibe-ink-muted: #8c7d6e;
-  --vibe-accent: #d4af37;
-  --vibe-accent-hover: #c49f2f;
-  --vibe-accent-subtle: rgba(212, 175, 55, 0.15);
-  --vibe-secondary: #8b1e24;
-  --vibe-secondary-hover: #a8252c;
-  --vibe-secondary-subtle: rgba(139, 30, 36, 0.18);
-  --vibe-badge-bg: #2e2218;
-  --vibe-badge-text: #d4af37;
-  --vibe-shadow: 0 4px 25px -2px rgba(0, 0, 0, 0.6);
-  --vibe-shadow-elevated: 0 16px 35px -4px rgba(212, 175, 55, 0.12);
-
-  /* Component specific tokens */
-  --bg-app: var(--vibe-bg);
-  --bg-surface: var(--vibe-card);
-  --bg-surface-glass: rgba(28, 22, 17, 0.94);
-  --bg-surface-accent: var(--vibe-card-subtle);
-  --bg-surface-active: #2e231b;
-  --border-subtle: var(--vibe-border);
-  --border-accent: var(--vibe-accent);
-  --border-quote: double 4px #3a2e21;
-  --text-primary: var(--vibe-ink);
-  --text-secondary: var(--vibe-ink-secondary);
-  --text-muted: var(--vibe-ink-muted);
-  --accent-primary: var(--vibe-accent);
-  --accent-primary-hover: var(--vibe-accent-hover);
-  --accent-primary-fg: #120e0a;
-  --accent-secondary: var(--vibe-secondary);
-  --accent-heart: #c8323b;
-  --accent-glow: 0 0 30px rgba(212, 175, 55, 0.18);
-  --timer-glow: radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, rgba(139, 30, 36, 0.1) 45%, transparent 70%);
-  --font-heading: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --radius-quote: 1rem;
-  --quote-bg: #221b14;
-  --backdrop-blur: blur(10px);
-  --chart-bar-primary: #8c7d6e;
-  --chart-bar-today: #d4af37;
-}
-
-/* 3. DEEP ORBIT (deep-orbit) - Sci-Fi Holo-Deck & Cosmic Glass */
+/* 8. DEEP ORBIT (deep-orbit) */
 [data-theme="deep-orbit"] {
   --vibe-bg: #05070e;
   --vibe-card: rgba(15, 23, 42, 0.65);
@@ -126,9 +390,9 @@
   --vibe-badge-bg: rgba(0, 245, 212, 0.12);
   --vibe-badge-text: #00f5d4;
   --vibe-shadow: 0 4px 20px -2px rgba(0, 245, 212, 0.1);
-  --vibe-shadow-elevated: 0 12px 35px -4px rgba(0, 245, 212, 0.25), 0 0 25px rgba(123, 44, 191, 0.2);
+  --vibe-shadow-elevated: 0 12px 35px -4px rgba(0, 245, 212, 0.25);
+  --vibe-ambient-gradient: radial-gradient(900px 500px at 70% 0%, rgba(0, 245, 212, 0.12) 0%, transparent 70%);
 
-  /* Component specific tokens */
   --bg-app: var(--vibe-bg);
   --bg-surface: var(--vibe-card);
   --bg-surface-glass: rgba(15, 23, 42, 0.55);
@@ -145,7 +409,7 @@
   --accent-primary-fg: #05070e;
   --accent-secondary: var(--vibe-secondary);
   --accent-heart: #ff007f;
-  --accent-glow: 0 0 25px rgba(0, 245, 212, 0.25), 0 0 50px rgba(123, 44, 191, 0.2);
+  --accent-glow: 0 0 25px rgba(0, 245, 212, 0.25);
   --timer-glow: radial-gradient(circle, rgba(0, 245, 212, 0.25) 0%, rgba(123, 44, 191, 0.18) 45%, transparent 75%);
   --font-heading: 'Space Grotesk', sans-serif;
   --font-mono: 'Space Grotesk', 'JetBrains Mono', monospace;
@@ -154,9 +418,10 @@
   --backdrop-blur: blur(20px);
   --chart-bar-primary: #7b2cbf;
   --chart-bar-today: #00f5d4;
+  color-scheme: dark;
 }
 
-/* 4. RAINY TOKYO CAFE (lofi-cafe) - Cozy Lo-Fi & Neon Dusk */
+/* 9. RAINY TOKYO CAFE (lofi-cafe) */
 [data-theme="lofi-cafe"] {
   --vibe-bg: #161925;
   --vibe-card: #212536;
@@ -176,9 +441,9 @@
   --vibe-badge-bg: #2c3147;
   --vibe-badge-text: #80ed99;
   --vibe-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-  --vibe-shadow-elevated: 0 12px 30px -4px rgba(255, 159, 28, 0.15), 0 0 20px rgba(128, 237, 153, 0.15);
+  --vibe-shadow-elevated: 0 12px 30px -4px rgba(255, 159, 28, 0.15);
+  --vibe-ambient-gradient: radial-gradient(circle at 80% 20%, rgba(255, 159, 28, 0.15) 0%, transparent 50%);
 
-  /* Component specific tokens */
   --bg-app: var(--vibe-bg);
   --bg-surface: var(--vibe-card);
   --bg-surface-glass: rgba(33, 37, 54, 0.92);
@@ -195,7 +460,7 @@
   --accent-primary-fg: #161925;
   --accent-secondary: var(--vibe-secondary);
   --accent-heart: #ff758f;
-  --accent-glow: 0 10px 30px rgba(255, 159, 28, 0.15), 0 0 25px rgba(128, 237, 153, 0.15);
+  --accent-glow: 0 10px 30px rgba(255, 159, 28, 0.15);
   --timer-glow: radial-gradient(circle, rgba(255, 159, 28, 0.22) 0%, rgba(128, 237, 153, 0.12) 45%, transparent 75%);
   --font-heading: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -204,21 +469,32 @@
   --backdrop-blur: blur(14px);
   --chart-bar-primary: #ff9f1c;
   --chart-bar-today: #80ed99;
+  color-scheme: dark;
 }
 
-/* Base Body Styles */
+/* ==============================================================================
+   GLOBAL SMOOTH TRANSITION & BASE STYLES
+   ============================================================================== */
 @layer base {
   html, body {
     background-color: var(--vibe-bg);
     color: var(--vibe-ink);
     min-height: 100vh;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
     overflow-x: clip;
     width: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  /* Global 500ms smooth transition across theme switching */
+  html, body, #root,
+  header, aside, nav, main, article,
+  button, input, select, textarea {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
   }
 
   button, a, input, select, textarea {
@@ -226,90 +502,16 @@
   }
 }
 
-/* ==============================================================================
-   AMBIENT BACKGROUND PATTERNS
-   ============================================================================== */
-
-/* 1. Deep Orbit Starfield Background */
-[data-theme="deep-orbit"] body {
-  background-image: 
-    radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, #00f5d4, rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 90px 40px, #7b2cbf, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 230px 180px, #00f5d4, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 310px 80px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(circle at 80% 20%, rgba(123, 44, 191, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 10% 80%, rgba(0, 245, 212, 0.08) 0%, transparent 45%);
-  background-size: 350px 350px, 350px 350px, 350px 350px, 350px 350px, 350px 350px, 350px 350px, 100% 100%, 100% 100%;
+/* Ambient Dynamic Background Aura */
+.ambient-vibe-bg {
+  background-image: var(--vibe-ambient-gradient);
+  transition: background-image 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 2. Dark Academia Candlelit Parchment Texture */
-[data-theme="dark-academia"] body {
-  background-image: 
-    radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 85% 80%, rgba(139, 30, 36, 0.05) 0%, transparent 60%);
-}
-
-/* 3. Rainy Tokyo Cafe Warm Lamp Glow */
-[data-theme="lofi-cafe"] body {
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(255, 159, 28, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 80% 75%, rgba(128, 237, 153, 0.06) 0%, transparent 50%);
-}
-
-/* 4. Solar Punk Botanical Conservatory Glass */
-[data-theme="botanical-zen"] body {
-  background-image: 
-    radial-gradient(circle at 80% 10%, rgba(244, 162, 97, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 20% 60%, rgba(64, 145, 108, 0.08) 0%, transparent 45%);
-}
-
-/* ==============================================================================
-   CREATIVE THEME ANIMATIONS
-   ============================================================================== */
-
-@keyframes orbit-glow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.animate-orbit-ring {
-  animation: orbit-glow 12s linear infinite;
-}
-
-@keyframes vinyl-pulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 159, 28, 0.3)); }
-  50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(128, 237, 153, 0.45)); }
-}
-
-.animate-vinyl {
-  animation: vinyl-pulse 3s ease-in-out infinite;
-}
-
-@keyframes plant-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.04); opacity: 1; }
-}
-
-.animate-breathe {
-  animation: plant-breathe 4.5s ease-in-out infinite;
-}
-
-@keyframes candle-flicker {
-  0%, 100% { opacity: 0.85; filter: blur(20px); }
-  50% { opacity: 1; filter: blur(24px); }
-  75% { opacity: 0.9; filter: blur(18px); }
-}
-
-.animate-candlelight {
-  animation: candle-flicker 3.5s ease-in-out infinite;
-}
-
-/* Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -319,8 +521,9 @@
 ::-webkit-scrollbar-thumb {
   background: var(--vibe-border);
   border-radius: 9999px;
+  transition: background-color 500ms;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--vibe-accent);
+  background: var(--vibe-ink-muted);
 }

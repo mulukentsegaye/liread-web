@@ -1,13 +1,13 @@
 export type VibeId = 
-  | 'dark-academia'
-  | 'deep-orbit'
-  | 'lofi-cafe'
-  | 'botanical-zen'
-  | 'nordic-studio' 
-  | 'midnight-library' 
+  | 'nordic-studio'
+  | 'midnight-library'
+  | 'dark-academia' 
   | 'sepia-manuscript' 
   | 'kyoto-minimalist' 
-  | 'cyber-codex';
+  | 'cyber-codex'
+  | 'botanical-zen'
+  | 'deep-orbit' 
+  | 'lofi-cafe';
 
 // Backward compatibility alias
 export type ThemeId = VibeId;
@@ -119,7 +119,6 @@ export const THEME_AMBIENT_MAP: Record<string, AmbientSoundId> = {
   'sepia-manuscript': 'fireplace',
   'kyoto-minimalist': 'birds',
   'cyber-codex': 'deep-space',
-  // Backward compatibility aliases
   'botanical-zen': 'birds',
   'deep-orbit': 'deep-space',
   'lofi-cafe': 'rain',

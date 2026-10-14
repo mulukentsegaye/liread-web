@@ -143,11 +143,12 @@ export const VibeSelector: React.FC<VibeSelectorProps> = ({ isOpen, onClose }) =
                           {item.name}
                         </span>
                         {item.isDefault && (
-                          <span className="text-[10px] font-semibold px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                            Default
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shadow-xs">
+                            <Sparkles className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+                            Default Theme
                           </span>
                         )}
-                        <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-vibe-card border border-vibe-border text-vibe-ink-muted">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-vibe-card border border-vibe-border text-vibe-ink-muted">
                           {item.mode === 'dark' ? 'Dark' : item.mode === 'warm' ? 'Warm' : 'Daylight'}
                         </span>
                       </div>
