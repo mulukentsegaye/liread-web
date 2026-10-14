@@ -68,7 +68,7 @@ export const App: React.FC = () => {
           - Tablet (768px - 1279px): 2-column layout (compact left sidebar + main center viewport with top summary bar)
           - Desktop (1280px+): 3-column layout (left sidebar, center viewport, right sidebar)
       */}
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex items-start gap-4 lg:gap-8 justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 flex items-start gap-4 sm:gap-6 lg:gap-8 justify-between">
         
         {/* Left Sidebar (Desktop & Tablet only: md+) */}
         <SidebarLeft
@@ -77,7 +77,7 @@ export const App: React.FC = () => {
         />
 
         {/* Center Main Viewport */}
-        <main className="flex-1 min-w-0 max-w-2xl mx-auto w-full py-4 sm:py-6">
+        <main className="flex-1 min-w-0 w-full py-4 sm:py-6">
           
           {/* Tablet Collapsible Top Summary Bar (md:block xl:hidden) */}
           <TabletSummaryBar 

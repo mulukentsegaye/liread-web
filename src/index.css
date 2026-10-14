@@ -488,6 +488,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+
   /* Global 500ms smooth transition across theme switching */
   html, body, #root,
   header, aside, nav, main, article,

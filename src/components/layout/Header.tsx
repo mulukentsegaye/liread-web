@@ -18,8 +18,8 @@ export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-vibe-card/90 backdrop-blur-md border-b border-vibe-border px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 transition-colors duration-500">
-      <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-2 sm:gap-4">
+    <header className="sticky top-0 z-30 w-full bg-vibe-card/90 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-2.5 sm:py-3 transition-colors duration-500">
+      <div className="w-full flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Brand / Logo */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
