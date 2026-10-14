@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
@@ -11,28 +11,19 @@ import { FullTimerModal } from './components/timer/FullTimerModal';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
+import { VibeSelector } from './components/theme/VibeSelector';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
-import { useThemeStore, THEMES } from './stores/themeStore';
+import { useTheme } from './context/ThemeContext';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { theme } = useThemeStore();
+  const { isPopoverOpen, closePopover } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, updateUser } = useAuthStore();
-
-  // Synchronize data-theme and dark class on mount and change
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (THEMES[theme]?.isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
 
   const handleTabChange = (tab: NavigationTab) => {
     if (tab === 'timer') {
@@ -62,14 +53,14 @@ export const App: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col overflow-x-hidden w-full pb-44 md:pb-28 transition-colors duration-400"
+      className="min-h-screen flex flex-col overflow-x-hidden w-full pb-44 md:pb-28 transition-colors duration-500"
       style={{
-        backgroundColor: 'var(--bg-app)',
-        color: 'var(--text-primary)',
+        backgroundColor: 'var(--vibe-bg)',
+        color: 'var(--vibe-ink)',
       }}
     >
       
-      {/* 1. Sticky Top Application Header with Theme Switcher */}
+      {/* 1. Sticky Top Application Header with Vibe Trigger */}
       <Header onSearch={(query) => setSearchQuery(query)} />
 
       {/* 2. Main Responsive App Shell: 
@@ -133,7 +124,13 @@ export const App: React.FC = () => {
         onClose={() => setCreateModalOpen(false)}
       />
 
-      {/* 6. Fixed Bottom Mobile Navigation Bar (< md) */}
+      {/* 6. Vibe Atmospheric Theme Selector Modal */}
+      <VibeSelector
+        isOpen={isPopoverOpen}
+        onClose={closePopover}
+      />
+
+      {/* 7. Fixed Bottom Mobile Navigation Bar (< md) */}
       <MobileNav
         activeTab={activeTab}
         onTabChange={handleTabChange}

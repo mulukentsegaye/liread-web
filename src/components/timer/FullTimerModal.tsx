@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { X, Play, Pause, Square, RotateCcw, BookOpen, Volume2, VolumeX } from 'lucide-react';
+import { X, Play, Pause, Square, RotateCcw, BookOpen } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
+import { AmbientAudioController } from './AmbientAudioController';
 
 export const FullTimerModal: React.FC = () => {
   const {
@@ -19,8 +20,6 @@ export const FullTimerModal: React.FC = () => {
 
   const { logSessionMinutes } = useAuthStore();
   const [seconds, setSeconds] = useState(getElapsedSeconds());
-  const [ambientSound, setAmbientSound] = useState(false);
-  const [audioObj, setAudioObj] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     setSeconds(getElapsedSeconds());
@@ -45,20 +44,6 @@ export const FullTimerModal: React.FC = () => {
     setFullScreenOpen(false);
   };
 
-  const toggleSound = () => {
-    if (ambientSound) {
-      audioObj?.pause();
-      setAmbientSound(false);
-    } else {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/1253/1253-preview.mp3');
-      audio.loop = true;
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-      setAudioObj(audio);
-      setAmbientSound(true);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto bg-vibe-bg text-vibe-ink backdrop-blur-md animate-in fade-in duration-300 transition-colors duration-500">
       {/* Top Header */}
@@ -78,18 +63,7 @@ export const FullTimerModal: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            onClick={toggleSound}
-            aria-label="Toggle ambient sound"
-            className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border transition-all ${
-              ambientSound 
-                ? 'bg-vibe-accent text-white border-vibe-accent' 
-                : 'bg-vibe-card text-vibe-ink-secondary border-vibe-border hover:bg-vibe-card-subtle'
-            }`}
-            title="Toggle soothing ambient sound"
-          >
-            {ambientSound ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-          </button>
+          <AmbientAudioController compact />
 
           <button
             onClick={() => setFullScreenOpen(false)}
@@ -172,6 +146,11 @@ export const FullTimerModal: React.FC = () => {
           >
             <Square className="w-5 h-5 fill-current" />
           </button>
+        </div>
+
+        {/* Ambient Background Audio paired with Active Vibe */}
+        <div className="w-full pt-3">
+          <AmbientAudioController />
         </div>
 
       </div>

@@ -10,10 +10,11 @@ import {
   BookOpen, 
   Layers, 
   RotateCcw,
-  Palette
+  Palette,
+  Volume2
 } from 'lucide-react';
 import { useTheme, DEFAULT_VIBE } from '../../context/ThemeContext';
-import { VibeConfig, VibeId } from '../../types/theme';
+import { VibeConfig, VibeId, THEME_AMBIENT_MAP, AMBIENT_SOUNDS, ThemeId } from '../../types/theme';
 
 interface VibeSelectorProps {
   isOpen: boolean;
@@ -247,6 +248,16 @@ export const VibeSelector: React.FC<VibeSelectorProps> = ({ isOpen, onClose }) =
                       {item.typography.uiFont} × {item.typography.quoteFont}
                     </div>
                   </div>
+
+                  {/* Paired Ambient Audio Soundscape */}
+                  {THEME_AMBIENT_MAP[item.id as ThemeId] && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-medium text-vibe-accent mt-1.5 pt-1.5 border-t border-vibe-border-subtle">
+                      <Volume2 className="w-3 h-3 flex-shrink-0" />
+                      <span className="truncate">
+                        Ambient: {AMBIENT_SOUNDS[THEME_AMBIENT_MAP[item.id as ThemeId]].name}
+                      </span>
+                    </div>
+                  )}
 
                 </div>
               );

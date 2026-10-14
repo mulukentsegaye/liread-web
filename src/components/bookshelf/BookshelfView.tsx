@@ -66,19 +66,13 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted">
             PERSONAL LIBRARY
           </span>
-          <h1 
-            className="text-2xl sm:text-3xl md:text-4xl font-bold break-words"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--text-primary)',
-            }}
-          >
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-vibe-ink break-words">
             {activeSubTab === 'bookshelf' ? 'My Bookshelf' : 'Saved Passages'}
           </h1>
-          <p className="text-xs sm:text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-xs sm:text-sm mt-0.5 text-vibe-ink-secondary">
             {activeSubTab === 'bookshelf' 
               ? `${user.bookshelfCount} books in your digital library.` 
               : `${savedPosts.length} inspiring quotes you have kept.`}
@@ -86,33 +80,25 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
         </div>
 
         {/* Tab switch */}
-        <div 
-          className="flex items-center gap-1 p-1 rounded-xl w-full sm:w-auto border"
-          style={{
-            backgroundColor: 'var(--bg-surface-accent)',
-            borderColor: 'var(--border-subtle)',
-          }}
-        >
+        <div className="flex items-center gap-1 p-1 rounded-full w-full sm:w-auto border border-vibe-border bg-vibe-card-subtle">
           <button
             onClick={() => setActiveSubTab('bookshelf')}
-            className="min-h-[44px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all"
-            style={{
-              backgroundColor: activeSubTab === 'bookshelf' ? 'var(--bg-surface)' : 'transparent',
-              color: activeSubTab === 'bookshelf' ? 'var(--accent-primary)' : 'var(--text-muted)',
-              boxShadow: activeSubTab === 'bookshelf' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-            }}
+            className={`min-h-[40px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all ${
+              activeSubTab === 'bookshelf'
+                ? 'bg-vibe-card text-vibe-accent shadow-xs border border-vibe-border'
+                : 'text-vibe-ink-muted hover:text-vibe-ink'
+            }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Bookshelf ({user.bookshelfCount})</span>
           </button>
           <button
             onClick={() => setActiveSubTab('saved')}
-            className="min-h-[44px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all"
-            style={{
-              backgroundColor: activeSubTab === 'saved' ? 'var(--bg-surface)' : 'transparent',
-              color: activeSubTab === 'saved' ? 'var(--accent-primary)' : 'var(--text-muted)',
-              boxShadow: activeSubTab === 'saved' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-            }}
+            className={`min-h-[40px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-full transition-all ${
+              activeSubTab === 'saved'
+                ? 'bg-vibe-card text-vibe-accent shadow-xs border border-vibe-border'
+                : 'text-vibe-ink-muted hover:text-vibe-ink'
+            }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
             <span>Saved ({savedPosts.length})</span>
@@ -126,66 +112,45 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
           {sampleBooks.map((b, idx) => (
             <div 
               key={idx} 
-              className="rounded-2xl p-4 border shadow-soft flex flex-col justify-between space-y-3 hover:shadow-md transition-all group overflow-hidden"
-              style={{
-                backgroundColor: 'var(--bg-surface)',
-                borderColor: 'var(--border-subtle)',
-              }}
+              className="bg-vibe-card border border-vibe-border rounded-2xl p-4 shadow-soft flex flex-col justify-between space-y-3 hover:shadow-vibe-elevated transition-all duration-500 group overflow-hidden"
             >
-              <div 
-                className="w-full h-32 sm:h-36 rounded-xl border p-3 flex flex-col justify-between text-center relative overflow-hidden"
-                style={{
-                  backgroundColor: 'var(--bg-surface-accent)',
-                  borderColor: 'var(--border-subtle)',
-                }}
-              >
-                <span 
-                  className="text-[10px] font-bold tracking-widest uppercase line-clamp-2"
-                  style={{ color: 'var(--text-primary)' }}
-                >
+              <div className="w-full h-32 sm:h-36 rounded-xl border border-vibe-border bg-vibe-card-subtle p-3 flex flex-col justify-between text-center relative overflow-hidden">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-vibe-ink line-clamp-2">
                   {b.title}
                 </span>
-                <span className="text-[9px] truncate" style={{ color: 'var(--text-muted)' }}>
+                <span className="text-[9px] text-vibe-ink-muted truncate">
                   {b.author}
                 </span>
 
                 <span 
-                  className="absolute top-2 right-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border"
-                  style={{
-                    backgroundColor: b.status === 'Currently Reading' 
-                      ? 'var(--accent-primary)' 
-                      : 'var(--bg-surface-active)',
-                    color: b.status === 'Currently Reading' 
-                      ? 'var(--accent-primary-fg)' 
-                      : 'var(--text-primary)',
-                    borderColor: 'var(--border-subtle)',
-                  }}
+                  className={`absolute top-2 right-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border ${
+                    b.status === 'Currently Reading'
+                      ? 'bg-vibe-accent text-white border-vibe-accent'
+                      : 'bg-vibe-card text-vibe-ink-muted border-vibe-border'
+                  }`}
                 >
                   {b.status}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-xs font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-xs font-bold text-vibe-ink truncate">
                   {b.title}
                 </h3>
-                <p className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>
+                <p className="text-[11px] text-vibe-ink-muted truncate">
                   {b.author}
                 </p>
                 
                 {/* Progress bar */}
                 <div className="mt-2 space-y-1">
-                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                  <div className="flex justify-between text-[10px] text-vibe-ink-muted">
                     <span>Progress</span>
                     <span>{b.progress}%</span>
                   </div>
-                  <div className="w-full rounded-full h-1.5" style={{ backgroundColor: 'var(--bg-surface-accent)' }}>
+                  <div className="w-full rounded-full h-1.5 bg-vibe-card-subtle">
                     <div 
-                      className="h-1.5 rounded-full"
-                      style={{ 
-                        width: `${b.progress}%`,
-                        backgroundColor: 'var(--accent-primary)',
-                      }}
+                      className="h-1.5 rounded-full bg-vibe-accent"
+                      style={{ width: `${b.progress}%` }}
                     />
                   </div>
                 </div>
@@ -193,12 +158,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
 
               <button
                 onClick={() => handleStartTimerForBook(b.title, b.author)}
-                className="w-full min-h-[44px] flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-colors active:scale-95"
-                style={{
-                  backgroundColor: 'var(--bg-surface-accent)',
-                  color: 'var(--accent-primary)',
-                  border: '1px solid var(--border-subtle)',
-                }}
+                className="w-full min-h-[40px] flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold bg-vibe-card-subtle hover:bg-vibe-accent hover:text-white text-vibe-accent border border-vibe-border transition-colors active:scale-95"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Read & Time</span>
@@ -209,16 +169,10 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
       ) : (
         <div className="space-y-3 sm:space-y-4">
           {savedPosts.length === 0 ? (
-            <div 
-              className="rounded-3xl p-8 sm:p-10 text-center border space-y-3"
-              style={{
-                backgroundColor: 'var(--bg-surface)',
-                borderColor: 'var(--border-subtle)',
-              }}
-            >
-              <Bookmark className="w-8 h-8 mx-auto" style={{ color: 'var(--text-muted)' }} />
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>No saved passages yet</h3>
-              <p className="text-xs max-w-sm mx-auto" style={{ color: 'var(--text-muted)' }}>
+            <div className="rounded-3xl p-8 sm:p-10 text-center border border-vibe-border bg-vibe-card space-y-3">
+              <Bookmark className="w-8 h-8 mx-auto text-vibe-ink-muted" />
+              <h3 className="text-sm font-semibold text-vibe-ink">No saved passages yet</h3>
+              <p className="text-xs max-w-sm mx-auto text-vibe-ink-muted">
                 Click the "Save" bookmark button on any post in the Discover Feed to keep your favorite quotes here.
               </p>
             </div>
@@ -226,28 +180,17 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
             savedPosts.map((post) => (
               <div 
                 key={post.id}
-                className="rounded-2xl p-4 sm:p-5 border shadow-soft space-y-2.5 overflow-hidden transition-all"
-                style={{
-                  backgroundColor: 'var(--bg-surface)',
-                  borderColor: 'var(--border-subtle)',
-                }}
+                className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft space-y-2.5 overflow-hidden transition-all duration-500"
               >
-                <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{post.bookTitle}</span>
+                <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
+                  <span className="font-semibold truncate text-vibe-ink">{post.bookTitle}</span>
                   <span className="flex-shrink-0">{post.pageNumber ? `p. ${post.pageNumber}` : 'Passage'}</span>
                 </div>
-                <blockquote 
-                  className="italic text-sm sm:text-base leading-relaxed border-l-2 pl-3.5 break-words"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: 'var(--text-primary)',
-                    borderColor: 'var(--accent-primary)',
-                  }}
-                >
+                <blockquote className="font-serif italic text-sm sm:text-base text-vibe-ink leading-relaxed border-l-2 border-vibe-accent pl-3.5 break-words">
                   “{post.quoteText}”
                 </blockquote>
-                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  Saved from <strong style={{ color: 'var(--text-primary)' }}>{post.authorName}</strong>'s post
+                <p className="text-xs text-vibe-ink-secondary">
+                  Saved from <strong className="text-vibe-ink">{post.authorName}</strong>'s post
                 </p>
               </div>
             ))

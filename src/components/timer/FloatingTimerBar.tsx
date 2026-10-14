@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pause, Play, Square, Maximize2 } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
-import { useTheme } from '../../context/ThemeContext';
+import { AmbientAudioController } from './AmbientAudioController';
 
 export const FloatingTimerBar: React.FC = () => {
   const {
@@ -16,7 +16,6 @@ export const FloatingTimerBar: React.FC = () => {
     setFullScreenOpen
   } = useTimerStore();
 
-  const { vibe } = useTheme();
   const { logSessionMinutes } = useAuthStore();
   const [seconds, setSeconds] = useState(getElapsedSeconds());
 
@@ -83,8 +82,10 @@ export const FloatingTimerBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Right: Digital Stopwatch & Controls */}
+      {/* Right: Ambient Audio + Digital Stopwatch & Controls */}
       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative z-10">
+        <AmbientAudioController compact />
+
         <div className="text-right">
           <div className="font-mono text-sm sm:text-base md:text-lg font-bold tracking-tight leading-none text-vibe-ink">
             {formatTime(seconds)}
