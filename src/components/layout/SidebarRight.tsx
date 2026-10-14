@@ -26,7 +26,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
   const strokeDashoffset = circumference - (circumference * (progressPercent / 100));
 
   return (
-    <aside className="w-80 flex-shrink-0 space-y-6 py-6 pl-4 pr-2 overflow-y-auto">
+    <aside className="w-72 xl:w-80 flex-shrink-0 space-y-6 py-6 pl-4 pr-2 overflow-y-auto select-none">
       
       {/* 1. Daily Reading Goal Widget */}
       <div className="bg-white rounded-2xl p-5 border border-[#e8ece8] shadow-soft">
@@ -36,10 +36,11 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
           </h2>
           <button 
             onClick={onAdjustGoal}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md"
+            className="min-w-[36px] min-h-[36px] flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
             title="Adjust reading goal"
+            aria-label="Adjust reading goal"
           >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <SlidersHorizontal className="w-4 h-4" />
           </button>
         </div>
 
@@ -51,7 +52,6 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
               height={size} 
               className="transform -rotate-90"
             >
-              {/* Background Track */}
               <circle
                 cx={size / 2}
                 cy={size / 2}
@@ -60,7 +60,6 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
                 strokeWidth={strokeWidth}
                 fill="transparent"
               />
-              {/* Progress Arc */}
               <circle
                 cx={size / 2}
                 cy={size / 2}
@@ -102,7 +101,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="mt-5 pt-4 border-t border-[#edf1ee]">
           <div className="flex items-center gap-2 mb-2.5">
             <div className="w-5 h-5 rounded-full bg-[#e8efe9] flex items-center justify-center text-[#35523f]">
-              <Flame className="w-3 h-3" />
+              <Flame className="w-3.5 h-3.5 fill-[#35523f]" />
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-800 leading-none">
@@ -154,18 +153,18 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="space-y-3">
           {TOP_WEEKLY_READERS.map((entry) => (
             <div key={entry.userId} className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 truncate">
                 <span className="w-4 text-center font-mono text-[11px] text-gray-400">
                   {entry.rank}
                 </span>
-                <div className="w-6 h-6 rounded-full bg-[#f0eee9] text-[#4d483f] font-medium flex items-center justify-center text-[10px]">
+                <div className="w-6 h-6 rounded-full bg-[#f0eee9] text-[#4d483f] font-medium flex items-center justify-center text-[10px] flex-shrink-0">
                   {entry.initials}
                 </div>
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 truncate">
                   {entry.fullName}
                 </span>
               </div>
-              <span className="text-gray-400 font-mono text-[11px]">
+              <span className="text-gray-400 font-mono text-[11px] flex-shrink-0">
                 {entry.formattedTime}
               </span>
             </div>
@@ -186,15 +185,15 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="mt-4 pt-3 border-t border-[#edf1ee] text-center">
           <button
             onClick={onViewLeaderboard}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#35523f] hover:text-[#213528] transition-colors group"
+            className="min-h-[44px] inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#35523f] hover:text-[#213528] transition-colors group w-full"
           >
             <span>View full leaderboard</span>
-            <ArrowRight className="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
 
-      {/* 3. Community Inspiring Quote Banner */}
+      {/* 3. Community Inspiring Banner */}
       <div className="p-5 rounded-2xl bg-transparent border border-dashed border-[#d8e0d9]">
         <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase block mb-1">
           Better, Together

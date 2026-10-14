@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Bookmark, Clock, Plus, Play } from 'lucide-react';
+import { BookOpen, Bookmark, Play } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { useTimerStore } from '../../stores/timerStore';
@@ -68,17 +68,17 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
   };
 
   return (
-    <div className="flex-1 max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <span className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-gray-400 uppercase">
             PERSONAL LIBRARY
           </span>
-          <h1 className="font-serif text-3xl font-bold text-[#192b1e]">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#192b1e] break-words">
             {activeSubTab === 'bookshelf' ? 'My Bookshelf' : 'Saved Passages'}
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
             {activeSubTab === 'bookshelf' 
               ? `${user.bookshelfCount} books in your digital library.` 
               : `${savedPosts.length} inspiring quotes you have kept.`}
@@ -86,10 +86,10 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
         </div>
 
         {/* Tab switch */}
-        <div className="flex items-center gap-1 bg-[#f0f4f0] p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-[#f0f4f0] p-1 rounded-xl w-full sm:w-auto">
           <button
             onClick={() => setActiveSubTab('bookshelf')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`min-h-[44px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
               activeSubTab === 'bookshelf'
                 ? 'bg-white text-[#253d2d] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800'
@@ -100,34 +100,34 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
           </button>
           <button
             onClick={() => setActiveSubTab('saved')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+            className={`min-h-[44px] flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
               activeSubTab === 'saved'
                 ? 'bg-white text-[#253d2d] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
-            <span>Saved Passages ({savedPosts.length})</span>
+            <span>Saved ({savedPosts.length})</span>
           </button>
         </div>
       </div>
 
-      {/* Content depending on subtab */}
+      {/* Content */}
       {activeSubTab === 'bookshelf' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
           {sampleBooks.map((b, idx) => (
             <div 
               key={idx} 
-              className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft flex flex-col justify-between space-y-3 hover:shadow-md transition-all group"
+              className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft flex flex-col justify-between space-y-3 hover:shadow-md transition-all group overflow-hidden"
             >
               <div 
-                className="w-full h-36 rounded-xl border border-gray-200/80 p-3 flex flex-col justify-between text-center relative overflow-hidden"
+                className="w-full h-32 sm:h-36 rounded-xl border border-gray-200/80 p-3 flex flex-col justify-between text-center relative overflow-hidden"
                 style={{ backgroundColor: b.coverBg }}
               >
-                <span className="text-[10px] font-bold tracking-widest text-[#243327] uppercase">
+                <span className="text-[10px] font-bold tracking-widest text-[#243327] uppercase line-clamp-2">
                   {b.title}
                 </span>
-                <span className="text-[9px] text-gray-500">
+                <span className="text-[9px] text-gray-500 truncate">
                   {b.author}
                 </span>
 
@@ -146,11 +146,11 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
                 <h3 className="text-xs font-bold text-gray-800 truncate">
                   {b.title}
                 </h3>
-                <p className="text-[11px] text-gray-400">
+                <p className="text-[11px] text-gray-400 truncate">
                   {b.author}
                 </p>
                 
-                {/* Reading Progress */}
+                {/* Progress bar */}
                 <div className="mt-2 space-y-1">
                   <div className="flex justify-between text-[10px] text-gray-400">
                     <span>Progress</span>
@@ -167,18 +167,18 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
 
               <button
                 onClick={() => handleStartTimerForBook(b.title, b.author)}
-                className="w-full flex items-center justify-center gap-1.5 bg-[#f0f5f1] hover:bg-[#35523f] hover:text-white text-[#2c4434] py-2 rounded-xl text-xs font-semibold transition-colors"
+                className="w-full min-h-[44px] flex items-center justify-center gap-1.5 bg-[#f0f5f1] hover:bg-[#35523f] hover:text-white text-[#2c4434] py-2.5 rounded-xl text-xs font-semibold transition-colors active:scale-95"
               >
-                <Play className="w-3 h-3 fill-current" />
+                <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Read & Time</span>
               </button>
             </div>
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {savedPosts.length === 0 ? (
-            <div className="bg-white rounded-3xl p-10 text-center border border-[#e8ece8] space-y-3">
+            <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-[#e8ece8] space-y-3">
               <Bookmark className="w-8 h-8 text-gray-300 mx-auto" />
               <h3 className="text-sm font-semibold text-gray-700">No saved passages yet</h3>
               <p className="text-xs text-gray-400 max-w-sm mx-auto">
@@ -189,13 +189,13 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
             savedPosts.map((post) => (
               <div 
                 key={post.id}
-                className="bg-white rounded-2xl p-5 border border-[#e8ece8] shadow-soft space-y-3"
+                className="bg-white rounded-2xl p-4 sm:p-5 border border-[#e8ece8] shadow-soft space-y-2.5 overflow-hidden"
               >
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span className="font-semibold text-gray-800">{post.bookTitle}</span>
-                  <span>{post.pageNumber ? `p. ${post.pageNumber}` : 'Passage'}</span>
+                  <span className="font-semibold text-gray-800 truncate">{post.bookTitle}</span>
+                  <span className="flex-shrink-0">{post.pageNumber ? `p. ${post.pageNumber}` : 'Passage'}</span>
                 </div>
-                <blockquote className="font-serif italic text-base text-[#1e2e22] leading-relaxed border-l-2 border-[#35523f] pl-4">
+                <blockquote className="font-serif italic text-sm sm:text-base text-[#1e2e22] leading-relaxed border-l-2 border-[#35523f] pl-3.5 break-words">
                   “{post.quoteText}”
                 </blockquote>
                 <p className="text-xs text-gray-500">

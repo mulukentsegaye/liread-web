@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
+import { TabletSummaryBar } from './components/layout/TabletSummaryBar';
 import { MobileNav } from './components/layout/MobileNav';
 import { FeedContainer } from './components/feed/FeedContainer';
 import { CreatePostModal } from './components/feed/CreatePostModal';
@@ -48,23 +49,34 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9f8] text-[#2c332d] flex flex-col font-sans pb-24 md:pb-28">
-      {/* Top Application Header */}
+    <div className="min-h-screen bg-[#f8f9f8] text-[#2c332d] flex flex-col font-sans overflow-x-hidden w-full pb-44 md:pb-28">
+      
+      {/* 1. Sticky Top Application Header */}
       <Header onSearch={(query) => setSearchQuery(query)} />
 
-      {/* Main 3-Column Desktop Layout */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 lg:px-8 flex-1 flex gap-6 lg:gap-8 justify-between">
+      {/* 2. Main Responsive App Shell: 
+          - Mobile (< 768px): 1-column main viewport
+          - Tablet (768px - 1279px): 2-column layout (compact left sidebar + main center viewport with top summary bar)
+          - Desktop (1280px+): 3-column layout (left sidebar, center viewport, right sidebar)
+      */}
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex gap-4 lg:gap-8 justify-between">
         
-        {/* Left Sidebar (Desktop only) */}
-        <div className="hidden md:block">
-          <SidebarLeft
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
-        </div>
+        {/* Left Sidebar (Desktop & Tablet only: md+) */}
+        <SidebarLeft
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
 
         {/* Center Main Viewport */}
-        <main className="flex-1 min-w-0 max-w-2xl mx-auto w-full">
+        <main className="flex-1 min-w-0 max-w-2xl mx-auto w-full py-4 sm:py-6">
+          
+          {/* Tablet Collapsible Top Summary Bar (md:block xl:hidden) */}
+          <TabletSummaryBar 
+            onViewLeaderboard={() => handleTabChange('leaderboard')}
+            onAdjustGoal={handleAdjustGoal}
+          />
+
+          {/* Active View Mount */}
           {activeTab === 'feed' && (
             <FeedContainer
               onOpenCreateModal={() => setCreateModalOpen(true)}
@@ -81,7 +93,7 @@ export const App: React.FC = () => {
           )}
         </main>
 
-        {/* Right Stats & Leaderboard Sidebar (Large screens only) */}
+        {/* Right Stats & Leaderboard Sidebar (Desktop only: xl+) */}
         <div className="hidden xl:block">
           <SidebarRight
             onViewLeaderboard={() => handleTabChange('leaderboard')}
@@ -91,23 +103,24 @@ export const App: React.FC = () => {
 
       </div>
 
-      {/* Persistent Floating Web Timer Bar */}
+      {/* 3. Persistent Floating Mini-Timer Bar (Positioned above mobile nav on mobile, bottom-center on desktop) */}
       <FloatingTimerBar />
 
-      {/* Distraction-Free Full-Screen Timer Mode */}
+      {/* 4. Distraction-Free Full-Screen Reading Timer Mode */}
       <FullTimerModal />
 
-      {/* Share a Moment / Create Post Modal */}
+      {/* 5. Create Reading Moment Modal (Full-screen mobile / bottom-sheet) */}
       <CreatePostModal
         isOpen={isCreateModalOpen}
         onClose={() => setCreateModalOpen(false)}
       />
 
-      {/* Mobile Navigation Bar */}
+      {/* 6. Fixed Bottom Mobile Navigation Bar (< md) */}
       <MobileNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
+
     </div>
   );
 };

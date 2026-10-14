@@ -3,17 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-[#f8f9f8] text-[#2c332d] min-h-screen font-sans;
+  html, body {
+    @apply bg-[#f8f9f8] text-[#2c332d] min-h-screen font-sans overflow-x-hidden w-full;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Ensure interactive touch targets have comfortable bounds on mobile */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
   }
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {

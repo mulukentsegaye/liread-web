@@ -17,7 +17,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#e8ece8] px-2 py-2 flex items-center justify-around">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 h-16 bg-white/95 backdrop-blur-md border-t border-[#e8ece8] px-1 flex items-center justify-around shadow-lg">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;
@@ -25,14 +25,15 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${
+            aria-label={item.label}
+            className={`min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-1 px-2.5 rounded-xl transition-all active:scale-95 ${
               isActive 
                 ? 'text-[#35523f] font-semibold' 
                 : 'text-gray-400 hover:text-gray-700'
             }`}
           >
-            <Icon className={`w-4 h-4 ${isActive ? 'stroke-[2.5]' : ''}`} />
-            <span className="text-[10px]">{item.label}</span>
+            <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : ''}`} />
+            <span className="text-[10px] leading-none tracking-tight">{item.label}</span>
           </button>
         );
       })}

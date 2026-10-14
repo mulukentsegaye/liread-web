@@ -8,7 +8,7 @@ import {
   ResponsiveContainer, 
   Cell 
 } from 'recharts';
-import { Flame, Trophy, Clock, Award, Target, BookOpen } from 'lucide-react';
+import { Flame, Trophy, Clock, Award, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 
 export const AnalyticsView: React.FC = () => {
@@ -31,7 +31,7 @@ export const AnalyticsView: React.FC = () => {
     { day: 'Week 1', minutes: 320 },
     { day: 'Week 2', minutes: 410 },
     { day: 'Week 3', minutes: 380 },
-    { day: 'This Week', minutes: todayMinutesRead + 355 },
+    { day: 'This Wk', minutes: todayMinutesRead + 355 },
   ];
 
   const chartData = timeRange === '7days' ? data7Days : data30Days;
@@ -39,87 +39,87 @@ export const AnalyticsView: React.FC = () => {
   const avgMinutes = Math.round(totalMinutesShown / chartData.length);
 
   return (
-    <div className="flex-1 max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       
       {/* Header */}
       <div>
-        <span className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+        <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-gray-400 uppercase">
           READING ANALYTICS
         </span>
-        <h1 className="font-serif text-3xl font-bold text-[#192b1e]">
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#192b1e] break-words">
           Your Reading Journey
         </h1>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
           Detailed metrics of your habits, streaks, and milestones.
         </p>
       </div>
 
-      {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Metric Cards Grid (2 cols on mobile, 4 on desktop) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Card 1: Today */}
-        <div className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft">
-          <div className="flex items-center justify-between text-gray-400 mb-2">
-            <span className="text-[11px] font-semibold uppercase">Today</span>
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-[#e8ece8] shadow-soft">
+          <div className="flex items-center justify-between text-gray-400 mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-semibold uppercase">Today</span>
             <Clock className="w-4 h-4 text-[#38523f]" />
           </div>
-          <div className="font-serif text-2xl font-bold text-[#1f2e22]">
+          <div className="font-serif text-xl sm:text-2xl font-bold text-[#1f2e22]">
             {todayMinutesRead} <span className="text-xs font-sans text-gray-500 font-normal">min</span>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
             Goal: {user.dailyGoalMinutes} min
           </p>
         </div>
 
         {/* Card 2: Streak */}
-        <div className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft">
-          <div className="flex items-center justify-between text-gray-400 mb-2">
-            <span className="text-[11px] font-semibold uppercase">Streak</span>
-            <Flame className="w-4 h-4 text-amber-500" />
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-[#e8ece8] shadow-soft">
+          <div className="flex items-center justify-between text-gray-400 mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-semibold uppercase">Streak</span>
+            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
           </div>
-          <div className="font-serif text-2xl font-bold text-[#1f2e22]">
+          <div className="font-serif text-xl sm:text-2xl font-bold text-[#1f2e22]">
             {user.currentStreak} <span className="text-xs font-sans text-gray-500 font-normal">days</span>
           </div>
-          <p className="text-[11px] text-emerald-600 font-medium mt-1">
+          <p className="text-[10px] sm:text-[11px] text-emerald-600 font-medium mt-1 truncate">
             Active streak 🔥
           </p>
         </div>
 
         {/* Card 3: Rank Tier */}
-        <div className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft">
-          <div className="flex items-center justify-between text-gray-400 mb-2">
-            <span className="text-[11px] font-semibold uppercase">Rank Tier</span>
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-[#e8ece8] shadow-soft">
+          <div className="flex items-center justify-between text-gray-400 mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-semibold uppercase">Rank</span>
             <Award className="w-4 h-4 text-[#38523f]" />
           </div>
-          <div className="text-base font-bold text-[#1f2e22] truncate">
+          <div className="text-sm sm:text-base font-bold text-[#1f2e22] truncate">
             {user.rankTier}
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
             {user.totalMinutesRead} total mins
           </p>
         </div>
 
         {/* Card 4: Bookshelf */}
-        <div className="bg-white rounded-2xl p-4 border border-[#e8ece8] shadow-soft">
-          <div className="flex items-center justify-between text-gray-400 mb-2">
-            <span className="text-[11px] font-semibold uppercase">Library</span>
+        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-[#e8ece8] shadow-soft">
+          <div className="flex items-center justify-between text-gray-400 mb-1.5">
+            <span className="text-[10px] sm:text-[11px] font-semibold uppercase">Library</span>
             <BookOpen className="w-4 h-4 text-[#38523f]" />
           </div>
-          <div className="font-serif text-2xl font-bold text-[#1f2e22]">
+          <div className="font-serif text-xl sm:text-2xl font-bold text-[#1f2e22]">
             {user.bookshelfCount} <span className="text-xs font-sans text-gray-500 font-normal">books</span>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-[10px] sm:text-[11px] text-gray-400 mt-1 truncate">
             {user.savedPassagesCount} saved quotes
           </p>
         </div>
 
       </div>
 
-      {/* Main Chart Section */}
-      <div className="bg-white rounded-3xl p-6 border border-[#e8ece8] shadow-soft space-y-4">
+      {/* Main Chart Section with ResponsiveContainer height 300 */}
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#e8ece8] shadow-soft space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="text-base font-bold text-gray-800">
+            <h2 className="text-sm sm:text-base font-bold text-gray-800">
               Minutes Read
             </h2>
             <p className="text-xs text-gray-400">
@@ -130,7 +130,7 @@ export const AnalyticsView: React.FC = () => {
           <div className="flex items-center gap-1 bg-[#f0f4f0] p-1 rounded-xl">
             <button
               onClick={() => setTimeRange('7days')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`min-h-[44px] px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
                 timeRange === '7days'
                   ? 'bg-white text-[#253d2d] shadow-xs'
                   : 'text-gray-500 hover:text-gray-800'
@@ -140,7 +140,7 @@ export const AnalyticsView: React.FC = () => {
             </button>
             <button
               onClick={() => setTimeRange('30days')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`min-h-[44px] px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
                 timeRange === '30days'
                   ? 'bg-white text-[#253d2d] shadow-xs'
                   : 'text-gray-500 hover:text-gray-800'
@@ -151,10 +151,10 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Recharts Bar Chart */}
-        <div className="h-64 w-full pt-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        {/* Recharts Bar Chart wrapped with ResponsiveContainer width 100% and height 300 */}
+        <div className="w-full pt-2">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
               <XAxis 
                 dataKey="day" 
                 axisLine={false} 
@@ -181,7 +181,7 @@ export const AnalyticsView: React.FC = () => {
                 {chartData.map((entry, index) => (
                   <Cell 
                     key={`cell-${index}`} 
-                    fill={entry.day === 'Today' || entry.day === 'This Week' ? '#35523f' : '#8fa996'} 
+                    fill={entry.day === 'Today' || entry.day === 'This Wk' ? '#35523f' : '#8fa996'} 
                   />
                 ))}
               </Bar>
@@ -191,8 +191,8 @@ export const AnalyticsView: React.FC = () => {
       </div>
 
       {/* Rank Tier Roadmap */}
-      <div className="bg-[#f5f8f5] rounded-3xl p-6 border border-[#e1eae2] space-y-3">
-        <h3 className="text-sm font-bold text-[#203425] flex items-center gap-2">
+      <div className="bg-[#f5f8f5] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#e1eae2] space-y-3">
+        <h3 className="text-xs sm:text-sm font-bold text-[#203425] flex items-center gap-2">
           <Trophy className="w-4 h-4 text-[#35523f]" />
           <span>Reader Rank Progression</span>
         </h3>
@@ -206,12 +206,12 @@ export const AnalyticsView: React.FC = () => {
             style={{ width: `${Math.min(100, (user.totalMinutesRead / 1200) * 100)}%` }}
           />
         </div>
-        <div className="flex justify-between text-[10px] text-gray-400 font-mono">
+        <div className="flex justify-between text-[9px] sm:text-[10px] text-gray-400 font-mono">
           <span>Novice (0m)</span>
           <span>Bookworm (300m)</span>
-          <span>Avid (1,200m)</span>
-          <span>Scholar (3,000m)</span>
-          <span>Master (6,000m)</span>
+          <span>Avid (1.2k)</span>
+          <span>Scholar (3k)</span>
+          <span>Master (6k)</span>
         </div>
       </div>
 
