@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Trophy } from 'lucide-react';
+import { Trophy, ArrowLeft } from 'lucide-react';
 import { TOP_WEEKLY_READERS, CURRENT_USER_LEADERBOARD_STATUS } from '../../data/mockData';
 
-export const LeaderboardView: React.FC = () => {
+interface LeaderboardViewProps {
+  onBack?: () => void;
+}
+
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
   const [filter, setFilter] = useState<'daily' | 'weekly' | 'lifetime'>('weekly');
 
   const multiplier = filter === 'daily' ? 0.15 : filter === 'weekly' ? 1 : 4.5;
@@ -32,6 +36,19 @@ export const LeaderboardView: React.FC = () => {
   return (
     <div className="w-full space-y-4 sm:space-y-6">
       
+      {/* Top Back Button */}
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-vibe-accent hover:text-vibe-accent-hover transition-colors group mb-1"
+          aria-label="Back to feed"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back to Feed</span>
+        </button>
+      )}
+
       {/* Header */}
       <div>
         <span className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted">

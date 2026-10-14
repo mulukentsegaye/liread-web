@@ -11,7 +11,8 @@ import {
   Layers, 
   RotateCcw,
   Palette,
-  Volume2
+  Volume2,
+  ArrowLeft
 } from 'lucide-react';
 import { useTheme, DEFAULT_VIBE } from '../../context/ThemeContext';
 import { VibeConfig, VibeId, THEME_AMBIENT_MAP, AMBIENT_SOUNDS, ThemeId } from '../../types/theme';
@@ -64,7 +65,17 @@ export const VibeSelector: React.FC<VibeSelectorProps> = ({ isOpen, onClose }) =
         {/* Popover Header */}
         <div className="flex items-center justify-between px-5 sm:px-7 py-4 sm:py-5 border-b border-vibe-border-subtle bg-vibe-card-subtle/50">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-vibe-accent/10 border border-vibe-accent/20 flex items-center justify-center text-vibe-accent transition-colors">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Back"
+              className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
+              title="Back"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            </button>
+
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-vibe-accent/10 border border-vibe-accent/20 flex items-center justify-center text-vibe-accent transition-colors flex-shrink-0">
               <Palette className="w-5 h-5" />
             </div>
             <div>

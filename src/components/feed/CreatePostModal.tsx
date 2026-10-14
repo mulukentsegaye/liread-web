@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Star } from 'lucide-react';
+import { X, Sparkles, Star, ArrowLeft } from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
 import { PostType } from '../../types';
 
@@ -57,11 +57,23 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         <div>
           {/* Header */}
           <div className="flex items-center justify-between border-b border-vibe-border pb-4 mb-4">
-            <div className="flex items-center gap-2 text-vibe-accent">
-              <Sparkles className="w-5 h-5 flex-shrink-0" />
-              <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
-                Share a Reading Moment
-              </h2>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Back"
+                className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
+                title="Back"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+
+              <div className="flex items-center gap-2 text-vibe-accent">
+                <Sparkles className="w-5 h-5 flex-shrink-0" />
+                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                  Share a Reading Moment
+                </h2>
+              </div>
             </div>
             <button
               onClick={onClose}

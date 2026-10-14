@@ -93,12 +93,16 @@ export const App: React.FC = () => {
             />
           )}
 
-          {activeTab === 'analytics' && <AnalyticsView />}
+          {activeTab === 'analytics' && (
+            <AnalyticsView onBack={() => handleTabChange('feed')} />
+          )}
 
-          {activeTab === 'leaderboard' && <LeaderboardView />}
+          {activeTab === 'leaderboard' && (
+            <LeaderboardView onBack={() => handleTabChange('feed')} />
+          )}
 
           {(activeTab === 'bookshelf' || activeTab === 'saved') && (
-            <BookshelfView initialTab={activeTab} />
+            <BookshelfView initialTab={activeTab} onBack={() => handleTabChange('feed')} />
           )}
         </main>
 

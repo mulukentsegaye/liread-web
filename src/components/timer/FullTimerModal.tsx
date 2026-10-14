@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Play, Pause, Square, RotateCcw, BookOpen } from 'lucide-react';
+import { X, Play, Pause, Square, RotateCcw, BookOpen, ArrowLeft } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
 import { AmbientAudioController } from './AmbientAudioController';
@@ -49,6 +49,15 @@ export const FullTimerModal: React.FC = () => {
       {/* Top Header */}
       <div className="flex items-center justify-between max-w-4xl w-full mx-auto relative z-10">
         <div className="flex items-center gap-2.5 sm:gap-3">
+          <button
+            onClick={() => setFullScreenOpen(false)}
+            aria-label="Back to feed"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
+            title="Back to reading feed"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+          </button>
+
           <div className="w-8 h-8 rounded-xl bg-vibe-accent text-white flex items-center justify-center flex-shrink-0 shadow-xs">
             <BookOpen className="w-4 h-4" />
           </div>

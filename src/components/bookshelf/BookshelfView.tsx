@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { BookOpen, Bookmark, Play } from 'lucide-react';
+import { BookOpen, Bookmark, Play, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { useTimerStore } from '../../stores/timerStore';
 
 interface BookshelfViewProps {
   initialTab?: 'bookshelf' | 'saved';
+  onBack?: () => void;
 }
 
-export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'bookshelf' }) => {
+export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'bookshelf', onBack }) => {
   const [activeSubTab, setActiveSubTab] = useState<'bookshelf' | 'saved'>(initialTab);
   const { user } = useAuthStore();
   const { posts } = useFeedStore();
@@ -63,6 +64,19 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
 
   return (
     <div className="w-full space-y-4 sm:space-y-6">
+      {/* Top Back Button */}
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-vibe-accent hover:text-vibe-accent-hover transition-colors group mb-1"
+          aria-label="Back to feed"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <span>Back to Feed</span>
+        </button>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
