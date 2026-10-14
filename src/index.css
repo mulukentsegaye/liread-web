@@ -3,23 +3,245 @@
 @tailwind utilities;
 
 @layer base {
+  /* ==========================================================================
+     1. THEME VIBE DEFINITIONS (CSS CUSTOM VARIABLES)
+     ========================================================================== */
+
+  /* DEFAULT VIBE: Nordic Studio (Clean, Airy, Daylight Minimal) */
+  :root,
+  [data-theme="nordic-studio"] {
+    --vibe-bg: #FBFBF9;
+    --vibe-card: #FFFFFF;
+    --vibe-card-subtle: #F4F3EE;
+    --vibe-card-hover: #F8F7F2;
+    --vibe-border: #E6E4DD;
+    --vibe-border-subtle: #EDECE7;
+    --vibe-ink: #18181B;
+    --vibe-ink-secondary: #52525B;
+    --vibe-ink-muted: #71717A;
+    --vibe-accent: #2D6A4F;
+    --vibe-accent-hover: #22533D;
+    --vibe-accent-text: #FFFFFF;
+    --vibe-accent-subtle: #EBF2ED;
+    --vibe-secondary: #E07A5F;
+    --vibe-secondary-hover: #CD674C;
+    --vibe-secondary-text: #FFFFFF;
+    --vibe-secondary-subtle: #FAF0ED;
+    --vibe-badge-bg: #EBF2ED;
+    --vibe-badge-text: #2D6A4F;
+    --vibe-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+    --vibe-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+    --vibe-ambient-gradient: radial-gradient(1100px 600px at 50% -10%, rgba(45, 106, 79, 0.04) 0%, rgba(224, 122, 95, 0.03) 50%, transparent 85%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Newsreader', 'Lora', Georgia, serif;
+    color-scheme: light;
+  }
+
+  /* Universal mapping aliases to current active vibe */
+  :root,
+  [data-theme] {
+    --bg-surface: var(--vibe-card);
+    --bg-surface-glass: var(--vibe-card);
+    --bg-surface-accent: var(--vibe-card-subtle);
+    --bg-surface-active: var(--vibe-accent-subtle);
+    --border-subtle: var(--vibe-border);
+    --border-accent: var(--vibe-accent);
+    --text-primary: var(--vibe-ink);
+    --text-secondary: var(--vibe-ink-secondary);
+    --text-muted: var(--vibe-ink-muted);
+    --accent-primary: var(--vibe-accent);
+    --accent-primary-fg: var(--vibe-accent-text);
+    --accent-secondary: var(--vibe-secondary);
+    --accent-glow: 0 0 25px var(--vibe-accent-subtle);
+    --font-heading: var(--font-quote);
+    --backdrop-blur: blur(12px);
+  }
+
+  /* MIDNIGHT LIBRARY (Archival Serenity & Banker's Lamp) */
+  [data-theme="midnight-library"] {
+    --vibe-bg: #0B0F17;
+    --vibe-card: #131926;
+    --vibe-card-subtle: #1B2335;
+    --vibe-card-hover: #1E273A;
+    --vibe-border: #232D42;
+    --vibe-border-subtle: #2D3A53;
+    --vibe-ink: #F1F5F9;
+    --vibe-ink-secondary: #CBD5E1;
+    --vibe-ink-muted: #94A3B8;
+    --vibe-accent: #10B981;
+    --vibe-accent-hover: #059669;
+    --vibe-accent-text: #FFFFFF;
+    --vibe-accent-subtle: rgba(16, 185, 129, 0.14);
+    --vibe-secondary: #F59E0B;
+    --vibe-secondary-hover: #D97706;
+    --vibe-secondary-text: #FFFFFF;
+    --vibe-secondary-subtle: rgba(245, 158, 11, 0.14);
+    --vibe-badge-bg: rgba(16, 185, 129, 0.16);
+    --vibe-badge-text: #34D399;
+    --vibe-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5);
+    --vibe-shadow-elevated: 0 20px 35px -8px rgba(0, 0, 0, 0.6);
+    --vibe-ambient-gradient: radial-gradient(900px 500px at 75% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 70%), radial-gradient(700px 450px at 15% 30%, rgba(245, 158, 11, 0.05) 0%, transparent 60%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Newsreader', Georgia, serif;
+    color-scheme: dark;
+  }
+
+  /* DARK ACADEMIA (Leather, Espresso & Candlelight) */
+  [data-theme="dark-academia"] {
+    --vibe-bg: #15100D;
+    --vibe-card: #201813;
+    --vibe-card-subtle: #2B211A;
+    --vibe-card-hover: #33271F;
+    --vibe-border: #3D2E24;
+    --vibe-border-subtle: #4D3A2E;
+    --vibe-ink: #FAF2E4;
+    --vibe-ink-secondary: #D6C7B2;
+    --vibe-ink-muted: #A89685;
+    --vibe-accent: #C15C3D;
+    --vibe-accent-hover: #A84A2C;
+    --vibe-accent-text: #FFFFFF;
+    --vibe-accent-subtle: rgba(193, 92, 61, 0.16);
+    --vibe-secondary: #D4AF37;
+    --vibe-secondary-hover: #BFA02E;
+    --vibe-secondary-text: #1F1711;
+    --vibe-secondary-subtle: rgba(212, 175, 55, 0.14);
+    --vibe-badge-bg: rgba(193, 92, 61, 0.18);
+    --vibe-badge-text: #E58B70;
+    --vibe-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.45);
+    --vibe-shadow-elevated: 0 20px 35px -8px rgba(0, 0, 0, 0.55);
+    --vibe-ambient-gradient: radial-gradient(900px 500px at 50% 0%, rgba(193, 92, 61, 0.09) 0%, rgba(212, 175, 55, 0.05) 50%, transparent 75%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Lora', Georgia, serif;
+    color-scheme: dark;
+  }
+
+  /* SEPIA MANUSCRIPT (Warm Linen & Vintage Bookshop) */
+  [data-theme="sepia-manuscript"] {
+    --vibe-bg: #F6F1E9;
+    --vibe-card: #FDFBF7;
+    --vibe-card-subtle: #EEE7DC;
+    --vibe-card-hover: #E7DFD2;
+    --vibe-border: #DFD4C3;
+    --vibe-border-subtle: #E9E0D3;
+    --vibe-ink: #2D2319;
+    --vibe-ink-secondary: #574737;
+    --vibe-ink-muted: #7C6C5D;
+    --vibe-accent: #B86221;
+    --vibe-accent-hover: #984D14;
+    --vibe-accent-text: #FFFFFF;
+    --vibe-accent-subtle: #EFE3D3;
+    --vibe-secondary: #5B7052;
+    --vibe-secondary-hover: #475940;
+    --vibe-secondary-text: #FFFFFF;
+    --vibe-secondary-subtle: #E7ECE6;
+    --vibe-badge-bg: #EFE3D3;
+    --vibe-badge-text: #B86221;
+    --vibe-shadow: 0 4px 20px -4px rgba(78, 52, 29, 0.07);
+    --vibe-shadow-elevated: 0 10px 25px -5px rgba(78, 52, 29, 0.1);
+    --vibe-ambient-gradient: radial-gradient(1000px 500px at 50% 0%, rgba(184, 98, 33, 0.05) 0%, rgba(91, 112, 82, 0.03) 50%, transparent 70%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Newsreader', Georgia, serif;
+    color-scheme: light;
+  }
+
+  /* KYOTO MINIMALIST (Sumi Ink, Mist & River Stone) */
+  [data-theme="kyoto-minimalist"] {
+    --vibe-bg: #F3F3F1;
+    --vibe-card: #FAFAF9;
+    --vibe-card-subtle: #E7E7E3;
+    --vibe-card-hover: #EEEEEC;
+    --vibe-border: #D5D5CF;
+    --vibe-border-subtle: #E0E0DC;
+    --vibe-ink: #121314;
+    --vibe-ink-secondary: #3B3E43;
+    --vibe-ink-muted: #696C73;
+    --vibe-accent: #2B3A42;
+    --vibe-accent-hover: #1B252B;
+    --vibe-accent-text: #FFFFFF;
+    --vibe-accent-subtle: #E4E9EC;
+    --vibe-secondary: #C2410C;
+    --vibe-secondary-hover: #9A3412;
+    --vibe-secondary-text: #FFFFFF;
+    --vibe-secondary-subtle: #FAECE7;
+    --vibe-badge-bg: #E4E9EC;
+    --vibe-badge-text: #2B3A42;
+    --vibe-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.04);
+    --vibe-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
+    --vibe-ambient-gradient: radial-gradient(900px 500px at 50% 0%, rgba(43, 58, 66, 0.04) 0%, transparent 75%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Newsreader', Georgia, serif;
+    color-scheme: light;
+  }
+
+  /* CYBER CODEX (Neo-Tokyo Synth & OLED Reading) */
+  [data-theme="cyber-codex"] {
+    --vibe-bg: #0A0912;
+    --vibe-card: #131122;
+    --vibe-card-subtle: #1D1933;
+    --vibe-card-hover: #24203E;
+    --vibe-border: #2E2750;
+    --vibe-border-subtle: #3D3469;
+    --vibe-ink: #F1F3FB;
+    --vibe-ink-secondary: #CBD0E8;
+    --vibe-ink-muted: #968DB8;
+    --vibe-accent: #06B6D4;
+    --vibe-accent-hover: #0891B2;
+    --vibe-accent-text: #05161C;
+    --vibe-accent-subtle: rgba(6, 182, 212, 0.14);
+    --vibe-secondary: #F43F5E;
+    --vibe-secondary-hover: #E11D48;
+    --vibe-secondary-text: #FFFFFF;
+    --vibe-secondary-subtle: rgba(244, 63, 94, 0.14);
+    --vibe-badge-bg: rgba(6, 182, 212, 0.16);
+    --vibe-badge-text: #22D3EE;
+    --vibe-shadow: 0 8px 30px -4px rgba(6, 182, 212, 0.15);
+    --vibe-shadow-elevated: 0 20px 35px -8px rgba(6, 182, 212, 0.22);
+    --vibe-ambient-gradient: radial-gradient(850px 500px at 75% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 70%), radial-gradient(750px 450px at 15% 30%, rgba(244, 63, 94, 0.08) 0%, transparent 60%);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-quote: 'Lora', Georgia, serif;
+    color-scheme: dark;
+  }
+
+  /* ==========================================================================
+     2. GLOBAL TRANSITIONS & BASE STYLES
+     ========================================================================== */
   html, body {
-    @apply bg-[#f8f9f8] text-[#2c332d] min-h-screen font-sans overflow-x-hidden w-full;
+    background-color: var(--vibe-bg);
+    color: var(--vibe-ink);
+    min-height: 100vh;
+    font-family: var(--font-ui);
+    overflow-x: hidden;
+    width: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Ensure interactive touch targets have comfortable bounds on mobile */
+  /* Smooth 500ms transition across theme changes */
+  html, body, #root,
+  header, aside, nav, main, article,
+  button, input, textarea, select {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 500ms;
+  }
+
+  /* Touch accessibility */
   button, a, input, select, textarea {
     touch-action: manipulation;
   }
 }
 
-/* Custom Scrollbar */
+/* Ambient dynamic background halo */
+.ambient-vibe-bg {
+  background-image: var(--vibe-ambient-gradient);
+  transition: background-image 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scrollbar styled dynamically with vibe borders */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -27,10 +249,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6ded8;
+  background: var(--vibe-border);
   border-radius: 9999px;
+  transition: background-color 500ms;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #bac5bc;
+  background: var(--vibe-ink-muted);
 }

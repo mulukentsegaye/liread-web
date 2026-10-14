@@ -8,6 +8,25 @@ export default {
   theme: {
     extend: {
       colors: {
+        vibe: {
+          bg: 'var(--vibe-bg)',
+          card: 'var(--vibe-card)',
+          'card-subtle': 'var(--vibe-card-subtle)',
+          'card-hover': 'var(--vibe-card-hover)',
+          border: 'var(--vibe-border)',
+          'border-subtle': 'var(--vibe-border-subtle)',
+          ink: 'var(--vibe-ink)',
+          'ink-secondary': 'var(--vibe-ink-secondary)',
+          'ink-muted': 'var(--vibe-ink-muted)',
+          accent: 'var(--vibe-accent)',
+          'accent-hover': 'var(--vibe-accent-hover)',
+          'accent-subtle': 'var(--vibe-accent-subtle)',
+          secondary: 'var(--vibe-secondary)',
+          'secondary-hover': 'var(--vibe-secondary-hover)',
+          'secondary-subtle': 'var(--vibe-secondary-subtle)',
+          'badge-bg': 'var(--vibe-badge-bg)',
+          'badge-text': 'var(--vibe-badge-text)',
+        },
         brand: {
           50: '#f2f6f3',
           100: '#e3ebe5',
@@ -42,13 +61,16 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Newsreader', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['Newsreader', 'Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'soft': '0 2px 10px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
-        'float': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+        'soft': 'var(--vibe-shadow, 0 4px 20px -4px rgba(0,0,0,0.05))',
+        'float': 'var(--vibe-shadow-elevated, 0 10px 25px -5px rgba(0, 0, 0, 0.08))',
+        'vibe': 'var(--vibe-shadow)',
+        'vibe-elevated': 'var(--vibe-shadow-elevated)',
+        'diffused': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
       }
     },
   },

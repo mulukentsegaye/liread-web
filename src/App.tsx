@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
@@ -13,14 +13,26 @@ import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
+import { useThemeStore, THEMES } from './stores/themeStore';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const { theme } = useThemeStore();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, updateUser } = useAuthStore();
+
+  // Synchronize data-theme and dark class on mount and change
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (THEMES[theme]?.isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   const handleTabChange = (tab: NavigationTab) => {
     if (tab === 'timer') {
@@ -49,9 +61,15 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9f8] text-[#2c332d] flex flex-col font-sans overflow-x-hidden w-full pb-44 md:pb-28">
+    <div 
+      className="min-h-screen flex flex-col overflow-x-hidden w-full pb-44 md:pb-28 transition-colors duration-400"
+      style={{
+        backgroundColor: 'var(--bg-app)',
+        color: 'var(--text-primary)',
+      }}
+    >
       
-      {/* 1. Sticky Top Application Header */}
+      {/* 1. Sticky Top Application Header with Theme Switcher */}
       <Header onSearch={(query) => setSearchQuery(query)} />
 
       {/* 2. Main Responsive App Shell: 
@@ -103,13 +121,13 @@ export const App: React.FC = () => {
 
       </div>
 
-      {/* 3. Persistent Floating Mini-Timer Bar (Positioned above mobile nav on mobile, bottom-center on desktop) */}
+      {/* 3. Persistent Floating Mini-Timer Bar (Active theme ambiance glow & creative animations) */}
       <FloatingTimerBar />
 
       {/* 4. Distraction-Free Full-Screen Reading Timer Mode */}
       <FullTimerModal />
 
-      {/* 5. Create Reading Moment Modal (Full-screen mobile / bottom-sheet) */}
+      {/* 5. Create Reading Moment Modal */}
       <CreatePostModal
         isOpen={isCreateModalOpen}
         onClose={() => setCreateModalOpen(false)}
