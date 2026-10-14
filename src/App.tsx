@@ -53,7 +53,7 @@ export const App: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col overflow-x-hidden w-full pb-44 md:pb-28 transition-colors duration-500"
+      className="min-h-screen flex flex-col w-full pb-44 md:pb-28 transition-colors duration-500 overflow-x-clip"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',
@@ -68,7 +68,7 @@ export const App: React.FC = () => {
           - Tablet (768px - 1279px): 2-column layout (compact left sidebar + main center viewport with top summary bar)
           - Desktop (1280px+): 3-column layout (left sidebar, center viewport, right sidebar)
       */}
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex gap-4 lg:gap-8 justify-between">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex items-start gap-4 lg:gap-8 justify-between">
         
         {/* Left Sidebar (Desktop & Tablet only: md+) */}
         <SidebarLeft
@@ -103,12 +103,10 @@ export const App: React.FC = () => {
         </main>
 
         {/* Right Stats & Leaderboard Sidebar (Desktop only: xl+) */}
-        <div className="hidden xl:block">
-          <SidebarRight
-            onViewLeaderboard={() => handleTabChange('leaderboard')}
-            onAdjustGoal={handleAdjustGoal}
-          />
-        </div>
+        <SidebarRight
+          onViewLeaderboard={() => handleTabChange('leaderboard')}
+          onAdjustGoal={handleAdjustGoal}
+        />
 
       </div>
 

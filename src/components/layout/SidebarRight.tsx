@@ -26,7 +26,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
   const strokeDashoffset = circumference - (circumference * (progressPercent / 100));
 
   return (
-    <aside className="w-72 xl:w-80 flex-shrink-0 space-y-6 py-6 pl-4 pr-2 overflow-y-auto select-none transition-colors duration-500">
+    <aside className="hidden xl:block w-72 xl:w-80 flex-shrink-0 space-y-6 py-6 pb-12 pl-4 pr-2 sticky top-[65px] h-[calc(100vh-65px)] self-start overflow-y-auto select-none transition-colors duration-500">
       
       {/* 1. Daily Reading Goal Widget */}
       <div className="bg-vibe-card rounded-2xl p-5 border border-vibe-border shadow-soft transition-all duration-500">
