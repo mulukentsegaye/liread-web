@@ -25,8 +25,8 @@ import {
   Quote
 } from 'lucide-react';
 import { useTheme, DEFAULT_VIBE } from '../../context/ThemeContext';
-import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
+import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId, AMBIENT_SOUNDS, VibeId, VibeConfig, ThemeMode } from '../../types/theme';
 
 interface LandingPageProps {
@@ -238,12 +238,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-vibe-ink-muted">
               <span>Theme:</span>
               <button
+                type="button"
                 onClick={() => handleVibeSelect('light')}
                 className={`px-2.5 py-0.5 rounded-full border transition-all ${vibe === 'light' ? 'border-vibe-accent bg-vibe-accent text-white font-semibold' : 'border-vibe-border hover:bg-vibe-card-subtle'}`}
               >
                 Light Mode
               </button>
               <button
+                type="button"
                 onClick={() => handleVibeSelect('dark')}
                 className={`px-2.5 py-0.5 rounded-full border transition-all ${vibe === 'dark' ? 'border-vibe-accent bg-vibe-accent text-white font-semibold' : 'border-vibe-border hover:bg-vibe-card-subtle'}`}
               >
