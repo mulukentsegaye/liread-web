@@ -33,10 +33,25 @@ export const App: React.FC = () => {
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { isPopoverOpen, closePopover } = useTheme();
+  const { isPopoverOpen, closePopover, theme } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, updateUser, initAuth } = useAuthStore();
   const { fetchPosts } = useFeedStore();
+
+  // Ensure landing and login start in light mode; home page ('app') respects user's theme selection (light/dark)
+  useEffect(() => {
+    if (currentView === 'landing' || currentView === 'login') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [currentView, theme]);
 
   useEffect(() => {
     // Initialize Supabase Auth & Realtime Feed sync

@@ -15,15 +15,21 @@
     <script>
       (function() {
         try {
+          var hash = window.location.hash;
+          var isHome = hash === '#app';
           var saved = localStorage.getItem('readers_hub_theme');
-          var mode = saved === 'dark' ? 'dark' : 'light';
-          document.documentElement.setAttribute('data-theme', mode);
-          if (mode === 'dark') {
+          // Only apply dark if on home page and user explicitly chose dark
+          if (isHome && saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
             document.documentElement.classList.add('dark');
           } else {
+            document.documentElement.setAttribute('data-theme', 'light');
             document.documentElement.classList.remove('dark');
           }
-        } catch (e) {}
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.remove('dark');
+        }
       })();
     </script>
   </head>

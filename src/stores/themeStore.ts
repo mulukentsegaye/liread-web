@@ -33,3 +33,14 @@ export const useThemeStore = create<ThemeState>()(
     }
   )
 );
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('readers-hub-theme-changed', (e: any) => {
+    if (e.detail?.theme) {
+      useThemeStore.setState({
+        theme: e.detail.theme,
+        isDark: e.detail.theme === 'dark',
+      });
+    }
+  });
+}

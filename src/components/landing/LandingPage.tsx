@@ -48,7 +48,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
     toggleMute 
   } = useAmbientAudioStore();
 
-  const [activeTabAesthetic, setActiveTabAesthetic] = useState<ThemeMode>(vibe);
+  const [activeTabAesthetic, setActiveTabAesthetic] = useState<ThemeMode>('light');
 
   const soundOptions: Array<{ id: AmbientSoundId; label: string; icon: string; desc: string }> = [
     { id: 'birds', label: 'Morning Songbirds', icon: '🕊️', desc: 'Light forest morning breeze' },
@@ -66,7 +66,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
   };
 
   const handleVibeSelect = (id: ThemeMode) => {
-    setVibe(id);
     setActiveTabAesthetic(id);
   };
 
@@ -425,7 +424,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           {/* Light & Dark Interactive Cards Grid */}
           <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {allVibes.map((item: VibeConfig) => {
-              const isSelected = vibe === item.id;
+              const isSelected = activeTabAesthetic === item.id;
 
               return (
                 <div
