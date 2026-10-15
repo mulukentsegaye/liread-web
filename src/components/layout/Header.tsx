@@ -83,7 +83,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
           >
             <span className={`w-2 h-2 rounded-full ${user.id && user.id.length > 20 && !user.id.includes('user-') ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
             <span className="text-vibe-ink-secondary">
-              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Supabase' : 'Demo Mode'}
+              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Supabase' : 'Offline'}
             </span>
           </button>
 

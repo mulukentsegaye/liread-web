@@ -93,9 +93,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           if (error) throw error;
           
           login({
-            id: data.user?.id || 'user-alex-morgan',
-            fullName: data.user?.user_metadata?.full_name || 'Alex Morgan',
-            username: data.user?.user_metadata?.username || 'alexmorgan',
+            id: data.user?.id,
+            fullName: data.user?.user_metadata?.full_name || email.split('@')[0] || 'Reader',
+            username: data.user?.user_metadata?.username || email.split('@')[0] || 'reader',
           });
           setSuccessMsg('Signed in successfully! Opening your sanctuary...');
           setTimeout(() => onSuccess(), 600);
@@ -105,8 +105,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
         await new Promise((res) => setTimeout(res, 600));
         
         login({
-          fullName: mode === 'signup' ? fullName : (email.split('@')[0] || 'Alex Morgan'),
-          username: mode === 'signup' ? username.replace(/^@/, '') : 'alexmorgan',
+          fullName: mode === 'signup' ? fullName : (email.split('@')[0] || 'Reader'),
+          username: mode === 'signup' ? username.replace(/^@/, '') : (email.split('@')[0] || 'reader'),
         });
         
         setSuccessMsg(mode === 'signup' ? 'Welcome to Readers Hub!' : 'Welcome back to your reading sanctuary!');
@@ -117,24 +117,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoSignIn = () => {
-    setLoading(true);
-    setErrorMsg(null);
-    setTimeout(() => {
-      login({
-        id: 'user-demo-alex',
-        fullName: 'Alex Morgan',
-        username: 'alexmorgan',
-        subtitle: 'Everyday Reader & Explorer',
-        totalMinutesRead: 522,
-        currentStreak: 7,
-        dailyGoalMinutes: 60,
-      });
-      setSuccessMsg('Signed in as Demo Reader! Loading dashboard...');
-      setTimeout(() => onSuccess(), 500);
-    }, 400);
   };
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
@@ -341,7 +323,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Alex Morgan"
+                        placeholder="Jane Doe"
                         required={mode === 'signup'}
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
                       />
@@ -359,7 +341,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder="alexmorgan"
+                        placeholder="janedoe"
                         required={mode === 'signup'}
                         className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
                       />
@@ -379,7 +361,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="alex@readershub.app"
+                    placeholder="reader@readershub.app"
                     required
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
                   />
@@ -457,22 +439,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Reader Instant Access */}
-            <div className="mt-6 pt-5 border-t border-vibe-border text-center space-y-3">
-              <p className="text-xs text-vibe-ink-muted">
-                Want to explore the app without registering?
-              </p>
-              <button
-                type="button"
-                onClick={handleDemoSignIn}
-                disabled={loading}
-                className="w-full min-h-[42px] py-2.5 px-4 rounded-full border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover text-xs font-semibold text-vibe-ink transition-all flex items-center justify-center gap-2 active:scale-98 shadow-xs"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-vibe-accent" />
-                <span>One-Click Demo Reader Sign In</span>
-              </button>
-            </div>
 
             {/* Footer Notice */}
             <p className="mt-6 text-center text-[11px] text-vibe-ink-muted leading-relaxed">

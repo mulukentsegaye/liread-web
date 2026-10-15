@@ -14,8 +14,10 @@ import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
+import { AuthModal } from './components/auth/AuthModal';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
+import { useFeedStore } from './stores/feedStore';
 import { useTheme } from './context/ThemeContext';
 
 export const App: React.FC = () => {
@@ -28,11 +30,19 @@ export const App: React.FC = () => {
   });
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { isPopoverOpen, closePopover } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
-  const { user, updateUser } = useAuthStore();
+  const { user, updateUser, initAuth } = useAuthStore();
+  const { fetchPosts } = useFeedStore();
+
+  useEffect(() => {
+    // Initialize Supabase Auth & Realtime Feed sync
+    initAuth();
+    fetchPosts(user.id);
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -136,7 +146,7 @@ export const App: React.FC = () => {
       <Header 
         onSearch={(query) => setSearchQuery(query)} 
         onGoToLanding={handleGoToLanding}
-        onGoToLogin={handleGoToLogin}
+        onGoToLogin={() => setAuthModalOpen(true)}
       />
 
       {/* 2. Main Responsive App Shell: 
@@ -210,7 +220,13 @@ export const App: React.FC = () => {
         onClose={closePopover}
       />
 
-      {/* 7. Fixed Bottom Mobile Navigation Bar (< md) */}
+      {/* 7. Supabase Account & Connection Settings Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
+
+      {/* 8. Fixed Bottom Mobile Navigation Bar (< md) */}
       <MobileNav
         activeTab={activeTab}
         onTabChange={handleTabChange}

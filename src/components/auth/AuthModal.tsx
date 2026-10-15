@@ -257,7 +257,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleSignIn} className="space-y-3.5">
               {!isConfigured && (
                 <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300">
-                  ⚡ <strong>Demo Mode active:</strong> Supabase credentials not yet detected. You can browse the app with mock data, or connect your Supabase project in the <strong>Backend Config</strong> tab.
+                  ⚡ <strong>Offline Mode:</strong> Supabase credentials not yet detected. You can connect your Supabase project in the <strong>Backend Config</strong> tab.
                 </div>
               )}
 
@@ -404,7 +404,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${isConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
                   <span className="text-xs font-semibold text-vibe-ink">
-                    {isConfigured ? 'Connected to Supabase' : 'Demo Mode (Offline / Mock data)'}
+                    {isConfigured ? 'Connected to Supabase' : 'Offline / Local Mode'}
                   </span>
                 </div>
 
