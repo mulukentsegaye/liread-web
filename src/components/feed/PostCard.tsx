@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star } from 'lucide-react';
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
+import { useAuthStore } from '../../stores/authStore';
 
 interface PostCardProps {
   post: Post;
@@ -10,6 +11,7 @@ interface PostCardProps {
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }) => {
   const { toggleUpvote, toggleSave } = useFeedStore();
+  const { user } = useAuthStore();
 
   return (
     <article className="bg-vibe-card border border-vibe-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-soft transition-all duration-500 hover:shadow-vibe-elevated space-y-4 overflow-hidden">
@@ -135,7 +137,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
       <div className="flex items-center justify-between pt-1 border-t border-vibe-border-subtle">
         <div className="flex items-center gap-2 sm:gap-6">
           <button
-            onClick={() => toggleUpvote(post.id)}
+            onClick={() => toggleUpvote(post.id, user.id)}
             aria-label="Upvote post"
             className={`min-h-[40px] px-2 flex items-center gap-1.5 text-xs font-medium transition-colors ${
               post.isUpvoted 
@@ -162,7 +164,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
         </div>
 
         <button
-          onClick={() => toggleSave(post.id)}
+          onClick={() => toggleSave(post.id, user.id)}
           aria-label="Save passage"
           className={`min-h-[40px] px-3 flex items-center gap-1.5 text-xs font-medium transition-colors ${
             post.isSaved 

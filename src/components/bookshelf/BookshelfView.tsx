@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Bookmark, Play, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { useTimerStore } from '../../stores/timerStore';
+import { bookshelfService, BookshelfItem } from '../../services/bookshelfService';
+import { isSupabaseConfigured } from '../../lib/supabase';
 
 interface BookshelfViewProps {
   initialTab?: 'bookshelf' | 'saved';
@@ -14,10 +16,20 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
   const { user } = useAuthStore();
   const { posts } = useFeedStore();
   const { setBook, startTimer, setFullScreenOpen } = useTimerStore();
+  const [dbBooks, setDbBooks] = useState<BookshelfItem[]>([]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured() || !user.id) return;
+    bookshelfService.getBookshelf(user.id).then((items) => {
+      if (items && items.length > 0) {
+        setDbBooks(items);
+      }
+    });
+  }, [user.id]);
 
   const savedPosts = posts.filter((p) => p.isSaved);
 
-  const sampleBooks = [
+  const fallbackBooks = [
     {
       title: 'The Creative Act: A Way of Being',
       author: 'Rick Rubin',
@@ -55,6 +67,15 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
       status: 'Want to Read',
     },
   ];
+
+  const sampleBooks = dbBooks.length > 0
+    ? dbBooks.map((b) => ({
+        title: b.title,
+        author: b.author,
+        progress: b.progressPercentage,
+        status: b.status === 'currently_reading' ? 'Currently Reading' : b.status === 'finished' ? 'Finished' : 'Want to Read',
+      }))
+    : fallbackBooks;
 
   const handleStartTimerForBook = (title: string, author: string) => {
     setBook(title, author);

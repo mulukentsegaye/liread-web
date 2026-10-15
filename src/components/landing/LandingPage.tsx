@@ -32,9 +32,10 @@ import { AmbientSoundId, AMBIENT_SOUNDS, VibeId, VibeConfig, ThemeMode } from '.
 interface LandingPageProps {
   onEnterApp: () => void;
   onOpenTimer?: () => void;
+  onGoToLogin?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer, onGoToLogin }) => {
   const { vibe, allVibes, setVibe, vibeConfig, openPopover } = useTheme();
   const { 
     isPlaying, 
@@ -120,6 +121,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <div className="flex items-center gap-2 sm:gap-3">
             <VibeTriggerButton variant="header" />
 
+            {onGoToLogin && (
+              <button
+                type="button"
+                onClick={onGoToLogin}
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
+              >
+                <span>Log In</span>
+              </button>
+            )}
+
             <button
               onClick={onEnterApp}
               className="group flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
@@ -178,15 +189,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <ArrowRight className="w-4 h-4" />
           </button>
 
+          {onGoToLogin && (
+            <button
+              onClick={onGoToLogin}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>Sign In to Account</span>
+              <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
+            </button>
+          )}
+
           <button
             onClick={() => {
               const el = document.getElementById('vibes');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Explore 9 Visual Vibes</span>
-            <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
+            <span>Explore Light & Dark Modes</span>
           </button>
         </div>
 
@@ -865,6 +885,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             >
               Reset Theme
             </button>
+            {onGoToLogin && (
+              <button 
+                onClick={onGoToLogin} 
+                className="hover:text-vibe-ink transition-colors font-medium"
+              >
+                Log In
+              </button>
+            )}
             <button 
               onClick={onEnterApp} 
               className="font-semibold text-vibe-accent hover:underline"

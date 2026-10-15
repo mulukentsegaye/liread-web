@@ -19,9 +19,10 @@ interface SidebarLeftProps {
   activeTab: NavigationTab;
   onTabChange: (tab: NavigationTab) => void;
   onGoToLanding?: () => void;
+  onGoToLogin?: () => void;
 }
 
-export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding }) => {
+export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding, onGoToLogin }) => {
   const { user } = useAuthStore();
 
   const navItems = [
@@ -157,7 +158,13 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
         </button>
 
         {/* Profile Card */}
-        <div className="flex items-center justify-center lg:justify-between p-2 rounded-xl bg-vibe-card/60 border border-vibe-border hover:bg-vibe-card-subtle transition-colors cursor-pointer group">
+        <div 
+          onClick={onGoToLogin}
+          role="button"
+          tabIndex={0}
+          title="Manage Account / Switch User"
+          className="flex items-center justify-center lg:justify-between p-2 rounded-xl bg-vibe-card/60 border border-vibe-border hover:bg-vibe-card-subtle transition-colors cursor-pointer group select-none active:scale-98"
+        >
           <div className="flex items-center gap-3 min-w-0">
             <img
               src={user.avatarUrl}

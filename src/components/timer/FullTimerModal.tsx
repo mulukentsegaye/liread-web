@@ -38,7 +38,7 @@ export const FullTimerModal: React.FC = () => {
   const handleStopAndSave = () => {
     const mins = stopTimer();
     if (mins > 0) {
-      logSessionMinutes(mins);
+      logSessionMinutes(mins, bookTitle);
       alert(`Reading session saved!\nLogged ${mins} minutes to your profile.`);
     }
     setFullScreenOpen(false);

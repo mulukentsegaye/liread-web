@@ -13,14 +13,16 @@ import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
+import { LoginPage } from './components/auth/LoginPage';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
 import { useTheme } from './context/ThemeContext';
 
 export const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'landing' | 'app'>(() => {
-    if (typeof window !== 'undefined' && window.location.hash === '#app') {
-      return 'app';
+  const [currentView, setCurrentView] = useState<'landing' | 'login' | 'app'>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#app') return 'app';
+      if (window.location.hash === '#login') return 'login';
     }
     return 'landing';
   });
@@ -36,6 +38,8 @@ export const App: React.FC = () => {
     const handleHashChange = () => {
       if (window.location.hash === '#app') {
         setCurrentView('app');
+      } else if (window.location.hash === '#login') {
+        setCurrentView('login');
       } else if (window.location.hash === '#landing' || !window.location.hash) {
         setCurrentView('landing');
       }
@@ -53,6 +57,12 @@ export const App: React.FC = () => {
   const handleGoToLanding = () => {
     setCurrentView('landing');
     window.location.hash = '#landing';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoToLogin = () => {
+    setCurrentView('login');
+    window.location.hash = '#login';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -82,12 +92,23 @@ export const App: React.FC = () => {
     }
   };
 
-  // 0. Render Premium Clean Landing Page when in 'landing' view
+  // 0. Render Login Page when in 'login' view
+  if (currentView === 'login') {
+    return (
+      <LoginPage
+        onSuccess={handleEnterApp}
+        onGoBack={handleGoToLanding}
+      />
+    );
+  }
+
+  // 1. Render Premium Clean Landing Page when in 'landing' view
   if (currentView === 'landing') {
     return (
       <>
         <LandingPage
           onEnterApp={handleEnterApp}
+          onGoToLogin={handleGoToLogin}
           onOpenTimer={() => {
             handleEnterApp();
             setFullScreenOpen(true);
@@ -115,6 +136,7 @@ export const App: React.FC = () => {
       <Header 
         onSearch={(query) => setSearchQuery(query)} 
         onGoToLanding={handleGoToLanding}
+        onGoToLogin={handleGoToLogin}
       />
 
       {/* 2. Main Responsive App Shell: 
@@ -129,6 +151,7 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onGoToLanding={handleGoToLanding}
+          onGoToLogin={handleGoToLogin}
         />
 
         {/* Center Main Viewport */}

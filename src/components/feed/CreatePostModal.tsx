@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Sparkles, Star, ArrowLeft } from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
+import { useAuthStore } from '../../stores/authStore';
 import { PostType } from '../../types';
 
 interface CreatePostModalProps {
@@ -10,6 +11,7 @@ interface CreatePostModalProps {
 
 export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose }) => {
   const { addPost } = useFeedStore();
+  const { user } = useAuthStore();
 
   const [postType, setPostType] = useState<PostType>('passage');
   const [bookTitle, setBookTitle] = useState('');
@@ -29,16 +31,21 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       return;
     }
 
-    addPost({
-      postType,
-      bookTitle: bookTitle.trim(),
-      bookAuthor: bookAuthor.trim() || 'Unknown Author',
-      quoteText: quoteText.trim() || undefined,
-      pageNumber: pageNumber ? parseInt(pageNumber, 10) : undefined,
-      tag,
-      recommendationText: recommendationText.trim() || undefined,
-      rating: postType === 'finished_book' ? rating : undefined,
-    });
+    addPost(
+      {
+        postType,
+        bookTitle: bookTitle.trim(),
+        bookAuthor: bookAuthor.trim() || 'Unknown Author',
+        quoteText: quoteText.trim() || undefined,
+        pageNumber: pageNumber ? parseInt(pageNumber, 10) : undefined,
+        tag,
+        recommendationText: recommendationText.trim() || undefined,
+        rating: postType === 'finished_book' ? rating : undefined,
+        authorName: user.fullName,
+        authorAvatar: user.avatarUrl,
+      },
+      user.id
+    );
 
     setBookTitle('');
     setBookAuthor('');

@@ -6,9 +6,10 @@ import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 interface HeaderProps {
   onSearch?: (query: string) => void;
   onGoToLanding?: () => void;
+  onGoToLogin?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding }) => {
+export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToLogin }) => {
   const { user } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
   const [isMobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -73,6 +74,19 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding }) => {
           {/* Sleek Vibe Selector Header Button */}
           <VibeTriggerButton variant="header" />
 
+          {/* Supabase Connection Status Pill */}
+          <button
+            type="button"
+            onClick={onGoToLogin}
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover transition-colors shadow-xs cursor-pointer"
+            title={user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Connected to Supabase' : 'Click to configure Supabase or manage account'}
+          >
+            <span className={`w-2 h-2 rounded-full ${user.id && user.id.length > 20 && !user.id.includes('user-') ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <span className="text-vibe-ink-secondary">
+              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Supabase' : 'Demo Mode'}
+            </span>
+          </button>
+
           {/* Mobile Search Toggle Button (< md) */}
           <button
             type="button"
@@ -111,8 +125,9 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding }) => {
           {/* User Profile Avatar Button */}
           <button 
             type="button" 
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-vibe-accent rounded-full"
-            title={`${user.fullName} (${user.subtitle})`}
+            onClick={onGoToLogin}
+            className="min-w-[40px] min-h-[40px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-vibe-accent rounded-full transition-transform active:scale-95"
+            title={`${user.fullName} (${user.subtitle}) — Click to manage account or switch user`}
           >
             <img
               src={user.avatarUrl}

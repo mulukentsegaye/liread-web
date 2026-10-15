@@ -78,6 +78,31 @@ CREATE TABLE IF NOT EXISTS public.saved_posts (
     CONSTRAINT unique_user_saved_post UNIQUE (user_id, post_id)
 );
 
+-- 2.6 BOOKSHELF TABLE
+-- Personal library shelves tracking reading progress, status and personal ratings
+CREATE TABLE IF NOT EXISTS public.bookshelf (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
+    cover_image_url TEXT,
+    status TEXT NOT NULL DEFAULT 'currently_reading' CHECK (status IN ('currently_reading', 'finished', 'want_to_read')),
+    progress_percentage INTEGER NOT NULL DEFAULT 0 CHECK (progress_percentage >= 0 AND progress_percentage <= 100),
+    rating NUMERIC(2, 1) CHECK (rating >= 0 AND rating <= 5),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+-- 2.7 POST COMMENTS TABLE
+-- Community discussions and replies under reading moments
+CREATE TABLE IF NOT EXISTS public.post_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
 -- ==============================================================================
 -- 3. PERFORMANCE INDEXES
 -- ==============================================================================
@@ -97,6 +122,9 @@ CREATE INDEX IF NOT EXISTS idx_reading_sessions_date ON public.reading_sessions(
 CREATE INDEX IF NOT EXISTS idx_reading_sessions_user_date ON public.reading_sessions(user_id, session_date);
 
 CREATE INDEX IF NOT EXISTS idx_saved_posts_user_id ON public.saved_posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookshelf_user_id ON public.bookshelf(user_id);
+CREATE INDEX IF NOT EXISTS idx_bookshelf_status ON public.bookshelf(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON public.post_comments(post_id);
 
 -- ==============================================================================
 -- 4. ROW LEVEL SECURITY (RLS) POLICIES
@@ -108,6 +136,8 @@ ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_upvotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reading_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bookshelf ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
 
 -- 4.1 PROFILES POLICIES
 -- Anyone can view user profiles
@@ -191,6 +221,36 @@ CREATE POLICY "Users can save posts"
 
 CREATE POLICY "Users can remove saved posts" 
     ON public.saved_posts FOR DELETE 
+    USING (auth.uid() = user_id);
+
+-- 4.6 BOOKSHELF POLICIES
+CREATE POLICY "Users can view their own bookshelf" 
+    ON public.bookshelf FOR SELECT 
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can add books to bookshelf" 
+    ON public.bookshelf FOR INSERT 
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own bookshelf" 
+    ON public.bookshelf FOR UPDATE 
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can remove books from bookshelf" 
+    ON public.bookshelf FOR DELETE 
+    USING (auth.uid() = user_id);
+
+-- 4.7 POST COMMENTS POLICIES
+CREATE POLICY "Comments are viewable by everyone" 
+    ON public.post_comments FOR SELECT 
+    USING (true);
+
+CREATE POLICY "Authenticated users can create comments" 
+    ON public.post_comments FOR INSERT 
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own comments" 
+    ON public.post_comments FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- ==============================================================================
@@ -320,6 +380,33 @@ CREATE OR REPLACE TRIGGER on_post_upvote_removed
     AFTER DELETE ON public.post_upvotes
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_upvote_change();
 
+-- 5.4 AUTOMATIC SYNC: POST COMMENTS COUNT
+CREATE OR REPLACE FUNCTION public.handle_post_comment_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        UPDATE public.posts
+        SET comments_count = comments_count + 1
+        WHERE id = NEW.post_id;
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        UPDATE public.posts
+        SET comments_count = GREATEST(0, comments_count - 1)
+        WHERE id = OLD.post_id;
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_post_comment_added
+    AFTER INSERT ON public.post_comments
+    FOR EACH ROW EXECUTE FUNCTION public.handle_post_comment_change();
+
+CREATE OR REPLACE TRIGGER on_post_comment_removed
+    AFTER DELETE ON public.post_comments
+    FOR EACH ROW EXECUTE FUNCTION public.handle_post_comment_change();
+
 -- ==============================================================================
 -- 6. COMMUNITY LEADERBOARD AGGREGATION FUNCTIONS / RPC
 -- ==============================================================================
@@ -413,8 +500,47 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ==============================================================================
--- 7. SUPABASE STORAGE BUCKET CONFIGURATION (REFERENCE)
+-- 7. SUPABASE STORAGE BUCKET CONFIGURATION & POLICIES
 -- ==============================================================================
--- In Supabase dashboard or via SQL:
--- INSERT INTO storage.buckets (id, name, public) VALUES ('book-covers', 'book-covers', true) ON CONFLICT DO NOTHING;
--- INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT DO NOTHING;
+
+-- Create public storage buckets
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('book-covers', 'book-covers', true) 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('avatars', 'avatars', true) 
+ON CONFLICT (id) DO NOTHING;
+
+-- Public read access for book covers and avatars
+CREATE POLICY "Public Read Access for Book Covers" 
+    ON storage.objects FOR SELECT 
+    USING (bucket_id = 'book-covers');
+
+CREATE POLICY "Public Read Access for Avatars" 
+    ON storage.objects FOR SELECT 
+    USING (bucket_id = 'avatars');
+
+-- Authenticated users can upload covers and avatars
+CREATE POLICY "Authenticated users can upload book covers" 
+    ON storage.objects FOR INSERT 
+    WITH CHECK (bucket_id = 'book-covers' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can upload avatars" 
+    ON storage.objects FOR INSERT 
+    WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
+
+-- ==============================================================================
+-- 8. SUPABASE REALTIME REPLICATION CONFIGURATION
+-- ==============================================================================
+-- Enable Realtime publication on posts, upvotes, and comments for live community feed
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.posts;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.post_upvotes;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.post_comments;
+EXCEPTION WHEN OTHERS THEN
+    -- If publication already includes table or does not exist, continue cleanly
+    NULL;
+END $$;
+

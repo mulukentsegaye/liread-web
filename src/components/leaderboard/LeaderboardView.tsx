@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trophy, ArrowLeft } from 'lucide-react';
 import { TOP_WEEKLY_READERS, CURRENT_USER_LEADERBOARD_STATUS } from '../../data/mockData';
+import { leaderboardService } from '../../services/leaderboardService';
+import { useAuthStore } from '../../stores/authStore';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { LeaderboardEntry } from '../../types';
 
 interface LeaderboardViewProps {
   onBack?: () => void;
@@ -8,10 +12,43 @@ interface LeaderboardViewProps {
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
   const [filter, setFilter] = useState<'daily' | 'weekly' | 'lifetime'>('weekly');
+  const [remoteList, setRemoteList] = useState<LeaderboardEntry[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
+    let isMounted = true;
+    setIsLoading(true);
+
+    leaderboardService
+      .getLeaderboard(filter, user.id)
+      .then((data) => {
+        if (isMounted) {
+          if (data && data.length > 0) {
+            setRemoteList(data);
+          } else {
+            setRemoteList(null);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Leaderboard fetch error, fallback to mock:', err);
+        if (isMounted) setRemoteList(null);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [filter, user.id]);
 
   const multiplier = filter === 'daily' ? 0.15 : filter === 'weekly' ? 1 : 4.5;
 
-  const currentList = TOP_WEEKLY_READERS.map((entry) => ({
+  const mockList = TOP_WEEKLY_READERS.map((entry) => ({
     ...entry,
     minutesRead: Math.round(entry.minutesRead * multiplier),
     formattedTime:
@@ -21,6 +58,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
         ? `${Math.round((entry.minutesRead * multiplier) / 60)} hrs`
         : entry.formattedTime,
   }));
+
+  const currentList = remoteList && remoteList.length > 0 ? remoteList : mockList;
 
   const userStanding = {
     ...CURRENT_USER_LEADERBOARD_STATUS,
