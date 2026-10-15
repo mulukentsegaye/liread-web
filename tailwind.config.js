@@ -58,6 +58,12 @@ export default {
           200: '#f3efe3',
           300: '#e9e3cf',
           400: '#ded3b6',
+        },
+        alabaster: '#FBFBF9',
+        forest: {
+          DEFAULT: '#2D6A4F',
+          dark: '#22533D',
+          light: '#EBF2ED',
         }
       },
       fontFamily: {

@@ -38,7 +38,7 @@ export const VibeSelector: React.FC<VibeSelectorProps> = ({ isOpen, onClose }) =
     {
       id: 'light',
       name: 'Light Mode',
-      desc: 'Clean paper alabaster reading space with distraction-free clarity',
+      desc: 'Warm Alabaster (#FBFBF9) with soothing Forest Sage (#2D6A4F) accents',
       icon: Sun,
     },
     {

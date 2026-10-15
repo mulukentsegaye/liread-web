@@ -9,7 +9,7 @@
 /* 1. LIGHT MODE (Default) */
 :root,
 [data-theme="light"] {
-  --vibe-bg: #FAFAF9;
+  --vibe-bg: #FBFBF9;
   --vibe-card: #FFFFFF;
   --vibe-card-subtle: #F4F4F0;
   --vibe-card-hover: #EFEFEA;

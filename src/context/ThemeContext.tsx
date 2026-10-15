@@ -4,13 +4,13 @@ import { ThemeMode, VibeConfig } from '../types/theme';
 export const LIGHT_THEME: VibeConfig = {
   id: 'light',
   name: 'Light Mode',
-  tagline: 'Clean, Airy, Daylight Minimal',
-  concept: 'Warm paper alabaster reading aesthetic with crisp typography and distraction-free clarity.',
-  description: 'Pure alabaster background, elevated crisp white cards, botanical emerald accents, and charcoal reader ink.',
+  tagline: 'Warm Alabaster & Forest Sage',
+  concept: 'Warm Alabaster reading aesthetic with Forest Sage botanical highlights and crisp typography.',
+  description: 'Warm Alabaster (#FBFBF9) background, elevated crisp white cards, Forest Sage (#2D6A4F) accents, and charcoal reader ink.',
   mode: 'light',
   isDefault: true,
   colors: {
-    bg: '#FAFAF9',
+    bg: '#FBFBF9',
     card: '#FFFFFF',
     cardSubtle: '#F4F4F0',
     cardHover: '#F0EFEA',
@@ -27,7 +27,7 @@ export const LIGHT_THEME: VibeConfig = {
     secondarySubtle: '#FEF3C7',
     badgeBg: '#EBF2ED',
     badgeText: '#2D6A4F',
-    ambientGlow: 'radial-gradient(1100px 600px at 50% -10%, rgba(45, 106, 79, 0.04) 0%, transparent 80%)',
+    ambientGlow: 'none',
   },
   typography: {
     uiFont: 'Plus Jakarta Sans',
@@ -35,7 +35,7 @@ export const LIGHT_THEME: VibeConfig = {
     description: 'Modern Geometric Sans UI × Classic Bookprint Serif Quotes',
   },
   surfaceFeel: 'Clean 1px borders, subtle soft diffused shadows, and rounded tactile cards.',
-  swatches: ['#FAFAF9', '#FFFFFF', '#2D6A4F', '#D97706'],
+  swatches: ['#FBFBF9', '#FFFFFF', '#2D6A4F', '#D97706'],
 };
 
 export const DARK_THEME: VibeConfig = {
@@ -63,7 +63,7 @@ export const DARK_THEME: VibeConfig = {
     secondarySubtle: 'rgba(245, 158, 11, 0.15)',
     badgeBg: 'rgba(16, 185, 129, 0.16)',
     badgeText: '#34D399',
-    ambientGlow: 'radial-gradient(900px 500px at 70% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 70%)',
+    ambientGlow: 'none',
   },
   typography: {
     uiFont: 'Plus Jakarta Sans',

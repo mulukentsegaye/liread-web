@@ -3,30 +3,26 @@ import {
   BookOpen, 
   Sparkles, 
   Clock, 
-  Compass, 
   Volume2, 
   VolumeX, 
   Play, 
   Pause, 
-  Flame, 
   ChevronRight, 
   ArrowRight, 
   Check, 
-  Star, 
-  SlidersHorizontal, 
   Bookmark, 
   BarChart3, 
-  Library, 
-  Layers, 
-  Moon, 
-  Sun,
-  ShieldCheck,
   Feather,
-  Quote
+  Star,
+  Compass,
+  Library,
+  Quote,
+  SlidersHorizontal,
+  Flame
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
-import { AmbientSoundId, AMBIENT_SOUNDS, VibeId, VibeConfig, ThemeMode } from '../../types/theme';
+import { AmbientSoundId, ThemeMode, VibeConfig } from '../../types/theme';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -35,7 +31,7 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer, onGoToLogin }) => {
-  const { vibe, allVibes, setVibe, vibeConfig, openPopover } = useTheme();
+  const { allVibes, vibeConfig } = useTheme();
   const { 
     isPlaying, 
     activeSoundId, 
@@ -197,209 +193,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </button>
         </div>
 
-        {/* Social Proof & Literary Metric Strip */}
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 py-3 px-6 rounded-2xl bg-vibe-card/60 border border-vibe-border text-xs text-vibe-ink-secondary mb-16 shadow-xs">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-1.5">
-              <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-600 border border-emerald-500/30 flex items-center justify-center text-[10px] font-bold">MP</span>
-              <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-600 border border-amber-500/30 flex items-center justify-center text-[10px] font-bold">RR</span>
-              <span className="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-600 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold">AM</span>
-            </div>
-            <span className="font-medium text-vibe-ink">12,000+</span> Mindful Readers
-          </div>
-
-          <div className="hidden sm:block w-px h-4 bg-vibe-border" />
-
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-vibe-accent" />
-            <span className="font-medium text-vibe-ink">1.4M+</span> Minutes Logged
-          </div>
-
-          <div className="hidden sm:block w-px h-4 bg-vibe-border" />
-
-          <div className="flex items-center gap-1.5">
-            <div className="flex text-amber-500">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-current" />
-              ))}
-            </div>
-            <span className="font-medium text-vibe-ink">4.9/5</span> Pure Reading Focus
-          </div>
-        </div>
-
-        {/* ==============================================================================
-            INTERACTIVE HERO MOCKUP CARD (Live Readers Hub Interface Preview)
-            ============================================================================== */}
-        <div className="w-full max-w-5xl rounded-3xl border border-vibe-border bg-vibe-card p-3 sm:p-5 shadow-2xl transition-all duration-500 overflow-hidden text-left relative">
-          
-          {/* Mockup Window Chrome Bar */}
-          <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-vibe-border-subtle mb-4">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rose-500/60" />
-              <span className="w-3 h-3 rounded-full bg-amber-500/60" />
-              <span className="w-3 h-3 rounded-full bg-emerald-500/60" />
-              <span className="text-[11px] font-mono text-vibe-ink-muted ml-2">readershub.app · Live Preview</span>
-            </div>
-
-            {/* Live Preview Indicator */}
-            <div className="hidden sm:flex items-center gap-2 text-[11px] text-vibe-ink-muted">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Active Reading Session</span>
-            </div>
-          </div>
-
-          {/* Mockup Inside Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            
-            {/* Left Column: Mini Nav */}
-            <div className="hidden lg:block lg:col-span-3 space-y-1.5 p-3 rounded-2xl bg-vibe-card-subtle/50 border border-vibe-border-subtle text-xs">
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-vibe-accent-subtle text-vibe-accent font-semibold">
-                <Compass className="w-4 h-4" />
-                <span>Discover Feed</span>
-              </div>
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-vibe-ink-secondary hover:text-vibe-ink">
-                <Clock className="w-4 h-4" />
-                <span>Reading Timer</span>
-              </div>
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-vibe-ink-secondary hover:text-vibe-ink">
-                <BarChart3 className="w-4 h-4" />
-                <span>Analytics</span>
-              </div>
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-vibe-ink-secondary hover:text-vibe-ink">
-                <Library className="w-4 h-4" />
-                <span>My Bookshelf</span>
-              </div>
-
-              <div className="pt-3 border-t border-vibe-border-subtle mt-4">
-                <div className="p-3 rounded-xl bg-vibe-card border border-vibe-border">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-vibe-ink-muted">Active Vibe</span>
-                  <p className="text-xs font-semibold text-vibe-ink mt-0.5">{vibeConfig.name}</p>
-                  <p className="text-[10px] text-vibe-ink-muted leading-tight mt-1">{vibeConfig.tagline}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Center Column: Featured Book Quote & Reflection Card */}
-            <div className="lg:col-span-6 space-y-3">
-              <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-xs space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <img 
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" 
-                      alt="Maya Patel" 
-                      className="w-8 h-8 rounded-full object-cover ring-1 ring-vibe-border"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-vibe-ink">Maya Patel</p>
-                      <p className="text-[10px] text-vibe-ink-muted">shared a passage · 2h ago</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-                    Creativity
-                  </span>
-                </div>
-
-                {/* Book Card Preview */}
-                <div className="p-3.5 sm:p-4 rounded-xl bg-vibe-card-subtle border border-vibe-border flex flex-col sm:flex-row gap-3 items-center">
-                  <div className="w-20 h-28 bg-vibe-card rounded border border-vibe-border p-2 flex flex-col justify-between text-center flex-shrink-0 shadow-xs">
-                    <span className="text-[8px] font-bold uppercase leading-tight line-clamp-2">The Creative Act</span>
-                    <span className="w-4 h-4 rounded-full border border-vibe-accent/40 mx-auto" />
-                    <span className="text-[7px] text-vibe-ink-muted">Rick Rubin</span>
-                  </div>
-                  <div className="flex-1">
-                    <Quote className="w-4 h-4 text-vibe-accent mb-1 opacity-75" />
-                    <blockquote className="font-serif italic text-xs sm:text-sm text-vibe-ink leading-relaxed">
-                      “The object isn't to make art, it's to be in that wonderful state which makes art inevitable.”
-                    </blockquote>
-                    <p className="text-[10px] font-mono text-vibe-ink-muted mt-2">p. 42 · Hardcover</p>
-                  </div>
-                </div>
-
-                {/* Footer Engagement */}
-                <div className="flex items-center justify-between text-[11px] text-vibe-ink-muted pt-1 border-t border-vibe-border-subtle">
-                  <span>❤️ 48 Readers inspired</span>
-                  <span>💬 12 Reflections</span>
-                  <span>🔖 Saved to Bookshelf</span>
-                </div>
-              </div>
-
-              {/* Floating Mini Sound Player Pill */}
-              <div className="p-3 rounded-full bg-vibe-card border border-vibe-border shadow-xs flex items-center justify-between px-4">
-                <div className="flex items-center gap-2.5">
-                  <button 
-                    onClick={togglePlay}
-                    className="w-7 h-7 rounded-full bg-vibe-accent text-white flex items-center justify-center hover:bg-vibe-accent-hover transition-colors"
-                  >
-                    {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
-                  </button>
-                  <div>
-                    <span className="text-xs font-semibold text-vibe-ink block leading-tight">
-                      {soundOptions.find(s => s.id === activeSoundId)?.label || 'Atmospheric Audio'}
-                    </span>
-                    <span className="text-[10px] text-vibe-ink-muted">
-                      {isPlaying ? 'Playing Ambient Soundscape' : 'Click Play to Listen'}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className={`w-1 h-3 rounded-full bg-vibe-accent ${isPlaying ? 'animate-pulse' : 'opacity-40'}`} />
-                  <span className={`w-1 h-4 rounded-full bg-vibe-accent ${isPlaying ? 'animate-pulse delay-75' : 'opacity-40'}`} />
-                  <span className={`w-1 h-2 rounded-full bg-vibe-accent ${isPlaying ? 'animate-pulse delay-150' : 'opacity-40'}`} />
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Column: Mini Goal & Streak Widget */}
-            <div className="lg:col-span-3 space-y-3">
-              <div className="p-4 rounded-2xl bg-vibe-card border border-vibe-border shadow-xs text-center space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-vibe-ink">Daily Goal</span>
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-vibe-ink-muted" />
-                </div>
-
-                <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" className="text-vibe-border" fill="transparent" />
-                    <circle 
-                      cx="48" 
-                      cy="48" 
-                      r="40" 
-                      stroke="currentColor" 
-                      strokeWidth="6" 
-                      strokeDasharray="251.2" 
-                      strokeDashoffset="40" 
-                      strokeLinecap="round" 
-                      className="text-vibe-accent transition-all duration-700" 
-                      fill="transparent" 
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-lg font-bold text-vibe-ink">52</span>
-                    <span className="text-[9px] text-vibe-ink-muted">of 60 mins</span>
-                  </div>
-                </div>
-
-                <div className="p-2 rounded-xl bg-vibe-card-subtle text-[11px] font-medium text-vibe-accent flex items-center justify-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5" />
-                  <span>7-Day Reading Streak!</span>
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-vibe-card border border-vibe-border text-center">
-                <button
-                  onClick={onEnterApp}
-                  className="w-full py-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors shadow-xs"
-                >
-                  Enter Live App →
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
       </section>
 
       {/* ==============================================================================
@@ -506,7 +299,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                           className="px-2 py-0.5 rounded-full text-[9px] font-medium text-white"
                           style={{ backgroundColor: item.colors.accent }}
                         >
-                          Active
+                          {item.mode === 'dark' ? 'Night Focus' : 'Daylight Focus'}
                         </span>
                       </div>
                     </div>
@@ -804,7 +597,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </h2>
 
           <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-lg mx-auto leading-relaxed">
-            Join thousands of thoughtful readers who have turned daily reading into an art form. 
+            A quiet, distraction-free space to turn your daily reading into an intentional art form. 
             Free, private, and distraction-free forever.
           </p>
 
