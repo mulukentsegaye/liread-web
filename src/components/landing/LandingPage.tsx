@@ -24,8 +24,7 @@ import {
   Feather,
   Quote
 } from 'lucide-react';
-import { useTheme, DEFAULT_VIBE } from '../../context/ThemeContext';
-import { VibeTriggerButton } from '../theme/VibeTriggerButton';
+import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId, AMBIENT_SOUNDS, VibeId, VibeConfig, ThemeMode } from '../../types/theme';
 
@@ -117,9 +116,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </a>
           </nav>
 
-          {/* Right Action Stack: Vibe Selector & Enter App Button */}
+          {/* Right Action Stack: Enter App Button & Login */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <VibeTriggerButton variant="header" />
 
             {onGoToLogin && (
               <button
@@ -254,23 +252,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               <span className="text-[11px] font-mono text-vibe-ink-muted ml-2">readershub.app · Live Preview</span>
             </div>
 
-            {/* Mini Quick Switcher directly on Mockup */}
-            <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-vibe-ink-muted">
-              <span>Theme:</span>
-              <button
-                type="button"
-                onClick={() => handleVibeSelect('light')}
-                className={`px-2.5 py-0.5 rounded-full border transition-all ${vibe === 'light' ? 'border-vibe-accent bg-vibe-accent text-white font-semibold' : 'border-vibe-border hover:bg-vibe-card-subtle'}`}
-              >
-                Light Mode
-              </button>
-              <button
-                type="button"
-                onClick={() => handleVibeSelect('dark')}
-                className={`px-2.5 py-0.5 rounded-full border transition-all ${vibe === 'dark' ? 'border-vibe-accent bg-vibe-accent text-white font-semibold' : 'border-vibe-border hover:bg-vibe-card-subtle'}`}
-              >
-                Dark Mode
-              </button>
+            {/* Live Preview Indicator */}
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-vibe-ink-muted">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Active Reading Session</span>
             </div>
           </div>
 
@@ -879,12 +864,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <a href="#vibes" className="hover:text-vibe-ink transition-colors">Vibes</a>
             <a href="#features" className="hover:text-vibe-ink transition-colors">Sanctuary</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Audio</a>
-            <button 
-              onClick={() => setVibe(DEFAULT_VIBE)} 
-              className="hover:text-vibe-accent transition-colors font-medium"
-            >
-              Reset Theme
-            </button>
             {onGoToLogin && (
               <button 
                 onClick={onGoToLogin} 

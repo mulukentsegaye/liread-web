@@ -108,15 +108,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setThemeState] = useState<ThemeMode>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'dark' || stored === 'light') {
-        return stored;
-      }
-      const legacy = localStorage.getItem('readers_hub_vibe');
-      if (legacy === 'dark' || legacy === 'midnight-library' || legacy === 'dark-academia' || legacy === 'deep-orbit' || legacy === 'lofi-cafe' || legacy === 'cyber-codex') {
+      if (stored === 'dark') {
         return 'dark';
       }
-      if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
+      if (stored === 'light') {
+        return 'light';
       }
     }
     return 'light';

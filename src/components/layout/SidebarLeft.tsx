@@ -11,7 +11,6 @@ import {
   ChevronsUpDown 
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
-import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
 export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved';
 
@@ -108,14 +107,6 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
               </span>
             </button>
           </div>
-        </div>
-
-        {/* Atmosphere & Vibe Selector in Navigation Bar */}
-        <div>
-          <div className="hidden lg:block px-4 text-[11px] font-semibold tracking-wider text-vibe-ink-muted uppercase mb-2">
-            Atmosphere
-          </div>
-          <VibeTriggerButton variant="sidebar" />
         </div>
 
         {/* Literary Inspiration Callout Card */}

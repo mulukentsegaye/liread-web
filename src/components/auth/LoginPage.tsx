@@ -17,7 +17,6 @@ import {
   Bookmark
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
-import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 interface LoginPageProps {
@@ -165,8 +164,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
               Readers Hub
             </span>
           </div>
-          
-          <VibeTriggerButton variant="header" />
         </div>
       </header>
 
