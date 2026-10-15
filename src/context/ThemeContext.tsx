@@ -42,7 +42,7 @@ export const DARK_THEME: VibeConfig = {
   id: 'dark',
   name: 'Dark Mode',
   tagline: 'Archival Serenity & Midnight Focus',
-  concept: 'Eye-comfort midnight slate sanctuary with luminous emerald desk highlights and soft reading glow.',
+  concept: 'Eye-comfort midnight slate workspace with luminous emerald desk highlights and soft reading glow.',
   description: 'Inky midnight slate paired with luminous emerald accents and warm amber bookmark ribbons.',
   mode: 'dark',
   colors: {
