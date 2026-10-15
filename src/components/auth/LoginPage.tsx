@@ -173,16 +173,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           
           {/* Left Column: Bookish Atmosphere Showcase (Desktop only: lg+) */}
           <div className="hidden lg:flex lg:col-span-5 p-8 xl:p-10 flex-col justify-between relative bg-vibe-card-subtle border-r border-vibe-border overflow-hidden">
-            {/* Ambient Background Aura */}
-            <div 
-              className="absolute -top-24 -left-24 w-72 h-72 rounded-full opacity-35 blur-3xl pointer-events-none"
-              style={{ background: 'var(--vibe-accent)' }}
-            />
-            <div 
-              className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full opacity-25 blur-3xl pointer-events-none"
-              style={{ background: 'var(--vibe-secondary)' }}
-            />
-
             {/* Top Brand Block */}
             <div className="relative z-10 space-y-3">
               <div className="flex items-center gap-2.5">

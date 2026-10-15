@@ -145,16 +145,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           2. HERO SECTION: EDITORIAL HEADLINE & ATMOSPHERIC SHOWCASE
           ============================================================================== */}
       <section className="relative w-full pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
-        
-        {/* Subtle Ambient Radial Glow */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-40 -z-10"
-          style={{
-            background: 'radial-gradient(1000px 500px at 50% 20%, var(--vibe-accent) 0%, transparent 70%)',
-            filter: 'blur(90px)',
-          }}
-        />
-
         {/* Top Tagline Pill */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border shadow-xs text-xs font-medium text-vibe-ink-secondary mb-6 sm:mb-8 animate-in fade-in duration-500">
           <Sparkles className="w-3.5 h-3.5 text-vibe-accent" />
@@ -804,16 +794,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           7. FINAL HIGH-IMPACT CALL TO ACTION
           ============================================================================== */}
       <section className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border relative overflow-hidden">
-        
-        {/* Glow backdrop */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-30 -z-10"
-          style={{
-            background: 'radial-gradient(800px 400px at 50% 50%, var(--vibe-accent) 0%, transparent 75%)',
-            filter: 'blur(100px)',
-          }}
-        />
-
         <div className="max-w-3xl mx-auto rounded-3xl border border-vibe-border bg-vibe-card p-8 sm:p-14 text-center shadow-xl space-y-6">
           <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent block">
             Begin Your Ritual
