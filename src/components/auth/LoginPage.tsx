@@ -78,6 +78,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           if (error) throw error;
           
           login({
+            id: data.user?.id || 'user-alex-morgan',
             fullName: fullName || 'Book Lover',
             username: username.replace(/^@/, '') || 'reader',
             subtitle: email,
@@ -92,6 +93,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           if (error) throw error;
           
           login({
+            id: data.user?.id || 'user-alex-morgan',
             fullName: data.user?.user_metadata?.full_name || 'Alex Morgan',
             username: data.user?.user_metadata?.username || 'alexmorgan',
           });
