@@ -5,9 +5,10 @@ import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
+  onGoToLanding?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
+export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding }) => {
   const { user } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
   const [isMobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -21,15 +22,20 @@ export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
     <header className="sticky top-0 z-30 w-full bg-vibe-card/90 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-2.5 sm:py-3 transition-colors duration-500">
       <div className="w-full flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Brand / Logo */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs transition-transform active:scale-95">
+        {/* Brand / Logo (Clickable to Landing Page) */}
+        <button 
+          type="button"
+          onClick={onGoToLanding}
+          className="flex items-center gap-2 sm:gap-3 flex-shrink-0 hover:opacity-85 transition-opacity text-left cursor-pointer group outline-none"
+          title="Back to Landing Page"
+        >
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs transition-transform group-hover:scale-105 active:scale-95">
             <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
             Readers Hub
           </span>
-        </div>
+        </button>
 
         {/* Center Search Bar (Tablet & Desktop: md+) */}
         <div className="hidden md:flex flex-1 max-w-xl mx-auto px-2">
@@ -52,6 +58,18 @@ export const Header: React.FC<HeaderProps> = ({ onSearch }) => {
         {/* Right Section: Vibe Selector Button, Streak badge, Date, Notifications, Profile */}
         <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 justify-end">
           
+          {/* Landing Page link pill */}
+          {onGoToLanding && (
+            <button
+              type="button"
+              onClick={onGoToLanding}
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors border border-vibe-border shadow-xs"
+              title="View Landing Page"
+            >
+              <span>Landing Page</span>
+            </button>
+          )}
+
           {/* Sleek Vibe Selector Header Button */}
           <VibeTriggerButton variant="header" />
 

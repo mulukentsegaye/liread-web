@@ -18,9 +18,10 @@ export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bo
 interface SidebarLeftProps {
   activeTab: NavigationTab;
   onTabChange: (tab: NavigationTab) => void;
+  onGoToLanding?: () => void;
 }
 
-export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange }) => {
+export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding }) => {
   const { user } = useAuthStore();
 
   const navItems = [
@@ -132,7 +133,19 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
       </div>
 
       {/* Sidebar Footer */}
-      <div className="pt-4 border-t border-vibe-border space-y-2">
+      <div className="pt-4 border-t border-vibe-border space-y-1">
+        {onGoToLanding && (
+          <button
+            onClick={onGoToLanding}
+            title="Return to Landing Page"
+            aria-label="Landing page"
+            className="w-full min-h-[44px] flex items-center justify-center lg:justify-start gap-3 px-3 py-2 text-xs font-medium text-vibe-ink-secondary hover:text-vibe-accent hover:bg-vibe-card-subtle rounded-xl transition-colors"
+          >
+            <Compass className="w-5 h-5 text-vibe-accent flex-shrink-0" />
+            <span className="hidden lg:inline">Landing Page</span>
+          </button>
+        )}
+
         <button
           onClick={() => alert("Reader Community & Help Guide:\n- Customize your reading vibe.\n- Track active reading time.\n- Share passages and notes.\n- Climb weekly leaderboards!")}
           title="Help & community"

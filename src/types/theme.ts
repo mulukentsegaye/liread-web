@@ -1,16 +1,7 @@
-export type VibeId = 
-  | 'nordic-studio'
-  | 'midnight-library'
-  | 'dark-academia' 
-  | 'sepia-manuscript' 
-  | 'kyoto-minimalist' 
-  | 'cyber-codex'
-  | 'botanical-zen'
-  | 'deep-orbit' 
-  | 'lofi-cafe';
+export type ThemeMode = 'light' | 'dark';
 
-// Backward compatibility alias
-export type ThemeId = VibeId;
+export type ThemeId = ThemeMode;
+export type VibeId = ThemeMode;
 
 export interface VibeColors {
   bg: string;
@@ -34,12 +25,12 @@ export interface VibeColors {
 }
 
 export interface VibeConfig {
-  id: VibeId;
+  id: ThemeMode;
   name: string;
   tagline: string;
   concept: string;
   description: string;
-  mode: 'light' | 'dark' | 'warm';
+  mode: ThemeMode;
   isDefault?: boolean;
   colors: VibeColors;
   typography: {
@@ -70,9 +61,9 @@ export const AMBIENT_SOUNDS: Record<AmbientSoundId, AmbientTrackConfig> = {
     id: 'birds',
     name: 'Daylight Birds',
     subtitle: 'Morning Meadow & Gentle Wind',
-    description: 'Gentle forest morning breeze and birdsong',
-    themeVibe: 'Nordic Studio',
-    themeId: 'nordic-studio',
+    description: 'Gentle forest morning breeze and birdsong for daylight reading focus',
+    themeVibe: 'Light Mode',
+    themeId: 'light',
     streamUrl: 'https://assets.mixkit.co/active_storage/sfx/1253/1253-preview.mp3',
     fallbackUrl: 'https://cdn.freesound.org/previews/316/316921_5121236-lq.mp3',
     iconName: 'Bird',
@@ -81,9 +72,9 @@ export const AMBIENT_SOUNDS: Record<AmbientSoundId, AmbientTrackConfig> = {
     id: 'rain',
     name: 'Rain on Glass',
     subtitle: 'Window Patter & Gray Skies',
-    description: 'Soothing steady rain against library window panes',
-    themeVibe: 'Midnight Library',
-    themeId: 'midnight-library',
+    description: 'Soothing steady rain against library window panes for night focus',
+    themeVibe: 'Dark Mode',
+    themeId: 'dark',
     streamUrl: 'https://assets.mixkit.co/active_storage/sfx/1251/1251-preview.mp3',
     fallbackUrl: 'https://cdn.freesound.org/previews/346/346170_5121236-lq.mp3',
     iconName: 'CloudRain',
@@ -93,8 +84,8 @@ export const AMBIENT_SOUNDS: Record<AmbientSoundId, AmbientTrackConfig> = {
     name: 'Hearth Fireplace',
     subtitle: 'Crackling Cedar & Warm Embers',
     description: 'Crackling oak embers in a mahogany study',
-    themeVibe: 'Dark Academia',
-    themeId: 'dark-academia',
+    themeVibe: 'Dark Mode',
+    themeId: 'dark',
     streamUrl: 'https://assets.mixkit.co/active_storage/sfx/1252/1252-preview.mp3',
     fallbackUrl: 'https://cdn.freesound.org/previews/399/399934_5121236-lq.mp3',
     iconName: 'Flame',
@@ -103,9 +94,9 @@ export const AMBIENT_SOUNDS: Record<AmbientSoundId, AmbientTrackConfig> = {
     id: 'deep-space',
     name: 'Cosmic Drone',
     subtitle: 'Nebula Resonance & Deep Focus',
-    description: 'Hypnotic resonant space hum for deep focus',
-    themeVibe: 'Cyber Codex',
-    themeId: 'cyber-codex',
+    description: 'Hypnotic resonant space hum for deep distraction-free reading',
+    themeVibe: 'Dark Mode',
+    themeId: 'dark',
     streamUrl: 'https://assets.mixkit.co/active_storage/sfx/2432/2432-preview.mp3',
     fallbackUrl: 'https://cdn.freesound.org/previews/384/384849_5121236-lq.mp3',
     iconName: 'Orbit',
@@ -113,13 +104,6 @@ export const AMBIENT_SOUNDS: Record<AmbientSoundId, AmbientTrackConfig> = {
 };
 
 export const THEME_AMBIENT_MAP: Record<string, AmbientSoundId> = {
-  'nordic-studio': 'birds',
-  'midnight-library': 'rain',
-  'dark-academia': 'fireplace',
-  'sepia-manuscript': 'fireplace',
-  'kyoto-minimalist': 'birds',
-  'cyber-codex': 'deep-space',
-  'botanical-zen': 'birds',
-  'deep-orbit': 'deep-space',
-  'lofi-cafe': 'rain',
+  'light': 'birds',
+  'dark': 'rain',
 };

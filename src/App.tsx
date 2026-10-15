@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
@@ -12,11 +12,18 @@ import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { VibeSelector } from './components/theme/VibeSelector';
+import { LandingPage } from './components/landing/LandingPage';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
 import { useTheme } from './context/ThemeContext';
 
 export const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<'landing' | 'app'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#app') {
+      return 'app';
+    }
+    return 'landing';
+  });
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +31,30 @@ export const App: React.FC = () => {
   const { isPopoverOpen, closePopover } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, updateUser } = useAuthStore();
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#app') {
+        setCurrentView('app');
+      } else if (window.location.hash === '#landing' || !window.location.hash) {
+        setCurrentView('landing');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleEnterApp = () => {
+    setCurrentView('app');
+    window.location.hash = '#app';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoToLanding = () => {
+    setCurrentView('landing');
+    window.location.hash = '#landing';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleTabChange = (tab: NavigationTab) => {
     if (tab === 'timer') {
@@ -51,6 +82,26 @@ export const App: React.FC = () => {
     }
   };
 
+  // 0. Render Premium Clean Landing Page when in 'landing' view
+  if (currentView === 'landing') {
+    return (
+      <>
+        <LandingPage
+          onEnterApp={handleEnterApp}
+          onOpenTimer={() => {
+            handleEnterApp();
+            setFullScreenOpen(true);
+          }}
+        />
+        {/* Vibe Atmospheric Theme Selector Modal */}
+        <VibeSelector
+          isOpen={isPopoverOpen}
+          onClose={closePopover}
+        />
+      </>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen flex flex-col w-full pb-44 md:pb-28 transition-colors duration-500 overflow-x-clip"
@@ -61,7 +112,10 @@ export const App: React.FC = () => {
     >
       
       {/* 1. Sticky Top Application Header with Vibe Trigger */}
-      <Header onSearch={(query) => setSearchQuery(query)} />
+      <Header 
+        onSearch={(query) => setSearchQuery(query)} 
+        onGoToLanding={handleGoToLanding}
+      />
 
       {/* 2. Main Responsive App Shell: 
           - Mobile (< 768px): 1-column main viewport
@@ -74,6 +128,7 @@ export const App: React.FC = () => {
         <SidebarLeft
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          onGoToLanding={handleGoToLanding}
         />
 
         {/* Center Main Viewport */}
