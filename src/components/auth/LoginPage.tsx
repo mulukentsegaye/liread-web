@@ -96,7 +96,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             fullName: data.user?.user_metadata?.full_name || email.split('@')[0] || 'Reader',
             username: data.user?.user_metadata?.username || email.split('@')[0] || 'reader',
           });
-          setSuccessMsg('Signed in successfully! Opening your sanctuary...');
+          setSuccessMsg('Signed in successfully! Opening your library...');
           setTimeout(() => onSuccess(), 600);
         }
       } else {
@@ -108,7 +108,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           username: mode === 'signup' ? username.replace(/^@/, '') : (email.split('@')[0] || 'reader'),
         });
         
-        setSuccessMsg(mode === 'signup' ? 'Welcome to Readers Hub!' : 'Welcome back to your reading sanctuary!');
+        setSuccessMsg(mode === 'signup' ? 'Welcome to Readers Hub!' : 'Welcome back to Readers Hub!');
         setTimeout(() => onSuccess(), 600);
       }
     } catch (err: any) {
@@ -152,7 +152,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           title="Return to Home"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back to Sanctuary</span>
+          <span>Back to Home</span>
         </button>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -184,7 +184,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                 </span>
               </div>
               <p className="text-xs text-vibe-ink-secondary leading-relaxed">
-                Your community sanctuary for active reading sessions, inspiring passages, and stillness.
+                Your dedicated space for active reading sessions, inspiring passages, and mindful habits.
               </p>
             </div>
 
@@ -233,7 +233,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             <div className="mb-6 sm:mb-8 text-center sm:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vibe-accent-subtle text-vibe-accent text-[11px] font-semibold mb-2 shadow-xs">
                 <Sparkles className="w-3 h-3" />
-                <span>Reader Sanctuary Portal</span>
+                <span>Reader Account</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-serif font-bold text-vibe-ink tracking-tight">
                 {mode === 'signin' ? 'Welcome Back, Reader' : 'Begin Your Reading Journey'}
@@ -420,7 +420,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>{mode === 'signin' ? 'Sign In to Sanctuary' : 'Complete Registration'}</span>
+                    <span>{mode === 'signin' ? 'Sign In' : 'Complete Registration'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

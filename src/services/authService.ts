@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { UserProfile } from '../types';
+import { DEFAULT_USER_AVATAR } from '../data/mockData';
 
 export const authService = {
   /**
@@ -82,7 +83,7 @@ export const authService = {
       id: data.id,
       username: data.username,
       fullName: data.full_name || data.username,
-      avatarUrl: data.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+      avatarUrl: data.avatar_url || DEFAULT_USER_AVATAR,
       subtitle: data.bio || undefined,
       totalMinutesRead: data.total_minutes_read,
       currentStreak: data.current_streak,

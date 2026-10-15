@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Post } from '../types';
-import { INITIAL_POSTS } from '../data/mockData';
+import { INITIAL_POSTS, DEFAULT_USER_AVATAR } from '../data/mockData';
 import { postsService } from '../services/postsService';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -116,7 +116,7 @@ export const useFeedStore = create<FeedStore>()(
           id: tempId,
           userId: currentUserId || 'user-alex-morgan',
           authorName: postData.authorName || 'Alex Morgan',
-          authorAvatar: postData.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+          authorAvatar: postData.authorAvatar || DEFAULT_USER_AVATAR,
           actionText: postData.postType === 'finished_book' ? 'finished a book' : 'shared a passage',
           timeAgo: 'Just now',
           tag: postData.tag || 'General',

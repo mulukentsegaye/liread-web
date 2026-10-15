@@ -89,9 +89,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
                 Readers Hub
               </span>
-              <span className="hidden sm:inline-block ml-2 text-[10px] uppercase tracking-widest font-mono font-semibold px-2 py-0.5 rounded-full bg-vibe-card-subtle text-vibe-ink-muted border border-vibe-border">
-                Sanctuary
-              </span>
             </div>
           </div>
 
@@ -101,7 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               Multi-Theme Vibes
             </a>
             <a href="#features" className="hover:text-vibe-accent transition-colors">
-              Reading Sanctuary
+              Features
             </a>
             <a href="#soundscapes" className="hover:text-vibe-accent transition-colors">
               Atmospheric Audio
@@ -143,7 +140,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
         {/* Top Tagline Pill */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border shadow-xs text-xs font-medium text-vibe-ink-secondary mb-6 sm:mb-8 animate-in fade-in duration-500">
           <Sparkles className="w-3.5 h-3.5 text-vibe-accent" />
-          <span>The Digital Sanctuary for Deep Reading</span>
+          <span>Distraction-Free Deep Reading</span>
           <span className="w-1 h-1 rounded-full bg-vibe-border" />
           <span className="text-vibe-accent font-semibold">{vibeConfig.name}</span>
         </div>
@@ -331,7 +328,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
-          4. CORE PRODUCT PILLARS & SANCTUARY FEATURES
+          4. CORE PRODUCT PILLARS & FEATURES
           ============================================================================== */}
       <section id="features" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
@@ -411,7 +408,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <Bookmark className="w-6 h-6" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-vibe-ink tracking-tight">
-                Digital Bookshelf & Quote Sanctuary
+                Digital Bookshelf & Saved Quotes
               </h3>
               <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
                 Preserve memorable lines and marginalia with literary serif cards. Build your digital personal library, track reading progress percentages, and revisit kept quotes anytime.
@@ -634,7 +631,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
             <a href="#vibes" className="hover:text-vibe-ink transition-colors">Vibes</a>
-            <a href="#features" className="hover:text-vibe-ink transition-colors">Sanctuary</a>
+            <a href="#features" className="hover:text-vibe-ink transition-colors">Features</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Audio</a>
             {onGoToLogin && (
               <button 

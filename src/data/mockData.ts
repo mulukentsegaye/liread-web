@@ -1,11 +1,13 @@
 import { UserProfile, Post, LeaderboardEntry } from '../types';
 
+export const DEFAULT_USER_AVATAR = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%232D6A4F'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>AM</text></svg>";
+
 export const CURRENT_USER: UserProfile = {
   id: 'user-alex-morgan',
   username: 'alexmorgan',
   fullName: 'Alex Morgan',
   subtitle: 'The everyday reader',
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+  avatarUrl: DEFAULT_USER_AVATAR,
   totalMinutesRead: 522, // 8h 42m (matches weekly leaderboard #12)
   currentStreak: 7,
   dailyGoalMinutes: 60,
@@ -19,7 +21,7 @@ export const INITIAL_POSTS: Post[] = [
     id: 'post-1',
     userId: 'user-maya-patel',
     authorName: 'Maya Patel',
-    authorAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+    authorAvatar: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23D97706'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>MP</text></svg>",
     actionText: 'shared a passage',
     timeAgo: '2 hours ago',
     tag: 'Creativity',
@@ -64,7 +66,7 @@ export const INITIAL_POSTS: Post[] = [
     id: 'post-3',
     userId: 'user-elena-rostova',
     authorName: 'Elena Rostova',
-    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200',
+    authorAvatar: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%234F46E5'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>ER</text></svg>",
     actionText: 'shared a passage',
     timeAgo: '7 hours ago',
     tag: 'Philosophy',

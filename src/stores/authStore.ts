@@ -190,12 +190,21 @@ export const useAuthStore = create<AuthStore>()(
       },
     }),
     {
-      name: 'readers_hub_user_profile_v1',
+      name: 'readers_hub_user_profile_v2',
       partialize: (state) => ({
         user: state.user,
         todayMinutesRead: state.todayMinutesRead,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.user?.avatarUrl && (
+          state.user.avatarUrl.includes('photo-1534528741775') ||
+          state.user.avatarUrl.includes('photo-1494790108377') ||
+          state.user.avatarUrl.includes('photo-1544005313-94ddf0286df2')
+        )) {
+          state.user.avatarUrl = CURRENT_USER.avatarUrl;
+        }
+      },
     }
   )
 );

@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Post } from '../types';
+import { DEFAULT_USER_AVATAR } from '../data/mockData';
 
 interface FetchPostsOptions {
   currentUserId?: string;
@@ -81,7 +82,7 @@ export const postsService = {
         id: item.id,
         userId: item.user_id,
         authorName: profile?.full_name || profile?.username || 'Fellow Reader',
-        authorAvatar: profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+        authorAvatar: profile?.avatar_url || DEFAULT_USER_AVATAR,
         actionText: item.post_type === 'finished_book' ? 'finished a book' : 'shared a passage',
         timeAgo,
         tag: item.tag || 'General',
@@ -143,7 +144,7 @@ export const postsService = {
       id: data.id,
       userId: data.user_id,
       authorName: profile?.full_name || profile?.username || 'You',
-      authorAvatar: profile?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+      authorAvatar: profile?.avatar_url || DEFAULT_USER_AVATAR,
       actionText: data.post_type === 'finished_book' ? 'finished a book' : 'shared a passage',
       timeAgo: 'Just now',
       tag: data.tag,
