@@ -18,7 +18,8 @@ import {
   Library,
   Quote,
   SlidersHorizontal,
-  Flame
+  Flame,
+  Trophy
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
@@ -137,14 +138,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           2. HERO SECTION: EDITORIAL HEADLINE & ATMOSPHERIC SHOWCASE
           ============================================================================== */}
       <section className="relative w-full pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
-        {/* Top Tagline Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border shadow-xs text-xs font-medium text-vibe-ink-secondary mb-6 sm:mb-8 animate-in fade-in duration-500">
-          <Sparkles className="w-3.5 h-3.5 text-vibe-accent" />
-          <span>Distraction-Free Deep Reading</span>
-          <span className="w-1 h-1 rounded-full bg-vibe-border" />
-          <span className="text-vibe-accent font-semibold">{vibeConfig.name}</span>
-        </div>
-
         {/* Editorial Title */}
         <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-vibe-ink leading-[1.15] sm:leading-[1.12] mb-6">
           Where deep reading meets <br />
@@ -375,31 +368,90 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               </ul>
             </div>
 
-            {/* Feature 2: Generative Atmospheric Soundscapes */}
-            <div className="p-6 sm:p-8 rounded-3xl bg-vibe-card border border-vibe-border shadow-xs hover:shadow-md transition-all space-y-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
-                <Volume2 className="w-6 h-6" />
+            {/* Feature 2: Generative Atmospheric Soundscapes (Merged Interactive Audio) */}
+            <div id="soundscapes" className="p-6 sm:p-8 rounded-3xl bg-vibe-card border border-vibe-border shadow-xs hover:shadow-md transition-all space-y-4 group">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
+                  <Volume2 className="w-6 h-6" />
+                </div>
+                {isPlaying && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-500/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live Audio
+                    </span>
+                    <button
+                      type="button"
+                      onClick={toggleMute}
+                      title={isMuted ? 'Unmute' : 'Mute'}
+                      className="p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+                    >
+                      {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
+                    </button>
+                  </div>
+                )}
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-vibe-ink tracking-tight">
-                Atmospheric Soundscape Engine
-              </h3>
-              <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
-                Drown out modern notifications with seamlessly looping binaural audio. Whether you prefer the crackle of a private library hearth or raindrops on a Shibuya coffee shop window.
-              </p>
-              <ul className="space-y-2 pt-2 text-xs text-vibe-ink-muted">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-vibe-accent" />
-                  <span>Auto-paired soundscapes for each aesthetic theme</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-vibe-accent" />
-                  <span>Independent volume controls & mute hotkey</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-vibe-accent" />
-                  <span>Lightweight audio synthesis with zero bandwidth lag</span>
-                </li>
-              </ul>
+
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-vibe-ink tracking-tight">
+                  Atmospheric Soundscape Engine
+                </h3>
+                <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed mt-1">
+                  Drown out distractions with looping ambient audio engineered for reading immersion. Tap any soundscape to preview live:
+                </p>
+              </div>
+
+              {/* 4 Interactive Audio Tracks */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {soundOptions.map((sound) => {
+                  const isThisPlaying = activeSoundId === sound.id && isPlaying;
+                  return (
+                    <button
+                      key={sound.id}
+                      type="button"
+                      onClick={() => handleSelectSound(sound.id)}
+                      className={`px-3 py-2 rounded-xl text-left border text-xs font-medium transition-all flex items-center justify-between gap-2 active:scale-98 ${
+                        isThisPlaying
+                          ? 'border-vibe-accent bg-vibe-accent-subtle text-vibe-accent font-semibold ring-1 ring-vibe-accent/30 shadow-xs'
+                          : 'border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink hover:border-vibe-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-base">{sound.icon}</span>
+                        <span className="truncate text-[11px]">{sound.label}</span>
+                      </div>
+                      <div className="flex-shrink-0">
+                        {isThisPlaying ? (
+                          <div className="w-5 h-5 rounded-full bg-vibe-accent text-white flex items-center justify-center">
+                            <Pause className="w-2.5 h-2.5" />
+                          </div>
+                        ) : (
+                          <div className="w-5 h-5 rounded-full border border-vibe-border flex items-center justify-center text-vibe-ink-muted group-hover:text-vibe-ink">
+                            <Play className="w-2.5 h-2.5 ml-0.5" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Volume Slider when active */}
+              {isPlaying && (
+                <div className="flex items-center gap-3 pt-2 border-t border-vibe-border-subtle text-xs text-vibe-ink-muted">
+                  <span className="text-[11px]">Volume</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={isMuted ? 0 : volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    className="w-24 accent-vibe-accent cursor-pointer h-1.5 bg-vibe-border rounded-lg"
+                  />
+                  <span className="font-mono text-[10px]">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
+                </div>
+              )}
             </div>
 
             {/* Feature 3: Digital Bookshelf & Saved Passages */}
@@ -462,103 +514,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
-          5. INTERACTIVE AMBIENT SOUNDSCAPE LOUNGE
-          ============================================================================== */}
-      <section id="soundscapes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-card-subtle/30">
-        <div className="max-w-4xl mx-auto rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-10 shadow-lg text-center space-y-6">
-          
-          <div className="space-y-2">
-            <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent">
-              Interactive Audio Lounge
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-serif font-normal text-vibe-ink">
-              Listen to Readers Hub Soundscapes
-            </h2>
-            <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-lg mx-auto">
-              Click any atmospheric track below to activate live soothing audio while you explore:
-            </p>
-          </div>
-
-          {/* Sound buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto text-left">
-            {soundOptions.map((sound) => {
-              const isThisPlaying = activeSoundId === sound.id && isPlaying;
-
-              return (
-                <div
-                  key={sound.id}
-                  onClick={() => handleSelectSound(sound.id)}
-                  tabIndex={0}
-                  role="button"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleSelectSound(sound.id);
-                    }
-                  }}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                    isThisPlaying
-                      ? 'border-vibe-accent bg-vibe-accent-subtle/60 ring-2 ring-vibe-accent/20 shadow-xs'
-                      : 'border-vibe-border bg-vibe-card hover:bg-vibe-card-subtle'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl">{sound.icon}</span>
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-vibe-ink truncate">{sound.label}</p>
-                      <p className="text-[11px] text-vibe-ink-muted truncate">{sound.desc}</p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    aria-label={`Play ${sound.label}`}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-                      isThisPlaying ? 'bg-vibe-accent text-white' : 'bg-vibe-card-subtle text-vibe-ink border border-vibe-border'
-                    }`}
-                  >
-                    {isThisPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Volume and Status Strip */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-vibe-border-subtle max-w-md mx-auto text-xs text-vibe-ink-muted">
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={toggleMute} 
-                className="hover:text-vibe-ink transition-colors"
-                title={isMuted ? 'Unmute' : 'Mute'}
-              >
-                {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-              <input 
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={isMuted ? 0 : volume}
-                onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="w-24 accent-vibe-accent cursor-pointer"
-              />
-              <span className="font-mono text-[11px]">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
-            </div>
-
-            <span className="hidden sm:inline">·</span>
-
-            <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-emerald-500 animate-pulse' : 'bg-vibe-ink-muted'}`} />
-              <span>{isPlaying ? 'Soundscape active' : 'Audio paused'}</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ==============================================================================
-          6. PHILOSOPHY & LITERARY QUOTES
+          5. PHILOSOPHY & LITERARY QUOTES
           ============================================================================== */}
       <section id="quotes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-4xl mx-auto text-center space-y-8">
