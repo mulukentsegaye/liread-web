@@ -64,7 +64,7 @@
 /* 2. DARK MODE */
 .dark,
 [data-theme="dark"] {
-  --vibe-bg: #0B0F17;
+  --vibe-bg: #0B0F19;
   --vibe-card: #131926;
   --vibe-card-subtle: #1B2335;
   --vibe-card-hover: #202A3E;
@@ -73,16 +73,16 @@
   --vibe-ink: #F1F5F9;
   --vibe-ink-secondary: #CBD5E1;
   --vibe-ink-muted: #94A3B8;
-  --vibe-accent: #10B981;
-  --vibe-accent-hover: #059669;
+  --vibe-accent: #6366F1;
+  --vibe-accent-hover: #4F46E5;
   --vibe-accent-text: #FFFFFF;
-  --vibe-accent-subtle: rgba(16, 185, 129, 0.15);
+  --vibe-accent-subtle: rgba(99, 102, 241, 0.15);
   --vibe-secondary: #F59E0B;
   --vibe-secondary-hover: #D97706;
   --vibe-secondary-text: #FFFFFF;
   --vibe-secondary-subtle: rgba(245, 158, 11, 0.15);
-  --vibe-badge-bg: rgba(16, 185, 129, 0.16);
-  --vibe-badge-text: #34D399;
+  --vibe-badge-bg: rgba(99, 102, 241, 0.16);
+  --vibe-badge-text: #818CF8;
   --vibe-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5);
   --vibe-shadow-elevated: 0 20px 35px -8px rgba(0, 0, 0, 0.65);
   --vibe-ambient-gradient: none;
@@ -101,7 +101,7 @@
   --text-muted: var(--vibe-ink-muted);
   --accent-primary: var(--vibe-accent);
   --accent-primary-hover: var(--vibe-accent-hover);
-  --accent-primary-fg: #0B0F17;
+  --accent-primary-fg: #FFFFFF;
   --accent-secondary: var(--vibe-secondary);
   --accent-heart: #F43F5E;
   --accent-glow: none;
@@ -111,7 +111,7 @@
   --radius-quote: 1.5rem;
   --quote-bg: #131926;
   --backdrop-blur: blur(12px);
-  --chart-bar-primary: #10B981;
+  --chart-bar-primary: #6366F1;
   --chart-bar-today: #F1F5F9;
   color-scheme: dark;
 }

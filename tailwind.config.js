@@ -64,6 +64,13 @@ export default {
           DEFAULT: '#2D6A4F',
           dark: '#22533D',
           light: '#EBF2ED',
+        },
+        obsidian: '#0B0F19',
+        electricIndigo: {
+          DEFAULT: '#6366F1',
+          hover: '#4F46E5',
+          light: '#818CF8',
+          subtle: 'rgba(99, 102, 241, 0.15)',
         }
       },
       fontFamily: {

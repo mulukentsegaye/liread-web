@@ -41,12 +41,12 @@ export const LIGHT_THEME: VibeConfig = {
 export const DARK_THEME: VibeConfig = {
   id: 'dark',
   name: 'Dark Mode',
-  tagline: 'Archival Serenity & Midnight Focus',
-  concept: 'Eye-comfort midnight slate workspace with luminous emerald desk highlights and soft reading glow.',
-  description: 'Inky midnight slate paired with luminous emerald accents and warm amber bookmark ribbons.',
+  tagline: 'Deep Obsidian & Electric Indigo',
+  concept: 'Deep Obsidian (#0B0F19) workspace with Electric Indigo (#6366F1) brand highlights and eye-comfort midnight clarity.',
+  description: 'Deep Obsidian background paired with Electric Indigo brand accents and clean typography.',
   mode: 'dark',
   colors: {
-    bg: '#0B0F17',
+    bg: '#0B0F19',
     card: '#131926',
     cardSubtle: '#1B2335',
     cardHover: '#202A3E',
@@ -55,14 +55,14 @@ export const DARK_THEME: VibeConfig = {
     ink: '#F1F5F9',
     inkSecondary: '#CBD5E1',
     inkMuted: '#94A3B8',
-    accent: '#10B981',
-    accentHover: '#059669',
-    accentSubtle: 'rgba(16, 185, 129, 0.15)',
+    accent: '#6366F1',
+    accentHover: '#4F46E5',
+    accentSubtle: 'rgba(99, 102, 241, 0.15)',
     secondary: '#F59E0B',
     secondaryHover: '#D97706',
     secondarySubtle: 'rgba(245, 158, 11, 0.15)',
-    badgeBg: 'rgba(16, 185, 129, 0.16)',
-    badgeText: '#34D399',
+    badgeBg: 'rgba(99, 102, 241, 0.16)',
+    badgeText: '#818CF8',
     ambientGlow: 'none',
   },
   typography: {
@@ -71,7 +71,7 @@ export const DARK_THEME: VibeConfig = {
     description: 'Luminous Sans UI × Archival Serif Quotes',
   },
   surfaceFeel: 'OLED-friendly dark cards, subtle night edges, warm reading glow.',
-  swatches: ['#0B0F17', '#131926', '#10B981', '#F59E0B'],
+  swatches: ['#0B0F19', '#131926', '#6366F1', '#F59E0B'],
 };
 
 export const VIBES: Record<ThemeMode, VibeConfig> = {
