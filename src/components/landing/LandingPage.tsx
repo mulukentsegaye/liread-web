@@ -88,12 +88,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </div>
 
           {/* Center Navigation Links (Hidden on mobile) */}
-          <nav className="hidden md:flex items-center gap-7 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
-            <a href="#features" className="hover:text-vibe-accent transition-colors">
-              Features
+          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
+            <a href="#timer" className="hover:text-vibe-accent transition-colors">
+              Timer
             </a>
             <a href="#soundscapes" className="hover:text-vibe-accent transition-colors">
-              Atmospheric Audio
+              Soundscapes
+            </a>
+            <a href="#bookshelf" className="hover:text-vibe-accent transition-colors">
+              Bookshelf
+            </a>
+            <a href="#analytics" className="hover:text-vibe-accent transition-colors">
+              Analytics
             </a>
             <a href="#quotes" className="hover:text-vibe-accent transition-colors">
               Philosophy
