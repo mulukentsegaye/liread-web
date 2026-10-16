@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
-import { AmbientSoundId, ThemeMode, VibeConfig } from '../../types/theme';
+import { AmbientSoundId } from '../../types/theme';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -32,7 +32,7 @@ interface LandingPageProps {
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer, onGoToLogin }) => {
-  const { allVibes, vibeConfig } = useTheme();
+  const { vibeConfig } = useTheme();
   const { 
     isPlaying, 
     activeSoundId, 
@@ -44,8 +44,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
     isMuted, 
     toggleMute 
   } = useAmbientAudioStore();
-
-  const [activeTabAesthetic, setActiveTabAesthetic] = useState<ThemeMode>('light');
 
   const soundOptions: Array<{ id: AmbientSoundId; label: string; icon: string; desc: string }> = [
     { id: 'birds', label: 'Morning Songbirds', icon: '🕊️', desc: 'Light forest morning breeze' },
@@ -60,10 +58,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
     } else {
       await play(soundId);
     }
-  };
-
-  const handleVibeSelect = (id: ThemeMode) => {
-    setActiveTabAesthetic(id);
   };
 
   return (
@@ -95,9 +89,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           {/* Center Navigation Links (Hidden on mobile) */}
           <nav className="hidden md:flex items-center gap-7 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
-            <a href="#vibes" className="hover:text-vibe-accent transition-colors">
-              Multi-Theme Vibes
-            </a>
             <a href="#features" className="hover:text-vibe-accent transition-colors">
               Features
             </a>
@@ -174,154 +165,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           <button
             onClick={() => {
-              const el = document.getElementById('vibes');
+              const el = document.getElementById('features');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
             className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Explore Light & Dark Modes</span>
+            <span>Explore Features</span>
           </button>
         </div>
 
       </section>
 
       {/* ==============================================================================
-          3. INTERACTIVE MULTI-THEME VIBES SECTION
-          ============================================================================== */}
-      <section id="vibes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-card-subtle/40 transition-colors duration-500">
-        <div className="max-w-6xl mx-auto">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-            <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent block mb-2">
-              Atmospheric Personalization
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight mb-4">
-              Light & Dark Reading Modes
-            </h2>
-            <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
-              Every reader has an optimal environment. Readers Hub switches seamlessly between clean 
-              daylight reading and soothing eye-comfort dark mode:
-            </p>
-          </div>
-
-          {/* Light & Dark Interactive Cards Grid */}
-          <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {allVibes.map((item: VibeConfig) => {
-              const isSelected = activeTabAesthetic === item.id;
-
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => handleVibeSelect(item.id)}
-                  tabIndex={0}
-                  role="button"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleVibeSelect(item.id);
-                    }
-                  }}
-                  className={`group relative text-left p-5 rounded-2xl border transition-all cursor-pointer select-none outline-none ${
-                    isSelected
-                      ? 'border-vibe-accent ring-2 ring-vibe-accent/25 bg-vibe-card shadow-lg'
-                      : 'border-vibe-border bg-vibe-card hover:border-vibe-ink-muted/50 hover:shadow-md'
-                  }`}
-                >
-                  {/* Top Bar: Title, Default Badge, and Checkmark */}
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-sm sm:text-base text-vibe-ink group-hover:text-vibe-accent transition-colors">
-                          {item.name}
-                        </span>
-                        {item.isDefault && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shadow-xs">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            Default
-                          </span>
-                        )}
-                        <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
-                          {item.mode === 'dark' ? 'Dark' : 'Light'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-vibe-ink-secondary mt-1 line-clamp-1 font-medium">
-                        {item.tagline}
-                      </p>
-                    </div>
-
-                    <div className="flex-shrink-0">
-                      {isSelected ? (
-                        <div className="w-6 h-6 rounded-full bg-vibe-accent text-white flex items-center justify-center shadow-xs">
-                          <Check className="w-3.5 h-3.5 stroke-[3]" />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border border-vibe-border-subtle group-hover:border-vibe-accent/40 flex items-center justify-center transition-colors">
-                          <div className="w-2 h-2 rounded-full bg-transparent group-hover:bg-vibe-accent/40" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Visual Color Swatches preview */}
-                  <div 
-                    className="p-3 rounded-xl border mb-3 overflow-hidden shadow-inner"
-                    style={{
-                      backgroundColor: item.colors.bg,
-                      borderColor: item.colors.border,
-                    }}
-                  >
-                    <div 
-                      className="p-2.5 rounded-lg border shadow-xs"
-                      style={{
-                        backgroundColor: item.colors.card,
-                        borderColor: item.colors.border,
-                      }}
-                    >
-                      <p 
-                        className="text-[11px] font-serif italic line-clamp-1 mb-1"
-                        style={{ color: item.colors.ink }}
-                      >
-                        “A book is a dream you hold in your hand.”
-                      </p>
-                      <div className="flex items-center justify-between pt-1 border-t" style={{ borderColor: item.colors.borderSubtle }}>
-                        <span className="text-[9px]" style={{ color: item.colors.inkMuted }}>Neil Gaiman</span>
-                        <span 
-                          className="px-2 py-0.5 rounded-full text-[9px] font-medium text-white"
-                          style={{ backgroundColor: item.colors.accent }}
-                        >
-                          {item.mode === 'dark' ? 'Night Focus' : 'Daylight Focus'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Swatches dots and typography pairing */}
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-vibe-border-subtle text-xs">
-                    <div className="flex items-center gap-1.5">
-                      {item.swatches.map((color, idx) => (
-                        <div 
-                          key={idx} 
-                          className="w-4 h-4 rounded-full border border-black/10 shadow-xs"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[10px] font-mono text-vibe-ink-muted truncate max-w-[150px]">
-                      {item.typography.uiFont} × {item.typography.quoteFont}
-                    </span>
-                  </div>
-
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ==============================================================================
-          4. CORE PRODUCT PILLARS & FEATURES
+          3. CORE PRODUCT PILLARS & FEATURES
           ============================================================================== */}
       <section id="features" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
@@ -586,7 +442,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
-            <a href="#vibes" className="hover:text-vibe-ink transition-colors">Vibes</a>
             <a href="#features" className="hover:text-vibe-ink transition-colors">Features</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Audio</a>
             {onGoToLogin && (

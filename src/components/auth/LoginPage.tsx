@@ -149,10 +149,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           type="button"
           onClick={onGoBack}
           className="group flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
-          title="Return to Home"
+          title="Back"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back to Home</span>
+          <span>Back</span>
         </button>
 
         <div className="flex items-center gap-2 sm:gap-3">
