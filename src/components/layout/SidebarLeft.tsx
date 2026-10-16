@@ -33,8 +33,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
   ];
 
   return (
-    <aside className="hidden md:flex flex-col justify-between h-[calc(100vh-65px)] sticky top-[65px] self-start py-6 pb-8 md:w-16 lg:w-64 xl:w-72 flex-shrink-0 md:px-1 lg:pr-4 lg:pl-2 overflow-y-auto select-none transition-all duration-500">
-      <div className="space-y-6">
+    <aside className="hidden md:flex flex-col justify-between h-full py-6 pb-12 md:w-16 lg:w-64 xl:w-72 flex-shrink-0 md:px-1 lg:pr-4 lg:pl-2 overflow-y-auto overscroll-contain select-none transition-all duration-500">
+      <div className="space-y-6 flex-shrink-0">
         
         {/* Main Navigation */}
         <nav className="space-y-1">
@@ -126,7 +126,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
       </div>
 
       {/* Sidebar Footer */}
-      <div className="pt-4 border-t border-vibe-border space-y-1">
+      <div className="pt-4 border-t border-vibe-border space-y-1 flex-shrink-0 mt-auto">
         {onGoToLanding && (
           <button
             onClick={onGoToLanding}

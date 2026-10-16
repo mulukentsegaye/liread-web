@@ -97,6 +97,10 @@ export const App: React.FC = () => {
       return;
     }
     setActiveTab(tab);
+    const mainEl = document.getElementById('main-viewport');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -150,7 +154,7 @@ export const App: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col w-full pb-44 md:pb-28 transition-colors duration-500 overflow-x-clip"
+      className="h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',
@@ -168,8 +172,9 @@ export const App: React.FC = () => {
           - Mobile (< 768px): 1-column main viewport
           - Tablet (768px - 1279px): 2-column layout (compact left sidebar + main center viewport with top summary bar)
           - Desktop (1280px+): 3-column layout (left sidebar, center viewport, right sidebar)
+          Each column scrolls independently with overscroll-contain
       */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 flex items-start gap-4 sm:gap-6 lg:gap-8 justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 min-h-0 flex items-stretch gap-4 sm:gap-6 lg:gap-8 justify-between overflow-hidden">
         
         {/* Left Sidebar (Desktop & Tablet only: md+) */}
         <SidebarLeft
@@ -179,8 +184,11 @@ export const App: React.FC = () => {
           onGoToLogin={handleGoToLogin}
         />
 
-        {/* Center Main Viewport */}
-        <main className="flex-1 min-w-0 w-full py-4 sm:py-6">
+        {/* Center Main Viewport (Independent scroll container) */}
+        <main 
+          id="main-viewport"
+          className="flex-1 min-w-0 h-full overflow-y-auto overscroll-contain py-4 sm:py-6 pb-36 md:pb-28 px-0.5"
+        >
           
           {/* Tablet Collapsible Top Summary Bar (md:block xl:hidden) */}
           <TabletSummaryBar 
