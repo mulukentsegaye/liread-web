@@ -118,11 +118,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const applyThemeToDocument = (mode: ThemeMode) => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
+    const isApp = typeof window !== 'undefined' && window.location.hash === '#app';
 
-    root.setAttribute('data-theme', mode);
-    if (mode === 'dark') {
+    // The landing page and login page always stay strictly in Light Mode.
+    // Dark mode only applies within the home page/app workspace (#app) when selected.
+    if (isApp && mode === 'dark') {
+      root.setAttribute('data-theme', 'dark');
       root.classList.add('dark');
     } else {
+      root.setAttribute('data-theme', 'light');
       root.classList.remove('dark');
     }
   };
@@ -147,6 +151,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     applyThemeToDocument(theme);
+    const handleHashChange = () => {
+      applyThemeToDocument(theme);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, [theme]);
 
   const value: ThemeContextValue = {

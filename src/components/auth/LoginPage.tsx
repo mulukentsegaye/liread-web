@@ -137,6 +137,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
 
   return (
     <div 
+      data-theme="light"
       className="min-h-screen w-full flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
       style={{
         backgroundColor: 'var(--vibe-bg)',

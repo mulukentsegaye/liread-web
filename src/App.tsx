@@ -76,18 +76,29 @@ export const App: React.FC = () => {
   const handleEnterApp = () => {
     setCurrentView('app');
     window.location.hash = '#app';
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoToLanding = () => {
     setCurrentView('landing');
     window.location.hash = '#landing';
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.remove('dark');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoToLogin = () => {
     setCurrentView('login');
     window.location.hash = '#login';
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.remove('dark');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
