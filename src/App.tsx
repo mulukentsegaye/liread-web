@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
@@ -28,6 +28,10 @@ export const App: React.FC = () => {
     }
     return 'landing';
   });
+  const [transitionStage, setTransitionStage] = useState<'idle' | 'exiting' | 'entering'>('entering');
+  const isTransitioningRef = useRef(false);
+  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
@@ -37,6 +41,14 @@ export const App: React.FC = () => {
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, updateUser, initAuth } = useAuthStore();
   const { fetchPosts } = useFeedStore();
+
+  // Settle initial tranquil page entrance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTransitionStage('idle');
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Ensure landing and login start in light mode; home page ('app') respects user's theme selection (light/dark)
   useEffect(() => {
@@ -59,47 +71,77 @@ export const App: React.FC = () => {
     fetchPosts(user.id);
   }, []);
 
+  const navigateWithTransition = (nextView: 'landing' | 'login' | 'app') => {
+    if (nextView === currentView && transitionStage === 'idle') return;
+    if (isTransitioningRef.current) return;
+
+    isTransitioningRef.current = true;
+    setTransitionStage('exiting');
+
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+
+    transitionTimeoutRef.current = setTimeout(() => {
+      // 1. Update active view state and url hash
+      setCurrentView(nextView);
+      window.location.hash = nextView === 'app' ? '#app' : (nextView === 'login' ? '#login' : '#landing');
+
+      // 2. Synchronize theme attributes
+      if (nextView === 'app') {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.remove('dark');
+        }
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.documentElement.classList.remove('dark');
+      }
+
+      // 3. Reset scroll position seamlessly at the transition boundary
+      window.scrollTo(0, 0);
+
+      // 4. Begin serene entrance
+      setTransitionStage('entering');
+
+      transitionTimeoutRef.current = setTimeout(() => {
+        setTransitionStage('idle');
+        isTransitioningRef.current = false;
+      }, 380);
+    }, 200);
+  };
+
   useEffect(() => {
     const handleHashChange = () => {
-      if (window.location.hash === '#app') {
-        setCurrentView('app');
-      } else if (window.location.hash === '#login') {
-        setCurrentView('login');
-      } else if (window.location.hash === '#landing' || !window.location.hash) {
-        setCurrentView('landing');
+      const hash = window.location.hash;
+      const target: 'landing' | 'login' | 'app' = 
+        hash === '#app' ? 'app' : (hash === '#login' ? 'login' : 'landing');
+      if (target !== currentView && !isTransitioningRef.current) {
+        navigateWithTransition(target);
       }
     };
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, [currentView, theme]);
 
   const handleEnterApp = () => {
-    setCurrentView('app');
-    window.location.hash = '#app';
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.classList.remove('dark');
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateWithTransition('app');
   };
 
   const handleGoToLanding = () => {
-    setCurrentView('landing');
-    window.location.hash = '#landing';
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.documentElement.classList.remove('dark');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateWithTransition('landing');
   };
 
   const handleGoToLogin = () => {
-    setCurrentView('login');
-    window.location.hash = '#login';
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.documentElement.classList.remove('dark');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateWithTransition('login');
   };
 
   const handleTabChange = (tab: NavigationTab) => {
@@ -132,20 +174,26 @@ export const App: React.FC = () => {
     }
   };
 
+  const transitionClass = transitionStage === 'exiting' ? 'page-exit' : (transitionStage === 'entering' ? 'page-enter' : '');
+
   // 0. Render Login Page when in 'login' view
   if (currentView === 'login') {
     return (
-      <LoginPage
-        onSuccess={handleEnterApp}
-        onGoBack={handleGoToLanding}
-      />
+      <div className={`w-full min-h-screen ${transitionClass}`}>
+        {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
+        <LoginPage
+          onSuccess={handleEnterApp}
+          onGoBack={handleGoToLanding}
+        />
+      </div>
     );
   }
 
   // 1. Render Premium Clean Landing Page when in 'landing' view
   if (currentView === 'landing') {
     return (
-      <>
+      <div className={`w-full min-h-screen ${transitionClass}`}>
+        {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
         <LandingPage
           onEnterApp={handleEnterApp}
           onGoToLogin={handleGoToLogin}
@@ -159,18 +207,19 @@ export const App: React.FC = () => {
           isOpen={isPopoverOpen}
           onClose={closePopover}
         />
-      </>
+      </div>
     );
   }
 
   return (
     <div 
-      className="h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden"
+      className={`h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden ${transitionClass}`}
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',
       }}
     >
+      {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
       
       {/* 1. Sticky Top Application Header with Vibe Trigger */}
       <Header 
@@ -207,25 +256,27 @@ export const App: React.FC = () => {
             onAdjustGoal={handleAdjustGoal}
           />
 
-          {/* Active View Mount */}
-          {activeTab === 'feed' && (
-            <FeedContainer
-              onOpenCreateModal={() => setCreateModalOpen(true)}
-              onSelectBookForTimer={handleSelectBookForTimer}
-            />
-          )}
+          {/* Active View Mount with Peaceful Tab Transition */}
+          <div key={activeTab} className="tab-content-enter">
+            {activeTab === 'feed' && (
+              <FeedContainer
+                onOpenCreateModal={() => setCreateModalOpen(true)}
+                onSelectBookForTimer={handleSelectBookForTimer}
+              />
+            )}
 
-          {activeTab === 'analytics' && (
-            <AnalyticsView onBack={() => handleTabChange('feed')} />
-          )}
+            {activeTab === 'analytics' && (
+              <AnalyticsView onBack={() => handleTabChange('feed')} />
+            )}
 
-          {activeTab === 'leaderboard' && (
-            <LeaderboardView onBack={() => handleTabChange('feed')} />
-          )}
+            {activeTab === 'leaderboard' && (
+              <LeaderboardView onBack={() => handleTabChange('feed')} />
+            )}
 
-          {(activeTab === 'bookshelf' || activeTab === 'saved') && (
-            <BookshelfView initialTab={activeTab} onBack={() => handleTabChange('feed')} />
-          )}
+            {(activeTab === 'bookshelf' || activeTab === 'saved') && (
+              <BookshelfView initialTab={activeTab} onBack={() => handleTabChange('feed')} />
+            )}
+          </div>
         </main>
 
         {/* Right Stats & Leaderboard Sidebar (Desktop only: xl+) */}

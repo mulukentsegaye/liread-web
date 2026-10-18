@@ -188,3 +188,116 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--vibe-ink-muted);
 }
+
+/* ==============================================================================
+   PEACEFUL, SMOOTH & MODERN PAGE TRANSITIONS
+   Inspired by editorial page-turning, subtle optical depth, and serene easing.
+   ============================================================================== */
+
+@keyframes peacefulPageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(1.5px);
+  }
+  60% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes peacefulPageExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+    filter: blur(1px);
+  }
+}
+
+@keyframes peacefulTabEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes peacefulBeamSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0.4;
+  }
+}
+
+.page-enter {
+  animation: peacefulPageEnter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform, filter;
+}
+
+.page-exit {
+  animation: peacefulPageExit 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  will-change: opacity, transform, filter;
+  pointer-events: none;
+}
+
+.tab-content-enter {
+  animation: peacefulTabEnter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+/* Ambient Reading Top Shimmer Beam during transitions */
+.peaceful-top-beam {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+.peaceful-top-beam::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--vibe-accent) 50%, transparent 100%);
+  box-shadow: 0 0 12px var(--vibe-accent);
+  animation: peacefulBeamSweep 600ms cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .page-exit,
+  .tab-content-enter,
+  .peaceful-top-beam::after {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    transition: opacity 150ms ease !important;
+  }
+}
+
