@@ -1,6 +1,6 @@
 import { UserProfile, Post, LeaderboardEntry } from '../types';
 
-export const DEFAULT_USER_AVATAR = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%232D6A4F'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>AM</text></svg>";
+export const DEFAULT_USER_AVATAR = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23059669'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>AM</text></svg>";
 
 export const CURRENT_USER: UserProfile = {
   id: 'user-alex-morgan',

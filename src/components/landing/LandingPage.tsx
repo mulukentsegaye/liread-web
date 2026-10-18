@@ -63,7 +63,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
   return (
     <div 
       data-theme="light"
-      className="min-h-screen w-full transition-colors duration-500 overflow-x-clip flex flex-col justify-between selection:bg-vibe-accent/20 selection:text-vibe-accent"
+      className="min-h-screen w-full transition-colors duration-500 overflow-x-clip flex flex-col justify-between selection:bg-vibe-accent/20 selection:text-vibe-accent bg-vibe-bg"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',
@@ -73,7 +73,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           1. STICKY EDITORIAL TOP NAVIGATION
           ============================================================================== */}
-      <header className="sticky top-0 z-40 w-full bg-vibe-card/85 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-12 py-3.5 transition-colors duration-500">
+      <header className="sticky top-0 z-40 w-full bg-vibe-bg/85 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-12 py-3.5 transition-colors duration-500">
         <div className="w-full flex items-center justify-between gap-4">
           
           {/* Logo & Manifesto link */}
@@ -325,7 +325,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 2: ATMOSPHERIC SOUNDSCAPE ENGINE
           ============================================================================== */}
-      <section id="soundscapes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-card-subtle/30">
+      <section id="soundscapes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
@@ -594,7 +594,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 4: GENTLE ANALYTICS & HABIT STREAKS
           ============================================================================== */}
-      <section id="analytics" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-card-subtle/30">
+      <section id="analytics" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
@@ -790,7 +790,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           8. EDITORIAL FOOTER
           ============================================================================== */}
-      <footer className="w-full py-10 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-card text-xs text-vibe-ink-muted transition-colors duration-500">
+      <footer className="w-full py-10 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-bg text-xs text-vibe-ink-muted transition-colors duration-500">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           
           <div className="flex items-center gap-2.5">

@@ -60,10 +60,25 @@ export default {
           400: '#ded3b6',
         },
         alabaster: '#FBFBF9',
+        whiteySilver: '#F3F4F6',
+        coolSilver: '#F3F4F6',
+        elevatedSlate: '#111827',
+        deepObsidian: '#0B0F19',
         forest: {
           DEFAULT: '#2D6A4F',
           dark: '#22533D',
           light: '#EBF2ED',
+        },
+        emeraldBrand: {
+          DEFAULT: '#059669',
+          dark: '#047857',
+          light: '#ECFDF5',
+          mint: '#34D399',
+        },
+        goldBrand: {
+          amber: '#D97706',
+          DEFAULT: '#FBBF24',
+          hover: '#F59E0B',
         },
         obsidian: '#0B0F19',
         electricIndigo: {

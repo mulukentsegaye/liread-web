@@ -138,7 +138,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
   return (
     <div 
       data-theme="light"
-      className="min-h-screen w-full flex flex-col justify-between transition-colors duration-500 overflow-x-clip"
+      className="min-h-screen w-full flex flex-col justify-between transition-colors duration-500 overflow-x-clip bg-vibe-bg"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',
@@ -170,10 +170,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
 
       {/* 2. Main Authentication Shell */}
       <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 flex items-center justify-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 rounded-3xl bg-vibe-card border border-vibe-border shadow-vibe-elevated overflow-hidden transition-all duration-500">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 rounded-3xl bg-white border border-vibe-border shadow-vibe-elevated overflow-hidden transition-all duration-500">
           
           {/* Left Column: Bookish Atmosphere Showcase (Desktop only: lg+) */}
-          <div className="hidden lg:flex lg:col-span-5 p-8 xl:p-10 flex-col justify-between relative bg-vibe-card-subtle border-r border-vibe-border overflow-hidden">
+          <div className="hidden lg:flex lg:col-span-5 p-8 xl:p-10 flex-col justify-between relative bg-[#F9FAFB] border-r border-vibe-border overflow-hidden">
             {/* Top Brand Block */}
             <div className="relative z-10 space-y-3">
               <div className="flex items-center gap-2.5">
@@ -228,7 +228,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           </div>
 
           {/* Right Column: Authentication Card */}
-          <div className="col-span-1 lg:col-span-7 p-6 sm:p-10 xl:p-12 flex flex-col justify-center">
+          <div className="col-span-1 lg:col-span-7 p-6 sm:p-10 xl:p-12 flex flex-col justify-center bg-white">
             
             {/* Header Titles */}
             <div className="mb-6 sm:mb-8 text-center sm:text-left">
@@ -247,7 +247,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             </div>
 
             {/* Mode Switcher Tabs (Sign In / Sign Up) */}
-            <div className="flex items-center p-1 rounded-full bg-vibe-card-subtle border border-vibe-border mb-6">
+            <div className="flex items-center p-1 rounded-full bg-[#F3F4F6] border border-vibe-border mb-6">
               <button
                 type="button"
                 onClick={() => {
@@ -257,7 +257,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                 }}
                 className={`flex-1 py-2 text-xs font-semibold rounded-full transition-all text-center ${
                   mode === 'signin'
-                    ? 'bg-vibe-card text-vibe-accent shadow-xs border border-vibe-border'
+                    ? 'bg-white text-vibe-accent shadow-xs border border-vibe-border'
                     : 'text-vibe-ink-muted hover:text-vibe-ink'
                 }`}
               >
@@ -272,7 +272,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                 }}
                 className={`flex-1 py-2 text-xs font-semibold rounded-full transition-all text-center ${
                   mode === 'signup'
-                    ? 'bg-vibe-card text-vibe-accent shadow-xs border border-vibe-border'
+                    ? 'bg-white text-vibe-accent shadow-xs border border-vibe-border'
                     : 'text-vibe-ink-muted hover:text-vibe-ink'
                 }`}
               >
@@ -456,7 +456,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-sm rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-white border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200">
             <h3 className="text-base font-bold text-vibe-ink mb-1">
               Reset Your Password
             </h3>

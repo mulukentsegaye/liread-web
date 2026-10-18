@@ -38,13 +38,13 @@ export const VibeSelector: React.FC<VibeSelectorProps> = ({ isOpen, onClose }) =
     {
       id: 'light',
       name: 'Light Mode',
-      desc: 'Warm Alabaster (#FBFBF9) with soothing Forest Sage (#2D6A4F) accents',
+      desc: 'Whitey-Silver (#F3F4F6) with Deep Emerald (#059669) accents',
       icon: Sun,
     },
     {
       id: 'dark',
       name: 'Dark Mode',
-      desc: 'Deep Obsidian (#0B0F19) with Electric Indigo (#6366F1) brand accents',
+      desc: 'Deep Obsidian (#0B0F19) with Mint-Emerald (#34D399) accents',
       icon: Moon,
     },
   ];
