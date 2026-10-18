@@ -9,6 +9,7 @@ export const FloatingTimerBar: React.FC = () => {
     isRunning,
     bookTitle,
     subtitleNote,
+    coverImageUrl,
     pauseTimer,
     resumeTimer,
     stopTimer,
@@ -52,27 +53,35 @@ export const FloatingTimerBar: React.FC = () => {
     }
   };
 
+  const bookInitial = bookTitle ? bookTitle.slice(0, 3).toUpperCase() : 'HUB';
+
   return (
     <div 
       onClick={() => setFullScreenOpen(true)}
-      className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] sm:w-[90%] md:max-w-xl rounded-full p-2.5 sm:p-3 px-3.5 sm:px-5 bg-vibe-card/95 backdrop-blur-md border border-vibe-border shadow-vibe-elevated flex items-center justify-between gap-2 sm:gap-4 cursor-pointer transition-all duration-500 group overflow-hidden"
+      className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[94%] sm:w-[88%] md:max-w-xl rounded-full p-2 sm:p-2.5 px-3.5 sm:px-4 bg-vibe-card/95 backdrop-blur-md border border-vibe-border shadow-float flex items-center justify-between gap-2 sm:gap-3 cursor-pointer transition-all duration-300 group hover:border-vibe-accent/40"
       title="Click to open full distraction-free reading timer"
     >
       {/* Left: Thumbnail & Book Details */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 relative z-10">
-        <div className="relative w-7 h-10 sm:w-8 sm:h-11 rounded border border-vibe-border bg-vibe-card-subtle text-vibe-ink shadow-xs flex-shrink-0 flex items-center justify-center text-[6px] sm:text-[7px] font-bold text-center leading-none p-0.5 select-none">
-          THE ACT
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 relative z-10">
+        <div className="relative w-8 h-10 rounded-md overflow-hidden border border-vibe-border bg-vibe-card-subtle shadow-xs flex-shrink-0 flex items-center justify-center">
+          {coverImageUrl ? (
+            <img src={coverImageUrl} alt={bookTitle} className="w-full h-full object-cover" />
+          ) : (
+            <span className="font-serif text-[8px] font-bold text-vibe-ink text-center leading-none">
+              {bookInitial}
+            </span>
+          )}
         </div>
 
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full flex-shrink-0 bg-vibe-accent ${isRunning ? 'animate-pulse' : 'opacity-40'}`} />
-            <span className="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase truncate text-vibe-accent">
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 bg-vibe-accent ${isRunning ? 'animate-pulse' : 'opacity-40'}`} />
+            <span className="text-[10px] font-semibold tracking-wider uppercase truncate text-vibe-accent">
               {isRunning ? 'Reading Now' : 'Timer Paused'}
             </span>
           </div>
 
-          <h3 className="text-xs font-bold truncate max-w-[130px] sm:max-w-[200px] text-vibe-ink">
+          <h3 className="text-xs sm:text-sm font-semibold truncate max-w-[120px] sm:max-w-[200px] text-vibe-ink leading-tight">
             {bookTitle}
           </h3>
 
@@ -83,47 +92,47 @@ export const FloatingTimerBar: React.FC = () => {
       </div>
 
       {/* Right: Ambient Audio + Digital Stopwatch & Controls */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 relative z-10">
+      <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 relative z-10">
         <AmbientAudioController compact />
 
         <div className="text-right">
-          <div className="font-mono text-sm sm:text-base md:text-lg font-bold tracking-tight leading-none text-vibe-ink">
+          <div className="font-mono text-sm sm:text-base font-bold tracking-tight leading-none text-vibe-ink tabular-nums">
             {formatTime(seconds)}
           </div>
           <span className="hidden sm:inline-block text-[10px] font-medium text-vibe-ink-muted">
-            Current session
+            Active session
           </span>
         </div>
 
-        {/* Pause/Play Button (Min 44x44px touch target) */}
+        {/* Pause/Play Button */}
         <button
           type="button"
           onClick={handleTogglePlay}
           aria-label={isRunning ? 'Pause timer' : 'Resume timer'}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-1.5 px-3 sm:px-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs active:scale-95 transition-all"
+          className="h-9 px-3 sm:px-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-1.5"
         >
           {isRunning ? (
             <>
-              <Pause className="w-4 h-4 fill-current" />
+              <Pause className="w-3.5 h-3.5 fill-current" />
               <span className="hidden sm:inline">Pause</span>
             </>
           ) : (
             <>
-              <Play className="w-4 h-4 fill-current" />
+              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
               <span className="hidden sm:inline">Resume</span>
             </>
           )}
         </button>
 
-        {/* Stop Button (Min 44x44px touch target) */}
+        {/* Stop Button */}
         <button
           type="button"
           onClick={handleStop}
           aria-label="Stop and log reading session"
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink active:scale-95 transition-all"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink active:scale-95 transition-all"
           title="Stop & save session"
         >
-          <Square className="w-4 h-4 fill-current" />
+          <Square className="w-3.5 h-3.5 fill-current" />
         </button>
 
         {/* Fullscreen Expand Icon */}
@@ -134,10 +143,10 @@ export const FloatingTimerBar: React.FC = () => {
             setFullScreenOpen(true);
           }}
           aria-label="Expand distraction-free mode"
-          className="hidden sm:flex min-w-[36px] min-h-[36px] items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+          className="hidden sm:flex w-8 h-8 items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink transition-colors"
           title="Full screen reading mode"
         >
-          <Maximize2 className="w-4 h-4" />
+          <Maximize2 className="w-3.5 h-3.5" />
         </button>
       </div>
 

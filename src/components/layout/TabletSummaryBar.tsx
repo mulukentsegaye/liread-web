@@ -106,14 +106,14 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
 
       {/* Expanded Tablet Panel */}
       {isExpanded && (
-        <div className="p-5 border-t border-vibe-border-subtle bg-vibe-card-subtle/50 grid grid-cols-2 gap-6 animate-in slide-in-from-top-2 duration-200">
+        <div className="p-5 border-t border-vibe-border-subtle bg-vibe-card-subtle/40 grid grid-cols-2 gap-6 animate-in slide-in-from-top-2 duration-200">
           {/* Left: 7-Day Streak Strip */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-vibe-ink">7-Day Reading Streak</span>
+              <span className="text-xs font-semibold text-vibe-ink">7-Day Reading Streak</span>
               <button
                 onClick={onAdjustGoal}
-                className="text-xs text-vibe-accent hover:underline flex items-center gap-1"
+                className="text-xs text-vibe-accent hover:underline flex items-center gap-1 font-medium"
               >
                 <SlidersHorizontal className="w-3 h-3" />
                 <span>Adjust Goal</span>
@@ -122,7 +122,7 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
 
             <div className="flex items-center justify-between pt-1">
               {STREAK_DAYS.map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center gap-1">
+                <div key={idx} className="flex flex-col items-center gap-1.5 flex-1">
                   <span className="text-[10px] font-medium text-vibe-ink-muted">{item.day}</span>
                   <div 
                     className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
@@ -141,9 +141,9 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
           </div>
 
           {/* Right: Top 3 Weekly Readers */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-vibe-ink">Top Weekly Readers</span>
+              <span className="text-xs font-semibold text-vibe-ink">Top Weekly Readers</span>
               <button
                 onClick={onViewLeaderboard}
                 className="text-xs font-semibold text-vibe-accent hover:underline flex items-center gap-1"
@@ -153,14 +153,23 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
               </button>
             </div>
 
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-1.5 pt-0.5">
               {TOP_WEEKLY_READERS.slice(0, 3).map((entry) => (
-                <div key={entry.userId} className="flex items-center justify-between text-xs">
+                <div key={entry.userId} className="flex items-center justify-between text-xs py-1 px-1.5 rounded-lg hover:bg-vibe-card-subtle transition-colors">
                   <div className="flex items-center gap-2 truncate">
-                    <span className="font-mono text-[11px] w-3 text-vibe-ink-muted">{entry.rank}</span>
+                    <span className={`font-mono text-[11px] w-3 font-bold ${
+                      entry.rank === 1 ? 'text-amber-500' :
+                      entry.rank === 2 ? 'text-slate-400' :
+                      'text-amber-700'
+                    }`}>
+                      {entry.rank}
+                    </span>
+                    <div className="w-5 h-5 rounded-full bg-vibe-card-subtle text-vibe-ink border border-vibe-border text-[9px] font-bold flex items-center justify-center flex-shrink-0">
+                      {entry.initials}
+                    </div>
                     <span className="font-medium truncate text-vibe-ink">{entry.fullName}</span>
                   </div>
-                  <span className="font-mono text-[11px] flex-shrink-0 text-vibe-ink-muted">{entry.formattedTime}</span>
+                  <span className="font-mono text-[11px] tabular-nums flex-shrink-0 text-vibe-ink-muted">{entry.formattedTime}</span>
                 </div>
               ))}
             </div>

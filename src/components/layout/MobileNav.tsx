@@ -17,7 +17,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-vibe-card/95 backdrop-blur-md border-t border-vibe-border px-1 flex items-center justify-around shadow-vibe-elevated transition-colors duration-500">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-vibe-card/95 backdrop-blur-md border-t border-vibe-border px-2 py-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-vibe-elevated transition-colors duration-500">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;
@@ -26,14 +26,14 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
             key={item.id}
             onClick={() => onTabChange(item.id)}
             aria-label={item.label}
-            className={`min-w-[44px] min-h-[44px] flex flex-col items-center justify-center gap-1 px-2.5 rounded-xl transition-all active:scale-95 ${
+            className={`min-w-[52px] h-11 flex flex-col items-center justify-center gap-0.5 px-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
               isActive 
-                ? 'text-vibe-accent font-semibold' 
+                ? 'bg-vibe-accent text-white shadow-xs font-semibold' 
                 : 'text-vibe-ink-muted hover:text-vibe-ink'
             }`}
           >
-            <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : ''}`} />
-            <span className="text-[10px] leading-none tracking-tight">{item.label}</span>
+            <Icon className={`w-4 h-4 ${isActive ? 'stroke-[2.5]' : ''}`} />
+            <span className="text-[10px] leading-tight tracking-tight">{item.label}</span>
           </button>
         );
       })}

@@ -1,14 +1,15 @@
 import React from 'react';
-import { 
-  Compass, 
-  Clock, 
-  BarChart3, 
-  Trophy, 
-  Library, 
-  Bookmark, 
-  Sparkles, 
-  HelpCircle, 
-  ChevronsUpDown 
+import {
+  Compass,
+  Clock,
+  BarChart3,
+  Trophy,
+  Library,
+  Bookmark,
+  Sparkles,
+  HelpCircle,
+  ChevronsUpDown,
+  ChevronRight
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
@@ -25,20 +26,28 @@ interface SidebarLeftProps {
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding, onGoToLogin }) => {
   const { user } = useAuthStore();
 
-  const navItems = [
-    { id: 'feed' as NavigationTab, label: 'Discover Feed', icon: Compass },
-    { id: 'timer' as NavigationTab, label: 'Reading Timer', icon: Clock },
-    { id: 'analytics' as NavigationTab, label: 'Analytics', icon: BarChart3 },
-    { id: 'leaderboard' as NavigationTab, label: 'Leaderboard', icon: Trophy },
+  const mainNavItems = [
+    { id: 'feed' as NavigationTab,        label: 'Discover',       icon: Compass,  },
+    { id: 'timer' as NavigationTab,       label: 'Reading Timer',  icon: Clock,    },
+    { id: 'analytics' as NavigationTab,   label: 'My Progress',    icon: BarChart3,},
+    { id: 'leaderboard' as NavigationTab, label: 'Leaderboard',    icon: Trophy,   },
+  ];
+
+  const libraryItems = [
+    { id: 'bookshelf' as NavigationTab, label: 'My Bookshelf', icon: Library,  badge: user.bookshelfCount },
+    { id: 'saved' as NavigationTab,     label: 'Saved Passages', icon: Bookmark, badge: user.savedPassagesCount },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col justify-between h-full py-6 pb-12 md:w-16 lg:w-64 xl:w-72 flex-shrink-0 md:px-1 lg:pr-4 lg:pl-2 overflow-y-auto overscroll-contain select-none transition-all duration-500">
-      <div className="space-y-6 flex-shrink-0">
-        
-        {/* Main Navigation */}
-        <nav className="space-y-1">
-          {navItems.map((item) => {
+    <aside className="hidden md:flex flex-col justify-between h-full py-5 pb-8 md:w-16 lg:w-60 xl:w-64 flex-shrink-0 md:px-1 lg:pr-3 lg:pl-1 overflow-y-auto overscroll-contain select-none transition-all duration-500">
+      <div className="space-y-5 flex-shrink-0">
+
+        {/* Primary Navigation */}
+        <nav className="space-y-0.5">
+          <p className="hidden lg:block px-3 text-[10px] font-semibold tracking-widest uppercase text-vibe-ink-muted mb-2">
+            Navigation
+          </p>
+          {mainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
@@ -47,136 +56,112 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 aria-label={item.label}
-                className={`w-full min-h-[44px] flex items-center justify-center lg:justify-start gap-3.5 px-3 lg:px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
+                className={`w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-vibe-accent-subtle text-vibe-accent font-semibold border border-vibe-accent/25 shadow-xs'
+                    ? 'bg-vibe-accent text-white shadow-sm'
                     : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
                 }`}
               >
-                <Icon 
-                  className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                    isActive ? 'text-vibe-accent' : 'text-vibe-ink-muted'
-                  }`} 
-                />
+                <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2.5 : 1.75} />
                 <span className="hidden lg:inline truncate">{item.label}</span>
               </button>
             );
           })}
         </nav>
 
-        {/* Your Reading Space Section */}
-        <div>
-          <div className="hidden lg:block px-4 text-[11px] font-semibold tracking-wider text-vibe-ink-muted uppercase mb-2">
-            Your Reading Space
-          </div>
-          <div className="space-y-1">
-            <button
-              onClick={() => onTabChange('bookshelf')}
-              title={`My bookshelf (${user.bookshelfCount})`}
-              aria-label="My bookshelf"
-              className={`w-full min-h-[44px] flex items-center justify-center lg:justify-between px-3 lg:px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
-                activeTab === 'bookshelf'
-                  ? 'bg-vibe-accent-subtle text-vibe-accent font-semibold border border-vibe-accent/25 shadow-xs'
-                  : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
-              }`}
-            >
-              <div className="flex items-center gap-3.5">
-                <Library className={`w-5 h-5 flex-shrink-0 ${activeTab === 'bookshelf' ? 'text-vibe-accent' : 'text-vibe-ink-muted'}`} />
-                <span className="hidden lg:inline truncate">My bookshelf</span>
-              </div>
-              <span className="hidden lg:inline-block text-xs font-medium text-vibe-ink-muted px-1.5 py-0.5 rounded-md">
-                {user.bookshelfCount}
-              </span>
-            </button>
-
-            <button
-              onClick={() => onTabChange('saved')}
-              title={`Saved passages (${user.savedPassagesCount})`}
-              aria-label="Saved passages"
-              className={`w-full min-h-[44px] flex items-center justify-center lg:justify-between px-3 lg:px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
-                activeTab === 'saved'
-                  ? 'bg-vibe-accent-subtle text-vibe-accent font-semibold border border-vibe-accent/25 shadow-xs'
-                  : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
-              }`}
-            >
-              <div className="flex items-center gap-3.5">
-                <Bookmark className={`w-5 h-5 flex-shrink-0 ${activeTab === 'saved' ? 'text-vibe-accent' : 'text-vibe-ink-muted'}`} />
-                <span className="hidden lg:inline truncate">Saved passages</span>
-              </div>
-              <span className="hidden lg:inline-block text-xs font-medium text-vibe-ink-muted px-1.5 py-0.5 rounded-md">
-                {user.savedPassagesCount}
-              </span>
-            </button>
-          </div>
-        </div>
-
-        {/* Literary Inspiration Callout Card */}
-        <div className="hidden lg:block mx-2 p-4 rounded-2xl bg-vibe-card border border-vibe-border relative overflow-hidden transition-all duration-500 shadow-soft">
-          <div className="flex items-center gap-2 mb-2 text-vibe-accent">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <p className="font-serif italic text-sm text-vibe-ink leading-snug font-medium mb-2">
-            “A few pages a day. A whole world within.”
+        {/* Library Section */}
+        <nav className="space-y-0.5">
+          <p className="hidden lg:block px-3 text-[10px] font-semibold tracking-widest uppercase text-vibe-ink-muted mb-2">
+            Library
           </p>
-          <p className="text-[11px] text-vibe-ink-muted leading-tight">
-            Make room for your next chapter.
+          {libraryItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                title={item.label}
+                aria-label={item.label}
+                className={`w-full h-10 flex items-center justify-center lg:justify-between px-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-vibe-accent text-white shadow-sm'
+                    : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2.5 : 1.75} />
+                  <span className="hidden lg:inline truncate">{item.label}</span>
+                </div>
+                {item.badge !== undefined && (
+                  <span className={`hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-semibold transition-colors ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-vibe-card text-vibe-ink-muted border border-vibe-border'
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Inspiration Quote Card (desktop only) */}
+        <div className="hidden lg:block mx-1 p-4 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft">
+          <Sparkles className="w-4 h-4 text-vibe-accent mb-2.5" strokeWidth={1.75} />
+          <p className="font-serif italic text-sm text-vibe-ink leading-snug mb-1">
+            "A few pages a day. A whole world within."
+          </p>
+          <p className="text-[11px] text-vibe-ink-muted">
+            Keep your story going.
           </p>
         </div>
 
       </div>
 
       {/* Sidebar Footer */}
-      <div className="pt-4 border-t border-vibe-border space-y-1 flex-shrink-0 mt-auto">
-        {onGoToLanding && (
-          <button
-            onClick={onGoToLanding}
-            title="Return to Landing Page"
-            aria-label="Landing page"
-            className="w-full min-h-[44px] flex items-center justify-center lg:justify-start gap-3 px-3 py-2 text-xs font-medium text-vibe-ink-secondary hover:text-vibe-accent hover:bg-vibe-card-subtle rounded-xl transition-colors"
-          >
-            <Compass className="w-5 h-5 text-vibe-accent flex-shrink-0" />
-            <span className="hidden lg:inline">Landing Page</span>
-          </button>
-        )}
+      <div className="space-y-1 flex-shrink-0 border-t border-vibe-border pt-4 mt-4">
 
+        {/* Help */}
         <button
-          onClick={() => alert("Reader Community & Help Guide:\n- Customize your reading vibe.\n- Track active reading time.\n- Share passages and notes.\n- Climb weekly leaderboards!")}
+          onClick={() => alert("Readers Hub Help:\n- Track your reading time with the timer\n- Share passages from books you love\n- Climb the weekly leaderboard\n- Build a 7-day reading streak!")}
           title="Help & community"
           aria-label="Help & community"
-          className="w-full min-h-[44px] flex items-center justify-center lg:justify-start gap-3 px-3 py-2 text-xs font-medium text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+          className="w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle rounded-xl transition-colors"
         >
-          <HelpCircle className="w-5 h-5 text-vibe-ink-muted flex-shrink-0" />
+          <HelpCircle className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={1.75} />
           <span className="hidden lg:inline">Help & community</span>
         </button>
 
-        {/* Theme Mode Toggle (Home Page) */}
-        <VibeTriggerButton variant="sidebar" className="mb-2" />
+        {/* Theme Toggle */}
+        <VibeTriggerButton variant="sidebar" />
 
         {/* Profile Card */}
-        <div 
+        <div
           onClick={onGoToLogin}
           role="button"
           tabIndex={0}
-          title="Manage Account / Switch User"
-          className="flex items-center justify-center lg:justify-between p-2 rounded-xl bg-vibe-card/60 border border-vibe-border hover:bg-vibe-card-subtle transition-colors cursor-pointer group select-none active:scale-98"
+          title="Account settings"
+          className="flex items-center justify-center lg:justify-between px-3 py-2.5 rounded-xl hover:bg-vibe-card-subtle transition-colors cursor-pointer group select-none"
+          onKeyDown={(e) => e.key === 'Enter' && onGoToLogin?.()}
         >
           <div className="flex items-center gap-3 min-w-0">
             <img
               src={user.avatarUrl}
               alt={user.fullName}
-              className="w-9 h-9 rounded-full object-cover ring-1 ring-vibe-border flex-shrink-0"
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
             />
-            <div className="hidden lg:block text-left truncate">
+            <div className="hidden lg:block text-left min-w-0">
               <p className="text-xs font-semibold text-vibe-ink leading-tight truncate">
                 {user.fullName}
               </p>
-              <p className="text-[11px] text-vibe-ink-muted leading-tight mt-0.5 truncate">
+              <p className="text-[11px] text-vibe-ink-muted mt-0.5 truncate">
                 {user.subtitle || 'The everyday reader'}
               </p>
             </div>
           </div>
-          <ChevronsUpDown className="hidden lg:block w-3.5 h-3.5 text-vibe-ink-muted group-hover:text-vibe-ink transition-colors" />
+          <ChevronsUpDown className="hidden lg:block w-3.5 h-3.5 text-vibe-ink-muted group-hover:text-vibe-ink transition-colors flex-shrink-0" strokeWidth={1.75} />
         </div>
+
       </div>
     </aside>
   );

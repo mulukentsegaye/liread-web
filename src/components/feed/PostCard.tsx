@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star } from 'lucide-react';
+import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star, BookOpen, Clock } from 'lucide-react';
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -9,173 +9,216 @@ interface PostCardProps {
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
 }
 
+// Deterministic cover color from book title
+function bookCoverColor(title: string): string {
+  const colors = [
+    '#1a3a4a', '#2d4a3e', '#3a2d4a', '#4a2d2d', '#2d3a4a',
+    '#3a4a2d', '#4a3a2d', '#2d2d4a', '#4a2d3a', '#3a2d3a',
+  ];
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = (hash * 31 + title.charCodeAt(i)) % colors.length;
+  }
+  return colors[Math.abs(hash)];
+}
+
+function bookCoverAccent(title: string): string {
+  const accents = [
+    '#7fb5c8', '#7dc4a0', '#a697c8', '#c87a7a', '#7a97c8',
+    '#a0c87a', '#c8a07a', '#7a7ac8', '#c87aa0', '#a07ac8',
+  ];
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = (hash * 31 + title.charCodeAt(i)) % accents.length;
+  }
+  return accents[Math.abs(hash)];
+}
+
 export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }) => {
   const { toggleUpvote, toggleSave } = useFeedStore();
   const { user } = useAuthStore();
+  const coverBg = bookCoverColor(post.bookTitle);
+  const coverAccent = bookCoverAccent(post.bookTitle);
 
   return (
-    <article className="bg-vibe-card border border-vibe-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-soft transition-all duration-500 hover:shadow-vibe-elevated space-y-4 overflow-hidden">
-      
-      {/* 1. Header: Author metadata & options */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+    <article className="bg-vibe-card border border-vibe-border rounded-2xl overflow-hidden shadow-soft hover:shadow-float hover:-translate-y-0.5 transition-all duration-300 group">
+
+      {/* Author header */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-0">
+        <div className="flex items-center gap-3 min-w-0">
           <img
             src={post.authorAvatar}
             alt={post.authorName}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-1 ring-vibe-border flex-shrink-0"
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
           />
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-semibold text-xs sm:text-sm text-vibe-ink truncate">
-                {post.authorName}
-              </span>
-              <span className="text-[11px] sm:text-xs text-vibe-ink-muted">
-                {post.actionText}
-              </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-vibe-ink">{post.authorName}</span>
+              <span className="text-xs text-vibe-ink-muted">{post.actionText}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-vibe-ink-muted mt-0.5">
-              <span>{post.timeAgo}</span>
-              <span>·</span>
-              <span className="font-medium text-vibe-accent bg-vibe-accent-subtle border border-vibe-accent/20 px-2 py-0.5 rounded-full">
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
+              <span className="text-vibe-border">·</span>
+              <span className="text-[11px] font-semibold text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
                 {post.tag}
               </span>
             </div>
           </div>
         </div>
 
-        <button 
+        <button
           aria-label="More options"
-          className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-xl text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors flex-shrink-0 ml-2"
         >
-          <MoreHorizontal className="w-5 h-5" />
+          <MoreHorizontal className="w-4 h-4" strokeWidth={1.75} />
         </button>
       </div>
 
-      {/* 2. Stylized Passage & Book Card (Mobile: flex-col, Tablet/Desktop: flex-row) */}
-      <div className="bg-vibe-card-subtle border border-vibe-border rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 transition-colors duration-500 overflow-hidden">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-stretch">
-          
-          {/* Book Spine / Jacket preview */}
-          <div 
+      {/* Book + Quote block */}
+      <div className="px-5 pt-4">
+        <div className="flex gap-4 items-stretch">
+
+          {/* Book cover */}
+          <div
+            className="flex-shrink-0 w-[72px] cursor-pointer group/cover"
             onClick={() => onSelectBookForTimer?.(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
-            className="flex flex-col items-center justify-center p-2 cursor-pointer group flex-shrink-0 w-full sm:w-36"
-            title="Click to start timer with this book"
+            title={`Read "${post.bookTitle}" with timer`}
           >
-            <div className="relative w-28 h-36 sm:h-40 bg-vibe-card rounded-md shadow-xs border border-vibe-border flex flex-col items-center justify-between p-3 text-center transform transition-transform group-hover:scale-105 duration-300">
-              <div className="text-[10px] font-bold tracking-widest text-vibe-ink uppercase leading-tight line-clamp-2">
-                {post.bookTitle}
+            {post.coverImageUrl ? (
+              <div className="relative w-[72px] h-[100px] rounded-lg overflow-hidden shadow-md ring-1 ring-black/10 group-hover/cover:shadow-lg group-hover/cover:scale-[1.02] transition-all duration-300">
+                <img
+                  src={post.coverImageUrl}
+                  alt={post.bookTitle}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                {/* Timer overlay on hover */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" strokeWidth={2} />
+                </div>
               </div>
-              
-              <div className="w-8 h-8 rounded-full border border-vibe-border flex items-center justify-center opacity-60">
-                <span className="w-5 h-5 rounded-full border border-vibe-accent/40"></span>
+            ) : (
+              <div
+                className="relative w-[72px] h-[100px] rounded-lg shadow-md ring-1 ring-black/10 flex flex-col items-center justify-between p-2.5 group-hover/cover:scale-[1.02] transition-all duration-300 overflow-hidden"
+                style={{ backgroundColor: coverBg }}
+              >
+                {/* Spine line */}
+                <div className="absolute left-2 top-0 bottom-0 w-px opacity-30" style={{ backgroundColor: coverAccent }} />
+                <span className="text-[9px] font-bold tracking-wide text-center leading-tight line-clamp-3 z-10" style={{ color: coverAccent }}>
+                  {post.bookTitle.toUpperCase()}
+                </span>
+                <span className="text-[8px] opacity-60 text-center z-10" style={{ color: coverAccent }}>
+                  {post.bookAuthor}
+                </span>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" strokeWidth={2} />
+                </div>
               </div>
-
-              <div className="text-[9px] tracking-wider font-medium text-vibe-ink-muted truncate w-full">
-                {post.bookAuthor}
-              </div>
-
-              {/* Book spine tactile accent */}
-              <div className="absolute left-1.5 top-0 bottom-0 w-[2px] bg-black/5 dark:bg-white/10"></div>
-            </div>
-
-            <div className="mt-2 text-center w-full">
-              <p className="text-xs font-bold text-vibe-ink leading-tight transition-colors truncate">
-                {post.bookTitle}
-              </p>
-              <p className="text-[11px] text-vibe-ink-muted leading-tight mt-0.5 truncate">
-                {post.bookAuthor}
-              </p>
-            </div>
+            )}
+            <p className="text-[10px] text-vibe-ink-muted text-center mt-1.5 leading-tight line-clamp-2">
+              {post.bookTitle}
+            </p>
           </div>
 
-          {/* Passage Quote block with Literary Serif Typography */}
-          <div className="flex flex-col justify-between h-full flex-1 min-w-0 w-full">
+          {/* Quote block */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
             <div>
-              <span className="font-serif text-3xl sm:text-4xl text-vibe-accent leading-none block select-none -mb-1 opacity-80">
-                “
+              {/* Opening mark */}
+              <span className="font-serif text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
+                "
               </span>
-              <blockquote className="font-serif italic text-base sm:text-lg md:text-xl text-vibe-ink leading-relaxed font-normal break-words">
+              <blockquote className="font-serif text-base sm:text-[17px] text-vibe-ink leading-relaxed break-words">
                 {post.quoteText}
               </blockquote>
             </div>
 
-            <div className="flex items-center justify-between pt-3 mt-3 border-t border-vibe-border-subtle text-[10px]">
-              <span className="font-bold tracking-widest uppercase text-vibe-ink-muted">
-                A PASSAGE TO KEEP
-              </span>
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-vibe-border-subtle">
+              <div className="flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-vibe-ink-muted" strokeWidth={1.75} />
+                <span className="text-[11px] text-vibe-ink-muted font-medium truncate max-w-[120px] sm:max-w-[180px]">
+                  {post.bookAuthor}
+                </span>
+              </div>
               {post.pageNumber && (
-                <span className="font-mono text-xs text-vibe-ink-muted">
-                  p. {post.pageNumber}
+                <span className="font-mono text-[11px] text-vibe-ink-muted flex-shrink-0">
+                  p.{post.pageNumber}
                 </span>
               )}
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* 3. Star Rating (if finished book or rated) */}
+      {/* Star rating */}
       {post.rating && (
-        <div className="flex items-center gap-1 pt-1 text-vibe-secondary">
+        <div className="px-5 pt-3 flex items-center gap-1">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star 
-              key={i} 
-              className={`w-4 h-4 ${i < (post.rating || 0) ? 'fill-current' : 'opacity-25'}`} 
+            <Star
+              key={i}
+              className={`w-3.5 h-3.5 ${i < (post.rating || 0) ? 'fill-vibe-secondary text-vibe-secondary' : 'text-vibe-border'}`}
+              strokeWidth={1.5}
             />
           ))}
+          <span className="ml-1.5 text-xs font-medium text-vibe-ink-muted">{post.rating}.0</span>
         </div>
       )}
 
-      {/* 4. Reader Reflection & Review */}
+      {/* Recommendation text */}
       {post.recommendationText && (
-        <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-normal break-words">
-          {post.recommendationText}
-        </p>
+        <div className="px-5 pt-3">
+          <p className="text-sm text-vibe-ink-secondary leading-relaxed">
+            {post.recommendationText}
+          </p>
+        </div>
       )}
 
-      {/* 5. Footer Actions: Upvote, Comment, Save */}
-      <div className="flex items-center justify-between pt-1 border-t border-vibe-border-subtle">
-        <div className="flex items-center gap-2 sm:gap-6">
+      {/* Footer actions */}
+      <div className="flex items-center justify-between px-5 pt-3 pb-3.5 mt-1 border-t border-vibe-border-subtle">
+        <div className="flex items-center gap-1">
+          {/* Heart / upvote */}
           <button
             onClick={() => toggleUpvote(post.id, user.id)}
-            aria-label="Upvote post"
-            className={`min-h-[40px] px-2 flex items-center gap-1.5 text-xs font-medium transition-colors ${
-              post.isUpvoted 
-                ? 'text-vibe-secondary font-semibold' 
-                : 'text-vibe-ink-muted hover:text-vibe-ink'
+            aria-label="Like post"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              post.isUpvoted
+                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400'
+                : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
             }`}
           >
-            <Heart 
-              className={`w-4 h-4 transition-transform active:scale-125 ${
-                post.isUpvoted ? 'fill-current' : ''
-              }`} 
+            <Heart
+              className={`w-3.5 h-3.5 transition-all ${post.isUpvoted ? 'fill-current scale-110' : ''}`}
+              strokeWidth={1.75}
             />
             <span>{post.upvotesCount}</span>
           </button>
 
+          {/* Comment */}
           <button
-            onClick={() => alert(`Comments for "${post.bookTitle}":\nJoin the discussion thread with fellow readers!`)}
-            aria-label="Comment on post"
-            className="min-h-[40px] px-2 flex items-center gap-1.5 text-xs font-medium text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+            onClick={() => alert(`Comments for "${post.bookTitle}":\nJoin the discussion!`)}
+            aria-label="Comment"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-all"
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />
             <span>{post.commentsCount}</span>
           </button>
         </div>
 
+        {/* Save */}
         <button
           onClick={() => toggleSave(post.id, user.id)}
           aria-label="Save passage"
-          className={`min-h-[40px] px-3 flex items-center gap-1.5 text-xs font-medium transition-colors ${
-            post.isSaved 
-              ? 'text-vibe-accent font-semibold' 
-              : 'text-vibe-ink-muted hover:text-vibe-ink'
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+            post.isSaved
+              ? 'bg-vibe-accent-subtle text-vibe-accent'
+              : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
           }`}
         >
-          <Bookmark 
-            className={`w-4 h-4 transition-all ${post.isSaved ? 'fill-current' : ''}`} 
+          <Bookmark
+            className={`w-3.5 h-3.5 ${post.isSaved ? 'fill-current' : ''}`}
+            strokeWidth={1.75}
           />
-          <span>Save</span>
+          <span>{post.isSaved ? 'Saved' : 'Save'}</span>
         </button>
       </div>
 

@@ -143,6 +143,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
   }
 
   #root {
@@ -161,6 +162,27 @@
 
   button, a, input, select, textarea {
     touch-action: manipulation;
+  }
+
+  /* Accessible focus ring — clean and consistent */
+  :focus-visible {
+    outline: 2px solid var(--vibe-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Prose and heading text balancing */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Serif blockquote reset */
+  blockquote {
+    font-family: 'Newsreader', 'Lora', Georgia, serif;
   }
 }
 

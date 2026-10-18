@@ -20,137 +20,126 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-vibe-card/90 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-2.5 sm:py-3 transition-colors duration-500">
-      <div className="w-full flex items-center justify-between gap-2 sm:gap-4">
-        
-        {/* Brand / Logo (Clickable to Landing Page) */}
-        <button 
+    <header className="sticky top-0 z-30 w-full border-b border-vibe-border bg-vibe-card/90 backdrop-blur-md transition-colors duration-500">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-0 flex items-center h-14 sm:h-15 gap-3 sm:gap-4">
+
+        {/* Brand / Logo */}
+        <button
           type="button"
           onClick={onGoToLanding}
-          className="flex items-center gap-2 sm:gap-3 flex-shrink-0 hover:opacity-85 transition-opacity text-left cursor-pointer group outline-none"
-          title="Back to Landing Page"
+          className="flex items-center gap-2.5 flex-shrink-0 group outline-none"
+          title="Readers Hub — Home"
         >
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs transition-transform group-hover:scale-105 active:scale-95">
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
+            <BookOpen className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
-          <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
+          <span className="font-serif text-xl font-bold tracking-tight text-vibe-ink hidden sm:block">
             Readers Hub
           </span>
         </button>
 
-        {/* Center Search Bar (Tablet & Desktop: md+) */}
-        <div className="hidden md:flex flex-1 max-w-xl mx-auto px-2">
+        {/* Center Search Bar (md+) */}
+        <div className="hidden md:flex flex-1 max-w-md mx-auto">
           <div className="relative w-full flex items-center">
-            <Search className="absolute left-4 w-4 h-4 text-vibe-ink-muted pointer-events-none" />
+            <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
             <input
               type="text"
               value={searchVal}
               onChange={handleSearchChange}
-              placeholder="Search books, authors, passages or vibes..."
-              className="w-full bg-vibe-card-subtle hover:bg-vibe-card-hover focus:bg-vibe-card text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-11 pr-14 py-2.5 rounded-full border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/20 transition-all shadow-inner"
+              placeholder="Search books, authors, passages…"
+              className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-4 py-2 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
             />
-            <div className="absolute right-3.5 flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-vibe-card border border-vibe-border text-[11px] font-mono text-vibe-ink-muted shadow-xs">
-              <span>⌘</span>
-              <span>K</span>
-            </div>
           </div>
         </div>
 
-        {/* Right Section: Vibe Selector Button, Streak badge, Date, Notifications, Profile */}
-        <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 justify-end">
-          
-          {/* Landing Page link pill */}
-          {onGoToLanding && (
-            <button
-              type="button"
-              onClick={onGoToLanding}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors border border-vibe-border shadow-xs"
-              title="View Landing Page"
-            >
-              <span>Landing Page</span>
-            </button>
-          )}
+        {/* Right Section */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
 
-          {/* Sleek Vibe Selector Header Button */}
+          {/* Theme Toggle */}
           <VibeTriggerButton variant="header" />
 
-          {/* Supabase Connection Status Pill */}
+          {/* Supabase Status */}
           <button
             type="button"
             onClick={onGoToLogin}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover transition-colors shadow-xs cursor-pointer"
-            title={user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Connected to Supabase' : 'Click to configure Supabase or manage account'}
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover transition-colors"
+            title="Account & connection settings"
           >
-            <span className={`w-2 h-2 rounded-full ${user.id && user.id.length > 20 && !user.id.includes('user-') ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+              user.id && user.id.length > 20 && !user.id.includes('user-')
+                ? 'bg-emerald-500' 
+                : 'bg-amber-400'
+            }`} />
             <span className="text-vibe-ink-secondary">
-              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Supabase' : 'Offline'}
+              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Live' : 'Demo'}
             </span>
           </button>
 
-          {/* Mobile Search Toggle Button (< md) */}
+          {/* Mobile search toggle */}
           <button
             type="button"
             onClick={() => setMobileSearchOpen(!isMobileSearchOpen)}
-            aria-label="Toggle search"
-            className="md:hidden min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+            aria-label="Search"
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
           >
             {isMobileSearchOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-4.5 h-4.5" strokeWidth={2} />
             ) : (
-              <Search className="w-5 h-5" />
+              <Search className="w-4.5 h-4.5" strokeWidth={1.75} />
             )}
           </button>
 
-          {/* Mobile Streak Indicator Badge */}
-          <div className="flex sm:hidden items-center gap-1 bg-vibe-accent-subtle border border-vibe-accent/20 px-2 py-1 rounded-full text-vibe-accent">
+          {/* Streak badge (mobile) */}
+          <div className="flex sm:hidden items-center gap-1 px-2 py-1 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="text-xs font-bold font-mono">{user.currentStreak}d</span>
+            <span className="text-xs font-bold leading-none">{user.currentStreak}</span>
           </div>
 
-          {/* Desktop Date Display */}
-          <span className="hidden lg:inline-block text-xs font-medium text-vibe-ink-muted tracking-wide">
-            Tuesday, October 13
-          </span>
+          {/* Streak badge (desktop) */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
+            <Flame className="w-3.5 h-3.5 fill-current" />
+            <span className="text-xs font-bold">{user.currentStreak}d</span>
+          </div>
 
-          {/* Notifications Button */}
-          <button 
+          {/* Notifications */}
+          <button
             type="button"
             aria-label="Notifications"
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center relative rounded-full text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+            className="relative w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
           >
-            <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-vibe-secondary ring-2 ring-vibe-card"></span>
+            <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-vibe-secondary ring-1 ring-vibe-card" />
           </button>
 
-          {/* User Profile Avatar Button */}
-          <button 
-            type="button" 
+          {/* Profile avatar */}
+          <button
+            type="button"
             onClick={onGoToLogin}
-            className="min-w-[40px] min-h-[40px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-vibe-accent rounded-full transition-transform active:scale-95"
-            title={`${user.fullName} (${user.subtitle}) — Click to manage account or switch user`}
+            className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-vibe-accent/40 transition-all active:scale-95 flex-shrink-0"
+            title={`${user.fullName} — Account settings`}
           >
             <img
               src={user.avatarUrl}
               alt={user.fullName}
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-vibe-border hover:ring-vibe-accent transition-all"
+              className="w-full h-full object-cover"
             />
           </button>
 
         </div>
       </div>
 
-      {/* Expandable Mobile Search Input Drawer */}
+      {/* Mobile search drawer */}
       {isMobileSearchOpen && (
-        <div className="md:hidden mt-2 pt-2 border-t border-vibe-border-subtle animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="relative flex items-center">
-            <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" />
+        <div className="md:hidden px-4 pb-3 border-t border-vibe-border-subtle">
+          <div className="relative flex items-center mt-2">
+            <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
             <input
               type="text"
               autoFocus
               value={searchVal}
               onChange={handleSearchChange}
-              placeholder="Search books, authors, or quotes..."
-              className="w-full bg-vibe-card-subtle text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-4 py-2.5 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none"
+              placeholder="Search books, authors or quotes…"
+              className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-4 py-2.5 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
             />
           </div>
         </div>
