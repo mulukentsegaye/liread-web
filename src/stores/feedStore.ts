@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Post } from '../types';
-import { DEFAULT_USER_AVATAR } from '../data/defaults';
+import { DEFAULT_USER_AVATAR, DEMO_POSTS } from '../data/defaults';
 import { postsService } from '../services/postsService';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -25,7 +25,7 @@ interface FeedStore {
 export const useFeedStore = create<FeedStore>()(
   persist(
     (set, get) => ({
-      posts: [],
+      posts: DEMO_POSTS,
       feedTab: 'for_you',
       sortBy: 'latest',
       isCreateModalOpen: false,
@@ -40,25 +40,28 @@ export const useFeedStore = create<FeedStore>()(
       setCreateModalOpen: (isOpen) => set({ isCreateModalOpen: isOpen }),
 
       fetchPosts: async (currentUserId?: string) => {
-        if (!isSupabaseConfigured()) return;
-
         set({ isLoading: true });
         try {
-          const { sortBy } = get();
-          const supabasePosts = await postsService.getPosts({ currentUserId, sortBy });
-          set({ posts: supabasePosts });
+          let supabasePosts: Post[] = [];
+          if (isSupabaseConfigured()) {
+            const { sortBy } = get();
+            supabasePosts = await postsService.getPosts({ currentUserId, sortBy });
+          }
+          if (supabasePosts.length > 0) {
+            set({ posts: supabasePosts });
+          } else {
+            // If database is empty or not yet seeded with seed.sql, display rich demo feed
+            set({ posts: DEMO_POSTS });
+          }
         } catch (err) {
-          console.warn('Failed to fetch posts from Supabase:', err);
+          console.warn('Failed to fetch posts from Supabase, using demo feed:', err);
+          set({ posts: DEMO_POSTS });
         } finally {
           set({ isLoading: false });
         }
       },
 
       toggleUpvote: async (postId: string, currentUserId?: string) => {
-        if (!currentUserId || currentUserId === 'guest-user') {
-          alert('Sign in to like posts. Guest browsing is read-only.');
-          return;
-        }
         set((state) => ({
           posts: state.posts.map((post) => {
             if (post.id === postId) {
@@ -73,7 +76,7 @@ export const useFeedStore = create<FeedStore>()(
           }),
         }));
 
-        if (isSupabaseConfigured() && currentUserId) {
+        if (isSupabaseConfigured() && currentUserId && currentUserId !== 'guest-user') {
           try {
             await postsService.toggleUpvote(postId, currentUserId);
           } catch (err) {
@@ -83,10 +86,6 @@ export const useFeedStore = create<FeedStore>()(
       },
 
       toggleSave: async (postId: string, currentUserId?: string) => {
-        if (!currentUserId || currentUserId === 'guest-user') {
-          alert('Sign in to save passages. Guest browsing is read-only.');
-          return;
-        }
         set((state) => ({
           posts: state.posts.map((post) => {
             if (post.id === postId) {
@@ -96,7 +95,7 @@ export const useFeedStore = create<FeedStore>()(
           }),
         }));
 
-        if (isSupabaseConfigured() && currentUserId) {
+        if (isSupabaseConfigured() && currentUserId && currentUserId !== 'guest-user') {
           try {
             await postsService.toggleSavePost(postId, currentUserId);
           } catch (err) {

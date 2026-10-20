@@ -51,6 +51,7 @@ export const App: React.FC = () => {
   }, []);
 
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [preSelectedBook, setPreSelectedBook] = useState<{
@@ -373,6 +374,12 @@ export const App: React.FC = () => {
       )}
 
       <Header
+        onSearch={(query) => {
+          setSearchQuery(query);
+          if (query.trim() && activeTab !== 'feed') {
+            setActiveTab('feed');
+          }
+        }}
         onGoToLanding={handleGoToLanding}
         onGoToLogin={() => setAuthModalOpen(true)}
         onSelectBookForTimer={handleSelectBookForTimer}
@@ -401,6 +408,7 @@ export const App: React.FC = () => {
           <div key={activeTab} className="tab-content-enter">
             {activeTab === 'feed' && (
               <FeedContainer
+                searchQuery={searchQuery}
                 onOpenCreateModal={handleOpenCreateModal}
                 onSelectBookForTimer={handleSelectBookForTimer}
               />

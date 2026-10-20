@@ -6,11 +6,13 @@ import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { PostCard } from './PostCard';
 
 interface FeedContainerProps {
+  searchQuery?: string;
   onOpenCreateModal: () => void;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
 }
 
 export const FeedContainer: React.FC<FeedContainerProps> = ({
+  searchQuery = '',
   onOpenCreateModal,
   onSelectBookForTimer
 }) => {
@@ -20,9 +22,20 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
   const filteredPosts = posts.filter((p) => {
     if (feedTab === 'following') {
       // "Following" = your own posts plus posts from authors you interact with.
-      // With no real follow graph yet, this resolves to your own activity.
       return user ? p.userId === user.id : false;
     }
+
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchTitle = p.bookTitle?.toLowerCase().includes(q);
+      const matchAuthor = p.bookAuthor?.toLowerCase().includes(q);
+      const matchQuote = p.quoteText?.toLowerCase().includes(q);
+      const matchTag = p.tag?.toLowerCase().includes(q);
+      const matchCreator = p.authorName?.toLowerCase().includes(q);
+      const matchRec = p.recommendationText?.toLowerCase().includes(q);
+      return matchTitle || matchAuthor || matchQuote || matchTag || matchCreator || matchRec;
+    }
+
     return true;
   });
 
@@ -129,16 +142,22 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
               <BookOpen className="w-6 h-6" />
             </div>
             <h3 className="font-heading text-lg font-semibold text-vibe-ink">
-              {feedTab === 'following' ? 'Nothing posted yet' : 'The feed is empty'}
+              {searchQuery.trim()
+                ? `No results for "${searchQuery}"`
+                : feedTab === 'following'
+                ? 'Nothing posted yet'
+                : 'The feed is empty'}
             </h3>
             <p className="text-xs text-vibe-ink-muted leading-relaxed max-w-sm mx-auto">
-              {feedTab === 'following'
+              {searchQuery.trim()
+                ? 'Try searching for another book title, author, or passage keyword.'
+                : feedTab === 'following'
                 ? 'Your own reading moments will appear here once you share one.'
                 : isGuest
                 ? 'No readers have shared yet. Be the first by creating an account.'
                 : 'No one has shared a reading moment yet. Share the first passage from the book you are reading.'}
             </p>
-            {isGuest && (
+            {isGuest && !searchQuery.trim() && (
               <p className="text-[11px] text-vibe-ink-muted">Signing in lets you publish to the community.</p>
             )}
           </div>

@@ -38,13 +38,37 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
 
   const savedPosts = posts.filter((p) => p.isSaved);
 
-  const mappedBooks = dbBooks.map((b) => ({
+  const demoBooks = [
+    {
+      title: 'The Creative Act: A Way of Being',
+      author: 'Rick Rubin',
+      progress: 68,
+      status: 'Currently Reading',
+      coverUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      title: 'Atomic Habits',
+      author: 'James Clear',
+      progress: 100,
+      status: 'Finished',
+      coverUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      title: 'Meditations',
+      author: 'Marcus Aurelius',
+      progress: 42,
+      status: 'Currently Reading',
+      coverUrl: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=400&q=80',
+    },
+  ];
+
+  const mappedBooks = dbBooks.length > 0 ? dbBooks.map((b) => ({
     title: b.title,
     author: b.author,
     progress: b.progressPercentage,
     status: b.status === 'currently_reading' ? 'Currently Reading' : b.status === 'finished' ? 'Finished' : 'Want to Read',
     coverUrl: b.coverImageUrl || '',
-  }));
+  })) : (isGuest ? demoBooks : []);
 
   const handleStartTimerForBook = (title: string, author: string, cover?: string) => {
     setBook(title, author, cover);
