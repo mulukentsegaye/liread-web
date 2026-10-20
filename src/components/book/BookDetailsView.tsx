@@ -264,6 +264,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <span>Start Timer</span>
               </button>
 
+              {/* Share Book / Passage */}
+              <button
+                type="button"
+                onClick={() => onShareBook({
+                  title: detailedBook.title,
+                  author: detailedBook.author,
+                  coverImageUrl: detailedBook.coverImageUrl,
+                })}
+                className="flex items-center gap-2 px-4 py-3 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95"
+                title={`Share a passage or moment from "${detailedBook.title}"`}
+              >
+                <Share2 className="w-4 h-4 text-vibe-accent" />
+                <span>Share</span>
+              </button>
+
               {/* Bookshelf Status Selector */}
               <div className="relative">
                 <button

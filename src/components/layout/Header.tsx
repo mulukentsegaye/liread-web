@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, BookOpen, Flame, X, Loader2, Sparkles, Clock } from 'lucide-react';
+import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
@@ -108,20 +108,6 @@ export const Header: React.FC<HeaderProps> = ({
     onSearch?.('');
   };
 
-  const handleSelectForTimer = (book: SuggestedBook) => {
-    setShowDropdown(false);
-    onSelectBookForTimer?.(book.title, book.author, book.coverImageUrl);
-  };
-
-  const handleSelectForShare = (book: SuggestedBook) => {
-    setShowDropdown(false);
-    onShareBook?.({
-      title: book.title,
-      author: book.author,
-      coverImageUrl: book.coverImageUrl,
-    });
-  };
-
   const handleViewDetails = (book: SuggestedBook) => {
     setShowDropdown(false);
     onViewBookDetails?.(book);
@@ -162,69 +148,52 @@ export const Header: React.FC<HeaderProps> = ({
             {suggestions.map((book) => (
               <div
                 key={book.id}
-                className="p-3 hover:bg-vibe-card-subtle/80 flex items-center gap-3 transition-colors group cursor-pointer"
+                role="button"
+                tabIndex={0}
                 onClick={() => handleViewDetails(book)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleViewDetails(book);
+                  }
+                }}
+                className="p-3 hover:bg-vibe-card-subtle/80 flex items-center justify-between gap-3 transition-colors group cursor-pointer outline-none focus-visible:bg-vibe-card-subtle"
+                title={`View dedicated book page for "${book.title}"`}
               >
-                {/* Book cover thumbnail */}
-                <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
-                  {book.coverThumbnailUrl ? (
-                    <img
-                      src={book.coverThumbnailUrl}
-                      alt={book.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
-                  )}
-                </div>
-
-                {/* Book metadata */}
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
-                    {book.title}
-                  </p>
-                  <p className="text-[11px] text-vibe-ink-muted truncate">
-                    by {book.author}
-                    {book.firstPublishYear && (
-                      <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
-                        {book.firstPublishYear}
-                      </span>
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {/* Book cover thumbnail */}
+                  <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
+                    {book.coverThumbnailUrl ? (
+                      <img
+                        src={book.coverThumbnailUrl}
+                        alt={book.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
                     )}
-                  </p>
+                  </div>
+
+                  {/* Book metadata */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                      {book.title}
+                    </p>
+                    <p className="text-[11px] text-vibe-ink-muted truncate">
+                      by {book.author}
+                      {book.firstPublishYear && (
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
+                          {book.firstPublishYear}
+                        </span>
+                      )}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Quick actions */}
-                <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    type="button"
-                    onClick={() => handleViewDetails(book)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-accent-subtle text-vibe-accent hover:bg-vibe-accent hover:text-white border border-vibe-accent/20 transition-all active:scale-95"
-                    title={`View book info and AI summary for "${book.title}"`}
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Summary</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectForTimer(book)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-card-subtle hover:bg-vibe-accent hover:text-white border border-vibe-border transition-all active:scale-95"
-                    title={`Read "${book.title}" with immersion timer`}
-                  >
-                    <Clock className="w-3 h-3" />
-                    <span className="hidden sm:inline">Timer</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectForShare(book)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-card-subtle text-vibe-ink hover:bg-vibe-accent hover:text-white border border-vibe-border transition-all active:scale-95"
-                    title={`Share a passage or moment from "${book.title}"`}
-                  >
-                    <BookOpen className="w-3 h-3" />
-                    <span className="hidden sm:inline">Share</span>
-                  </button>
+                {/* Subtle affordance chevron indicating dedicated book page */}
+                <div className="flex-shrink-0 pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
               </div>
             ))}
