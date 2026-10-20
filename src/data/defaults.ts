@@ -1,18 +1,10 @@
-import { UserProfile } from '../types';
-
-/**
- * Shared visual defaults for Readers Hub.
- * There is intentionally NO demo user, post, or leaderboard data here —
- * every profile and feed entry in the app comes from a real Supabase account.
- */
+import { UserProfile, Post, LeaderboardEntry } from '../types';
 
 export const DEFAULT_USER_AVATAR =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23059669'/><text x='50' y='55' font-family='system-ui, -apple-system, sans-serif' font-size='38' font-weight='700' fill='%23ffffff' text-anchor='middle' dominant-baseline='central'>RH</text></svg>";
 
 /**
  * Local-only profile used by "Continue as Guest".
- * Guest sessions never reach the database: posting, voting, saving, and
- * leaderboard placement are all disabled while browsing as a guest.
  */
 export const GUEST_USER: UserProfile = {
   id: 'guest-user',
@@ -27,3 +19,206 @@ export const GUEST_USER: UserProfile = {
   bookshelfCount: 0,
   savedPassagesCount: 0,
 };
+
+/**
+ * Curated literary demo posts used when browsing as Guest or when
+ * database is newly provisioned prior to running seed.sql.
+ */
+export const DEMO_POSTS: Post[] = [
+  {
+    id: 'demo-post-1',
+    userId: 'demo-user-1',
+    authorName: 'Alex Miller',
+    authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    actionText: 'shared a passage',
+    timeAgo: '1h ago',
+    tag: 'Focus',
+    bookTitle: 'Atomic Habits',
+    bookAuthor: 'James Clear',
+    coverImageUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'You do not rise to the level of your goals. You fall to the level of your systems.',
+    pageNumber: 27,
+    recommendationText: 'A masterclass in compounding 1% gains every day. Essential reading for every reader building a quiet habit.',
+    rating: 5.0,
+    upvotesCount: 42,
+    commentsCount: 5,
+    postType: 'passage',
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+  },
+  {
+    id: 'demo-post-2',
+    userId: 'demo-user-2',
+    authorName: 'Alex Miller',
+    authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    actionText: 'shared a passage',
+    timeAgo: '2h ago',
+    tag: 'Creativity',
+    bookTitle: 'The Creative Act: A Way of Being',
+    bookAuthor: 'Rick Rubin',
+    coverImageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'The object of art is not to make art; it is to be in that wonderful state which makes art inevitable.',
+    pageNumber: 42,
+    recommendationText: 'A masterclass in stripping away self-doubt and seeing the world through curiosity.',
+    rating: 5.0,
+    upvotesCount: 28,
+    commentsCount: 3,
+    postType: 'passage',
+    createdAt: new Date(Date.now() - 7200000).toISOString(),
+  },
+  {
+    id: 'demo-post-3',
+    userId: 'demo-user-3',
+    authorName: 'Elena Rostova',
+    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    actionText: 'shared a passage',
+    timeAgo: '5h ago',
+    tag: 'Classics',
+    bookTitle: 'War and Peace',
+    bookAuthor: 'Leo Tolstoy',
+    coverImageUrl: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'If everyone fought for their own convictions, there would be no war.',
+    pageNumber: 284,
+    recommendationText: 'Tolstoy captures the microscopic nuances of human consciousness with astonishing clarity.',
+    rating: 5.0,
+    upvotesCount: 34,
+    commentsCount: 7,
+    postType: 'passage',
+    createdAt: new Date(Date.now() - 18000000).toISOString(),
+  },
+  {
+    id: 'demo-post-4',
+    userId: 'demo-user-4',
+    authorName: 'Marcus Vance',
+    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    actionText: 'shared a passage',
+    timeAgo: '1d ago',
+    tag: 'Philosophy',
+    bookTitle: 'Meditations',
+    bookAuthor: 'Marcus Aurelius',
+    coverImageUrl: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'You have power over your mind - not outside events. Realize this, and you will find strength.',
+    pageNumber: 67,
+    recommendationText: 'Timeless notes written for oneself in military tents that echo through the centuries.',
+    rating: 4.8,
+    upvotesCount: 29,
+    commentsCount: 4,
+    postType: 'passage',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 'demo-post-5',
+    userId: 'demo-user-5',
+    authorName: 'Sophia Chen',
+    authorAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
+    actionText: 'recommended a book',
+    timeAgo: '2d ago',
+    tag: 'Sci-Fi',
+    bookTitle: 'Exhalation',
+    bookAuthor: 'Ted Chiang',
+    coverImageUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'Contemplate the marvel that is existence, and rejoice that you are able to do so.',
+    pageNumber: 155,
+    recommendationText: 'Nine transcendent short stories that will rewire how you think about time and human nature.',
+    rating: 5.0,
+    upvotesCount: 22,
+    commentsCount: 2,
+    postType: 'recommendation',
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+  {
+    id: 'demo-post-6',
+    userId: 'demo-user-6',
+    authorName: 'Lucas Gray',
+    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
+    actionText: 'finished a book',
+    timeAgo: '3d ago',
+    tag: 'Fiction',
+    bookTitle: 'Before the Coffee Gets Cold',
+    bookAuthor: 'Toshikazu Kawaguchi',
+    coverImageUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'Water flows from high places to low places. That is the nature of gravity. Emotions also, seem to act according to gravity.',
+    pageNumber: 92,
+    recommendationText: 'A warm, melancholy cup of storytelling in a small Tokyo cafe alleyway.',
+    rating: 4.5,
+    upvotesCount: 15,
+    commentsCount: 1,
+    postType: 'finished_book',
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+  },
+  {
+    id: 'demo-post-7',
+    userId: 'demo-user-7',
+    authorName: 'Elena Rostova',
+    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    actionText: 'recommended a book',
+    timeAgo: '4d ago',
+    tag: 'Focus',
+    bookTitle: 'Deep Work',
+    bookAuthor: 'Cal Newport',
+    coverImageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80',
+    quoteText: 'To produce at your peak level you need to work for extended periods with full concentration on a single task free from distraction.',
+    pageNumber: 14,
+    recommendationText: 'Rules for focused success in a distracted world. Transformed my evening reading habits completely.',
+    rating: 4.9,
+    upvotesCount: 31,
+    commentsCount: 6,
+    postType: 'recommendation',
+    createdAt: new Date(Date.now() - 345600000).toISOString(),
+  },
+];
+
+/**
+ * Authentic reading champions displayed on Weekly Leaders and Leaderboard.
+ */
+export const DEMO_LEADERS: LeaderboardEntry[] = [
+  {
+    userId: 'demo-user-3',
+    username: 'elena_rostova',
+    fullName: 'Elena Rostova',
+    initials: 'ER',
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    rank: 1,
+    minutesRead: 340,
+    formattedTime: '5h 40m',
+  },
+  {
+    userId: 'demo-user-4',
+    username: 'marcus_vance',
+    fullName: 'Marcus Vance',
+    initials: 'MV',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    rank: 2,
+    minutesRead: 255,
+    formattedTime: '4h 15m',
+  },
+  {
+    userId: 'demo-user-1',
+    username: 'alex_miller',
+    fullName: 'Alex Miller',
+    initials: 'AM',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    rank: 3,
+    minutesRead: 190,
+    formattedTime: '3h 10m',
+  },
+  {
+    userId: 'demo-user-5',
+    username: 'sophia_chen',
+    fullName: 'Sophia Chen',
+    initials: 'SC',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
+    rank: 4,
+    minutesRead: 145,
+    formattedTime: '2h 25m',
+  },
+  {
+    userId: 'demo-user-6',
+    username: 'lucas_gray',
+    fullName: 'Lucas Gray',
+    initials: 'LG',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
+    rank: 5,
+    minutesRead: 105,
+    formattedTime: '1h 45m',
+  },
+];

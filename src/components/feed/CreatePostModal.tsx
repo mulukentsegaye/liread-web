@@ -8,9 +8,14 @@ import { bookSearchService, SuggestedBook } from '../../services/bookSearchServi
 interface CreatePostModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialBook?: {
+    title: string;
+    author: string;
+    coverImageUrl?: string;
+  } | null;
 }
 
-export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose }) => {
+export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClose, initialBook }) => {
   const { addPost } = useFeedStore();
   const { user } = useAuthStore();
 
@@ -32,6 +37,22 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Pre-fill initialBook if passed (e.g. from header search or feed action)
+  useEffect(() => {
+    if (isOpen && initialBook) {
+      setBookTitle(initialBook.title);
+      setBookAuthor(initialBook.author);
+      setCoverImageUrl(initialBook.coverImageUrl);
+      setSelectedBook({
+        id: initialBook.title,
+        title: initialBook.title,
+        author: initialBook.author,
+        coverImageUrl: initialBook.coverImageUrl,
+      });
+      setShowSuggestions(false);
+    }
+  }, [isOpen, initialBook]);
 
   // Debounced search on bookTitle change
   useEffect(() => {

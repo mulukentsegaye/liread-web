@@ -53,6 +53,11 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [preSelectedBook, setPreSelectedBook] = useState<{
+    title: string;
+    author: string;
+    coverImageUrl?: string;
+  } | null>(null);
 
   const { isPopoverOpen, closePopover, theme } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
@@ -287,15 +292,8 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleOpenCreateModal = () => {
-    if (isGuest) {
-      alert('Create an account to share reading moments. Guests can browse but not post.');
-      return;
-    }
-    if (!isAuthenticated) {
-      navigateWithTransition('login');
-      return;
-    }
+  const handleOpenCreateModal = (initialBook?: { title: string; author: string; coverImageUrl?: string }) => {
+    setPreSelectedBook(initialBook || null);
     setCreateModalOpen(true);
   };
 
@@ -377,6 +375,8 @@ export const App: React.FC = () => {
       <Header
         onGoToLanding={handleGoToLanding}
         onGoToLogin={() => setAuthModalOpen(true)}
+        onSelectBookForTimer={handleSelectBookForTimer}
+        onShareBook={(book) => handleOpenCreateModal(book)}
       />
 
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 min-h-0 flex items-stretch gap-4 sm:gap-6 lg:gap-8 justify-between overflow-hidden">
@@ -433,7 +433,11 @@ export const App: React.FC = () => {
 
       <CreatePostModal
         isOpen={isCreateModalOpen}
-        onClose={() => setCreateModalOpen(false)}
+        initialBook={preSelectedBook}
+        onClose={() => {
+          setCreateModalOpen(false);
+          setPreSelectedBook(null);
+        }}
       />
 
       <VibeSelector
