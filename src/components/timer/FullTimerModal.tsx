@@ -1,11 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { X, Play, Pause, Square, RotateCcw, BookOpen, ArrowLeft } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useCelebrationStore } from '../../stores/celebrationStore';
 import { AmbientAudioController } from './AmbientAudioController';
+import { NavigationTab } from '../layout/SidebarLeft';
 
-export const FullTimerModal: React.FC = () => {
+interface FullTimerModalProps {
+  previousTab?: NavigationTab;
+}
+
+const TAB_NAME_MAP: Record<NavigationTab, string> = {
+  feed: 'Discover',
+  timer: 'reading feed',
+  analytics: 'My Progress',
+  leaderboard: 'Leaderboard',
+  bookshelf: 'My Bookshelf',
+  saved: 'Saved Passages',
+};
+
+export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'feed' }) => {
   const {
     isFullScreenOpen,
     setFullScreenOpen,
@@ -23,6 +37,13 @@ export const FullTimerModal: React.FC = () => {
   const { showCelebration } = useCelebrationStore();
   const [seconds, setSeconds] = useState(getElapsedSeconds());
 
+  // Transition & lifecycle states
+  const [isRendered, setIsRendered] = useState(isFullScreenOpen);
+  const [transitionStage, setTransitionStage] = useState<'idle' | 'entering' | 'exiting'>('idle');
+  const enterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Synchronize elapsed clock
   useEffect(() => {
     setSeconds(getElapsedSeconds());
     const interval = setInterval(() => {
@@ -31,31 +52,106 @@ export const FullTimerModal: React.FC = () => {
     return () => clearInterval(interval);
   }, [isRunning, getElapsedSeconds]);
 
-  if (!isFullScreenOpen) return null;
+  // Synchronize store opening/closing with peaceful page transitions
+  useEffect(() => {
+    if (isFullScreenOpen) {
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+      setIsRendered(true);
+      setTransitionStage('entering');
+
+      enterTimeoutRef.current = setTimeout(() => {
+        setTransitionStage('idle');
+      }, 380);
+    } else if (isRendered && transitionStage !== 'exiting') {
+      // Gracefully handle external close (e.g. from background actions)
+      setTransitionStage('exiting');
+      exitTimeoutRef.current = setTimeout(() => {
+        setIsRendered(false);
+        setTransitionStage('idle');
+      }, 220);
+    }
+  }, [isFullScreenOpen]);
+
+  // Clean up any timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+    };
+  }, []);
+
+  // Peaceful close handler with exit animation
+  const handleClose = (onComplete?: () => void) => {
+    if (transitionStage === 'exiting') return;
+
+    if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
+    if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+
+    setTransitionStage('exiting');
+
+    exitTimeoutRef.current = setTimeout(() => {
+      onComplete?.();
+      setFullScreenOpen(false);
+      setIsRendered(false);
+      setTransitionStage('idle');
+    }, 220);
+  };
+
+  // Keyboard accessibility: Escape key closes with peaceful transition
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isRendered && transitionStage !== 'exiting') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isRendered, transitionStage]);
+
+  if (!isRendered) return null;
 
   const formatHours = Math.floor(seconds / 3600).toString().padStart(2, '0');
   const formatMins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
   const formatSecs = (seconds % 60).toString().padStart(2, '0');
 
   const handleStopAndSave = () => {
-    const mins = stopTimer();
-    if (mins > 0) {
-      logSessionMinutes(mins, bookTitle);
-      showCelebration(mins, bookTitle);
-    }
-    setFullScreenOpen(false);
+    handleClose(() => {
+      const mins = stopTimer();
+      if (mins > 0) {
+        logSessionMinutes(mins, bookTitle);
+        showCelebration(mins, bookTitle);
+      }
+    });
   };
 
+  const backDestinationName = TAB_NAME_MAP[previousTab] || 'reading feed';
+  const transitionClass =
+    transitionStage === 'exiting'
+      ? 'timer-page-exit'
+      : transitionStage === 'entering'
+      ? 'timer-page-enter'
+      : '';
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto bg-vibe-bg text-vibe-ink backdrop-blur-md animate-in fade-in duration-300 transition-colors duration-500">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Distraction-free reading timer sanctuary"
+      className={`fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto bg-vibe-bg text-vibe-ink backdrop-blur-md transition-colors duration-500 ${transitionClass}`}
+    >
+      {/* Signature Readers Hub Ambient Top Beam during Transition */}
+      {transitionStage !== 'idle' && (
+        <div className="peaceful-top-beam" aria-hidden="true" />
+      )}
+
       {/* Top Header */}
-      <div className="flex items-center justify-between max-w-4xl w-full mx-auto relative z-10">
+      <div className="flex items-center justify-between max-w-4xl w-full mx-auto relative z-10 timer-element-reveal-1">
         <div className="flex items-center gap-2.5 sm:gap-3">
           <button
-            onClick={() => setFullScreenOpen(false)}
-            aria-label="Back to feed"
+            onClick={() => handleClose()}
+            aria-label={`Back to ${backDestinationName}`}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
-            title="Back to reading feed"
+            title={`Back to ${backDestinationName}`}
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -77,9 +173,10 @@ export const FullTimerModal: React.FC = () => {
           <AmbientAudioController compact />
 
           <button
-            onClick={() => setFullScreenOpen(false)}
+            onClick={() => handleClose()}
             aria-label="Close timer"
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors shadow-xs"
+            title="Close timer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -87,7 +184,7 @@ export const FullTimerModal: React.FC = () => {
       </div>
 
       {/* Center Focus Display */}
-      <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4 sm:space-y-6 my-auto py-6 relative z-10">
+      <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4 sm:space-y-6 my-auto py-6 relative z-10 timer-element-reveal-2">
         
         {/* Book Jacket Art */}
         <div className="relative w-24 h-36 sm:w-32 sm:h-48 rounded-lg shadow-vibe-elevated border border-vibe-border bg-vibe-card flex flex-col items-center justify-between p-3 sm:p-4 text-center">
@@ -167,12 +264,12 @@ export const FullTimerModal: React.FC = () => {
       </div>
 
       {/* Bottom Quote & Tip */}
-      <div className="text-center max-w-xl mx-auto pt-4 relative z-10">
+      <div className="text-center max-w-xl mx-auto pt-4 relative z-10 timer-element-reveal-3">
         <p className="font-display italic text-sm sm:text-base text-vibe-ink-secondary leading-relaxed font-normal">
           “The more that you read, the more things you will know. The more that you learn, the more places you'll go.”
         </p>
         <span className="text-[10px] font-mono mt-1 block text-vibe-ink-muted">
-          Close to return to feed while timer keeps ticking
+          Close to return to {backDestinationName} while timer keeps ticking
         </span>
       </div>
 
