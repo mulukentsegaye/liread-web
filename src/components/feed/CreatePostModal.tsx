@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { X, Sparkles, Star, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Sparkles, Star, ArrowLeft, Search, BookOpen, Loader2, CheckCircle2 } from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
 import { PostType } from '../../types';
+import { bookSearchService, SuggestedBook } from '../../services/bookSearchService';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -16,13 +17,105 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [postType, setPostType] = useState<PostType>('passage');
   const [bookTitle, setBookTitle] = useState('');
   const [bookAuthor, setBookAuthor] = useState('');
+  const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(undefined);
   const [quoteText, setQuoteText] = useState('');
   const [pageNumber, setPageNumber] = useState('');
   const [tag, setTag] = useState('Creativity');
   const [recommendationText, setRecommendationText] = useState('');
   const [rating, setRating] = useState(5);
 
+  // Open Library Book Search & Auto-Suggest state
+  const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<SuggestedBook | null>(null);
+
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Debounced search on bookTitle change
+  useEffect(() => {
+    const query = bookTitle.trim();
+
+    // If query is empty or too short, reset suggestions
+    if (query.length < 2) {
+      setSuggestions([]);
+      setIsSearching(false);
+      return;
+    }
+
+    // If title matches currently selected book, don't trigger search
+    if (selectedBook && selectedBook.title.toLowerCase() === query.toLowerCase()) {
+      return;
+    }
+
+    setIsSearching(true);
+
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await bookSearchService.searchBooks(query, controller.signal);
+        setSuggestions(results);
+        setShowSuggestions(true);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.warn('Search error in CreatePostModal:', err);
+        }
+      } finally {
+        setIsSearching(false);
+      }
+    }, 320);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [bookTitle, selectedBook]);
+
+  // Click outside to dismiss suggestions dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
   if (!isOpen) return null;
+
+  const handleSelectBook = (book: SuggestedBook) => {
+    setBookTitle(book.title);
+    setBookAuthor(book.author);
+    setCoverImageUrl(book.coverImageUrl);
+    setSelectedBook(book);
+    setShowSuggestions(false);
+  };
+
+  const handleRemoveCover = () => {
+    setCoverImageUrl(undefined);
+    setSelectedBook(null);
+  };
+
+  const handleClose = () => {
+    setShowSuggestions(false);
+    onClose();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,19 +129,24 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         postType,
         bookTitle: bookTitle.trim(),
         bookAuthor: bookAuthor.trim() || 'Unknown Author',
+        coverImageUrl: coverImageUrl || undefined,
         quoteText: quoteText.trim() || undefined,
         pageNumber: pageNumber ? parseInt(pageNumber, 10) : undefined,
         tag,
         recommendationText: recommendationText.trim() || undefined,
         rating: postType === 'finished_book' ? rating : undefined,
-        authorName: user.fullName,
-        authorAvatar: user.avatarUrl,
+        authorName: user?.fullName,
+        authorAvatar: user?.avatarUrl,
       },
-      user.id
+      user?.id
     );
 
     setBookTitle('');
     setBookAuthor('');
+    setCoverImageUrl(undefined);
+    setSelectedBook(null);
+    setSuggestions([]);
+    setShowSuggestions(false);
     setQuoteText('');
     setPageNumber('');
     setRecommendationText('');
@@ -67,7 +165,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 aria-label="Back"
                 className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
                 title="Back"
@@ -83,7 +181,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               aria-label="Close modal"
               className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
             >
@@ -130,21 +228,134 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
           <form id="create-post-form" onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Book Title & Author */}
+            {/* Book Title & Author Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
-                  Book Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={bookTitle}
-                  onChange={(e) => setBookTitle(e.target.value)}
-                  placeholder="e.g. The Creative Act"
-                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none"
-                />
+              {/* Book Title with Open Library Auto-Suggest */}
+              <div className="relative" ref={searchContainerRef}>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">
+                    Book Title *
+                  </label>
+                  <span className="text-[10px] text-vibe-accent font-medium flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    Auto-Suggest
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={bookTitle}
+                    onChange={(e) => {
+                      setBookTitle(e.target.value);
+                      if (selectedBook && e.target.value !== selectedBook.title) {
+                        setSelectedBook(null);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (suggestions.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    placeholder="Type title (e.g. The Creative Act)..."
+                    className="w-full text-xs sm:text-sm p-3 pr-9 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none transition-all"
+                    autoComplete="off"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-vibe-ink-muted pointer-events-none">
+                    {isSearching ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-vibe-accent" />
+                    ) : selectedBook ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    ) : (
+                      <Search className="w-4 h-4 text-vibe-ink-muted" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Auto-suggest dropdown */}
+                {showSuggestions && bookTitle.trim().length >= 2 && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-72 overflow-y-auto">
+                    <div className="px-3 py-2 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-[11px] text-vibe-ink-muted font-medium">
+                      <span className="flex items-center gap-1.5 text-vibe-ink">
+                        <BookOpen className="w-3.5 h-3.5 text-vibe-accent" />
+                        Open Library Suggestions
+                      </span>
+                      {isSearching && (
+                        <span className="flex items-center gap-1 text-vibe-accent text-[10px]">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Searching...
+                        </span>
+                      )}
+                    </div>
+
+                    {isSearching && suggestions.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-vibe-ink-muted space-y-2">
+                        <Loader2 className="w-5 h-5 animate-spin mx-auto text-vibe-accent" />
+                        <p>Searching Open Library for "{bookTitle}"...</p>
+                      </div>
+                    ) : suggestions.length > 0 ? (
+                      <div className="divide-y divide-vibe-border/50">
+                        {suggestions.map((book) => (
+                          <button
+                            key={book.id}
+                            type="button"
+                            onClick={() => handleSelectBook(book)}
+                            className="w-full p-2.5 sm:p-3 text-left hover:bg-vibe-card-subtle flex items-center gap-3 transition-colors group cursor-pointer"
+                          >
+                            {/* Thumbnail */}
+                            <div className="w-9 h-12 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
+                              {book.coverThumbnailUrl ? (
+                                <img
+                                  src={book.coverThumbnailUrl}
+                                  alt={book.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
+                              )}
+                            </div>
+
+                            {/* Details */}
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                                {book.title}
+                              </p>
+                              <p className="text-[11px] text-vibe-ink-muted truncate">
+                                by {book.author}
+                                {book.firstPublishYear && (
+                                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
+                                    {book.firstPublishYear}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+
+                            {/* Cover status indicator */}
+                            <div className="flex-shrink-0 text-[10px] hidden sm:block">
+                              {book.coverImageUrl ? (
+                                <span className="text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                  Cover
+                                </span>
+                              ) : (
+                                <span className="text-vibe-ink-muted">Text only</span>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 text-center text-xs text-vibe-ink-muted">
+                        <p>No matches found on Open Library.</p>
+                        <p className="text-[11px] mt-1 text-vibe-ink-muted/80">You can type the author manually below.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Author Input */}
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
                   Author
@@ -158,6 +369,37 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                 />
               </div>
             </div>
+
+            {/* Auto-Fetched Cover Preview Card */}
+            {coverImageUrl && (
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-16 rounded-lg overflow-hidden border border-vibe-border shadow-md flex-shrink-0 bg-vibe-card">
+                    <img
+                      src={coverImageUrl}
+                      alt={bookTitle}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mb-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Cover auto-fetched from Open Library</span>
+                    </div>
+                    <p className="text-xs font-bold text-vibe-ink truncate">{bookTitle || 'Selected Book'}</p>
+                    <p className="text-[11px] text-vibe-ink-muted truncate">by {bookAuthor || 'Unknown Author'}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleRemoveCover}
+                  className="text-[11px] font-medium text-rose-500 hover:text-rose-600 hover:underline px-2.5 py-1.5 rounded-lg hover:bg-rose-500/10 transition-colors flex-shrink-0"
+                >
+                  Remove Cover
+                </button>
+              </div>
+            )}
 
             {/* Quote Section */}
             <div>
@@ -248,7 +490,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-vibe-border mt-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="min-h-[44px] px-4 py-2.5 text-xs sm:text-sm font-semibold text-vibe-ink-muted hover:text-vibe-ink transition-colors"
           >
             Cancel
