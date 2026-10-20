@@ -11,9 +11,7 @@ import {
   Quote, 
   CheckCircle2, 
   Loader2, 
-  Library, 
   Plus, 
-  ExternalLink,
   ChevronDown
 } from 'lucide-react';
 import { BookDetailsData, BookSummaryData } from '../../types';
@@ -42,7 +40,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   const [detailedBook, setDetailedBook] = useState<BookDetailsData>(book);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
-  // AI Summary State
+  // Summary State
   const [summary, setSummary] = useState<BookSummaryData | null>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const [activeTab, setActiveTab] = useState<'summary' | 'synopsis' | 'quotes'>('summary');
@@ -88,7 +86,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     };
   }, [book]);
 
-  // Load AI Summary on mount or when requested
+  // Load summary on mount or when requested
   useEffect(() => {
     let isMounted = true;
     async function loadSummary() {
@@ -103,7 +101,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           setSummary(res);
         }
       } catch (err) {
-        console.warn('Failed to load AI summary:', err);
+        console.warn('Failed to load summary:', err);
       } finally {
         if (isMounted) setIsLoadingSummary(false);
       }
@@ -138,42 +136,27 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300 pb-16">
+    <div className="w-full max-w-3xl mx-auto space-y-6 animate-in fade-in duration-300 pb-20">
       
       {/* Top Navigation & Back Bar */}
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center justify-between pt-1">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-vibe-border bg-vibe-card text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-vibe-border bg-vibe-card text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
           <span>Back</span>
         </button>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onShareBook({
-              title: detailedBook.title,
-              author: detailedBook.author,
-              coverImageUrl: detailedBook.coverImageUrl,
-            })}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-vibe-border bg-vibe-card text-xs font-semibold text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs"
-          >
-            <Share2 className="w-3.5 h-3.5 text-vibe-accent" />
-            <span>Share</span>
-          </button>
-        </div>
       </div>
 
       {/* Hero: Book Presentation Header */}
-      <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft transition-all space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+      <div className="rounded-3xl border border-vibe-border bg-vibe-card p-5 sm:p-7 shadow-soft transition-all space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-7 items-center md:items-start">
           
           {/* Left: Book Cover Showcase */}
           <div className="md:col-span-4 flex flex-col items-center">
-            <div className="relative group w-44 sm:w-52 h-64 sm:h-76 rounded-2xl overflow-hidden shadow-2xl border border-vibe-border bg-vibe-card-subtle transition-transform duration-300 group-hover:scale-[1.02]">
+            <div className="relative group w-36 sm:w-44 h-52 sm:h-64 rounded-2xl overflow-hidden shadow-2xl border border-vibe-border bg-vibe-card-subtle transition-transform duration-300 group-hover:scale-[1.02]">
               {detailedBook.coverImageUrl ? (
                 <img
                   src={detailedBook.coverImageUrl}
@@ -183,7 +166,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-vibe-card-subtle">
                   <BookOpen className="w-12 h-12 text-vibe-accent mb-2" />
-                  <p className="font-serif font-bold text-sm text-vibe-ink line-clamp-2">{detailedBook.title}</p>
+                  <p className="font-heading font-semibold text-xs text-vibe-ink line-clamp-2">{detailedBook.title}</p>
                   <p className="text-xs text-vibe-ink-muted mt-1">{detailedBook.author}</p>
                 </div>
               )}
@@ -217,66 +200,51 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               </div>
 
               {/* Title & Author */}
-              <h1 className="font-serif text-2xl sm:text-4xl font-bold tracking-tight text-vibe-ink leading-tight">
+              <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
                 {detailedBook.title}
               </h1>
-              <p className="text-base sm:text-lg text-vibe-ink-secondary mt-1 font-medium">
-                by {detailedBook.author}
+              <p className="text-sm sm:text-base text-vibe-ink-secondary mt-1 font-normal">
+                by <span className="font-medium text-vibe-ink">{detailedBook.author}</span>
               </p>
             </div>
 
             {/* Reading Pills Row */}
-            <div className="grid grid-cols-3 gap-2 py-3 border-y border-vibe-border">
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle">
-                <span className="block text-[10px] font-mono uppercase text-vibe-ink-muted">Est. Read</span>
-                <span className="text-xs sm:text-sm font-bold text-vibe-ink">~5.5 Hours</span>
+            <div className="grid grid-cols-3 gap-2 py-2.5 border-y border-vibe-border">
+              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
+                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Est. Read</span>
+                <span className="text-xs font-mono font-semibold text-vibe-ink">~5.5 Hours</span>
               </div>
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle">
-                <span className="block text-[10px] font-mono uppercase text-vibe-ink-muted">AI Summary</span>
-                <span className="text-xs sm:text-sm font-bold text-vibe-accent">6–8 Mins</span>
+              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
+                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Overview</span>
+                <span className="text-xs font-mono font-semibold text-vibe-accent">6–8 Mins</span>
               </div>
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle">
-                <span className="block text-[10px] font-mono uppercase text-vibe-ink-muted">Pacing</span>
-                <span className="text-xs sm:text-sm font-bold text-vibe-ink">Mindful Flow</span>
+              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
+                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Pacing</span>
+                <span className="text-xs font-semibold text-vibe-ink">Mindful Flow</span>
               </div>
             </div>
 
-            {/* Action Buttons Row */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
+            {/* Standard Unified Action Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
               
-              {/* Primary: AI Summary Button */}
+              {/* Primary: Overview Button */}
               <button
                 type="button"
                 onClick={handleScrollToSummary}
-                className="flex items-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 group"
+                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-98 flex items-center justify-center gap-1.5 group"
               >
-                <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                <span>Read 5–10 Min AI Summary</span>
+                <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform flex-shrink-0" />
+                <span className="truncate">Overview</span>
               </button>
 
               {/* Start Reading Timer */}
               <button
                 type="button"
                 onClick={() => onStartTimer(detailedBook.title, detailedBook.author, detailedBook.coverImageUrl)}
-                className="flex items-center gap-2 px-4 py-3 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95"
+                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
               >
-                <Clock className="w-4 h-4 text-vibe-accent" />
-                <span>Start Timer</span>
-              </button>
-
-              {/* Share Book / Passage */}
-              <button
-                type="button"
-                onClick={() => onShareBook({
-                  title: detailedBook.title,
-                  author: detailedBook.author,
-                  coverImageUrl: detailedBook.coverImageUrl,
-                })}
-                className="flex items-center gap-2 px-4 py-3 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95"
-                title={`Share a passage or moment from "${detailedBook.title}"`}
-              >
-                <Share2 className="w-4 h-4 text-vibe-accent" />
-                <span>Share</span>
+                <Clock className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0" />
+                <span className="truncate">Start Timer</span>
               </button>
 
               {/* Bookshelf Status Selector */}
@@ -284,20 +252,22 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="flex items-center gap-1.5 px-3.5 py-3 rounded-full text-xs sm:text-sm font-semibold border border-vibe-border bg-vibe-card-subtle text-vibe-ink-secondary hover:text-vibe-ink transition-colors"
+                  className="w-full h-10 px-2.5 rounded-xl text-xs font-semibold border border-vibe-border bg-vibe-card text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-between gap-1 shadow-xs"
                 >
-                  <Bookmark className={`w-4 h-4 ${bookshelfStatus !== 'none' ? 'fill-current text-vibe-accent' : ''}`} />
-                  <span>
-                    {bookshelfStatus === 'currently_reading' && 'Reading'}
-                    {bookshelfStatus === 'want_to_read' && 'Want to Read'}
-                    {bookshelfStatus === 'finished' && 'Finished'}
-                    {bookshelfStatus === 'none' && 'Add to Shelf'}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Bookmark className={`w-3.5 h-3.5 flex-shrink-0 ${bookshelfStatus !== 'none' ? 'fill-current text-vibe-accent' : 'text-vibe-ink-muted'}`} />
+                    <span className="truncate">
+                      {bookshelfStatus === 'currently_reading' && 'Reading'}
+                      {bookshelfStatus === 'want_to_read' && 'Want to Read'}
+                      {bookshelfStatus === 'finished' && 'Finished'}
+                      {bookshelfStatus === 'none' && 'Add to Shelf'}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-3 h-3 text-vibe-ink-muted flex-shrink-0" />
                 </button>
 
                 {showStatusDropdown && (
-                  <div className="absolute left-0 mt-2 w-48 rounded-2xl bg-vibe-card border border-vibe-border shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute right-0 sm:left-0 mt-1.5 w-44 rounded-2xl bg-vibe-card border border-vibe-border shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150">
                     <button
                       type="button"
                       onClick={() => handleBookshelfToggle('want_to_read')}
@@ -326,6 +296,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 )}
               </div>
 
+              {/* Share Book / Passage */}
+              <button
+                type="button"
+                onClick={() => onShareBook({
+                  title: detailedBook.title,
+                  author: detailedBook.author,
+                  coverImageUrl: detailedBook.coverImageUrl,
+                })}
+                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
+                title={`Share a passage or moment from "${detailedBook.title}"`}
+              >
+                <Share2 className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0" />
+                <span className="truncate">Share</span>
+              </button>
+
             </div>
 
           </div>
@@ -345,7 +330,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           }`}
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>✨ 5–10 Min AI Summary</span>
+          <span>Overview</span>
         </button>
 
         <button
@@ -371,12 +356,12 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           }`}
         >
           <Quote className="w-3.5 h-3.5" />
-          <span>Quotes & Community ({bookRelatedPosts.length})</span>
+          <span>Community ({bookRelatedPosts.length})</span>
         </button>
       </div>
 
       {/* =========================================================================
-          TAB 1: AI SUMMARY READER (The requested feature)
+          TAB 1: BOOK OVERVIEW
           ========================================================================= */}
       {activeTab === 'summary' && (
         <div ref={summarySectionRef} className="space-y-6">
@@ -385,9 +370,9 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             <div className="rounded-3xl border border-vibe-border bg-vibe-card p-12 text-center space-y-4 shadow-soft">
               <Loader2 className="w-8 h-8 animate-spin mx-auto text-vibe-accent" />
               <div className="space-y-1">
-                <p className="font-serif font-bold text-lg text-vibe-ink">Synthesizing 5–10 Minute Summary...</p>
+                <p className="font-heading font-semibold text-base text-vibe-ink">Loading Overview...</p>
                 <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
-                  Distilling core mental models, executive takeaways, and notable quotes from {detailedBook.title}.
+                  Preparing overview and reading insights for {detailedBook.title}.
                 </p>
               </div>
             </div>
@@ -399,75 +384,96 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <div className="flex items-center justify-between pb-3 border-b border-vibe-border">
                   <div className="flex items-center gap-2 text-xs font-semibold text-vibe-accent">
                     <Sparkles className="w-4 h-4" />
-                    <span>Executive Literary Synthesis</span>
+                    <span>Editorial Overview</span>
                   </div>
                   <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary">
-                    ⏱️ {summary.readTimeMinutes} min read
+                    {summary.readTimeMinutes} min read
                   </span>
                 </div>
 
                 {/* One-Sentence Takeaway */}
-                <div className="py-2 space-y-1.5">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted font-bold block">
-                    The One-Sentence Essence
-                  </span>
-                  <blockquote className="font-serif italic text-base sm:text-xl text-vibe-ink leading-relaxed font-normal">
-                    “{summary.oneSentenceTakeaway}”
-                  </blockquote>
-                </div>
+                {summary.oneSentenceTakeaway && (
+                  <div className="py-2 space-y-1.5">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted font-bold block">
+                      Core Takeaway
+                    </span>
+                    <blockquote className="font-display italic text-base sm:text-xl text-vibe-ink leading-relaxed font-normal">
+                      “{summary.oneSentenceTakeaway}”
+                    </blockquote>
+                  </div>
+                )}
               </div>
 
-              {/* Core Ideas & Mental Models Grid */}
-              <div className="space-y-3">
-                <h3 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
-                  Core Ideas & Mental Models
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {summary.keyIdeas.map((idea, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-2xl border border-vibe-border bg-vibe-card p-5 space-y-2 shadow-xs hover:border-vibe-accent/40 transition-colors"
-                    >
-                      <h4 className="font-serif text-sm sm:text-base font-bold text-vibe-ink">
-                        {idea.title}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
-                        {idea.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Full Executive Deep-Dive Text */}
-              <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-4">
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink pb-2 border-b border-vibe-border">
-                  Executive Deep-Dive
-                </h3>
-                <div className="prose prose-sm dark:prose-invert max-w-none font-serif text-vibe-ink leading-relaxed space-y-4">
-                  {summary.fullSummaryMarkdown.split('\n\n').map((paragraph, idx) => {
-                    if (paragraph.startsWith('### ')) {
-                      return (
-                        <h4 key={idx} className="font-serif text-base sm:text-lg font-bold text-vibe-ink pt-3">
-                          {paragraph.replace('### ', '')}
+              {/* Core Ideas / Themes Grid (Only when verified key ideas exist) */}
+              {summary.keyIdeas && summary.keyIdeas.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
+                    Key Themes
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {summary.keyIdeas.map((idea, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-2xl border border-vibe-border bg-vibe-card p-5 space-y-2 shadow-xs hover:border-vibe-accent/40 transition-colors"
+                      >
+                        <h4 className="font-heading text-sm font-semibold text-vibe-ink">
+                          {idea.title}
                         </h4>
-                      );
-                    }
-                    return (
-                      <p key={idx} className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-sans">
-                        {paragraph}
-                      </p>
-                    );
-                  })}
+                        <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-normal">
+                          {idea.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Notable Quotes Card */}
+              {/* Full Text Synopsis */}
+              {summary.fullSummaryMarkdown && (
+                <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-4">
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink pb-2 border-b border-vibe-border">
+                    Synopsis
+                  </h3>
+                  <div className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed space-y-4">
+                    {summary.fullSummaryMarkdown
+                      .split('\n\n')
+                      .map((p) =>
+                        p
+                          .replace(/###\s*How to Apply These Insights Today[\s\S]*/gi, '')
+                          .replace(/1\.\s*\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+                          .replace(/\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+                          .trim()
+                      )
+                      .filter(
+                        (p) =>
+                          p.length > 0 &&
+                          !p.toLowerCase().includes('daily sanctuary') &&
+                          !p.toLowerCase().includes('how to apply these insights')
+                      )
+                      .map((paragraph, idx) => {
+                        if (paragraph.startsWith('### ')) {
+                          return (
+                            <h4 key={idx} className="font-heading text-sm sm:text-base font-bold text-vibe-ink pt-2">
+                              {paragraph.replace('### ', '')}
+                            </h4>
+                          );
+                        }
+                        return (
+                          <p key={idx} className="leading-relaxed">
+                            {paragraph}
+                          </p>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              {/* Notable Quotes Card (Only when verified quotes exist) */}
               {summary.notableQuotes && summary.notableQuotes.length > 0 && (
                 <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft space-y-4">
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink flex items-center gap-2">
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink flex items-center gap-2">
                     <Quote className="w-4 h-4 text-vibe-accent" />
-                    <span>Memorable Passages & Quotes</span>
+                    <span>Notable Quotes</span>
                   </h3>
                   <div className="space-y-3">
                     {summary.notableQuotes.map((quote, idx) => (
@@ -475,7 +481,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                         key={idx}
                         className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-start justify-between gap-4 group"
                       >
-                        <blockquote className="font-serif italic text-xs sm:text-sm text-vibe-ink leading-relaxed">
+                        <blockquote className="font-display italic text-xs sm:text-sm text-vibe-ink leading-relaxed font-normal">
                           {quote}
                         </blockquote>
                         <button
@@ -501,7 +507,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-accent font-bold">
                   Take The Full Journey
                 </span>
-                <h4 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink">
+                <h4 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
                   Ready to read the complete work?
                 </h4>
                 <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto">
@@ -526,12 +532,12 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       )}
 
       {/* =========================================================================
-          TAB 2: ABOUT THE BOOK / SYNOPSIS
+          TAB 2: ABOUT THE BOOK / ARCHIVE SYNOPSIS
           ========================================================================= */}
       {activeTab === 'synopsis' && (
         <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-6">
           <div>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink mb-1">
+            <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink mb-1">
               About {detailedBook.title}
             </h3>
             <p className="text-xs text-vibe-ink-muted">Published archive description from Open Library</p>
@@ -580,11 +586,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
       {/* =========================================================================
           TAB 3: COMMUNITY ACTIVITY & QUOTES
-          ========================================================= */}
+          ========================================================================= */}
       {activeTab === 'quotes' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink">
+            <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
               Community Reflections ({bookRelatedPosts.length})
             </h3>
             <button
@@ -615,7 +621,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             <div className="rounded-3xl border border-vibe-border bg-vibe-card p-10 text-center space-y-4 shadow-soft">
               <BookOpen className="w-10 h-10 mx-auto text-vibe-accent opacity-60" />
               <div className="space-y-1">
-                <p className="font-serif font-bold text-base text-vibe-ink">No reader posts yet for this title</p>
+                <p className="font-heading font-semibold text-sm text-vibe-ink">No reader posts yet for this title</p>
                 <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
                   Be the first member of Readers Hub to share a favorite quotation, rating, or personal reflection.
                 </p>
