@@ -80,7 +80,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
           className="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
         />
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-vibe-ink-muted group-hover:text-vibe-ink transition-colors">
+          <p className="text-sm font-medium text-vibe-ink transition-colors">
             {userFirstName ? (
               <>
                 What are you reading, <span className="font-semibold text-vibe-ink">{userFirstName}</span>?
@@ -89,7 +89,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
               'What are you reading?'
             )}
           </p>
-          <p className="text-xs text-vibe-ink-muted/70 mt-0.5">Share a passage, a rating, or a reflection...</p>
+          <p className="text-xs text-vibe-ink-muted mt-0.5">Share a passage, a rating, or a reflection...</p>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onOpenCreateModal(); }}
