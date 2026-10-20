@@ -11,6 +11,7 @@ interface HeaderProps {
   onGoToLogin?: () => void;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
   onShareBook?: (book: { title: string; author: string; coverImageUrl?: string }) => void;
+  onViewBookDetails?: (book: SuggestedBook) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -18,7 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   onGoToLanding, 
   onGoToLogin,
   onSelectBookForTimer,
-  onShareBook
+  onShareBook,
+  onViewBookDetails,
 }) => {
   const { user, isAuthenticated, isGuest } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
@@ -120,6 +122,11 @@ export const Header: React.FC<HeaderProps> = ({
     });
   };
 
+  const handleViewDetails = (book: SuggestedBook) => {
+    setShowDropdown(false);
+    onViewBookDetails?.(book);
+  };
+
   const connectionLabel = isAuthenticated ? 'Live' : (isGuest ? 'Guest' : 'Offline');
   const connectionColor = isAuthenticated ? 'bg-emerald-500' : (isGuest ? 'bg-amber-400' : 'bg-rose-400');
 
@@ -155,7 +162,8 @@ export const Header: React.FC<HeaderProps> = ({
             {suggestions.map((book) => (
               <div
                 key={book.id}
-                className="p-3 hover:bg-vibe-card-subtle/80 flex items-center gap-3 transition-colors group"
+                className="p-3 hover:bg-vibe-card-subtle/80 flex items-center gap-3 transition-colors group cursor-pointer"
+                onClick={() => handleViewDetails(book)}
               >
                 {/* Book cover thumbnail */}
                 <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
@@ -187,7 +195,17 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 {/* Quick actions */}
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={() => handleViewDetails(book)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-accent-subtle text-vibe-accent hover:bg-vibe-accent hover:text-white border border-vibe-accent/20 transition-all active:scale-95"
+                    title={`View book info and AI summary for "${book.title}"`}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    <span>Summary</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => handleSelectForTimer(book)}
@@ -201,11 +219,11 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectForShare(book)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-95"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-vibe-card-subtle text-vibe-ink hover:bg-vibe-accent hover:text-white border border-vibe-border transition-all active:scale-95"
                     title={`Share a passage or moment from "${book.title}"`}
                   >
-                    <Sparkles className="w-3 h-3" />
-                    <span>Share</span>
+                    <BookOpen className="w-3 h-3" />
+                    <span className="hidden sm:inline">Share</span>
                   </button>
                 </div>
               </div>

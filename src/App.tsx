@@ -11,6 +11,7 @@ import { FullTimerModal } from './components/timer/FullTimerModal';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
+import { BookDetailsView } from './components/book/BookDetailsView';
 import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
@@ -21,6 +22,7 @@ import { useAuthStore } from './stores/authStore';
 import { useFeedStore } from './stores/feedStore';
 import { useTheme } from './context/ThemeContext';
 import { authService } from './services/authService';
+import { BookDetailsData } from './types';
 
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'login' | 'app'>(() => {
@@ -51,6 +53,8 @@ export const App: React.FC = () => {
   }, []);
 
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
+  const [previousTab, setPreviousTab] = useState<NavigationTab>('feed');
+  const [selectedBookDetails, setSelectedBookDetails] = useState<BookDetailsData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
@@ -298,6 +302,29 @@ export const App: React.FC = () => {
     setCreateModalOpen(true);
   };
 
+  const handleViewBookDetails = (book: {
+    title: string;
+    author: string;
+    coverImageUrl?: string;
+    firstPublishYear?: number;
+    workKey?: string;
+    description?: string;
+  }) => {
+    setPreviousTab(activeTab === 'book_details' ? 'feed' : activeTab);
+    setSelectedBookDetails({
+      title: book.title,
+      author: book.author,
+      coverImageUrl: book.coverImageUrl,
+      firstPublishYear: book.firstPublishYear,
+      workKey: book.workKey,
+      description: book.description,
+    });
+    setActiveTab('book_details');
+    const mainEl = document.getElementById('main-viewport');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const transitionClass = transitionStage === 'exiting' ? 'page-exit' : (transitionStage === 'entering' ? 'page-enter' : '');
 
   if (currentView === 'login') {
@@ -376,7 +403,7 @@ export const App: React.FC = () => {
       <Header
         onSearch={(query) => {
           setSearchQuery(query);
-          if (query.trim() && activeTab !== 'feed') {
+          if (query.trim() && activeTab !== 'feed' && activeTab !== 'book_details') {
             setActiveTab('feed');
           }
         }}
@@ -384,6 +411,7 @@ export const App: React.FC = () => {
         onGoToLogin={() => setAuthModalOpen(true)}
         onSelectBookForTimer={handleSelectBookForTimer}
         onShareBook={(book) => handleOpenCreateModal(book)}
+        onViewBookDetails={handleViewBookDetails}
       />
 
       <div 
@@ -415,6 +443,18 @@ export const App: React.FC = () => {
                 searchQuery={searchQuery}
                 onOpenCreateModal={handleOpenCreateModal}
                 onSelectBookForTimer={handleSelectBookForTimer}
+                onViewBookDetails={(title, author, cover) =>
+                  handleViewBookDetails({ title, author, coverImageUrl: cover })
+                }
+              />
+            )}
+
+            {activeTab === 'book_details' && selectedBookDetails && (
+              <BookDetailsView
+                book={selectedBookDetails}
+                onBack={() => handleTabChange(previousTab || 'feed')}
+                onStartTimer={handleSelectBookForTimer}
+                onShareBook={handleOpenCreateModal}
               />
             )}
 
@@ -427,7 +467,13 @@ export const App: React.FC = () => {
             )}
 
             {(activeTab === 'bookshelf' || activeTab === 'saved') && (
-              <BookshelfView initialTab={activeTab} onBack={() => handleTabChange('feed')} />
+              <BookshelfView 
+                initialTab={activeTab} 
+                onBack={() => handleTabChange('feed')} 
+                onViewBookDetails={(title, author, cover) =>
+                  handleViewBookDetails({ title, author, coverImageUrl: cover })
+                }
+              />
             )}
           </div>
         </main>

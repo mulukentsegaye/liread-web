@@ -9,12 +9,14 @@ interface FeedContainerProps {
   searchQuery?: string;
   onOpenCreateModal: () => void;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
+  onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
 export const FeedContainer: React.FC<FeedContainerProps> = ({
   searchQuery = '',
   onOpenCreateModal,
-  onSelectBookForTimer
+  onSelectBookForTimer,
+  onViewBookDetails,
 }) => {
   const { user, isGuest, isAuthenticated } = useAuthStore();
   const { posts, feedTab, setFeedTab, sortBy, setSortBy, isLoading } = useFeedStore();
@@ -172,6 +174,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
             <PostCard
               post={post}
               onSelectBookForTimer={onSelectBookForTimer}
+              onViewBookDetails={onViewBookDetails}
             />
           </div>
         ))}

@@ -15,7 +15,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
-export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved';
+export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details';
 
 interface SidebarLeftProps {
   activeTab: NavigationTab;

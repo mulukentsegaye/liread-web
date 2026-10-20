@@ -74,3 +74,32 @@ export interface TimerSessionData {
   coverImageUrl?: string;
   pageNote?: string;
 }
+
+export interface BookDetailsData {
+  title: string;
+  author: string;
+  coverImageUrl?: string;
+  firstPublishYear?: number;
+  workKey?: string;
+  isbn?: string;
+  description?: string;
+  subjects?: string[];
+  pageCount?: number;
+  ratingAverage?: number;
+}
+
+export interface BookSummaryData {
+  bookTitle: string;
+  bookAuthor: string;
+  readTimeMinutes: number;
+  oneSentenceTakeaway: string;
+  keyIdeas: Array<{
+    title: string;
+    description: string;
+  }>;
+  fullSummaryMarkdown: string;
+  notableQuotes: string[];
+  generatedAt?: string;
+  cached?: boolean;
+}
+

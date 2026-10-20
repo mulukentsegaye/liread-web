@@ -17,6 +17,7 @@ const TAB_NAME_MAP: Record<NavigationTab, string> = {
   leaderboard: 'Leaderboard',
   bookshelf: 'My Bookshelf',
   saved: 'Saved Passages',
+  book_details: 'Book Info',
 };
 
 export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'feed' }) => {

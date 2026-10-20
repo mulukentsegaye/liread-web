@@ -8,6 +8,7 @@ import { AnimatedCounter } from '../ui/AnimatedCounter';
 interface PostCardProps {
   post: Post;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
+  onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
 // Deterministic cover color from book title
@@ -35,7 +36,7 @@ function bookCoverAccent(title: string): string {
   return accents[Math.abs(hash)];
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, onViewBookDetails }) => {
   const { toggleUpvote, toggleSave } = useFeedStore();
   const { user } = useAuthStore();
   const [isBouncing, setIsBouncing] = useState(false);
@@ -142,9 +143,17 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
                 </div>
               </div>
             )}
-            <p className="text-[10px] text-vibe-ink-muted text-center mt-1.5 leading-tight line-clamp-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewBookDetails?.(post.bookTitle, post.bookAuthor, post.coverImageUrl);
+              }}
+              className="text-[10px] text-vibe-ink-muted hover:text-vibe-accent text-center mt-1.5 leading-tight line-clamp-2 transition-colors cursor-pointer block w-full hover:underline"
+              title={`View book info & AI summary for "${post.bookTitle}"`}
+            >
               {post.bookTitle}
-            </p>
+            </button>
           </div>
 
           {/* Quote block */}

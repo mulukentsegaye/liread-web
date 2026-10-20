@@ -9,6 +9,7 @@ import { isSupabaseConfigured } from '../../lib/supabase';
 interface BookshelfViewProps {
   initialTab?: 'bookshelf' | 'saved';
   onBack?: () => void;
+  onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
 function bookCoverColor(title: string): string {
@@ -22,7 +23,7 @@ function bookCoverAccent(title: string): string {
   return accents[Math.abs(hash)];
 }
 
-export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'bookshelf', onBack }) => {
+export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'bookshelf', onBack, onViewBookDetails }) => {
   const [activeSubTab, setActiveSubTab] = useState<'bookshelf' | 'saved'>(initialTab);
   const { user, isGuest } = useAuthStore();
   const { posts } = useFeedStore();
@@ -152,7 +153,16 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
                     </button>
                   </div>
                   <div className="space-y-3">
-                    <div><h3 className="font-heading text-base font-semibold text-vibe-ink line-clamp-1 group-hover:text-vibe-accent transition-colors">{b.title}</h3><p className="text-xs text-vibe-ink-muted mt-0.5">{b.author}</p></div>
+                    <div>
+                      <h3
+                        onClick={() => onViewBookDetails?.(b.title, b.author, b.coverUrl)}
+                        className="font-heading text-base font-semibold text-vibe-ink line-clamp-1 group-hover:text-vibe-accent transition-colors cursor-pointer hover:underline"
+                        title={`View book info and AI summary for "${b.title}"`}
+                      >
+                        {b.title}
+                      </h3>
+                      <p className="text-xs text-vibe-ink-muted mt-0.5">{b.author}</p>
+                    </div>
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs text-vibe-ink-muted"><span className="font-medium text-vibe-ink-secondary">Progress</span><span className="font-mono font-semibold text-vibe-ink">{b.progress}%</span></div>
                       <div className="w-full rounded-full h-1.5 bg-vibe-card-subtle overflow-hidden"><div className={`h-full rounded-full transition-all duration-700 ${isFinished ? 'bg-emerald-500' : 'bg-vibe-accent'}`} style={{ width: `${b.progress}%` }} /></div>
