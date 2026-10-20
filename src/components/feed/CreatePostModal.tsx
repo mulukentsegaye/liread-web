@@ -154,7 +154,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={handleClose}
+    >
       <div 
         className="w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl p-5 sm:p-6 md:p-8 bg-vibe-card border border-vibe-border text-vibe-ink shadow-vibe-elevated flex flex-col justify-between overflow-y-auto max-h-screen sm:max-h-[90vh] transition-all duration-500"
         onClick={(e) => e.stopPropagation()}

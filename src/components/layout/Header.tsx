@@ -14,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
   const { user, isAuthenticated, isGuest } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
   const [isMobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [isNotificationsOpen, setNotificationsOpen] = useState(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchVal(e.target.value);
@@ -100,14 +101,40 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
           </div>
 
           {/* Notifications */}
-          <button
-            type="button"
-            aria-label="Notifications"
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
-          >
-            <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-vibe-secondary ring-1 ring-vibe-card" />
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setNotificationsOpen(!isNotificationsOpen)}
+              aria-label="Notifications"
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+            >
+              <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-vibe-secondary ring-1 ring-vibe-card" />
+            </button>
+
+            {isNotificationsOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setNotificationsOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-vibe-card border border-vibe-border shadow-vibe-elevated p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex items-center justify-between pb-2 mb-2 border-b border-vibe-border">
+                    <span className="font-heading text-xs font-bold text-vibe-ink">Notifications</span>
+                    <span className="text-[10px] text-vibe-ink-muted">All caught up</span>
+                  </div>
+                  <div className="space-y-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border/60">
+                      <p className="font-semibold text-vibe-ink">Welcome to Readers Hub</p>
+                      <p className="text-vibe-ink-muted text-[11px] mt-0.5 leading-relaxed">
+                        Start your reading timer today to log your first streak session and climb the weekly leaderboard.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Profile avatar */}
           <button

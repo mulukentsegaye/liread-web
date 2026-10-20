@@ -82,7 +82,18 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
         </div>
 
         <button
+          type="button"
           aria-label="More options"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (navigator?.clipboard?.writeText) {
+              navigator.clipboard.writeText(`"${post.quoteText}" — ${post.bookTitle} (${post.bookAuthor})`);
+              alert(`Copied passage from "${post.bookTitle}" to clipboard!`);
+            } else {
+              alert(`Reading: "${post.bookTitle}" by ${post.bookAuthor}`);
+            }
+          }}
+          title="Copy passage to clipboard"
           className="w-8 h-8 flex items-center justify-center rounded-xl text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors flex-shrink-0 ml-2"
         >
           <MoreHorizontal className="w-4 h-4" strokeWidth={1.75} />

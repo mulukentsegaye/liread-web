@@ -32,7 +32,23 @@ export const App: React.FC = () => {
   });
   const [transitionStage, setTransitionStage] = useState<'idle' | 'exiting' | 'entering'>('entering');
   const isTransitioningRef = useRef(false);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const targetViewRef = useRef<'landing' | 'login' | 'app' | null>(null);
+  const currentViewRef = useRef<'landing' | 'login' | 'app'>(currentView);
+  const exitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const enterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keep currentViewRef synced with latest state
+  useEffect(() => {
+    currentViewRef.current = currentView;
+  }, [currentView]);
+
+  // Clean up any pending transition timers on unmount
+  useEffect(() => {
+    return () => {
+      if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+      if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
+    };
+  }, []);
 
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
@@ -131,19 +147,34 @@ export const App: React.FC = () => {
         nextView = 'login';
       }
     }
-    if (nextView === currentView && transitionStage === 'idle') return;
-    if (isTransitioningRef.current) return;
 
-    isTransitioningRef.current = true;
-    setTransitionStage('exiting');
-
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
+    // If already at target view and idle, do nothing
+    if (nextView === currentViewRef.current && transitionStage === 'idle') {
+      return;
     }
 
-    transitionTimeoutRef.current = setTimeout(() => {
+    // If already transitioning to this exact target view, avoid duplicate work
+    if (targetViewRef.current === nextView && isTransitioningRef.current) {
+      return;
+    }
+
+    targetViewRef.current = nextView;
+    isTransitioningRef.current = true;
+
+    // Clear any pending transitions
+    if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+    if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
+
+    setTransitionStage('exiting');
+
+    exitTimeoutRef.current = setTimeout(() => {
       setCurrentView(nextView);
-      window.location.hash = nextView === 'app' ? '#app' : (nextView === 'login' ? '#login' : '#landing');
+      currentViewRef.current = nextView;
+
+      const targetHash = nextView === 'app' ? '#app' : (nextView === 'login' ? '#login' : '#landing');
+      if (window.location.hash !== targetHash) {
+        window.location.hash = targetHash;
+      }
 
       if (nextView === 'app') {
         if (theme === 'dark') {
@@ -161,11 +192,21 @@ export const App: React.FC = () => {
       window.scrollTo(0, 0);
       setTransitionStage('entering');
 
-      transitionTimeoutRef.current = setTimeout(() => {
+      enterTimeoutRef.current = setTimeout(() => {
         setTransitionStage('idle');
         isTransitioningRef.current = false;
+        targetViewRef.current = null;
       }, 380);
     }, 200);
+
+    // Watchdog fallback: guarantee unlock after 850ms in case of unexpected interrupts
+    setTimeout(() => {
+      if (isTransitioningRef.current && targetViewRef.current === nextView) {
+        setTransitionStage('idle');
+        isTransitioningRef.current = false;
+        targetViewRef.current = null;
+      }
+    }, 850);
   };
 
   useEffect(() => {
@@ -173,6 +214,7 @@ export const App: React.FC = () => {
       const hash = window.location.hash;
       const target: 'landing' | 'login' | 'app' =
         hash === '#app' ? 'app' : (hash === '#login' ? 'login' : 'landing');
+
       if (target === 'app') {
         const hasAccess = useAuthStore.getState().isAuthenticated || useAuthStore.getState().isGuest;
         if (!hasAccess) {
@@ -180,18 +222,18 @@ export const App: React.FC = () => {
           return;
         }
       }
-      if (target !== currentView && !isTransitioningRef.current) {
+
+      // Trigger transition only if target is different from current & not already transitioning there
+      if (target !== currentViewRef.current && target !== targetViewRef.current) {
         navigateWithTransition(target);
       }
     };
+
     window.addEventListener('hashchange', handleHashChange);
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
     };
-  }, [currentView, theme]);
+  }, []);
 
   const handleEnterApp = () => {
     navigateWithTransition('app');
@@ -310,6 +352,7 @@ export const App: React.FC = () => {
   if (!isAuthenticated && !isGuest) {
     return (
       <div className={`w-full min-h-screen ${transitionClass}`}>
+        {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
         <LoginPage onSuccess={handleEnterApp} onGoBack={handleGoToLanding} onGuest={handleGuestEnterApp} />
       </div>
     );
@@ -342,7 +385,7 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onGoToLanding={handleGoToLanding}
-          onGoToLogin={handleGoToLogin}
+          onGoToLogin={() => setAuthModalOpen(true)}
         />
 
         <main

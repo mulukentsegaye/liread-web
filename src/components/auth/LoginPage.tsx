@@ -135,14 +135,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
         </button>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 sm:hidden">
+          <button
+            type="button"
+            onClick={onGoBack}
+            className="flex items-center gap-2 sm:hidden cursor-pointer"
+            title="Return to Landing"
+          >
             <div className="w-7 h-7 rounded-lg bg-vibe-accent flex items-center justify-center text-white shadow-xs">
               <BookOpen className="w-4 h-4 text-white" />
             </div>
             <span className="font-display text-lg font-bold tracking-tight text-vibe-ink">
               Readers Hub
             </span>
-          </div>
+          </button>
         </div>
       </header>
 
@@ -154,14 +159,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
           <div className="hidden lg:flex lg:col-span-5 p-8 xl:p-10 flex-col justify-between relative bg-[#F9FAFB] border-r border-vibe-border overflow-hidden">
             {/* Top Brand Block */}
             <div className="relative z-10 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs">
+              <button
+                type="button"
+                onClick={onGoBack}
+                className="flex items-center gap-2.5 text-left cursor-pointer group"
+                title="Return to Landing"
+              >
+                <div className="w-9 h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink">
+                <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink group-hover:text-vibe-accent transition-colors">
                   Readers Hub
                 </span>
-              </div>
+              </button>
               <p className="text-xs text-vibe-ink-secondary leading-relaxed">
                 Your dedicated space for active reading sessions, inspiring passages, and mindful habits.
               </p>
@@ -495,8 +505,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
+          onClick={() => setForgotPasswordOpen(false)}
         >
-          <div className="w-full max-w-sm rounded-3xl bg-white border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200">
+          <div 
+            className="w-full max-w-sm rounded-3xl bg-white border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-base font-bold text-vibe-ink mb-1">
               Reset Your Password
             </h3>

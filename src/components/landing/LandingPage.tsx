@@ -115,8 +115,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </nav>
 
           {/* Right Action Stack: Login / Guest */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
 
+            {/* Desktop buttons */}
             <button
               type="button"
               onClick={handleGuest}
@@ -132,6 +133,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
               >
                 <span>Sign In / Create Account</span>
+              </button>
+            )}
+
+            {/* Mobile buttons */}
+            <button
+              type="button"
+              onClick={handleGuest}
+              className="flex sm:hidden items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
+            >
+              <span>Guest</span>
+            </button>
+
+            {onGoToLogin && (
+              <button
+                type="button"
+                onClick={onGoToLogin}
+                className="flex sm:hidden items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
+              >
+                <span>Sign In</span>
               </button>
             )}
           </div>
