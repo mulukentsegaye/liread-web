@@ -209,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-vibe-border bg-vibe-card/90 backdrop-blur-md transition-colors duration-500">
+    <header className="sticky top-0 z-30 w-full border-b border-vibe-border bg-vibe-card border-b border-vibe-border">
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-0 flex items-center h-14 sm:h-15 gap-3 sm:gap-4">
 
         {/* Brand / Logo */}

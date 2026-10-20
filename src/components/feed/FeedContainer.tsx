@@ -93,7 +93,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onOpenCreateModal(); }}
-          className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-sm transition-all active:scale-95"
+          className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-colors"
         >
           <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
           <span>Share</span>
@@ -102,34 +102,34 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
 
       {/* Feed navigation */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 bg-vibe-card border border-vibe-border rounded-xl p-1 shadow-soft">
+        <div className="flex items-center gap-1 bg-vibe-card border border-vibe-border rounded-xl p-1 shadow-xs">
           <button
             onClick={() => setFeedTab('for_you')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               feedTab === 'for_you'
-                ? 'bg-vibe-accent text-white shadow-sm'
-                : 'text-vibe-ink-muted hover:text-vibe-ink'
+                ? 'bg-vibe-accent text-white shadow-xs'
+                : 'text-vibe-ink-secondary hover:text-vibe-ink'
             }`}
           >
-            <Sparkles className="w-3 h-3" strokeWidth={2} />
-            For you
+            <Sparkles className="w-3.5 h-3.5" strokeWidth={2} />
+            <span>For you</span>
           </button>
           <button
             onClick={() => setFeedTab('following')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               feedTab === 'following'
-                ? 'bg-vibe-accent text-white shadow-sm'
-                : 'text-vibe-ink-muted hover:text-vibe-ink'
+                ? 'bg-vibe-accent text-white shadow-xs'
+                : 'text-vibe-ink-secondary hover:text-vibe-ink'
             }`}
           >
-            Mine
+            <span>Mine</span>
           </button>
         </div>
 
         {/* Sort toggle */}
         <button
           onClick={() => setSortBy(sortBy === 'latest' ? 'top' : 'latest')}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle border border-vibe-border transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle border border-vibe-border transition-colors"
         >
           {sortBy === 'latest' ? (
             <><Clock className="w-3.5 h-3.5" strokeWidth={1.75} />Latest</>

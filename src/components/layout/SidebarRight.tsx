@@ -64,7 +64,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
     <aside className="hidden xl:block w-72 xl:w-80 2xl:w-88 flex-shrink-0 space-y-5 py-6 pb-32 pl-4 pr-1 h-full overflow-y-auto overscroll-contain select-none transition-colors duration-500">
       
       {/* 1. Daily Reading Goal Card */}
-      <div className="bg-vibe-card rounded-2xl p-5 border border-vibe-border shadow-soft transition-all duration-300 hover:border-vibe-border">
+      <div className="bg-vibe-card rounded-2xl p-5 border border-vibe-border shadow-soft transition-colors duration-150 hover:border-vibe-border">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
@@ -141,7 +141,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
       </div>
 
       {/* 2. Weekly Leaders Widget */}
-      <div className="bg-vibe-card rounded-2xl p-5 border border-vibe-border shadow-soft transition-all duration-300 hover:border-vibe-border">
+      <div className="bg-vibe-card rounded-2xl p-5 border border-vibe-border shadow-soft transition-colors duration-150 hover:border-vibe-border">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <Trophy className="w-3.5 h-3.5 text-vibe-secondary" />
@@ -193,7 +193,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
       </div>
 
       {/* 3. Community Inspiring Card */}
-      <div className="p-4 rounded-2xl border border-vibe-border bg-vibe-card transition-all duration-300">
+      <div className="p-4 rounded-2xl border border-vibe-border bg-vibe-card transition-colors duration-150">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded-lg bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5" />

@@ -57,7 +57,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
   };
 
   return (
-    <article className="bg-vibe-card border border-vibe-border rounded-2xl overflow-hidden shadow-soft hover:shadow-float hover:-translate-y-0.5 transition-all duration-300 group">
+    <article className="bg-vibe-card border border-vibe-border rounded-2xl overflow-hidden shadow-soft hover:shadow-float transition-shadow duration-200 group">
 
       {/* Author header */}
       <div className="flex items-center justify-between px-5 pt-4 pb-0">
@@ -244,7 +244,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
           <button
             onClick={() => alert(`Comments for "${post.bookTitle}":\nJoin the discussion!`)}
             aria-label="Comment"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />
             <span>{post.commentsCount}</span>
@@ -255,7 +255,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
         <button
             onClick={() => toggleSave(post.id, user?.id)}
           aria-label="Save passage"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
             post.isSaved
               ? 'bg-vibe-accent-subtle text-vibe-accent'
               : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'

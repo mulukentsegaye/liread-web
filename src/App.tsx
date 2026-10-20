@@ -386,7 +386,7 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className={`h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden ${transitionClass}`}
+      className="h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',

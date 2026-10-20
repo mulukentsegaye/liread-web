@@ -57,9 +57,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 aria-label={item.label}
-                className={`w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 rounded-xl text-sm font-medium transition-colors duration-150 ${
                   isActive
-                    ? 'bg-vibe-accent text-white shadow-sm'
+                    ? 'bg-vibe-accent text-white shadow-xs'
                     : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
                 }`}
               >
@@ -84,9 +84,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 aria-label={item.label}
-                className={`w-full h-10 flex items-center justify-center lg:justify-between px-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`w-full h-10 flex items-center justify-center lg:justify-between px-3 rounded-xl text-sm font-medium transition-colors duration-150 ${
                   isActive
-                    ? 'bg-vibe-accent text-white shadow-sm'
+                    ? 'bg-vibe-accent text-white shadow-xs'
                     : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
                 }`}
               >

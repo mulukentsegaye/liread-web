@@ -132,7 +132,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
               const isFinished = b.status === 'Finished';
               const isReading = b.status === 'Currently Reading';
               return (
-                <div key={idx} className="bg-vibe-card border border-vibe-border rounded-2xl p-4 shadow-soft flex flex-col justify-between hover:shadow-float hover:-translate-y-0.5 transition-all duration-300 group">
+                <div key={idx} className="bg-vibe-card border border-vibe-border rounded-2xl p-4 shadow-soft flex flex-col justify-between hover:shadow-float transition-shadow duration-200 group">
                   <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden mb-3.5 border border-vibe-border/60 shadow-xs flex items-center justify-center">
                     {b.coverUrl ? (
                       <><img src={b.coverUrl} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" /></>
