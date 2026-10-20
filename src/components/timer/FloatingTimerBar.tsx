@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pause, Play, Square, Maximize2 } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useCelebrationStore } from '../../stores/celebrationStore';
 import { AmbientAudioController } from './AmbientAudioController';
 
 export const FloatingTimerBar: React.FC = () => {
@@ -18,6 +19,7 @@ export const FloatingTimerBar: React.FC = () => {
   } = useTimerStore();
 
   const { logSessionMinutes } = useAuthStore();
+  const { showCelebration } = useCelebrationStore();
   const [seconds, setSeconds] = useState(getElapsedSeconds());
 
   useEffect(() => {
@@ -39,8 +41,8 @@ export const FloatingTimerBar: React.FC = () => {
     e.stopPropagation();
     const minutesRead = stopTimer();
     if (minutesRead > 0) {
-      logSessionMinutes(minutesRead);
-      alert(`Reading session saved!\nYou logged ${minutesRead} active minutes for "${bookTitle}".`);
+      logSessionMinutes(minutesRead, bookTitle);
+      showCelebration(minutesRead, bookTitle);
     }
   };
 

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star, BookOpen, Clock } from 'lucide-react';
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
+import { AnimatedCounter } from '../ui/AnimatedCounter';
 
 interface PostCardProps {
   post: Post;
@@ -37,8 +38,22 @@ function bookCoverAccent(title: string): string {
 export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }) => {
   const { toggleUpvote, toggleSave } = useFeedStore();
   const { user } = useAuthStore();
+  const [isBouncing, setIsBouncing] = useState(false);
+  const [showPlusOne, setShowPlusOne] = useState(false);
   const coverBg = bookCoverColor(post.bookTitle);
   const coverAccent = bookCoverAccent(post.bookTitle);
+
+  const handleUpvote = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsBouncing(true);
+    setTimeout(() => setIsBouncing(false), 480);
+
+    if (!post.isUpvoted) {
+      setShowPlusOne(true);
+      setTimeout(() => setShowPlusOne(false), 700);
+    }
+    toggleUpvote(post.id, user?.id);
+  };
 
   return (
     <article className="bg-vibe-card border border-vibe-border rounded-2xl overflow-hidden shadow-soft hover:shadow-float hover:-translate-y-0.5 transition-all duration-300 group">
@@ -176,21 +191,33 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
       {/* Footer actions */}
       <div className="flex items-center justify-between px-5 pt-3 pb-3.5 mt-1 border-t border-vibe-border-subtle">
         <div className="flex items-center gap-1">
-          {/* Heart / upvote */}
+          {/* Heart / upvote with Spring Bounce & Animated Counter */}
           <button
-            onClick={() => toggleUpvote(post.id, user.id)}
+            onClick={handleUpvote}
             aria-label="Like post"
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-90 ${
               post.isUpvoted
                 ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400'
                 : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
             }`}
           >
-            <Heart
-              className={`w-3.5 h-3.5 transition-all ${post.isUpvoted ? 'fill-current scale-110' : ''}`}
-              strokeWidth={1.75}
-            />
-            <span>{post.upvotesCount}</span>
+            {/* Spring Bounce Heart Icon */}
+            <span className={`inline-flex items-center justify-center ${isBouncing ? 'animate-spring-bounce' : ''}`}>
+              <Heart
+                className={`w-3.5 h-3.5 transition-colors ${post.isUpvoted ? 'fill-current' : ''}`}
+                strokeWidth={1.75}
+              />
+            </span>
+
+            {/* Animated Counter Transition */}
+            <AnimatedCounter value={post.upvotesCount} />
+
+            {/* Floating +1 Pop Badge */}
+            {showPlusOne && (
+              <span className="absolute -top-3.5 left-3 text-[10px] font-bold text-rose-500 dark:text-rose-400 pointer-events-none animate-float-badge select-none">
+                +1
+              </span>
+            )}
           </button>
 
           {/* Comment */}
@@ -206,7 +233,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
 
         {/* Save */}
         <button
-          onClick={() => toggleSave(post.id, user.id)}
+            onClick={() => toggleSave(post.id, user?.id)}
           aria-label="Save passage"
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
             post.isSaved

@@ -15,10 +15,12 @@ import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { AuthModal } from './components/auth/AuthModal';
+import { CelebrationToast } from './components/ui/CelebrationToast';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
 import { useFeedStore } from './stores/feedStore';
 import { useTheme } from './context/ThemeContext';
+import { authService } from './services/authService';
 
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'landing' | 'login' | 'app'>(() => {
@@ -35,11 +37,10 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const { isPopoverOpen, closePopover, theme } = useTheme();
   const { setFullScreenOpen, setBook, startTimer } = useTimerStore();
-  const { user, updateUser, initAuth } = useAuthStore();
+  const { user, isAuthenticated, isGuest, authReady, updateUser, initAuth } = useAuthStore();
   const { fetchPosts } = useFeedStore();
 
   // Settle initial tranquil page entrance
@@ -65,13 +66,71 @@ export const App: React.FC = () => {
     }
   }, [currentView, theme]);
 
+  // Boot: handle the Supabase email-confirmation callback, then initialise auth.
+  // PKCE confirmation links arrive as ?token_hash=...&type=signup, which the
+  // SDK's detectSessionInUrl does NOT process on its own.
   useEffect(() => {
-    // Initialize Supabase Auth & Realtime Feed sync
-    initAuth();
-    fetchPosts(user.id);
+    let cancelled = false;
+
+    const boot = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const tokenHash = params.get('token_hash') || params.get('token');
+      const type = params.get('type') || 'signup';
+
+      if (tokenHash) {
+        try {
+          await authService.verifyEmailToken(tokenHash, type);
+          const clean = new URL(window.location.href);
+          clean.searchParams.delete('token_hash');
+          clean.searchParams.delete('token');
+          clean.searchParams.delete('type');
+          window.history.replaceState({}, '', clean.toString());
+        } catch (err) {
+          console.warn('Email confirmation failed:', err);
+        }
+      }
+
+      if (cancelled) return;
+      await initAuth();
+
+      if (!cancelled && tokenHash) {
+        const { isAuthenticated } = useAuthStore.getState();
+        if (isAuthenticated) navigateWithTransition('app');
+      }
+    };
+
+    boot();
+    return () => { cancelled = true; };
   }, []);
 
+  // Fetch posts when entering app, or when user changes (login/guest)
+  useEffect(() => {
+    if (currentView === 'app' && user?.id) {
+      fetchPosts(user.id);
+    } else if (currentView === 'app' && !user) {
+      fetchPosts(undefined);
+    }
+  }, [currentView, user?.id]);
+
+  // Auth guard: if user lands on #app without authenticated/guest session, redirect to login
+  useEffect(() => {
+    if (!authReady) return;
+    const hasAccess = isAuthenticated || isGuest;
+    if (currentView === 'app' && !hasAccess) {
+      navigateWithTransition('login');
+    } else if (currentView === 'landing' && hasAccess && window.location.hash === '#app') {
+      // already handled via initial state
+    }
+  }, [authReady, isAuthenticated, isGuest]);
+
   const navigateWithTransition = (nextView: 'landing' | 'login' | 'app') => {
+    // Guard: cannot enter app without authentication or guest mode
+    if (nextView === 'app') {
+      const hasAccess = useAuthStore.getState().isAuthenticated || useAuthStore.getState().isGuest;
+      if (!hasAccess) {
+        nextView = 'login';
+      }
+    }
     if (nextView === currentView && transitionStage === 'idle') return;
     if (isTransitioningRef.current) return;
 
@@ -83,11 +142,9 @@ export const App: React.FC = () => {
     }
 
     transitionTimeoutRef.current = setTimeout(() => {
-      // 1. Update active view state and url hash
       setCurrentView(nextView);
       window.location.hash = nextView === 'app' ? '#app' : (nextView === 'login' ? '#login' : '#landing');
 
-      // 2. Synchronize theme attributes
       if (nextView === 'app') {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
@@ -101,10 +158,7 @@ export const App: React.FC = () => {
         document.documentElement.classList.remove('dark');
       }
 
-      // 3. Reset scroll position seamlessly at the transition boundary
       window.scrollTo(0, 0);
-
-      // 4. Begin serene entrance
       setTransitionStage('entering');
 
       transitionTimeoutRef.current = setTimeout(() => {
@@ -117,8 +171,15 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      const target: 'landing' | 'login' | 'app' = 
+      const target: 'landing' | 'login' | 'app' =
         hash === '#app' ? 'app' : (hash === '#login' ? 'login' : 'landing');
+      if (target === 'app') {
+        const hasAccess = useAuthStore.getState().isAuthenticated || useAuthStore.getState().isGuest;
+        if (!hasAccess) {
+          navigateWithTransition('login');
+          return;
+        }
+      }
       if (target !== currentView && !isTransitioningRef.current) {
         navigateWithTransition(target);
       }
@@ -133,6 +194,11 @@ export const App: React.FC = () => {
   }, [currentView, theme]);
 
   const handleEnterApp = () => {
+    navigateWithTransition('app');
+  };
+
+  const handleGuestEnterApp = () => {
+    // signInAsGuest already called by the calling page; just navigate
     navigateWithTransition('app');
   };
 
@@ -164,6 +230,11 @@ export const App: React.FC = () => {
   };
 
   const handleAdjustGoal = () => {
+    if (!user) return;
+    if (isGuest) {
+      alert('Guest mode is read-only. Create an account to set a daily goal.');
+      return;
+    }
     const current = user.dailyGoalMinutes || 60;
     const input = prompt('Set your daily reading goal in minutes:', current.toString());
     if (input) {
@@ -174,9 +245,20 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleOpenCreateModal = () => {
+    if (isGuest) {
+      alert('Create an account to share reading moments. Guests can browse but not post.');
+      return;
+    }
+    if (!isAuthenticated) {
+      navigateWithTransition('login');
+      return;
+    }
+    setCreateModalOpen(true);
+  };
+
   const transitionClass = transitionStage === 'exiting' ? 'page-exit' : (transitionStage === 'entering' ? 'page-enter' : '');
 
-  // 0. Render Login Page when in 'login' view
   if (currentView === 'login') {
     return (
       <div className={`w-full min-h-screen ${transitionClass}`}>
@@ -184,12 +266,12 @@ export const App: React.FC = () => {
         <LoginPage
           onSuccess={handleEnterApp}
           onGoBack={handleGoToLanding}
+          onGuest={handleGuestEnterApp}
         />
       </div>
     );
   }
 
-  // 1. Render Premium Clean Landing Page when in 'landing' view
   if (currentView === 'landing') {
     return (
       <div className={`w-full min-h-screen ${transitionClass}`}>
@@ -197,12 +279,17 @@ export const App: React.FC = () => {
         <LandingPage
           onEnterApp={handleEnterApp}
           onGoToLogin={handleGoToLogin}
+          onGuest={handleGuestEnterApp}
           onOpenTimer={() => {
+            const hasAccess = isAuthenticated || isGuest;
+            if (!hasAccess) {
+              navigateWithTransition('login');
+              return;
+            }
             handleEnterApp();
             setFullScreenOpen(true);
           }}
         />
-        {/* Vibe Atmospheric Theme Selector Modal */}
         <VibeSelector
           isOpen={isPopoverOpen}
           onClose={closePopover}
@@ -211,8 +298,25 @@ export const App: React.FC = () => {
     );
   }
 
+  // App shell — requires auth or guest
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-vibe-bg">
+        <div className="w-6 h-6 border-2 border-vibe-border border-t-vibe-accent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated && !isGuest) {
+    return (
+      <div className={`w-full min-h-screen ${transitionClass}`}>
+        <LoginPage onSuccess={handleEnterApp} onGoBack={handleGoToLanding} onGuest={handleGuestEnterApp} />
+      </div>
+    );
+  }
+
   return (
-    <div 
+    <div
       className={`h-screen max-h-screen flex flex-col w-full transition-colors duration-500 overflow-hidden ${transitionClass}`}
       style={{
         backgroundColor: 'var(--vibe-bg)',
@@ -220,23 +324,20 @@ export const App: React.FC = () => {
       }}
     >
       {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
-      
-      {/* 1. Sticky Top Application Header with Vibe Trigger */}
-      <Header 
-        onSearch={(query) => setSearchQuery(query)} 
+
+      {isGuest && (
+        <div className="w-full bg-amber-500 text-white text-xs font-medium text-center py-1.5 px-4">
+          You’re browsing as a guest — <button onClick={handleGoToLogin} className="underline font-semibold">create an account</button> to post, save, and track reading.
+        </div>
+      )}
+
+      <Header
         onGoToLanding={handleGoToLanding}
         onGoToLogin={() => setAuthModalOpen(true)}
       />
 
-      {/* 2. Main Responsive App Shell: 
-          - Mobile (< 768px): 1-column main viewport
-          - Tablet (768px - 1279px): 2-column layout (compact left sidebar + main center viewport with top summary bar)
-          - Desktop (1280px+): 3-column layout (left sidebar, center viewport, right sidebar)
-          Each column scrolls independently with overscroll-contain
-      */}
       <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 min-h-0 flex items-stretch gap-4 sm:gap-6 lg:gap-8 justify-between overflow-hidden">
-        
-        {/* Left Sidebar (Desktop & Tablet only: md+) */}
+
         <SidebarLeft
           activeTab={activeTab}
           onTabChange={handleTabChange}
@@ -244,23 +345,20 @@ export const App: React.FC = () => {
           onGoToLogin={handleGoToLogin}
         />
 
-        {/* Center Main Viewport (Independent scroll container) */}
-        <main 
+        <main
           id="main-viewport"
           className="flex-1 min-w-0 h-full overflow-y-auto overscroll-contain py-4 sm:py-6 pb-36 md:pb-28 px-0.5"
         >
-          
-          {/* Tablet Collapsible Top Summary Bar (md:block xl:hidden) */}
-          <TabletSummaryBar 
+
+          <TabletSummaryBar
             onViewLeaderboard={() => handleTabChange('leaderboard')}
             onAdjustGoal={handleAdjustGoal}
           />
 
-          {/* Active View Mount with Peaceful Tab Transition */}
           <div key={activeTab} className="tab-content-enter">
             {activeTab === 'feed' && (
               <FeedContainer
-                onOpenCreateModal={() => setCreateModalOpen(true)}
+                onOpenCreateModal={handleOpenCreateModal}
                 onSelectBookForTimer={handleSelectBookForTimer}
               />
             )}
@@ -279,7 +377,6 @@ export const App: React.FC = () => {
           </div>
         </main>
 
-        {/* Right Stats & Leaderboard Sidebar (Desktop only: xl+) */}
         <SidebarRight
           onViewLeaderboard={() => handleTabChange('leaderboard')}
           onAdjustGoal={handleAdjustGoal}
@@ -287,31 +384,25 @@ export const App: React.FC = () => {
 
       </div>
 
-      {/* 3. Persistent Floating Mini-Timer Bar (Active theme ambiance glow & creative animations) */}
+      <CelebrationToast />
       <FloatingTimerBar />
-
-      {/* 4. Distraction-Free Full-Screen Reading Timer Mode */}
       <FullTimerModal />
 
-      {/* 5. Create Reading Moment Modal */}
       <CreatePostModal
         isOpen={isCreateModalOpen}
         onClose={() => setCreateModalOpen(false)}
       />
 
-      {/* 6. Vibe Atmospheric Theme Selector Modal */}
       <VibeSelector
         isOpen={isPopoverOpen}
         onClose={closePopover}
       />
 
-      {/* 7. Supabase Account & Connection Settings Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setAuthModalOpen(false)}
       />
 
-      {/* 8. Fixed Bottom Mobile Navigation Bar (< md) */}
       <MobileNav
         activeTab={activeTab}
         onTabChange={handleTabChange}

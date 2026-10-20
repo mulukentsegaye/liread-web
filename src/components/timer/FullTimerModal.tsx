@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, Play, Pause, Square, RotateCcw, BookOpen, ArrowLeft } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useCelebrationStore } from '../../stores/celebrationStore';
 import { AmbientAudioController } from './AmbientAudioController';
 
 export const FullTimerModal: React.FC = () => {
@@ -19,6 +20,7 @@ export const FullTimerModal: React.FC = () => {
   } = useTimerStore();
 
   const { logSessionMinutes } = useAuthStore();
+  const { showCelebration } = useCelebrationStore();
   const [seconds, setSeconds] = useState(getElapsedSeconds());
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export const FullTimerModal: React.FC = () => {
     const mins = stopTimer();
     if (mins > 0) {
       logSessionMinutes(mins, bookTitle);
-      alert(`Reading session saved!\nLogged ${mins} minutes to your profile.`);
+      showCelebration(mins, bookTitle);
     }
     setFullScreenOpen(false);
   };

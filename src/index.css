@@ -315,11 +315,200 @@
   .page-enter,
   .page-exit,
   .tab-content-enter,
-  .peaceful-top-beam::after {
+  .peaceful-top-beam::after,
+  .feed-card-stagger,
+  .animate-spring-bounce,
+  .celebration-toast-enter,
+  .celebration-progress-shrink,
+  .animate-counter-up-in,
+  .animate-counter-up-out,
+  .animate-counter-down-in,
+  .animate-counter-down-out,
+  .animate-float-badge {
     animation: none !important;
     transform: none !important;
     filter: none !important;
     transition: opacity 150ms ease !important;
   }
 }
+
+/* ==============================================================================
+   INTERACTIVE SPRING & CELEBRATION ANIMATIONS
+   ============================================================================== */
+
+/* 1. Staggered Feed Entrance */
+@keyframes feedCardStagger {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feed-card-stagger {
+  animation: feedCardStagger 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform;
+}
+
+/* 2. Interactive Spring Bounce (Quote Upvote) */
+@keyframes springBounce {
+  0% {
+    transform: scale(1);
+  }
+  28% {
+    transform: scale(1.36);
+  }
+  48% {
+    transform: scale(0.88);
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  85% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-spring-bounce {
+  animation: springBounce 480ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  will-change: transform;
+}
+
+/* 3. Rolling Number Counter Transitions */
+@keyframes counterUpIn {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes counterUpOut {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes counterDownIn {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes counterDownOut {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.animate-counter-up-in {
+  animation: counterUpIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-counter-up-out {
+  animation: counterUpOut 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-counter-down-in {
+  animation: counterDownIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-counter-down-out {
+  animation: counterDownOut 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 4. Subtle Floating Upvote +1 Badge */
+@keyframes floatUpBadge {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-16px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.9);
+  }
+}
+
+.animate-float-badge {
+  animation: floatUpBadge 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 5. Session Completion Celebration Toast */
+@keyframes celebrationToastEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-28px) scale(0.94);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(4px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes celebrationProgress {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+.celebration-toast-enter {
+  animation: celebrationToastEnter 450ms cubic-bezier(0.175, 0.885, 0.32, 1.2) both;
+}
+
+.celebration-progress-shrink {
+  animation: celebrationProgress 4500ms linear forwards;
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 1.8s ease-in-out infinite;
+}
+
 
