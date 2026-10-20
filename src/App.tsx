@@ -12,6 +12,7 @@ import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { BookDetailsView } from './components/book/BookDetailsView';
+import { ExploreView } from './components/explore/ExploreView';
 import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
@@ -446,6 +447,14 @@ export const App: React.FC = () => {
                 onViewBookDetails={(title, author, cover) =>
                   handleViewBookDetails({ title, author, coverImageUrl: cover })
                 }
+              />
+            )}
+
+            {activeTab === 'explore' && (
+              <ExploreView
+                onViewBookDetails={handleViewBookDetails}
+                onStartTimer={handleSelectBookForTimer}
+                onShareBook={handleOpenCreateModal}
               />
             )}
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Clock, BarChart3, Trophy, Library } from 'lucide-react';
+import { MessageSquare, Compass, Clock, BarChart3, Trophy, Library } from 'lucide-react';
 import { NavigationTab } from './SidebarLeft';
 
 interface MobileNavProps {
@@ -9,10 +9,10 @@ interface MobileNavProps {
 
 export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) => {
   const items = [
-    { id: 'feed' as NavigationTab, label: 'Feed', icon: Compass },
+    { id: 'feed' as NavigationTab, label: 'Feed', icon: MessageSquare },
+    { id: 'explore' as NavigationTab, label: 'Explore', icon: Compass },
     { id: 'timer' as NavigationTab, label: 'Timer', icon: Clock },
     { id: 'analytics' as NavigationTab, label: 'Analytics', icon: BarChart3 },
-    { id: 'leaderboard' as NavigationTab, label: 'Rankings', icon: Trophy },
     { id: 'bookshelf' as NavigationTab, label: 'Library', icon: Library },
   ];
 

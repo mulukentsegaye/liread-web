@@ -11,7 +11,8 @@ interface FullTimerModalProps {
 }
 
 const TAB_NAME_MAP: Record<NavigationTab, string> = {
-  feed: 'Discover',
+  feed: 'Community Feed',
+  explore: 'Explore Books',
   timer: 'reading feed',
   analytics: 'My Progress',
   leaderboard: 'Leaderboard',

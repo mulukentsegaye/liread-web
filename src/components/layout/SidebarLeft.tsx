@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Compass,
+  MessageSquare,
   Clock,
   BarChart3,
   Trophy,
@@ -15,7 +16,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
-export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details';
+export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details';
 
 interface SidebarLeftProps {
   activeTab: NavigationTab;
@@ -28,7 +29,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
   const { user } = useAuthStore();
 
   const mainNavItems = [
-    { id: 'feed' as NavigationTab,        label: 'Discover',       icon: Compass,  },
+    { id: 'feed' as NavigationTab,        label: 'Community Feed', icon: MessageSquare, },
+    { id: 'explore' as NavigationTab,     label: 'Explore Books',  icon: Compass,        },
     { id: 'timer' as NavigationTab,       label: 'Reading Timer',  icon: Clock,    },
     { id: 'analytics' as NavigationTab,   label: 'My Progress',    icon: BarChart3,},
     { id: 'leaderboard' as NavigationTab, label: 'Leaderboard',    icon: Trophy,   },
