@@ -44,6 +44,10 @@ export const describeAuthError = (error: unknown): string => {
     return 'Incorrect email or password. Please try again.';
   }
 
+  if (lower.includes('database error saving new user') || lower.includes('profiles_username_key')) {
+    return 'This username or email is already registered. If you already created your account, please switch to the "Sign In" tab.';
+  }
+
   if (lower.includes('user already registered') || lower.includes('already been registered')) {
     return 'An account with this email already exists. Try signing in instead.';
   }

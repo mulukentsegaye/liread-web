@@ -260,9 +260,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
             {/* Alert Notifications */}
             {errorMsg && (
-              <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span className="leading-relaxed flex-1">{errorMsg}</span>
+              <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span className="leading-relaxed flex-1">{errorMsg}</span>
+                </div>
+                {mode === 'signup' && (errorMsg.includes('Sign In') || errorMsg.includes('already')) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin');
+                      setErrorMsg(null);
+                    }}
+                    className="self-start ml-6 px-3 py-1 rounded-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-700 dark:text-rose-300 font-semibold text-[11px] transition-colors"
+                  >
+                    Switch to Sign In →
+                  </button>
+                )}
               </div>
             )}
 

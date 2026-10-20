@@ -16,12 +16,25 @@ export const authService = {
       throw new Error('Supabase is not configured. Please enter your credentials in .env or the Supabase Settings.');
     }
 
+    const cleanUsername = username.toLowerCase().replace(/^@/, '').trim();
+
+    // Check if the username is already taken to avoid cryptic database trigger aborts
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .eq('username', cleanUsername)
+      .maybeSingle();
+
+    if (existingProfile) {
+      throw new Error(`The username "@${cleanUsername}" is already registered. If this is your account, please switch to the "Sign In" tab.`);
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          username: username.toLowerCase().trim(),
+          username: cleanUsername,
           full_name: fullName.trim(),
         },
         // Send the confirmation link back to this app so the session is established here.

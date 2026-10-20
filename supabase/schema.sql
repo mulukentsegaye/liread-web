@@ -266,7 +266,18 @@ CREATE POLICY "Users can delete own comments"
 -- 5.1 AUTOMATIC PROFILE CREATION ON AUTH SIGNUP
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    base_username TEXT;
+    final_username TEXT;
 BEGIN
+    base_username := COALESCE(NEW.raw_user_meta_data->>'username', 'reader_' || substr(NEW.id::text, 1, 8));
+    final_username := base_username;
+
+    -- If another user already registered with this exact username, disambiguate with a short unique suffix
+    IF EXISTS (SELECT 1 FROM public.profiles WHERE username = final_username AND id <> NEW.id) THEN
+        final_username := final_username || '_' || substr(NEW.id::text, 1, 4);
+    END IF;
+
     INSERT INTO public.profiles (
         id, 
         username, 
@@ -277,12 +288,16 @@ BEGIN
     )
     VALUES (
         NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'username', 'reader_' || substr(NEW.id::text, 1, 8)),
+        final_username,
         COALESCE(NEW.raw_user_meta_data->>'full_name', 'Avid Reader'),
         NEW.raw_user_meta_data->>'avatar_url',
         'Novice Reader',
         60
-    );
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        username = EXCLUDED.username,
+        full_name = EXCLUDED.full_name;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
