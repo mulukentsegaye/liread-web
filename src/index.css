@@ -9,15 +9,15 @@
 /* 1. LIGHT MODE (Default) */
 :root,
 [data-theme="light"] {
-  --vibe-bg: #F3F4F6;
+  --vibe-bg: #FAF9F6;
   --vibe-card: #FFFFFF;
-  --vibe-card-subtle: #F9FAFB;
-  --vibe-card-hover: #F3F4F6;
-  --vibe-border: #E5E7EB;
-  --vibe-border-subtle: #F3F4F6;
-  --vibe-ink: #111827;
-  --vibe-ink-secondary: #4B5563;
-  --vibe-ink-muted: #9CA3AF;
+  --vibe-card-subtle: #F5F4EE;
+  --vibe-card-hover: #ECEAE3;
+  --vibe-border: #E6E4DD;
+  --vibe-border-subtle: #ECEAE4;
+  --vibe-ink: #0F172A;
+  --vibe-ink-secondary: #334155;
+  --vibe-ink-muted: #64748B;
   --vibe-accent: #059669;
   --vibe-accent-hover: #047857;
   --vibe-accent-text: #FFFFFF;
@@ -28,8 +28,8 @@
   --vibe-secondary-subtle: #FEF3C7;
   --vibe-badge-bg: #ECFDF5;
   --vibe-badge-text: #059669;
-  --vibe-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
-  --vibe-shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --vibe-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --vibe-shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --vibe-ambient-gradient: none;
 
   /* Universal Component Tokens */
@@ -51,7 +51,7 @@
   --accent-heart: #E11D48;
   --accent-glow: none;
   --timer-glow: none;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
   --font-heading: 'Syne', sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -108,7 +108,7 @@
   --accent-heart: #F43F5E;
   --accent-glow: none;
   --timer-glow: none;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-display: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
   --font-heading: 'Syne', sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -144,10 +144,16 @@
     font-family: var(--font-sans);
     overflow-x: clip;
     width: 100%;
+    /* Keep native subpixel ClearType rendering crisp and sharp on Windows */
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: geometricPrecision;
+  }
+
+  .dark {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    -webkit-tap-highlight-color: transparent;
-    text-rendering: optimizeLegibility;
   }
 
   #root {
@@ -155,13 +161,8 @@
     min-height: 100vh;
   }
 
-  /* Global 350ms smooth transition across theme switching */
-  html, body, #root,
-  header, aside, nav, main, article,
-  button, input, select, textarea {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 350ms;
+  img {
+    image-rendering: -webkit-optimize-contrast;
   }
 
   button, a, input, select, textarea {
@@ -225,16 +226,11 @@
 @keyframes peacefulPageEnter {
   0% {
     opacity: 0;
-    transform: translateY(6px);
-    filter: blur(1.5px);
-  }
-  60% {
-    filter: blur(0px);
+    transform: translateY(4px);
   }
   100% {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0px);
   }
 }
 
@@ -242,12 +238,10 @@
   0% {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0px);
   }
   100% {
     opacity: 0;
     transform: translateY(-4px);
-    filter: blur(1px);
   }
 }
 
@@ -278,12 +272,12 @@
 
 .page-enter {
   animation: peacefulPageEnter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 .page-exit {
   animation: peacefulPageExit 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
   pointer-events: none;
 }
 
@@ -297,15 +291,12 @@
   0% {
     opacity: 0;
     transform: translateY(12px) scale(0.985);
-    filter: blur(2.5px);
   }
   60% {
-    filter: blur(0px);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    filter: blur(0px);
   }
 }
 
@@ -313,23 +304,21 @@
   0% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    filter: blur(0px);
   }
   100% {
     opacity: 0;
     transform: translateY(-8px) scale(0.985);
-    filter: blur(2px);
   }
 }
 
 .timer-page-enter {
   animation: peacefulTimerEnter 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 .timer-page-exit {
   animation: peacefulTimerExit 220ms cubic-bezier(0.4, 0, 0.2, 1) both;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
   pointer-events: none;
 }
 

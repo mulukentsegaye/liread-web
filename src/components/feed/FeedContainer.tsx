@@ -59,7 +59,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         <p className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted mb-1">
           Today's Reading Feed
         </p>
-        <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
+        <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
         <p className="text-xs sm:text-sm text-vibe-ink-secondary mt-1">

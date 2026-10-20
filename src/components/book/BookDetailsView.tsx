@@ -200,7 +200,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               </div>
 
               {/* Title & Author */}
-              <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
                 {detailedBook.title}
               </h1>
               <p className="text-sm sm:text-base text-vibe-ink-secondary mt-1 font-normal">

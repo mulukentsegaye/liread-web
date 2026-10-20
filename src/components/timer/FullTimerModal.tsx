@@ -203,7 +203,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
 
         {/* Current Book Info */}
         <div className="space-y-0.5">
-          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-medium leading-tight text-vibe-ink break-words">
+          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-vibe-ink break-words">
             {bookTitle}
           </h1>
           <p className="text-xs text-vibe-ink-muted">

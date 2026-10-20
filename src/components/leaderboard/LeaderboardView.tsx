@@ -61,7 +61,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
                 Community Rankings
               </span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
               Readers Leaderboard
             </h1>
             <p className="text-xs sm:text-sm mt-1 text-vibe-ink-secondary">

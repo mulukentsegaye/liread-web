@@ -89,8 +89,8 @@ export default {
         }
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        display: ['Newsreader', '"Cormorant Garamond"', 'Georgia', 'serif'],
+        serif: ['Newsreader', '"Cormorant Garamond"', 'Georgia', 'serif'],
         heading: ['Syne', 'sans-serif'],
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['"DM Mono"', 'ui-monospace', 'monospace'],
