@@ -113,9 +113,6 @@ export const Header: React.FC<HeaderProps> = ({
     onViewBookDetails?.(book);
   };
 
-  const connectionLabel = isAuthenticated ? 'Live' : (isGuest ? 'Guest' : 'Offline');
-  const connectionColor = isAuthenticated ? 'bg-emerald-500' : (isGuest ? 'bg-amber-400' : 'bg-rose-400');
-
   const renderSuggestionsDropdown = () => {
     if (!showDropdown || searchVal.trim().length < 2) return null;
 
@@ -266,16 +263,15 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Theme Toggle */}
           <VibeTriggerButton variant="header" />
 
-          {/* Connection status */}
-          <button
-            type="button"
-            onClick={onGoToLogin}
-            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover transition-colors"
-            title="Account & connection settings"
-          >
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${connectionColor}`} />
-            <span className="text-vibe-ink-secondary">{connectionLabel}</span>
-          </button>
+          {!isAuthenticated && !isGuest && onGoToLogin && (
+            <button
+              type="button"
+              onClick={onGoToLogin}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs"
+            >
+              Sign In
+            </button>
+          )}
 
           {/* Mobile search toggle */}
           <button
