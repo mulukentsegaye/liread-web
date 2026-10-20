@@ -222,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
             <BookOpen className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
-          <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink hidden sm:block">
+          <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-vibe-ink hidden sm:block">
             Readers Hub
           </span>
         </button>

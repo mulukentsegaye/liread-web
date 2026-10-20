@@ -57,14 +57,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-              <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted">
+              <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">
                 Community Rankings
               </span>
             </div>
-            <h1 className="font-display text-4xl sm:text-5xl font-normal text-vibe-ink tracking-tight leading-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
               Readers Leaderboard
             </h1>
-            <p className="text-sm mt-1 text-vibe-ink-secondary">
+            <p className="text-xs sm:text-sm mt-1 text-vibe-ink-secondary">
               Rankings are driven entirely by real reading sessions from creators.
             </p>
           </div>

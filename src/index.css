@@ -292,7 +292,7 @@
   will-change: opacity, transform;
 }
 
-/* Reading Timer Sanctuary Page Transitions */
+/* Reading Timer Page Transitions */
 @keyframes peacefulTimerEnter {
   0% {
     opacity: 0;
@@ -333,7 +333,7 @@
   pointer-events: none;
 }
 
-/* Staggered serene reveals inside the timer sanctuary */
+/* Staggered serene reveals inside the timer */
 @keyframes timerElementFadeUp {
   0% {
     opacity: 0;

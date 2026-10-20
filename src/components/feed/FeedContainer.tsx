@@ -48,20 +48,21 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
-  const firstName = user?.fullName?.split(' ')[0] ?? 'Reader';
+  const isRealUser = isAuthenticated && !isGuest && !!user?.fullName && user.fullName !== 'Guest Explorer';
+  const userFirstName = isRealUser ? user.fullName.trim().split(' ')[0] : null;
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-5 sm:space-y-6">
 
       {/* Page header */}
       <div className="pt-1 pb-1">
-        <p className="font-mono text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted mb-1">
+        <p className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted mb-1">
           Today's Reading Feed
         </p>
-        <h1 className="font-display text-4xl sm:text-5xl font-normal text-vibe-ink leading-tight">
+        <h1 className="font-display text-2xl sm:text-3xl font-medium tracking-tight text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
-        <p className="text-sm text-vibe-ink-secondary mt-1.5">
+        <p className="text-xs sm:text-sm text-vibe-ink-secondary mt-1">
           {posts.length === 0
             ? 'Real reading moments from real readers will appear here.'
             : 'Discover what readers around you are exploring right now.'}
@@ -75,14 +76,20 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
       >
         <img
           src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
-          alt={user?.fullName ?? 'Guest'}
+          alt={isRealUser ? (user?.fullName ?? 'User avatar') : 'Readers Hub avatar'}
           className="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-vibe-ink-muted group-hover:text-vibe-ink transition-colors">
-            What are you reading, <span className="font-semibold">{firstName}</span>?
+            {userFirstName ? (
+              <>
+                What are you reading, <span className="font-semibold text-vibe-ink">{userFirstName}</span>?
+              </>
+            ) : (
+              'What are you reading?'
+            )}
           </p>
-          <p className="text-xs text-vibe-ink-muted/70 mt-0.5">Share a passage, a rating, or a reflectionâ€¦</p>
+          <p className="text-xs text-vibe-ink-muted/70 mt-0.5">Share a passage, a rating, or a reflection...</p>
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onOpenCreateModal(); }}
@@ -186,7 +193,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
           <div className="inline-flex flex-col items-center gap-2">
             <div className="w-8 h-px bg-vibe-border" />
             <p className="text-xs text-vibe-ink-muted font-medium">
-              You're all caught up â€” time for another chapter.
+              You're all caught up — time for another chapter.
             </p>
             <div className="w-8 h-px bg-vibe-border" />
           </div>

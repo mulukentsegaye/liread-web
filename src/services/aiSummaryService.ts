@@ -1,6 +1,33 @@
 import { BookSummaryData } from '../types';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
+// Purge any legacy cached summaries that contained preachy boilerplate
+if (typeof window !== 'undefined' && window.localStorage) {
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('rh_summary_')) {
+        keysToRemove.push(k);
+      }
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    // Ignore storage restrictions
+  }
+}
+
+function cleanText(text: string): string {
+  return text
+    .replace(/\r\n/g, '\n')
+    .replace(/\[.*?\]/g, '')
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/###\s*How to Apply These Insights Today[\s\S]*/gi, '')
+    .replace(/1\.\s*\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+    .replace(/\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+    .trim();
+}
+
 // High-fidelity curated summaries for iconic literature & non-fiction
 const CURATED_SUMMARIES: Record<string, BookSummaryData> = {
   'atomic habits': {
@@ -108,7 +135,7 @@ Expertise can become a prison when it locks an artist into habitual patterns. Th
       {
         title: '1. The Dichotomy of Control',
         description:
-          'You have power over your mind, not outside events. Realize this, and you will find your indestructible sanctuary.',
+          'You have power over your mind, not outside events. Realize this, and you will find inner strength.',
       },
       {
         title: '2. The Transience of All Things',
@@ -123,7 +150,7 @@ Expertise can become a prison when it locks an artist into habitual patterns. Th
       {
         title: '4. The Inner Citadel',
         description:
-          'No retreat is more peaceful and free from trouble than that which a person finds within their own soul. Keep this sanctuary clear and unpolluted.',
+          'No retreat is more peaceful and free from trouble than that which a person finds within their own soul. Keep this inner citadel clear and unpolluted.',
       },
     ],
     fullSummaryMarkdown: `### A Private Journal for the Soul
@@ -236,7 +263,7 @@ export const aiSummaryService = {
             readTimeMinutes: data.read_time_minutes || 6,
             oneSentenceTakeaway: data.one_sentence_takeaway,
             keyIdeas: Array.isArray(data.key_ideas) ? data.key_ideas : [],
-            fullSummaryMarkdown: data.full_summary_markdown,
+            fullSummaryMarkdown: cleanText(data.full_summary_markdown),
             notableQuotes: Array.isArray(data.notable_quotes) ? data.notable_quotes : [],
             cached: true,
           };
@@ -248,9 +275,8 @@ export const aiSummaryService = {
       }
     }
 
-    // 4. Generate high-quality synthesized summary
-    // Artificial 600ms contemplation delay to give an intentional, calm feeling
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    // 4. Generate clean synopsis from verified metadata
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const generated = synthesizeBookSummary(cleanTitle, cleanAuthor, description);
 
@@ -261,84 +287,40 @@ export const aiSummaryService = {
       // ignore
     }
 
-    // If Supabase is available, asynchronously persist so other readers get it
-    if (isSupabaseConfigured()) {
-      Promise.resolve(
-        supabase
-          .from('book_summaries')
-          .insert({
-            book_title: cleanTitle,
-            book_author: cleanAuthor,
-            read_time_minutes: generated.readTimeMinutes,
-            one_sentence_takeaway: generated.oneSentenceTakeaway,
-            key_ideas: generated.keyIdeas,
-            full_summary_markdown: generated.fullSummaryMarkdown,
-            notable_quotes: generated.notableQuotes,
-          })
-      )
-        .then(() => {})
-        .catch((e: any) => console.warn('Could not cache summary to Supabase:', e));
-    }
-
     return generated;
   },
 };
 
 /**
- * Intelligent literary synthesis generator based on book metadata and thematic analysis
+ * Intelligent literary overview generator based on book metadata
  */
 function synthesizeBookSummary(title: string, author: string, rawDesc?: string): BookSummaryData {
-  const cleanDesc = rawDesc
-    ? rawDesc.replace(/\r\n/g, '\n').replace(/\[.*?\]/g, '').trim()
-    : '';
+  const cleanDesc = rawDesc ? cleanText(rawDesc) : '';
 
-  const snippet = cleanDesc.slice(0, 300);
+  // Extract a clean takeaway from the first meaningful sentence
+  let takeaway = '';
+  if (cleanDesc) {
+    const sentences = cleanDesc.split(/(?<=[.?!])\s+/);
+    const candidate = sentences.find((s) => s.length > 25 && s.length < 220);
+    takeaway = candidate ? candidate.trim() : cleanDesc.slice(0, 160) + '...';
+  } else {
+    takeaway = `A notable work by ${author || 'the author'}.`;
+  }
+
+  // Use clean description paragraphs
+  let fullText = cleanDesc;
+  if (!fullText) {
+    fullText = `An acclaimed work by ${author || 'the author'}.`;
+  }
 
   return {
     bookTitle: title,
     bookAuthor: author || 'Unknown Author',
-    readTimeMinutes: 6,
-    oneSentenceTakeaway:
-      snippet.length > 50
-        ? `A masterclass in examining human purpose, discipline, and understanding through the visionary lens of ${author}.`
-        : `An enduring exploration of intentional living, deeper insight, and literary mastery by ${author}.`,
-    keyIdeas: [
-      {
-        title: '1. The Core Philosophy',
-        description: `${title} challenges conventional assumptions and invites the reader to cultivate heightened awareness, intentionality, and focus in their daily craft.`,
-      },
-      {
-        title: '2. Overcoming Friction & Resistance',
-        description: `External noise and self-doubt are the primary obstacles to deep understanding. By designing deliberate daily rituals, sustained mastery becomes possible.`,
-      },
-      {
-        title: '3. Perspective and Long-Term Horizon',
-        description: `Short-term thinking yields anxiety; adopting an expansive, generational perspective unlocks clarity, patience, and peaceful execution.`,
-      },
-      {
-        title: '4. Practical Translation into Action',
-        description: `Knowledge without contemplation is fleeting. The true power of the text emerges when insights are applied immediately to one's own habits and relationships.`,
-      },
-    ],
-    fullSummaryMarkdown: `### The Essence of "${title}"
-${
-  cleanDesc
-    ? cleanDesc.slice(0, 800) + '...'
-    : `In this profound work, ${author} provides an evocative framework for understanding what truly matters in an age of distraction and superficial novelty.`
-}
-
-### Key Themes & Structural Insight
-The text guides readers away from mechanical productivity and toward deep, deliberate immersion. ${author} emphasizes that meaningful transformation is rarely loud or instantaneous; it is cultivated through disciplined silence, reflective reading, and reverence for timeless principles.
-
-### How to Apply These Insights Today
-1. **Establish a Daily Sanctuary**: Carve out uninterrupted blocks of time with zero electronic intrusion.
-2. **Read with a Pen**: Engage actively with the margins, preserving reflections rather than passively consuming words.
-3. **Protect Your Attention**: Guard your mental bandwidth as your most sacred creative asset.`,
-    notableQuotes: [
-      `“The greatest discovery is that human beings can alter their lives by altering their attitudes of mind.” — ${author}`,
-      `“In quiet contemplation, the soul finds its truest voice.” — ${title}`,
-      `“Consistency over intensity is the eternal law of growth.”`,
-    ],
+    readTimeMinutes: Math.max(3, Math.min(10, Math.ceil(fullText.split(/\s+/).length / 200))),
+    oneSentenceTakeaway: takeaway,
+    keyIdeas: [],
+    fullSummaryMarkdown: fullText,
+    notableQuotes: [],
     generatedAt: new Date().toISOString(),
     cached: false,
   };

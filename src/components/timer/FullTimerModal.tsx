@@ -137,7 +137,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Distraction-free reading timer sanctuary"
+      aria-label="Distraction-free reading timer"
       className={`fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto bg-vibe-bg text-vibe-ink backdrop-blur-md transition-colors duration-500 ${transitionClass}`}
     >
       {/* Signature Readers Hub Ambient Top Beam during Transition */}
@@ -203,7 +203,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
 
         {/* Current Book Info */}
         <div className="space-y-0.5">
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-normal leading-tight text-vibe-ink break-words">
+          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-medium leading-tight text-vibe-ink break-words">
             {bookTitle}
           </h1>
           <p className="text-xs text-vibe-ink-muted">
@@ -212,7 +212,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
         </div>
 
         {/* Digital Clock */}
-        <div className="font-mono text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-bold tracking-wider py-2 sm:py-4 select-none drop-shadow-md text-vibe-ink">
+        <div className="font-mono text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider py-2 select-none drop-shadow-sm text-vibe-ink">
           <span>{formatHours}</span>:
           <span>{formatMins}</span>:
           <span>{formatSecs}</span>

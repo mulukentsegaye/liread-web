@@ -271,7 +271,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleSignIn} className="space-y-3.5">
               {!isConfigured && (
                 <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300">
-                  âš¡ <strong>Offline Mode:</strong> Supabase credentials not yet detected. You can connect your Supabase project in the <strong>Backend Config</strong> tab.
+                  ⚡ <strong>Offline Mode:</strong> Supabase credentials not yet detected. You can connect your Supabase project in the <strong>Backend Config</strong> tab.
                 </div>
               )}
 
@@ -298,7 +298,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="••••••••"
                   className="w-full bg-vibe-card-subtle px-3 py-2 text-xs rounded-xl border border-vibe-border text-vibe-ink focus:border-vibe-accent focus:outline-none"
                 />
               </div>
@@ -545,7 +545,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <ol className="list-decimal list-inside space-y-0.5 text-vibe-ink-muted">
                   <li>Create a project at <a href="https://app.supabase.com" target="_blank" rel="noreferrer" className="text-vibe-accent underline">supabase.com</a></li>
                   <li>Copy SQL from <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/schema.sql</code> and run it in the SQL Editor</li>
-                  <li>Do <strong>not</strong> run <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/seed.sql</code> â€” it only contained demo users, and the app never uses demo data</li>
+                  <li>Do <strong>not</strong> run <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/seed.sql</code> — it only contained demo users, and the app never uses demo data</li>
                   <li>Copy Project URL and Anon Key above or into your <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">.env</code></li>
                 </ol>
               </div>
