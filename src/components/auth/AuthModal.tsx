@@ -14,6 +14,8 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { DEFAULT_USER_AVATAR } from '../../data/defaults';
+import { describeAuthError } from '../../lib/authErrors';
 import { 
   isSupabaseConfigured, 
   getSupabaseConfig, 
@@ -35,6 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const { 
     user, 
     isAuthenticated, 
+    isGuest,
     signIn, 
     signUp, 
     signOut, 
@@ -72,7 +75,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setStatusMessage(null);
     }
   }, [isOpen, isAuthenticated, defaultTab]);
-
   if (!isOpen) return null;
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -85,10 +87,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 1000);
     } catch (err: any) {
-      setStatusMessage({ 
-        type: 'error', 
-        text: err.message || 'Failed to sign in. Please check your credentials.' 
-      });
+      setStatusMessage({ type: 'error', text: describeAuthError(err) });
     }
   };
 
@@ -102,18 +101,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       await signUp(email, password, username, fullName);
-      setStatusMessage({ 
-        type: 'success', 
-        text: 'Account created! Please check your email to verify your account or proceed.' 
+      if (useAuthStore.getState().pendingConfirmationEmail) {
+        setStatusMessage({
+          type: 'info',
+          text: 'Account created! Check your email to confirm the address, then sign in.',
+        });
+        setTimeout(() => { onClose(); }, 2500);
+        return;
+      }
+      setStatusMessage({
+        type: 'success',
+        text: 'Account created! You are now signed in.'
       });
       setTimeout(() => {
         onClose();
       }, 1200);
     } catch (err: any) {
-      setStatusMessage({ 
-        type: 'error', 
-        text: err.message || 'Failed to sign up. Please try again.' 
-      });
+      setStatusMessage({ type: 'error', text: describeAuthError(err) });
     }
   };
 
@@ -171,7 +175,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <DatabaseIcon className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="font-serif text-lg font-bold text-vibe-ink">
+                <h2 className="font-heading text-lg font-bold text-vibe-ink">
                   {isAuthenticated ? 'Your Account & Backend' : 'Readers Hub Account'}
                 </h2>
                 <p className="text-[11px] text-vibe-ink-muted">
@@ -227,10 +231,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
-              <span>Backend Config</span>
+              <span>Account</span>
               <span className={`w-2 h-2 rounded-full ${isConfigured ? 'bg-emerald-500' : 'bg-amber-500'}`} />
             </button>
           </div>
+
+          {/* Guest banner */}
+          {isGuest && (
+            <div className="mb-4 p-3 rounded-xl text-xs flex items-start gap-2 border bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <span className="leading-snug">
+                You are browsing as a guest. Sign in or create an account to publish, save passages, and track reading history.
+              </span>
+            </div>
+          )}
 
           {/* Status Message Banner */}
           {statusMessage && (
@@ -257,7 +271,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <form onSubmit={handleSignIn} className="space-y-3.5">
               {!isConfigured && (
                 <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300">
-                  ⚡ <strong>Offline Mode:</strong> Supabase credentials not yet detected. You can connect your Supabase project in the <strong>Backend Config</strong> tab.
+                  âš¡ <strong>Offline Mode:</strong> Supabase credentials not yet detected. You can connect your Supabase project in the <strong>Backend Config</strong> tab.
                 </div>
               )}
 
@@ -284,7 +298,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   className="w-full bg-vibe-card-subtle px-3 py-2 text-xs rounded-xl border border-vibe-border text-vibe-ink focus:border-vibe-accent focus:outline-none"
                 />
               </div>
@@ -312,7 +326,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="bookworm_alex"
+                  placeholder="yourname"
                   className="w-full bg-vibe-card-subtle px-3 py-2 text-xs rounded-xl border border-vibe-border text-vibe-ink focus:border-vibe-accent focus:outline-none"
                 />
               </div>
@@ -326,7 +340,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Alex Morgan"
+                  placeholder="Your Name"
                   className="w-full bg-vibe-card-subtle px-3 py-2 text-xs rounded-xl border border-vibe-border text-vibe-ink focus:border-vibe-accent focus:outline-none"
                 />
               </div>
@@ -374,30 +388,67 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* TAB 3: Supabase Backend Configuration */}
           {tab === 'config' && (
             <div className="space-y-4">
-              {isAuthenticated ? (
+              {isAuthenticated && user ? (
                 <div className="p-3.5 rounded-xl bg-vibe-card-subtle border border-vibe-border flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={user.avatarUrl}
                       alt={user.fullName}
                       className="w-10 h-10 rounded-full object-cover ring-1 ring-vibe-border"
                     />
-                    <div>
-                      <p className="text-xs font-bold text-vibe-ink">{user.fullName}</p>
-                      <p className="text-[11px] text-vibe-ink-muted">@{user.username} · {user.rankTier}</p>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-vibe-ink truncate">{user.fullName}</p>
+                      <p className="text-[11px] text-vibe-ink-muted truncate">@{user.username} Â· {user.rankTier}</p>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={signOut}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-vibe-border text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-vibe-border text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors flex-shrink-0"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>
                   </button>
                 </div>
               ) : null}
+
+              {isGuest && (
+                <div className="p-3.5 rounded-xl bg-vibe-card-subtle border border-vibe-border">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={DEFAULT_USER_AVATAR}
+                      alt="Guest"
+                      className="w-10 h-10 rounded-full object-cover ring-1 ring-vibe-border"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-vibe-ink truncate">Guest Explorer</p>
+                      <p className="text-[11px] text-vibe-ink-muted truncate">Read-only browsing mode</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => { setTab('signup'); onClose(); }}
+                      className="flex-1 min-h-[38px] inline-flex items-center justify-center gap-1.5 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      <span>Create Account</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await signOut();
+                        onClose();
+                      }}
+                      className="flex-1 min-h-[38px] inline-flex items-center justify-center gap-1.5 rounded-xl border border-vibe-border text-xs font-semibold text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Exit Guest</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Status Indicator Pill */}
               <div className="flex items-center justify-between p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border">
@@ -494,7 +545,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <ol className="list-decimal list-inside space-y-0.5 text-vibe-ink-muted">
                   <li>Create a project at <a href="https://app.supabase.com" target="_blank" rel="noreferrer" className="text-vibe-accent underline">supabase.com</a></li>
                   <li>Copy SQL from <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/schema.sql</code> and run it in the SQL Editor</li>
-                  <li>(Optional) Run <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/seed.sql</code> to load mock data</li>
+                  <li>Do <strong>not</strong> run <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">supabase/seed.sql</code> â€” it only contained demo users, and the app never uses demo data</li>
                   <li>Copy Project URL and Anon Key above or into your <code className="px-1 py-0.5 rounded bg-vibe-card border border-vibe-border text-[10px]">.env</code></li>
                 </ol>
               </div>

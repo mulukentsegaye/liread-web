@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Bell, BookOpen, Flame, X } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
 interface HeaderProps {
@@ -10,7 +11,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToLogin }) => {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated, isGuest } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
   const [isMobileSearchOpen, setMobileSearchOpen] = useState(false);
 
@@ -18,6 +19,9 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
     setSearchVal(e.target.value);
     onSearch?.(e.target.value);
   };
+
+  const connectionLabel = isAuthenticated ? 'Live' : (isGuest ? 'Guest' : 'Offline');
+  const connectionColor = isAuthenticated ? 'bg-emerald-500' : (isGuest ? 'bg-amber-400' : 'bg-rose-400');
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-vibe-border bg-vibe-card/90 backdrop-blur-md transition-colors duration-500">
@@ -28,12 +32,12 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
           type="button"
           onClick={onGoToLanding}
           className="flex items-center gap-2.5 flex-shrink-0 group outline-none"
-          title="Readers Hub — Home"
+          title="Readers Hub â€” Home"
         >
           <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
             <BookOpen className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
-          <span className="font-serif text-xl font-bold tracking-tight text-vibe-ink hidden sm:block">
+          <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink hidden sm:block">
             Readers Hub
           </span>
         </button>
@@ -46,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
               type="text"
               value={searchVal}
               onChange={handleSearchChange}
-              placeholder="Search books, authors, passages…"
+              placeholder="Search books, authors, passagesâ€¦"
               className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-4 py-2 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
             />
           </div>
@@ -58,21 +62,15 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
           {/* Theme Toggle */}
           <VibeTriggerButton variant="header" />
 
-          {/* Supabase Status */}
+          {/* Connection status */}
           <button
             type="button"
             onClick={onGoToLogin}
             className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card-hover transition-colors"
             title="Account & connection settings"
           >
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-              user.id && user.id.length > 20 && !user.id.includes('user-')
-                ? 'bg-emerald-500' 
-                : 'bg-amber-400'
-            }`} />
-            <span className="text-vibe-ink-secondary">
-              {user.id && user.id.length > 20 && !user.id.includes('user-') ? 'Live' : 'Demo'}
-            </span>
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${connectionColor}`} />
+            <span className="text-vibe-ink-secondary">{connectionLabel}</span>
           </button>
 
           {/* Mobile search toggle */}
@@ -92,13 +90,13 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
           {/* Streak badge (mobile) */}
           <div className="flex sm:hidden items-center gap-1 px-2 py-1 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="text-xs font-bold leading-none">{user.currentStreak}</span>
+            <span className="font-mono text-xs font-bold leading-none">{user?.currentStreak ?? 0}</span>
           </div>
 
           {/* Streak badge (desktop) */}
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="text-xs font-bold">{user.currentStreak}d</span>
+            <span className="font-mono text-xs font-bold">{user?.currentStreak ?? 0}d</span>
           </div>
 
           {/* Notifications */}
@@ -116,11 +114,11 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
             type="button"
             onClick={onGoToLogin}
             className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-vibe-accent/40 transition-all active:scale-95 flex-shrink-0"
-            title={`${user.fullName} — Account settings`}
+            title={`${user?.fullName ?? 'Guest'} â€” Account settings`}
           >
             <img
-              src={user.avatarUrl}
-              alt={user.fullName}
+              src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
+              alt={user?.fullName ?? 'Guest'}
               className="w-full h-full object-cover"
             />
           </button>
@@ -138,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearch, onGoToLanding, onGoToL
               autoFocus
               value={searchVal}
               onChange={handleSearchChange}
-              placeholder="Search books, authors or quotes…"
+              placeholder="Search books, authors or quotesâ€¦"
               className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-4 py-2.5 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
             />
           </div>

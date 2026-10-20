@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Post } from '../types';
-import { DEFAULT_USER_AVATAR } from '../data/mockData';
+import { DEFAULT_USER_AVATAR } from '../data/defaults';
 
 interface FetchPostsOptions {
   currentUserId?: string;

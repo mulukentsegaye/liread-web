@@ -18,14 +18,16 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { describeAuthError } from '../../lib/authErrors';
 
 interface LoginPageProps {
   onSuccess: () => void;
   onGoBack: () => void;
+  onGuest?: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => {
-  const { login } = useAuthStore();
+export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGuest }) => {
+  const { signIn, signUp, signInAsGuest, pendingConfirmationEmail, clearPendingConfirmation } = useAuthStore();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   
   // Form fields
@@ -59,63 +61,39 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
       return;
     }
 
+    if (!isSupabaseConfigured()) {
+      setErrorMsg('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env, or use Guest to explore.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      if (isSupabaseConfigured()) {
-        if (mode === 'signup') {
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                full_name: fullName,
-                username: username.replace(/^@/, ''),
-              },
-            },
-          });
-          if (error) throw error;
-          
-          login({
-            id: data.user?.id || 'user-alex-morgan',
-            fullName: fullName || 'Book Lover',
-            username: username.replace(/^@/, '') || 'reader',
-            subtitle: email,
-          });
-          setSuccessMsg('Account created successfully! Welcome to Readers Hub.');
-          setTimeout(() => onSuccess(), 800);
-        } else {
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          if (error) throw error;
-          
-          login({
-            id: data.user?.id,
-            fullName: data.user?.user_metadata?.full_name || email.split('@')[0] || 'Reader',
-            username: data.user?.user_metadata?.username || email.split('@')[0] || 'reader',
-          });
-          setSuccessMsg('Signed in successfully! Opening your library...');
-          setTimeout(() => onSuccess(), 600);
+      if (mode === 'signup') {
+        await signUp(email, password, username, fullName);
+        // Read the fresh value from the store (the closure value is stale here)
+        if (useAuthStore.getState().pendingConfirmationEmail) {
+          // Account created but email confirmation is required — stay on this page
+          setSuccessMsg(null);
+          return;
         }
+        setSuccessMsg('Account created successfully! Welcome to Readers Hub.');
+        setTimeout(() => onSuccess(), 800);
       } else {
-        // Simulated local authentication when Supabase is not configured
-        await new Promise((res) => setTimeout(res, 600));
-        
-        login({
-          fullName: mode === 'signup' ? fullName : (email.split('@')[0] || 'Reader'),
-          username: mode === 'signup' ? username.replace(/^@/, '') : (email.split('@')[0] || 'reader'),
-        });
-        
-        setSuccessMsg(mode === 'signup' ? 'Welcome to Readers Hub!' : 'Welcome back to Readers Hub!');
+        await signIn(email, password);
+        setSuccessMsg('Signed in successfully! Opening your library...');
         setTimeout(() => onSuccess(), 600);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'An error occurred during authentication. Please try again.');
+      setErrorMsg(describeAuthError(err));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGuest = () => {
+    signInAsGuest();
+    onGuest ? onGuest() : onSuccess();
   };
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
@@ -161,7 +139,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             <div className="w-7 h-7 rounded-lg bg-vibe-accent flex items-center justify-center text-white shadow-xs">
               <BookOpen className="w-4 h-4 text-white" />
             </div>
-            <span className="font-serif text-lg font-bold tracking-tight text-vibe-ink">
+            <span className="font-display text-lg font-bold tracking-tight text-vibe-ink">
               Readers Hub
             </span>
           </div>
@@ -180,7 +158,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                 <div className="w-9 h-9 rounded-xl bg-vibe-accent flex items-center justify-center text-white shadow-xs">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <span className="font-serif text-2xl font-bold tracking-tight text-vibe-ink">
+                <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink">
                   Readers Hub
                 </span>
               </div>
@@ -193,9 +171,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             <div className="relative z-10 my-8 p-5 rounded-2xl bg-vibe-card/90 backdrop-blur-md border border-vibe-border shadow-soft space-y-3">
               <div className="flex items-center gap-2 text-vibe-accent text-xs font-semibold">
                 <Bookmark className="w-3.5 h-3.5 fill-current" />
-                <span>Passage of the Day</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider font-bold">Passage of the Day</span>
               </div>
-              <blockquote className="font-serif italic text-sm text-vibe-ink leading-relaxed">
+              <blockquote className="font-display italic font-normal text-sm sm:text-base text-vibe-ink leading-relaxed">
                 “A reader lives a thousand lives before he dies. The man who never reads lives only one.”
               </blockquote>
               <div className="flex items-center justify-between pt-2 border-t border-vibe-border-subtle text-[11px] text-vibe-ink-muted">
@@ -234,9 +212,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
             <div className="mb-6 sm:mb-8 text-center sm:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vibe-accent-subtle text-vibe-accent text-[11px] font-semibold mb-2 shadow-xs">
                 <Sparkles className="w-3 h-3" />
-                <span>Reader Account</span>
+                <span className="font-mono text-[10px] font-bold tracking-wider uppercase">Reader Account</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-serif font-bold text-vibe-ink tracking-tight">
+              <h1 className="font-heading text-2xl sm:text-3xl font-bold text-vibe-ink tracking-tight">
                 {mode === 'signin' ? 'Welcome Back, Reader' : 'Begin Your Reading Journey'}
               </h1>
               <p className="text-xs sm:text-sm text-vibe-ink-secondary mt-1">
@@ -292,6 +270,34 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
               <div className="mb-5 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                 <span className="leading-relaxed flex-1 font-medium">{successMsg}</span>
+              </div>
+            )}
+
+            {/* Awaiting email confirmation */}
+            {pendingConfirmationEmail && (
+              <div className="mb-5 p-4 rounded-2xl bg-vibe-accent-subtle border border-vibe-accent/30 text-xs space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-start gap-2.5">
+                  <Mail className="w-4 h-4 flex-shrink-0 mt-0.5 text-vibe-accent" />
+                  <div className="flex-1 space-y-1">
+                    <p className="font-semibold text-vibe-ink">Check your inbox to confirm your account</p>
+                    <p className="leading-relaxed text-vibe-ink-secondary">
+                      We sent a confirmation link to <strong className="text-vibe-ink">{pendingConfirmationEmail}</strong>.
+                      Click it to activate your account, then sign in.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearPendingConfirmation();
+                    setMode('signin');
+                    setEmail(pendingConfirmationEmail);
+                    setErrorMsg(null);
+                  }}
+                  className="w-full min-h-[40px] py-2 rounded-xl border border-vibe-border bg-vibe-card text-vibe-ink text-xs font-semibold hover:bg-vibe-card-subtle transition-colors"
+                >
+                  I have confirmed — go to sign in
+                </button>
               </div>
             )}
 
@@ -426,6 +432,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack }) => 
                   </>
                 )}
               </button>
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 py-1">
+                <div className="flex-1 h-px bg-vibe-border" />
+                <span className="text-[11px] text-vibe-ink-muted">or</span>
+                <div className="flex-1 h-px bg-vibe-border" />
+              </div>
+
+              {/* Guest Button */}
+              <button
+                type="button"
+                onClick={handleGuest}
+                className="w-full min-h-[44px] py-3 px-6 rounded-full bg-white hover:bg-vibe-card-subtle text-vibe-ink text-xs sm:text-sm font-semibold border border-vibe-border shadow-xs active:scale-98 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Continue as Guest</span>
+                <span className="text-[11px] font-normal text-vibe-ink-muted">(explore without account)</span>
+              </button>
+              <p className="text-center text-[11px] text-vibe-ink-muted">
+                Guest mode is read-only — create an account to post, save, and track reading.
+              </p>
             </form>
 
             {/* Footer Notice */}

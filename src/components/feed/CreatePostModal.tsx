@@ -175,7 +175,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
               <div className="flex items-center gap-2 text-vibe-accent">
                 <Sparkles className="w-5 h-5 flex-shrink-0" />
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-heading text-lg sm:text-xl font-bold text-vibe-ink">
                   Share a Reading Moment
                 </h2>
               </div>
@@ -411,7 +411,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                 value={quoteText}
                 onChange={(e) => setQuoteText(e.target.value)}
                 placeholder="“The object isn't to make art, it's to be in that wonderful state...”"
-                className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none font-serif italic"
+                className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none font-display italic font-normal"
               />
             </div>
 

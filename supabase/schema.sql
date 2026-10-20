@@ -155,6 +155,12 @@ CREATE POLICY "Users can update their own profile"
     ON public.profiles FOR UPDATE 
     USING (auth.uid() = id);
 
+-- Users can delete their own profile (account self-deletion).
+-- Deleting the auth.users row also cascades to this profile.
+CREATE POLICY "Users can delete their own profile" 
+    ON public.profiles FOR DELETE 
+    USING (auth.uid() = id);
+
 -- 4.2 POSTS POLICIES
 -- Anyone can view posts
 CREATE POLICY "Posts are viewable by everyone" 

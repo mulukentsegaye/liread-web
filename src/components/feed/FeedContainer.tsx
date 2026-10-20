@@ -40,10 +40,10 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
 
       {/* Page header */}
       <div className="pt-1 pb-1">
-        <p className="text-[11px] font-semibold tracking-widest uppercase text-vibe-ink-muted mb-1">
+        <p className="font-mono text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted mb-1">
           Today's Reading Feed
         </p>
-        <h1 className="font-serif text-3xl sm:text-4xl font-normal text-vibe-ink">
+        <h1 className="font-display text-4xl sm:text-5xl font-normal text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
         <p className="text-sm text-vibe-ink-secondary mt-1.5">
@@ -128,7 +128,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
             <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center mx-auto">
               <BookOpen className="w-6 h-6" />
             </div>
-            <h3 className="font-serif text-lg font-normal text-vibe-ink">
+            <h3 className="font-heading text-lg font-semibold text-vibe-ink">
               {feedTab === 'following' ? 'Nothing posted yet' : 'The feed is empty'}
             </h3>
             <p className="text-xs text-vibe-ink-muted leading-relaxed max-w-sm mx-auto">

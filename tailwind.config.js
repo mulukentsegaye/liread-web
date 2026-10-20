@@ -89,9 +89,11 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Newsreader', 'Lora', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        heading: ['Syne', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"DM Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
         'soft': 'var(--vibe-shadow, 0 4px 20px -4px rgba(0,0,0,0.05))',

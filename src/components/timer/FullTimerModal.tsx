@@ -64,7 +64,7 @@ export const FullTimerModal: React.FC = () => {
             <BookOpen className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-xs sm:text-sm font-semibold text-vibe-ink">
+            <h2 className="font-heading text-xs sm:text-sm font-semibold text-vibe-ink">
               Distraction-Free Reading
             </h2>
             <p className="text-[10px] sm:text-[11px] text-vibe-ink-muted">
@@ -91,7 +91,7 @@ export const FullTimerModal: React.FC = () => {
         
         {/* Book Jacket Art */}
         <div className="relative w-24 h-36 sm:w-32 sm:h-48 rounded-lg shadow-vibe-elevated border border-vibe-border bg-vibe-card flex flex-col items-center justify-between p-3 sm:p-4 text-center">
-          <span className="text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-vibe-ink line-clamp-2">
+          <span className="font-mono text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-vibe-ink line-clamp-2">
             {bookTitle}
           </span>
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-vibe-border flex items-center justify-center">
@@ -105,7 +105,7 @@ export const FullTimerModal: React.FC = () => {
 
         {/* Current Book Info */}
         <div className="space-y-0.5">
-          <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-vibe-ink break-words">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-normal leading-tight text-vibe-ink break-words">
             {bookTitle}
           </h1>
           <p className="text-xs text-vibe-ink-muted">
@@ -168,7 +168,7 @@ export const FullTimerModal: React.FC = () => {
 
       {/* Bottom Quote & Tip */}
       <div className="text-center max-w-xl mx-auto pt-4 relative z-10">
-        <p className="font-serif italic text-xs sm:text-sm text-vibe-ink-secondary">
+        <p className="font-display italic text-sm sm:text-base text-vibe-ink-secondary leading-relaxed font-normal">
           “The more that you read, the more things you will know. The more that you learn, the more places you'll go.”
         </p>
         <span className="text-[10px] font-mono mt-1 block text-vibe-ink-muted">

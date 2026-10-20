@@ -1,6 +1,6 @@
 # Supabase Backend Setup for Readers Hub
 
-This directory contains the database schema, security policies, triggers, and seed data for the Readers Hub application powered by Supabase.
+This directory contains the database schema, security policies, and triggers for the Readers Hub application powered by Supabase. There is no demo seed data — all content belongs to real users.
 
 ---
 
@@ -43,11 +43,15 @@ This directory contains the database schema, security policies, triggers, and se
 
 ---
 
-### Step 3: (Optional) Run the Seed Data
-To populate your development database with initial profiles, community recommendations, and reading sessions:
-1. In the Supabase **SQL Editor**, click **New Query**.
-2. Copy and paste the contents of [`supabase/seed.sql`](./seed.sql).
-3. Click **Run**.
+### Step 3: (No seed data required)
+Readers Hub ships **no demo accounts**. Every profile, post, bookshelf entry, and
+leaderboard position must belong to a real user who signs up through the app.
+
+- `seed.sql` is intentionally empty — do not add fake users to it.
+- If your database still contains rows from an older setup, run
+  [`supabase/cleanup_demo_data.sql`](./cleanup_demo_data.sql) once to remove them.
+- To create a test account, use **Create Account** in the app so it is registered in
+  `auth.users` and receives a proper `profiles` row from the `on_auth_user_created` trigger.
 
 ---
 
@@ -61,13 +65,36 @@ To populate your development database with initial profiles, community recommend
    VITE_SUPABASE_URL=https://your-project-id.supabase.co
    VITE_SUPABASE_ANON_KEY=your-anon-key-here
    ```
-4. Alternatively, click the **Supabase / Demo Mode** pill in the top header within the running app to paste your credentials directly in the browser!
+4. Alternatively, click the **Account** status pill in the top header within the running app to paste your credentials directly in the browser!
+
+---
+
+### Step 5: Configure Email Delivery
+Go to **Authentication → Providers → Email** in the Supabase dashboard.
+
+- **Confirm email** is enabled by default. New accounts must click the confirmation
+  link before they can sign in. The app handles the confirmation callback
+  automatically and signs the user in when they return.
+- For production, add a **custom SMTP provider** so confirmation emails are actually delivered.
+- For local development, you can disable **Confirm email** to skip the step entirely.
+
+> **Important:** the Supabase **built-in** email service only allows **2 emails per
+> hour for the whole project** and only delivers to your organization's team members.
+> With it enabled, "Create Account" fails for real users with
+> `email rate limit exceeded`. Either configure custom SMTP or turn off
+> "Confirm email" (which makes sign-up instant and sends no email at all).
+>
+> Also add your app origins to **Authentication → URL Configuration → Redirect URLs**
+> so confirmation links return to the app.
+
+Note that the built-in Supabase email service is rate limited. If sign-ups fail with
+"email rate limit exceeded", wait for the limit to reset or configure custom SMTP.
 
 ---
 
 ## 🛠️ Testing Your Backend Connection
 In the Readers Hub web interface:
-1. Click the status pill in the top-right header (`⚡ Demo Mode` or `🟢 Supabase`).
-2. Switch to the **Backend Config** tab.
+1. Click the status pill in the top-right header (`Live`, `Guest`, or `Offline`).
+2. Switch to the **Account** tab.
 3. Click **Ping Database** or enter your credentials and click **Save & Connect**.
 4. You will see an instant success confirmation!

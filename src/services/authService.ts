@@ -1,6 +1,11 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { UserProfile } from '../types';
-import { DEFAULT_USER_AVATAR } from '../data/mockData';
+import { DEFAULT_USER_AVATAR } from '../data/defaults';
+
+const getAppOrigin = (): string => {
+  if (typeof window === 'undefined') return '';
+  return `${window.location.origin}${window.location.pathname}`;
+};
 
 export const authService = {
   /**
@@ -19,7 +24,27 @@ export const authService = {
           username: username.toLowerCase().trim(),
           full_name: fullName.trim(),
         },
+        // Send the confirmation link back to this app so the session is established here.
+        emailRedirectTo: getAppOrigin(),
       },
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Exchange a confirmation token from the email link for a session.
+   * Supabase's PKCE email templates deliver `?token_hash=...&type=signup`,
+   * which `detectSessionInUrl` does NOT process on its own.
+   */
+  async verifyEmailToken(tokenHash: string, type: string) {
+    if (!isSupabaseConfigured()) return null;
+
+    const normalizedType = (type || 'signup').toUpperCase() as any;
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: normalizedType,
     });
 
     if (error) throw error;

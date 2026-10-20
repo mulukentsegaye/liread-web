@@ -37,8 +37,8 @@ export const CelebrationToast: React.FC = () => {
               </span>
             </div>
 
-            <h3 className="font-serif text-base sm:text-lg font-bold text-vibe-ink tracking-tight leading-snug">
-              <span className="text-emerald-600 dark:text-emerald-400 font-extrabold mr-1.5">
+            <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink tracking-tight leading-snug">
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold mr-1.5">
                 +{minutes} {minutes === 1 ? 'Minute' : 'Minutes'}
               </span>
               Added to Leaderboard!

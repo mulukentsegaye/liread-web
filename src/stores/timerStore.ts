@@ -25,13 +25,13 @@ interface TimerStore {
 export const useTimerStore = create<TimerStore>()(
   persist(
     (set, get) => ({
-      isRunning: true, // Default running as seen in mockup ("00:42:15 Current session")
-      startTime: Date.now() - 2535 * 1000, // Pre-seeded with 42 mins 15s to match the exact mockup!
+      isRunning: false,
+      startTime: null,
       accumulatedSeconds: 0,
-      bookTitle: 'The Creative Act',
-      bookAuthor: 'Rick Rubin',
+      bookTitle: 'Untitled Book',
+      bookAuthor: 'Unknown Author',
       subtitleNote: 'A little time, well spent.',
-      coverImageUrl: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=300',
+      coverImageUrl: undefined,
       isFullScreenOpen: false,
 
       getElapsedSeconds: () => {
@@ -107,7 +107,7 @@ export const useTimerStore = create<TimerStore>()(
       setFullScreenOpen: (isOpen) => set({ isFullScreenOpen: isOpen }),
     }),
     {
-      name: 'readers_hub_timer_state_v1',
+      name: 'readers_hub_timer_state_v2',
     }
   )
 );

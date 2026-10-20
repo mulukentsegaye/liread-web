@@ -12,6 +12,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
 export type NavigationTab = 'feed' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved';
@@ -34,8 +35,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
   ];
 
   const libraryItems = [
-    { id: 'bookshelf' as NavigationTab, label: 'My Bookshelf', icon: Library,  badge: user.bookshelfCount },
-    { id: 'saved' as NavigationTab,     label: 'Saved Passages', icon: Bookmark, badge: user.savedPassagesCount },
+    { id: 'bookshelf' as NavigationTab, label: 'My Bookshelf', icon: Library,  badge: user?.bookshelfCount ?? 0 },
+    { id: 'saved' as NavigationTab,     label: 'Saved Passages', icon: Bookmark, badge: user?.savedPassagesCount ?? 0 },
   ];
 
   return (
@@ -44,7 +45,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
 
         {/* Primary Navigation */}
         <nav className="space-y-0.5">
-          <p className="hidden lg:block px-3 text-[10px] font-semibold tracking-widest uppercase text-vibe-ink-muted mb-2">
+          <p className="hidden lg:block px-3 text-[10px] font-mono font-bold tracking-widest uppercase text-vibe-ink-muted mb-2">
             Navigation
           </p>
           {mainNavItems.map((item) => {
@@ -71,7 +72,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
 
         {/* Library Section */}
         <nav className="space-y-0.5">
-          <p className="hidden lg:block px-3 text-[10px] font-semibold tracking-widest uppercase text-vibe-ink-muted mb-2">
+          <p className="hidden lg:block px-3 text-[10px] font-mono font-bold tracking-widest uppercase text-vibe-ink-muted mb-2">
             Library
           </p>
           {libraryItems.map((item) => {
@@ -94,7 +95,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                   <span className="hidden lg:inline truncate">{item.label}</span>
                 </div>
                 {item.badge !== undefined && (
-                  <span className={`hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-semibold transition-colors ${
+                  <span className={`hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md font-mono text-[10px] font-semibold transition-colors ${
                     isActive ? 'bg-white/20 text-white' : 'bg-vibe-card text-vibe-ink-muted border border-vibe-border'
                   }`}>
                     {item.badge}
@@ -108,7 +109,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
         {/* Inspiration Quote Card (desktop only) */}
         <div className="hidden lg:block mx-1 p-4 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft">
           <Sparkles className="w-4 h-4 text-vibe-accent mb-2.5" strokeWidth={1.75} />
-          <p className="font-serif italic text-sm text-vibe-ink leading-snug mb-1">
+          <p className="font-display italic text-sm text-vibe-ink leading-snug mb-1 font-normal">
             "A few pages a day. A whole world within."
           </p>
           <p className="text-[11px] text-vibe-ink-muted">
@@ -146,16 +147,16 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
         >
           <div className="flex items-center gap-3 min-w-0">
             <img
-              src={user.avatarUrl}
-              alt={user.fullName}
+              src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
+              alt={user?.fullName ?? 'Guest'}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
             />
             <div className="hidden lg:block text-left min-w-0">
               <p className="text-xs font-semibold text-vibe-ink leading-tight truncate">
-                {user.fullName}
+                {user?.fullName ?? 'Guest Explorer'}
               </p>
               <p className="text-[11px] text-vibe-ink-muted mt-0.5 truncate">
-                {user.subtitle || 'The everyday reader'}
+                {user?.subtitle ?? 'Browsing as guest'}
               </p>
             </div>
           </div>

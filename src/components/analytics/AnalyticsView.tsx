@@ -11,40 +11,85 @@ import {
 import { Flame, Trophy, Clock, Award, BookOpen, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../context/ThemeContext';
+import { sessionsService } from '../../services/sessionsService';
+import { useEffect } from 'react';
 
 interface AnalyticsViewProps {
   onBack?: () => void;
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
-  const { user, todayMinutesRead } = useAuthStore();
+  const { user, todayMinutesRead, isGuest } = useAuthStore();
   const { vibeConfig } = useTheme();
   const [timeRange, setTimeRange] = useState<'7days' | '30days'>('7days');
+  const [sessions, setSessions] = useState<{ session_date: string; duration_minutes: number }[]>([]);
 
-  const data7Days = [
-    { day: 'Wed', minutes: 45 },
-    { day: 'Thu', minutes: 60 },
-    { day: 'Fri', minutes: 35 },
-    { day: 'Sat', minutes: 75 },
-    { day: 'Sun', minutes: 90 },
-    { day: 'Mon', minutes: 50 },
-    { day: 'Today', minutes: todayMinutesRead },
-  ];
+  useEffect(() => {
+    if (!user || isGuest) { setSessions([]); return; }
+    sessionsService.getUserSessions(user.id, 100).then((rows) => {
+      setSessions(rows.map((r) => ({ session_date: r.sessionDate, duration_minutes: r.durationMinutes })));
+    }).catch(() => setSessions([]));
+  }, [user?.id, isGuest, todayMinutesRead]);
 
-  const data30Days = [
-    { day: 'Week 1', minutes: 320 },
-    { day: 'Week 2', minutes: 410 },
-    { day: 'Week 3', minutes: 380 },
-    { day: 'This Wk', minutes: todayMinutesRead + 355 },
-  ];
+  // Build chart from real sessions; if no data, show empty/today only
+  const build7DayData = () => {
+    if (sessions.length === 0) {
+      return isGuest
+        ? [{ day: 'Today', minutes: 0 }]
+        : [{ day: 'Today', minutes: todayMinutesRead }];
+    }
+    const map = new Map<string, number>();
+    sessions.forEach((s) => map.set(s.session_date, (map.get(s.session_date) || 0) + s.duration_minutes));
+    const days: { day: string; minutes: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const iso = d.toISOString().split('T')[0];
+      const label = i === 0 ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      days.push({ day: label, minutes: map.get(iso) || 0 });
+    }
+    return days;
+  };
+
+  const data7Days = build7DayData();
+
+  const data30Days = (() => {
+    if (sessions.length === 0) return [{ day: 'This Wk', minutes: todayMinutesRead }];
+    // Simple weekly buckets for real data
+    const weeks: { day: string; minutes: number }[] = [
+      { day: 'Week 1', minutes: 0 },
+      { day: 'Week 2', minutes: 0 },
+      { day: 'Week 3', minutes: 0 },
+      { day: 'This Wk', minutes: 0 },
+    ];
+    sessions.forEach((s) => {
+      const d = new Date(s.session_date);
+      const now = new Date();
+      const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+      const bucket = diffDays < 7 ? 3 : diffDays < 14 ? 2 : diffDays < 21 ? 1 : 0;
+      if (bucket >= 0) weeks[bucket].minutes += s.duration_minutes;
+    });
+    return weeks;
+  })();
 
   const chartData = timeRange === '7days' ? data7Days : data30Days;
   const totalMinutesShown = chartData.reduce((acc, curr) => acc + curr.minutes, 0);
   const avgMinutes = Math.round(totalMinutesShown / chartData.length);
 
+  if (!user) {
+    return (
+      <div className="p-8 text-center text-sm text-vibe-ink-muted">Sign in to view your analytics.</div>
+    );
+  }
+
   return (
     <div className="w-full space-y-6 sm:space-y-8 animate-fade-in">
       
+      {isGuest && (
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 text-center">
+          Guest analytics — create an account to persist reading stats. Timer sessions here are local only.
+        </div>
+      )}
+
       {/* Top Back Button & Section Header */}
       <div className="space-y-4">
         {onBack && (
@@ -62,15 +107,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-            <span className="text-[11px] font-semibold tracking-wider uppercase text-vibe-ink-muted">
+            <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted">
               Personal Analytics
             </span>
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-normal text-vibe-ink tracking-tight">
+          <h1 className="font-display text-4xl sm:text-5xl font-normal text-vibe-ink tracking-tight leading-tight">
             Your Reading Journey
           </h1>
           <p className="text-sm mt-1 text-vibe-ink-secondary max-w-xl">
-            Detailed insights into your reading consistency, streaks, and literary milestones.
+            Insights from your real reading history. No sample data — only what you have logged.
           </p>
         </div>
       </div>
@@ -81,16 +126,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 1: Today */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">Today</span>
+            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Today</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
               {todayMinutesRead} <span className="text-xs font-sans font-normal text-vibe-ink-muted">min</span>
             </div>
-            <p className="text-xs text-vibe-ink-muted mt-1.5 flex items-center justify-between">
+            <p className="text-xs text-vibe-ink-muted mt-1.5 flex items-center justify-between font-mono">
               <span>Goal: {user.dailyGoalMinutes}m</span>
               <span className="font-medium text-vibe-accent">
                 {Math.round((todayMinutesRead / (user.dailyGoalMinutes || 60)) * 100)}%
@@ -102,16 +147,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 2: Streak */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">Streak</span>
+            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Streak</span>
             <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
               <Flame className="w-4 h-4 fill-current" />
             </div>
           </div>
           <div>
-            <div className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
               {user.currentStreak} <span className="text-xs font-sans font-normal text-vibe-ink-muted">days</span>
             </div>
-            <p className="text-xs font-medium text-vibe-accent mt-1.5 flex items-center gap-1">
+            <p className="text-xs font-medium text-vibe-accent mt-1.5 flex items-center gap-1 font-mono">
               <span>Personal record 🔥</span>
             </p>
           </div>
@@ -120,16 +165,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 3: Rank Tier */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
+            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl sm:text-2xl font-semibold text-vibe-ink leading-tight truncate">
+            <div className="font-heading text-xl sm:text-2xl font-bold text-vibe-ink leading-tight truncate">
               {user.rankTier}
             </div>
-            <p className="text-xs text-vibe-ink-muted mt-1.5">
+            <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">
               {user.totalMinutesRead.toLocaleString()} total logged mins
             </p>
           </div>
@@ -138,16 +183,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 4: Bookshelf */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">Library</span>
+            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Library</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <BookOpen className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
               {user.bookshelfCount} <span className="text-xs font-sans font-normal text-vibe-ink-muted">books</span>
             </div>
-            <p className="text-xs text-vibe-ink-muted mt-1.5">
+            <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">
               {user.savedPassagesCount} saved quotes
             </p>
           </div>
@@ -159,7 +204,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
       <div className="bg-vibe-card border border-vibe-border rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-soft space-y-5 transition-all duration-300">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="font-serif text-xl sm:text-2xl font-normal text-vibe-ink">
+            <h2 className="font-heading text-xl sm:text-2xl font-bold text-vibe-ink">
               Reading Time
             </h2>
             <p className="text-xs sm:text-sm text-vibe-ink-muted mt-0.5">
@@ -236,17 +281,17 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
       {/* Rank Tier Roadmap */}
       <div className="bg-vibe-card border border-vibe-border rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-4 shadow-soft transition-all duration-300">
         <div className="flex items-center justify-between">
-          <h3 className="font-serif text-lg sm:text-xl font-normal flex items-center gap-2 text-vibe-ink">
+          <h3 className="font-heading text-lg sm:text-xl font-bold flex items-center gap-2 text-vibe-ink">
             <Trophy className="w-5 h-5 text-vibe-accent" />
             <span>Reader Rank Progression</span>
           </h3>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-            {user.rankTier}
+            {user!.rankTier}
           </span>
         </div>
         
         <p className="text-xs sm:text-sm text-vibe-ink-secondary">
-          You are currently at <strong className="text-vibe-ink">{user.rankTier}</strong>. Log {Math.max(0, 1200 - user.totalMinutesRead)} more minutes to reach <strong className="text-vibe-accent">Avid Reader</strong> tier!
+          You are currently at <strong className="text-vibe-ink">{user!.rankTier}</strong>. Log {Math.max(0, 1200 - user!.totalMinutesRead)} more minutes to reach <strong className="text-vibe-accent">Avid Reader</strong> tier!
         </p>
 
         {/* Progress Bar */}
@@ -255,7 +300,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
             <div 
               className="h-full rounded-full transition-all duration-1000 bg-vibe-accent"
               style={{ 
-                width: `${Math.min(100, (user.totalMinutesRead / 1200) * 100)}%`,
+                width: `${Math.min(100, (user!.totalMinutesRead / 1200) * 100)}%`,
               }}
             />
           </div>

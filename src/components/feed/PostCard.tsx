@@ -68,13 +68,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-vibe-ink">{post.authorName}</span>
+              <span className="font-heading text-sm font-semibold text-vibe-ink">{post.authorName}</span>
               <span className="text-xs text-vibe-ink-muted">{post.actionText}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
+              <span className="font-mono text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
               <span className="text-vibe-border">·</span>
-              <span className="text-[11px] font-semibold text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
                 {post.tag}
               </span>
             </div>
@@ -140,10 +140,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
           <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
             <div>
               {/* Opening mark */}
-              <span className="font-serif text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
+              <span className="font-display text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
                 "
               </span>
-              <blockquote className="font-serif text-base sm:text-[17px] text-vibe-ink leading-relaxed break-words">
+              <blockquote className="font-display italic font-normal text-base sm:text-[18px] text-vibe-ink leading-relaxed break-words">
                 {post.quoteText}
               </blockquote>
             </div>
@@ -175,7 +175,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer }
               strokeWidth={1.5}
             />
           ))}
-          <span className="ml-1.5 text-xs font-medium text-vibe-ink-muted">{post.rating}.0</span>
+          <span className="ml-1.5 font-mono text-xs font-semibold text-vibe-ink-muted">{post.rating}.0</span>
         </div>
       )}
 

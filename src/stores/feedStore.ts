@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Post } from '../types';
-import { INITIAL_POSTS, DEFAULT_USER_AVATAR } from '../data/mockData';
+import { DEFAULT_USER_AVATAR } from '../data/defaults';
 import { postsService } from '../services/postsService';
 import { isSupabaseConfigured } from '../lib/supabase';
 
@@ -25,7 +25,7 @@ interface FeedStore {
 export const useFeedStore = create<FeedStore>()(
   persist(
     (set, get) => ({
-      posts: INITIAL_POSTS,
+      posts: [],
       feedTab: 'for_you',
       sortBy: 'latest',
       isCreateModalOpen: false,
@@ -40,30 +40,25 @@ export const useFeedStore = create<FeedStore>()(
       setCreateModalOpen: (isOpen) => set({ isCreateModalOpen: isOpen }),
 
       fetchPosts: async (currentUserId?: string) => {
-        if (!isSupabaseConfigured()) {
-          return;
-        }
+        if (!isSupabaseConfigured()) return;
 
         set({ isLoading: true });
         try {
           const { sortBy } = get();
-          const supabasePosts = await postsService.getPosts({
-            currentUserId,
-            sortBy,
-          });
-
-          if (supabasePosts && supabasePosts.length > 0) {
-            set({ posts: supabasePosts });
-          }
+          const supabasePosts = await postsService.getPosts({ currentUserId, sortBy });
+          set({ posts: supabasePosts });
         } catch (err) {
-          console.warn('Failed to fetch posts from Supabase, using cached/mock posts:', err);
+          console.warn('Failed to fetch posts from Supabase:', err);
         } finally {
           set({ isLoading: false });
         }
       },
 
       toggleUpvote: async (postId: string, currentUserId?: string) => {
-        // Optimistic UI update
+        if (!currentUserId || currentUserId === 'guest-user') {
+          alert('Sign in to like posts. Guest browsing is read-only.');
+          return;
+        }
         set((state) => ({
           posts: state.posts.map((post) => {
             if (post.id === postId) {
@@ -88,14 +83,14 @@ export const useFeedStore = create<FeedStore>()(
       },
 
       toggleSave: async (postId: string, currentUserId?: string) => {
-        // Optimistic UI update
+        if (!currentUserId || currentUserId === 'guest-user') {
+          alert('Sign in to save passages. Guest browsing is read-only.');
+          return;
+        }
         set((state) => ({
           posts: state.posts.map((post) => {
             if (post.id === postId) {
-              return {
-                ...post,
-                isSaved: !post.isSaved,
-              };
+              return { ...post, isSaved: !post.isSaved };
             }
             return post;
           }),
@@ -111,11 +106,19 @@ export const useFeedStore = create<FeedStore>()(
       },
 
       addPost: async (postData: Partial<Post>, currentUserId?: string) => {
+        if (!currentUserId || currentUserId === 'guest-user') {
+          alert('Create an account to share reading moments. Guests can only browse.');
+          return;
+        }
+        if (!isSupabaseConfigured()) {
+          alert('Supabase is not configured.');
+          return;
+        }
         const tempId = `post-${Date.now()}`;
         const newPost: Post = {
           id: tempId,
-          userId: currentUserId || 'user-alex-morgan',
-          authorName: postData.authorName || 'Alex Morgan',
+          userId: currentUserId,
+          authorName: postData.authorName || 'You',
           authorAvatar: postData.authorAvatar || DEFAULT_USER_AVATAR,
           actionText: postData.postType === 'finished_book' ? 'finished a book' : 'shared a passage',
           timeAgo: 'Just now',
@@ -136,27 +139,26 @@ export const useFeedStore = create<FeedStore>()(
           createdAt: new Date().toISOString(),
         };
 
-        // Prepend optimistically
         set((state) => ({
           posts: [newPost, ...state.posts],
           isCreateModalOpen: false,
         }));
 
-        if (isSupabaseConfigured() && currentUserId) {
-          try {
-            const savedPost = await postsService.createPost(postData, currentUserId);
-            // Replace temporary post with Supabase post
-            set((state) => ({
-              posts: state.posts.map((p) => (p.id === tempId ? savedPost : p)),
-            }));
-          } catch (err) {
-            console.warn('Could not persist new post to Supabase:', err);
-          }
+        try {
+          const savedPost = await postsService.createPost(postData, currentUserId);
+          set((state) => ({
+            posts: state.posts.map((p) => (p.id === tempId ? savedPost : p)),
+          }));
+        } catch (err) {
+          console.warn('Could not persist new post to Supabase:', err);
+          // Remove temp post on failure to avoid phantom data
+          set((state) => ({ posts: state.posts.filter((p) => p.id !== tempId) }));
+          alert('Failed to publish. Please try again.');
         }
       },
     }),
     {
-      name: 'readers_hub_feed_state_v1',
+      name: 'readers_hub_feed_state_v2',
       partialize: (state) => ({
         posts: state.posts,
         feedTab: state.feedTab,

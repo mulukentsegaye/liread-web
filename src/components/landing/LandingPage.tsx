@@ -24,14 +24,21 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId } from '../../types/theme';
+import { useAuthStore } from '../../stores/authStore';
 
 interface LandingPageProps {
   onEnterApp: () => void;
   onOpenTimer?: () => void;
   onGoToLogin?: () => void;
+  onGuest?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer, onGoToLogin }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTimer, onGoToLogin, onGuest }) => {
+  const { signInAsGuest } = useAuthStore();
+  const handleGuest = () => {
+    signInAsGuest();
+    if (onGuest) onGuest(); else onEnterApp();
+  };
   const { vibeConfig } = useTheme();
   const { 
     isPlaying, 
@@ -82,7 +89,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
+              <span className="font-display text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
                 Readers Hub
               </span>
             </div>
@@ -107,26 +114,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </a>
           </nav>
 
-          {/* Right Action Stack: Enter App Button & Login */}
+          {/* Right Action Stack: Login / Guest */}
           <div className="flex items-center gap-2 sm:gap-3">
+
+            <button
+              type="button"
+              onClick={handleGuest}
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
+            >
+              <span>Continue as Guest</span>
+            </button>
 
             {onGoToLogin && (
               <button
                 type="button"
                 onClick={onGoToLogin}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
+                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
               >
-                <span>Log In</span>
+                <span>Sign In / Create Account</span>
               </button>
             )}
-
-            <button
-              onClick={onEnterApp}
-              className="group flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
-            >
-              <span>Enter App</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </button>
           </div>
 
         </div>
@@ -137,9 +144,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           ============================================================================== */}
       <section className="relative w-full pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
         {/* Editorial Title */}
-        <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-vibe-ink leading-[1.15] sm:leading-[1.12] mb-6">
+        <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-display font-normal tracking-tight text-vibe-ink leading-[1.15] sm:leading-[1.12] mb-6">
           Where deep reading meets <br />
-          <span className="italic font-serif font-medium text-vibe-accent">
+          <span className="italic font-display font-normal text-vibe-accent">
             aesthetic focus.
           </span>
         </h1>
@@ -152,23 +159,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
         {/* Action Button Group */}
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto mb-12 sm:mb-16">
-          <button
-            onClick={onEnterApp}
-            className="w-full sm:w-auto px-7 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2.5"
-          >
-            <span>Launch Your Reading Space</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-
           {onGoToLogin && (
             <button
               onClick={onGoToLogin}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2.5"
             >
-              <span>Sign In to Account</span>
-              <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
+              <span>Create Account / Sign In</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           )}
+
+          <button
+            onClick={handleGuest}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-2"
+          >
+            <span>Continue as Guest</span>
+            <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
+          </button>
 
           <button
             onClick={() => {
@@ -191,7 +198,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent block">
             Engineered For Immersion
           </span>
-          <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Everything You Need to Read More Deeply
           </h2>
           <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed max-w-xl mx-auto">
@@ -214,7 +221,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <span>Feature 01 · Ritual & Focus</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Distraction-Free Immersion Timer
               </h2>
 
@@ -273,7 +280,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
                 <div className="space-y-1.5">
                   <p className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted">Currently Reading</p>
-                  <h4 className="text-base sm:text-lg font-serif font-bold text-vibe-ink flex items-center gap-2">
+                  <h4 className="text-base sm:text-lg font-heading font-bold text-vibe-ink flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-vibe-accent flex-shrink-0" />
                     <span>The Creative Act: A Way of Being</span>
                   </h4>
@@ -339,7 +346,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                       <Volume2 className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm sm:text-base font-bold text-vibe-ink">Interactive Audio Lounge</h4>
+                      <h4 className="text-sm sm:text-base font-heading font-bold text-vibe-ink">Interactive Audio Lounge</h4>
                       <p className="text-[11px] text-vibe-ink-muted">Tap any vibe to preview in real-time</p>
                     </div>
                   </div>
@@ -432,7 +439,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <span>Feature 02 · Binaural Audio</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Atmospheric Soundscape Engine
               </h2>
 
@@ -480,7 +487,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <span>Feature 03 · Curation & Margins</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Digital Bookshelf & Saved Quotes
               </h2>
 
@@ -518,7 +525,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
                   <div className="flex items-center gap-2">
                     <Library className="w-4 h-4 text-vibe-accent" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-vibe-ink">Active Reading Shelf</span>
+                    <span className="text-xs font-heading font-bold uppercase tracking-wider text-vibe-ink">Active Reading Shelf</span>
                   </div>
                   <span className="text-[11px] font-mono text-vibe-ink-muted">3 Books in Progress</span>
                 </div>
@@ -528,7 +535,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="font-bold text-vibe-ink">The Creative Act</span>
+                        <span className="font-heading font-bold text-vibe-ink">The Creative Act</span>
                         <span className="text-vibe-ink-muted"> · Rick Rubin</span>
                       </div>
                       <span className="font-mono text-[11px] font-bold text-vibe-accent">68%</span>
@@ -537,7 +544,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                       <div className="h-full bg-vibe-accent rounded-full w-[68%]" />
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
-                      <span>Page 142 of 210</span>
+                      <span className="font-mono">Page 142 of 210</span>
                       <span>Updated 2 hours ago</span>
                     </div>
                   </div>
@@ -546,7 +553,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <div>
-                        <span className="font-bold text-vibe-ink">Meditations</span>
+                        <span className="font-heading font-bold text-vibe-ink">Meditations</span>
                         <span className="text-vibe-ink-muted"> · Marcus Aurelius</span>
                       </div>
                       <span className="font-mono text-[11px] font-bold text-vibe-accent">42%</span>
@@ -555,7 +562,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                       <div className="h-full bg-vibe-accent rounded-full w-[42%]" />
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
-                      <span>Book IV · Gregory Hays translation</span>
+                      <span className="font-mono">Book IV · Gregory Hays translation</span>
                       <span>Yesterday</span>
                     </div>
                   </div>
@@ -575,7 +582,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   </div>
                 </div>
 
-                <blockquote className="font-serif italic text-sm sm:text-base text-vibe-ink leading-relaxed">
+                <blockquote className="font-display italic text-sm sm:text-base text-vibe-ink leading-relaxed font-normal">
                   “The art of reading is in great part that of acquiring a better, deeper understanding of life through the words of others.”
                 </blockquote>
 
@@ -605,7 +612,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 {/* Metric Summary Pills */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold">
+                    <div className="flex items-center gap-1.5 text-xs text-amber-500 font-heading font-bold">
                       <Flame className="w-4 h-4 fill-current" />
                       <span>Reading Streak</span>
                     </div>
@@ -614,7 +621,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   </div>
 
                   <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs text-vibe-accent font-bold">
+                    <div className="flex items-center gap-1.5 text-xs text-vibe-accent font-heading font-bold">
                       <Clock className="w-4 h-4" />
                       <span>Today's Time</span>
                     </div>
@@ -626,7 +633,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 {/* 7-Day Gentle Habit Activity Chart */}
                 <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-vibe-ink">7-Day Reading Rhythm</span>
+                    <span className="font-heading font-bold text-vibe-ink">7-Day Reading Rhythm</span>
                     <span className="font-mono text-[11px] text-vibe-ink-muted">Total: 6.8 hrs</span>
                   </div>
 
@@ -661,7 +668,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 {/* Friendly Community Leaderboard Preview */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-vibe-ink flex items-center gap-1.5">
+                    <span className="font-heading font-bold text-vibe-ink flex items-center gap-1.5">
                       <Trophy className="w-3.5 h-3.5 text-amber-500" />
                       Weekly Readers Circle
                     </span>
@@ -670,9 +677,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
                   <div className="space-y-1.5">
                     {[
-                      { rank: '1', name: 'Elena Rostova', time: '14.5 hrs', badge: '🥇' },
-                      { rank: '2', name: 'Marcus Vance', time: '11.2 hrs', badge: '🥈' },
-                      { rank: '3', name: 'Maya Patel', time: '9.8 hrs', badge: '🥉' },
+                      { rank: '1', name: 'Top Reader', time: 'This week', badge: '🥇' },
+                      { rank: '2', name: 'Second Reader', time: 'This week', badge: '🥈' },
+                      { rank: '3', name: 'Third Reader', time: 'This week', badge: '🥉' },
                     ].map((reader) => (
                       <div key={reader.rank} className="flex items-center justify-between p-2 rounded-xl bg-vibe-card-subtle text-xs">
                         <div className="flex items-center gap-2">
@@ -683,6 +690,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                       </div>
                     ))}
                   </div>
+                  <p className="text-[10px] text-vibe-ink-muted pt-1">
+                    Rankings appear here once real readers log sessions.
+                  </p>
                 </div>
 
               </div>
@@ -695,7 +705,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 <span>Feature 04 · Mindful Metrics</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Gentle Analytics & Habit Streaks
               </h2>
 
@@ -739,12 +749,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <Feather className="w-5 h-5" />
           </div>
 
-          <blockquote className="font-serif italic text-xl sm:text-2xl lg:text-3xl text-vibe-ink leading-relaxed max-w-3xl mx-auto font-normal">
+          <blockquote className="font-display italic text-xl sm:text-2xl lg:text-3xl text-vibe-ink leading-relaxed max-w-3xl mx-auto font-normal">
             “When I think of all the books still left for me to read, I have the certainty of being still happy.”
           </blockquote>
 
           <div className="space-y-1">
-            <p className="text-sm font-bold text-vibe-ink tracking-wide">Jules Renard</p>
+            <p className="text-sm font-heading font-bold text-vibe-ink tracking-wide">Jules Renard</p>
             <p className="text-xs text-vibe-ink-muted">French Author & Dramatist</p>
           </div>
 
@@ -760,9 +770,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             Begin Your Ritual
           </span>
 
-          <h2 className="text-2xl sm:text-4xl font-serif font-normal text-vibe-ink tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Reclaim your attention. <br />
-            <span className="italic text-vibe-accent">One page at a time.</span>
+            <span className="italic font-display font-normal text-vibe-accent">One page at a time.</span>
           </h2>
 
           <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-lg mx-auto leading-relaxed">
@@ -771,12 +781,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            {onGoToLogin && (
+              <button
+                onClick={onGoToLogin}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>Create Account / Sign In</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
             <button
-              onClick={onEnterApp}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+              onClick={handleGuest}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-white text-vibe-ink border border-vibe-border hover:bg-vibe-card-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              <span>Launch Readers Hub</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Continue as Guest</span>
+              <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
             </button>
           </div>
 
@@ -797,7 +816,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <div className="w-7 h-7 rounded-lg bg-vibe-accent flex items-center justify-center text-white shadow-xs">
               <BookOpen className="w-4 h-4" />
             </div>
-            <span className="font-serif text-base font-bold text-vibe-ink">Readers Hub</span>
+            <span className="font-display text-base font-bold text-vibe-ink">Readers Hub</span>
             <span className="text-[11px]">© 2026 Readers Hub Inc. All rights reserved.</span>
           </div>
 
@@ -807,20 +826,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
             <a href="#analytics" className="hover:text-vibe-ink transition-colors">Analytics</a>
             <a href="#quotes" className="hover:text-vibe-ink transition-colors">Philosophy</a>
+            <button 
+              onClick={handleGuest} 
+              className="hover:text-vibe-ink transition-colors font-medium"
+            >
+              Continue as Guest
+            </button>
             {onGoToLogin && (
               <button 
                 onClick={onGoToLogin} 
                 className="hover:text-vibe-ink transition-colors font-medium"
               >
-                Log In
+                Sign In
               </button>
             )}
-            <button 
-              onClick={onEnterApp} 
-              className="font-semibold text-vibe-accent hover:underline"
-            >
-              Enter App →
-            </button>
           </div>
 
         </div>

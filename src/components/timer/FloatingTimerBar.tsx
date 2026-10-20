@@ -69,7 +69,7 @@ export const FloatingTimerBar: React.FC = () => {
           {coverImageUrl ? (
             <img src={coverImageUrl} alt={bookTitle} className="w-full h-full object-cover" />
           ) : (
-            <span className="font-serif text-[8px] font-bold text-vibe-ink text-center leading-none">
+            <span className="font-mono text-[8px] font-bold text-vibe-ink text-center leading-none">
               {bookInitial}
             </span>
           )}
@@ -78,12 +78,12 @@ export const FloatingTimerBar: React.FC = () => {
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 bg-vibe-accent ${isRunning ? 'animate-pulse' : 'opacity-40'}`} />
-            <span className="text-[10px] font-semibold tracking-wider uppercase truncate text-vibe-accent">
+            <span className="font-mono text-[10px] font-bold tracking-widest uppercase truncate text-vibe-accent">
               {isRunning ? 'Reading Now' : 'Timer Paused'}
             </span>
           </div>
 
-          <h3 className="text-xs sm:text-sm font-semibold truncate max-w-[120px] sm:max-w-[200px] text-vibe-ink leading-tight">
+          <h3 className="font-heading text-xs sm:text-sm font-semibold truncate max-w-[120px] sm:max-w-[200px] text-vibe-ink leading-tight">
             {bookTitle}
           </h3>
 
