@@ -45,21 +45,21 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
       author: 'Rick Rubin',
       progress: 68,
       status: 'Currently Reading',
-      coverUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+      coverUrl: 'https://covers.openlibrary.org/b/id/13316390-L.jpg',
     },
     {
       title: 'Atomic Habits',
       author: 'James Clear',
       progress: 100,
       status: 'Finished',
-      coverUrl: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80',
+      coverUrl: 'https://covers.openlibrary.org/b/id/12539702-L.jpg',
     },
     {
       title: 'Meditations',
       author: 'Marcus Aurelius',
       progress: 42,
       status: 'Currently Reading',
-      coverUrl: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=400&q=80',
+      coverUrl: 'https://covers.openlibrary.org/b/id/12818862-L.jpg',
     },
   ];
 
