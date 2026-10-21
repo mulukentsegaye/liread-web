@@ -333,22 +333,29 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                           Open Library Suggestions
                         </span>
                       )}
-                      {isSearching ? (
-                        <span className="flex items-center gap-1 text-vibe-accent text-[10px]">
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                          Searching...
-                        </span>
-                      ) : isOffline ? (
+                      {isOffline ? (
                         <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
                           {suggestions.length > 0 ? `${suggestions.length} offline matches` : 'Offline'}
+                        </span>
+                      ) : suggestions.length > 0 ? (
+                        <span className="text-[10px] text-vibe-ink-muted">
+                          {suggestions.length} found
                         </span>
                       ) : null}
                     </div>
 
+                    {/* Loading state: subtle, tranquil skeleton placeholders without duplicate spinners */}
                     {isSearching && suggestions.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-vibe-ink-muted space-y-2">
-                        <Loader2 className="w-5 h-5 animate-spin mx-auto text-vibe-accent" />
-                        <p>Searching Open Library for "{bookTitle}"...</p>
+                      <div className="p-2 space-y-1">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="p-2 flex items-center gap-3 animate-pulse">
+                            <div className="w-8 h-11 rounded-md bg-vibe-border/60 flex-shrink-0" />
+                            <div className="flex-1 min-w-0 space-y-1.5">
+                              <div className="h-3 bg-vibe-border/60 rounded-md w-3/5" />
+                              <div className="h-2 bg-vibe-border/40 rounded-md w-2/5" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : suggestions.length > 0 ? (
                       <div className="divide-y divide-vibe-border/50">

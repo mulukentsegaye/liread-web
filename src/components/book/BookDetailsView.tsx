@@ -175,8 +175,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
   const bodyFontClass =
     readingFont === 'serif'
-      ? 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90 selection:bg-vibe-accent/20'
-      : 'font-sans text-sm sm:text-base leading-relaxed text-vibe-ink-secondary selection:bg-vibe-accent/20';
+      ? 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90'
+      : 'font-sans text-sm sm:text-base leading-relaxed text-vibe-ink-secondary';
 
   const summarySectionRef = useRef<HTMLDivElement>(null);
 

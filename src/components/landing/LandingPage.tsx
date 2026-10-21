@@ -70,7 +70,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
   return (
     <div 
       data-theme="light"
-      className="min-h-screen w-full transition-colors duration-500 overflow-x-clip flex flex-col justify-between selection:bg-vibe-accent/20 selection:text-vibe-accent bg-vibe-bg"
+      className="min-h-screen w-full transition-colors duration-500 overflow-x-clip flex flex-col justify-between bg-vibe-bg"
       style={{
         backgroundColor: 'var(--vibe-bg)',
         color: 'var(--vibe-ink)',

@@ -500,22 +500,25 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                     Open Library Results
                   </span>
                 )}
-                {isSearching ? (
-                  <span className="flex items-center gap-1.5 text-vibe-accent text-[11px]">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    Searching...
-                  </span>
-                ) : (
+                {suggestions.length > 0 && (
                   <span className="text-[11px] text-vibe-ink-muted">
                     {suggestions.length} {suggestions.length === 1 ? 'book' : 'books'} found
                   </span>
                 )}
               </div>
 
+              {/* Loading state: subtle, tranquil skeleton placeholders without duplicate spinners */}
               {isSearching && suggestions.length === 0 ? (
-                <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-2">
-                  <Loader2 className="w-5 h-5 animate-spin mx-auto text-vibe-accent" />
-                  <p>Searching Open Library for "{searchQuery}"...</p>
+                <div className="p-2 space-y-1">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="p-2.5 flex items-center gap-3 animate-pulse">
+                      <div className="w-10 h-14 rounded-md bg-vibe-border/60 flex-shrink-0" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-3.5 bg-vibe-border/60 rounded-md w-3/5" />
+                        <div className="h-2.5 bg-vibe-border/40 rounded-md w-2/5" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : suggestions.length > 0 ? (
                 <div className="divide-y divide-vibe-border/50">
