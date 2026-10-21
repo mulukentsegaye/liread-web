@@ -18,6 +18,8 @@ import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { AuthModal } from './components/auth/AuthModal';
 import { CelebrationToast } from './components/ui/CelebrationToast';
+import { WifiOff } from 'lucide-react';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useTimerStore } from './stores/timerStore';
 import { useAuthStore } from './stores/authStore';
 import { useFeedStore } from './stores/feedStore';
@@ -69,6 +71,7 @@ export const App: React.FC = () => {
   const { isFullScreenOpen, setFullScreenOpen, setBook, startTimer } = useTimerStore();
   const { user, isAuthenticated, isGuest, authReady, updateUser, initAuth } = useAuthStore();
   const { fetchPosts } = useFeedStore();
+  const isOnline = useOnlineStatus();
 
   // Settle initial tranquil page entrance
   useEffect(() => {
@@ -394,6 +397,13 @@ export const App: React.FC = () => {
       }}
     >
       {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
+
+      {!isOnline && (
+        <div className="w-full bg-amber-600 dark:bg-amber-700 text-white text-xs font-medium text-center py-1.5 px-4 flex items-center justify-center gap-2 shadow-xs transition-all">
+          <WifiOff className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>You are offline. Reading timer, cached summaries, and offline books remain accessible.</span>
+        </div>
+      )}
 
       {isGuest && (
         <div className="w-full bg-amber-500 text-white text-xs font-medium text-center py-1.5 px-4">
