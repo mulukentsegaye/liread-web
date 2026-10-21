@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight, WifiOff, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
-import { bookSearchService, SuggestedBook } from '../../services/bookSearchService';
+import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../../services/bookSearchService';
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -31,10 +31,43 @@ export const Header: React.FC<HeaderProps> = ({
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Core search execution logic
+  const executeSearch = useCallback(async (query: string, signal: AbortSignal) => {
+    // If the browser already knows it is offline, bypass network call immediately
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOffline(true);
+      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+      setSuggestions(localMatches);
+      setIsSearching(false);
+      return;
+    }
+
+    try {
+      const results = await bookSearchService.searchBooks(query, signal);
+      setSuggestions(results);
+      setIsOffline(false);
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        return;
+      }
+      if (isOfflineOrNetworkError(err)) {
+        setIsOffline(true);
+        const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+        setSuggestions(localMatches);
+      } else {
+        setSuggestions([]);
+        setIsOffline(false);
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
   // Debounced search on searchVal change
   useEffect(() => {
@@ -44,6 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
       setSuggestions([]);
       setIsSearching(false);
       setShowDropdown(false);
+      setIsOffline(false);
       return;
     }
 
@@ -56,24 +90,46 @@ export const Header: React.FC<HeaderProps> = ({
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    const timer = setTimeout(async () => {
-      try {
-        const results = await bookSearchService.searchBooks(query, controller.signal);
-        setSuggestions(results);
-      } catch (err: any) {
-        if (err.name !== 'AbortError') {
-          console.warn('Open Library search error in Header:', err);
-        }
-      } finally {
-        setIsSearching(false);
-      }
+    const timer = setTimeout(() => {
+      executeSearch(query, controller.signal);
     }, 320);
 
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [searchVal]);
+  }, [searchVal, executeSearch]);
+
+  // Network connectivity listener: auto-retry when coming back online
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      const query = searchVal.trim();
+      if (query.length >= 2 && showDropdown) {
+        setIsSearching(true);
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+        executeSearch(query, controller.signal);
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOffline(true);
+      const query = searchVal.trim();
+      if (query.length >= 2) {
+        const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+        setSuggestions(localMatches);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [searchVal, showDropdown, executeSearch]);
 
   // Click outside to dismiss search dropdown
   useEffect(() => {
@@ -105,7 +161,20 @@ export const Header: React.FC<HeaderProps> = ({
     setSearchVal('');
     setSuggestions([]);
     setShowDropdown(false);
+    setIsOffline(false);
     onSearch?.('');
+  };
+
+  const handleRetrySearch = () => {
+    const query = searchVal.trim();
+    if (query.length < 2) return;
+    setIsSearching(true);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    executeSearch(query, controller.signal);
   };
 
   const handleViewDetails = (book: SuggestedBook) => {
@@ -118,15 +187,30 @@ export const Header: React.FC<HeaderProps> = ({
 
     return (
       <div className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-96 overflow-y-auto backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+        {/* Header bar */}
         <div className="px-3.5 py-2.5 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-xs text-vibe-ink-muted font-medium">
-          <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
-            <BookOpen className="w-4 h-4 text-vibe-accent" />
-            Open Library Suggestions
-          </span>
+          {isOffline ? (
+            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+              <WifiOff className="w-4 h-4" />
+              Offline Search
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
+              <BookOpen className="w-4 h-4 text-vibe-accent" />
+              Open Library Suggestions
+            </span>
+          )}
+
           {isSearching ? (
             <span className="flex items-center gap-1.5 text-vibe-accent text-[11px]">
               <Loader2 className="w-3 h-3 animate-spin" />
               Searching...
+            </span>
+          ) : isOffline ? (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+              {suggestions.length > 0
+                ? `${suggestions.length} offline ${suggestions.length === 1 ? 'match' : 'matches'}`
+                : 'Offline'}
             </span>
           ) : (
             <span className="text-[11px] text-vibe-ink-muted">
@@ -135,12 +219,111 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
+        {/* Loading state */}
         {isSearching && suggestions.length === 0 ? (
           <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-2">
             <Loader2 className="w-5 h-5 animate-spin mx-auto text-vibe-accent" />
             <p>Searching Open Library for "{searchVal}"...</p>
           </div>
+        ) : isOffline ? (
+          /* Offline Mode State */
+          suggestions.length > 0 ? (
+            <div>
+              {/* Informational notice when offline but local catalog matches */}
+              <div className="px-3.5 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-2">
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <WifiOff className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                  <span className="truncate">You are offline. Showing matching offline books.</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRetrySearch}
+                  className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1 flex-shrink-0 cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Retry
+                </button>
+              </div>
+
+              {/* Book cards */}
+              <div className="divide-y divide-vibe-border/50">
+                {suggestions.map((book) => (
+                  <div
+                    key={book.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleViewDetails(book)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleViewDetails(book);
+                      }
+                    }}
+                    className="p-3 hover:bg-vibe-card-subtle/80 flex items-center justify-between gap-3 transition-colors group cursor-pointer outline-none focus-visible:bg-vibe-card-subtle"
+                    title={`View dedicated book page for "${book.title}"`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
+                        {book.coverThumbnailUrl ? (
+                          <img
+                            src={book.coverThumbnailUrl}
+                            alt={book.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                          {book.title}
+                        </p>
+                        <p className="text-[11px] text-vibe-ink-muted truncate">
+                          by {book.author}
+                          {book.firstPublishYear && (
+                            <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
+                              {book.firstPublishYear}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0 pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Offline and no local match: Inform user clearly that they are offline */
+            <div className="p-6 text-center text-xs space-y-3">
+              <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400 shadow-xs">
+                <WifiOff className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-vibe-ink text-sm">You are offline</p>
+                <p className="text-[11px] text-vibe-ink-muted max-w-xs mx-auto leading-relaxed">
+                  Open Library cannot be reached to search for <span className="font-semibold text-vibe-ink">"{searchVal}"</span> without an internet connection.
+                </p>
+              </div>
+              <div className="pt-1 flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={handleRetrySearch}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-vibe-accent text-white hover:bg-vibe-accent/90 transition-all shadow-xs active:scale-95 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Retry Search
+                </button>
+              </div>
+            </div>
+          )
         ) : suggestions.length > 0 ? (
+          /* Normal online suggestions list */
           <div className="divide-y divide-vibe-border/50">
             {suggestions.map((book) => (
               <div
@@ -196,6 +379,7 @@ export const Header: React.FC<HeaderProps> = ({
             ))}
           </div>
         ) : (
+          /* Normal online: no books found */
           <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-1">
             <p className="font-semibold text-vibe-ink">No books found for "{searchVal}"</p>
             <p className="text-[11px] text-vibe-ink-muted/80">Try checking the spelling or searching another title or author.</p>
@@ -213,7 +397,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           type="button"
           onClick={onGoToLanding}
-          className="flex items-center gap-2.5 flex-shrink-0 group outline-none"
+          className="flex items-center gap-2.5 flex-shrink-0 group outline-none cursor-pointer"
           title="Readers Hub — Home"
         >
           <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
@@ -227,7 +411,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Center Search Bar (md+) */}
         <div className="hidden md:flex flex-1 max-w-lg mx-auto relative" ref={desktopSearchRef}>
           <div className="relative w-full flex items-center">
-            <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
+            {isOffline ? (
+              <WifiOff className="absolute left-3.5 w-4 h-4 text-amber-500 pointer-events-none" strokeWidth={1.75} />
+            ) : (
+              <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
+            )}
             <input
               type="text"
               value={searchVal}
@@ -237,8 +425,12 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowDropdown(true);
                 }
               }}
-              placeholder="Search books, authors, passages..."
-              className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
+              placeholder={isOffline ? "Search offline books & authors..." : "Search books, authors, passages..."}
+              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2 rounded-xl border focus:outline-none transition-all ${
+                isOffline 
+                  ? 'border-amber-500/40 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15'
+                  : 'border-vibe-border focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/15'
+              }`}
             />
             {isSearching ? (
               <Loader2 className="absolute right-3 w-4 h-4 text-vibe-accent animate-spin" />
@@ -246,7 +438,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -267,7 +459,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onGoToLogin}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs cursor-pointer"
             >
               Sign In
             </button>
@@ -283,7 +475,7 @@ export const Header: React.FC<HeaderProps> = ({
               }
             }}
             aria-label="Search"
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
           >
             {isMobileSearchOpen ? (
               <X className="w-4.5 h-4.5" strokeWidth={2} />
@@ -310,7 +502,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={() => setNotificationsOpen(!isNotificationsOpen)}
               aria-label="Notifications"
-              className="relative w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+              className="relative w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
             >
               <Bell className="w-4.5 h-4.5" strokeWidth={1.75} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-vibe-secondary ring-1 ring-vibe-card" />
@@ -344,7 +536,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onGoToLogin}
-            className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-vibe-accent/40 transition-all active:scale-95 flex-shrink-0"
+            className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-vibe-accent/40 transition-all active:scale-95 flex-shrink-0 cursor-pointer"
             title={`${user?.fullName ?? 'Guest'} — Account settings`}
           >
             <img
@@ -361,7 +553,11 @@ export const Header: React.FC<HeaderProps> = ({
       {isMobileSearchOpen && (
         <div className="md:hidden px-4 pb-3 border-t border-vibe-border-subtle relative" ref={mobileSearchRef}>
           <div className="relative flex items-center mt-2">
-            <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
+            {isOffline ? (
+              <WifiOff className="absolute left-3.5 w-4 h-4 text-amber-500 pointer-events-none" strokeWidth={1.75} />
+            ) : (
+              <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
+            )}
             <input
               type="text"
               autoFocus
@@ -372,8 +568,12 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowDropdown(true);
                 }
               }}
-              placeholder="Search books, authors, passages..."
-              className="w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2.5 rounded-xl border border-vibe-border focus:border-vibe-accent focus:outline-none focus:ring-2 focus:ring-vibe-accent/15 transition-all"
+              placeholder={isOffline ? "Search offline books & authors..." : "Search books, authors, passages..."}
+              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2.5 rounded-xl border focus:outline-none transition-all ${
+                isOffline 
+                  ? 'border-amber-500/40 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15'
+                  : 'border-vibe-border focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/15'
+              }`}
             />
             {isSearching ? (
               <Loader2 className="absolute right-3 w-4 h-4 text-vibe-accent animate-spin" />
@@ -381,7 +581,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
