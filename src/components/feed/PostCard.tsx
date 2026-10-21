@@ -70,8 +70,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-sans text-[13.5px] font-medium text-vibe-ink">{post.authorName}</span>
-              <span className="text-xs text-vibe-ink-muted">{post.actionText}</span>
+              <span className="font-sans text-[13.5px] font-medium text-vibe-ink truncate">{post.authorName}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="font-mono text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
