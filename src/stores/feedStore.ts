@@ -157,12 +157,29 @@ export const useFeedStore = create<FeedStore>()(
       },
     }),
     {
-      name: 'readers_hub_feed_state_v2',
+      name: 'readers_hub_feed_state_v3',
       partialize: (state) => ({
         posts: state.posts,
         feedTab: state.feedTab,
         sortBy: state.sortBy,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        // Automatically sync demo posts to authentic Open Library book covers
+        const currentPosts = state.posts || [];
+        const hasOutdatedDemoCover = currentPosts.some(
+          (p) => p.id.startsWith('demo-post-') && p.coverImageUrl?.includes('unsplash.com')
+        );
+        if (hasOutdatedDemoCover) {
+          state.posts = currentPosts.map((p) => {
+            if (p.id.startsWith('demo-post-')) {
+              const freshDemo = DEMO_POSTS.find((d) => d.id === p.id);
+              if (freshDemo) return { ...p, coverImageUrl: freshDemo.coverImageUrl };
+            }
+            return p;
+          });
+        }
+      },
     }
   )
 );

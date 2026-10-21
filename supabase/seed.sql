@@ -848,7 +848,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'The Creative Act: A Way of Being',
         'Rick Rubin',
-        'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/13316390-L.jpg',
         'currently_reading',
         68,
         5.0
@@ -857,7 +857,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Meditations',
         'Marcus Aurelius',
-        'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/12818862-L.jpg',
         'currently_reading',
         42,
         4.8
@@ -866,7 +866,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Before the Coffee Gets Cold',
         'Toshikazu Kawaguchi',
-        'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/10313327-L.jpg',
         'finished',
         100,
         4.5
@@ -875,7 +875,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Atomic Habits',
         'James Clear',
-        'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/12539702-L.jpg',
         'finished',
         100,
         5.0
@@ -884,7 +884,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Klara and the Sun',
         'Kazuo Ishiguro',
-        'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/10542385-L.jpg',
         'want_to_read',
         0,
         NULL
@@ -893,7 +893,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Tomorrow, and Tomorrow, and Tomorrow',
         'Gabrielle Zevin',
-        'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/12836262-L.jpg',
         'want_to_read',
         0,
         NULL
@@ -904,7 +904,7 @@ VALUES
         'b2222222-2222-2222-2222-222222222222',
         'War and Peace',
         'Leo Tolstoy',
-        'https://images.unsplash.com/photo-1476275466078-4007374efbbe?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/10541987-L.jpg',
         'currently_reading',
         82,
         5.0
@@ -913,7 +913,7 @@ VALUES
         'b2222222-2222-2222-2222-222222222222',
         'The Brothers Karamazov',
         'Fyodor Dostoevsky',
-        'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=400&q=80',
+        'https://covers.openlibrary.org/b/id/8235114-L.jpg',
         'finished',
         100,
         5.0
