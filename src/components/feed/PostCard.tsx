@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star, BookOpen, Clock } from 'lucide-react';
+import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star, BookOpen } from 'lucide-react';
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -105,28 +105,24 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
       <div className="px-5 pt-4">
         <div className="flex gap-4 items-stretch">
 
-          {/* Book cover */}
+          {/* Book cover & info trigger */}
           <div
             className="flex-shrink-0 w-[72px] cursor-pointer group/cover"
-            onClick={() => onSelectBookForTimer?.(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
-            title={`Read "${post.bookTitle}" with timer`}
+            onClick={() => onViewBookDetails?.(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
+            title={`View "${post.bookTitle}" details`}
           >
             {post.coverImageUrl ? (
-              <div className="relative w-[72px] h-[100px] rounded-lg overflow-hidden shadow-md ring-1 ring-black/10 group-hover/cover:shadow-lg group-hover/cover:scale-[1.02] transition-all duration-300">
+              <div className="relative w-[72px] h-[100px] rounded-lg overflow-hidden shadow-md ring-1 ring-black/10 group-hover/cover:shadow-lg transition-shadow duration-300">
                 <img
                   src={post.coverImageUrl}
                   alt={post.bookTitle}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-                {/* Timer overlay on hover */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" strokeWidth={2} />
-                </div>
               </div>
             ) : (
               <div
-                className="relative w-[72px] h-[100px] rounded-lg shadow-md ring-1 ring-black/10 flex flex-col items-center justify-between p-2.5 group-hover/cover:scale-[1.02] transition-all duration-300 overflow-hidden"
+                className="relative w-[72px] h-[100px] rounded-lg shadow-md ring-1 ring-black/10 flex flex-col items-center justify-between p-2.5 group-hover/cover:shadow-lg transition-shadow duration-300 overflow-hidden"
                 style={{ backgroundColor: coverBg }}
               >
                 {/* Spine line */}
@@ -137,23 +133,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
                 <span className="text-[8px] opacity-60 text-center z-10" style={{ color: coverAccent }}>
                   {post.bookAuthor}
                 </span>
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/cover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" strokeWidth={2} />
-                </div>
               </div>
             )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewBookDetails?.(post.bookTitle, post.bookAuthor, post.coverImageUrl);
-              }}
-              className="text-[10px] text-vibe-ink-muted hover:text-vibe-accent text-center mt-1.5 leading-tight line-clamp-2 transition-colors cursor-pointer block w-full hover:underline"
-              title={`View book info & AI summary for "${post.bookTitle}"`}
+            <p
+              className="text-[10px] text-vibe-ink-muted group-hover/cover:text-vibe-accent text-center mt-1.5 leading-tight line-clamp-2 transition-colors cursor-pointer block w-full group-hover/cover:underline"
             >
               {post.bookTitle}
-            </button>
+            </p>
           </div>
 
           {/* Quote block */}

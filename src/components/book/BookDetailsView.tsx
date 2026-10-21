@@ -26,6 +26,7 @@ interface BookDetailsViewProps {
   onBack: () => void;
   onStartTimer: (title: string, author: string, cover?: string) => void;
   onShareBook: (book: { title: string; author: string; coverImageUrl?: string }) => void;
+  onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
 export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
@@ -33,6 +34,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   onBack,
   onStartTimer,
   onShareBook,
+  onViewBookDetails,
 }) => {
   const { user, isGuest } = useAuthStore();
   const { posts } = useFeedStore();
@@ -614,6 +616,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   key={post.id}
                   post={post}
                   onSelectBookForTimer={onStartTimer}
+                  onViewBookDetails={onViewBookDetails}
                 />
               ))}
             </div>

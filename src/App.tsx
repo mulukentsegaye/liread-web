@@ -464,6 +464,9 @@ export const App: React.FC = () => {
                 onBack={() => handleTabChange(previousTab || 'feed')}
                 onStartTimer={handleSelectBookForTimer}
                 onShareBook={handleOpenCreateModal}
+                onViewBookDetails={(title, author, cover) =>
+                  handleViewBookDetails({ title, author, coverImageUrl: cover })
+                }
               />
             )}
 
