@@ -27,7 +27,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
   const [activeSubTab, setActiveSubTab] = useState<'bookshelf' | 'saved'>(initialTab);
   const { user, isGuest } = useAuthStore();
   const { posts } = useFeedStore();
-  const { setBook, startTimer, setFullScreenOpen } = useTimerStore();
+  const { setBook, startTimer, setFullScreenOpen, prepareTimerForBook } = useTimerStore();
   const [dbBooks, setDbBooks] = useState<BookshelfItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -72,9 +72,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
   })) : (isGuest ? demoBooks : []);
 
   const handleStartTimerForBook = (title: string, author: string, cover?: string) => {
-    setBook(title, author, cover);
-    startTimer(title, author);
-    setFullScreenOpen(true);
+    prepareTimerForBook(title, author, cover);
   };
 
   return (
@@ -148,9 +146,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
                         {isFinished && <Check className="w-2.5 h-2.5 stroke-[3]" />}{b.status}
                       </span>
                     </div>
-                    <button onClick={() => handleStartTimerForBook(b.title, b.author, b.coverUrl)} className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px] text-white font-medium text-xs gap-1.5" title={`Start timer for ${b.title}`}>
-                      <div className="w-10 h-10 rounded-full bg-vibe-accent flex items-center justify-center text-white shadow-lg"><Play className="w-4 h-4 fill-current ml-0.5" /></div>
-                    </button>
+                    <button onClick={() => onViewBookDetails?.(b.title, b.author, b.coverUrl)} className="absolute inset-0 cursor-pointer" title={`View "${b.title}" details`}></button>
                   </div>
                   <div className="space-y-3">
                     <div>

@@ -18,6 +18,7 @@ interface TimerStore {
   stopTimer: () => number; // returns elapsed minutes
   resetTimer: () => void;
   setBook: (title: string, author: string, note?: string, cover?: string) => void;
+  prepareTimerForBook: (title: string, author: string, cover?: string) => void;
   setFullScreenOpen: (isOpen: boolean) => void;
   getElapsedSeconds: () => number;
 }
@@ -101,6 +102,21 @@ export const useTimerStore = create<TimerStore>()(
           bookAuthor: author,
           subtitleNote: note || `${author} - A little time, well spent.`,
           coverImageUrl: cover,
+        });
+      },
+
+      prepareTimerForBook: (title, author, cover) => {
+        const current = get();
+        const isSameBook = current.bookTitle.toLowerCase() === (title || '').toLowerCase();
+        set({
+          isRunning: false,
+          startTime: null,
+          accumulatedSeconds: isSameBook ? current.accumulatedSeconds : 0,
+          bookTitle: title || current.bookTitle,
+          bookAuthor: author || current.bookAuthor,
+          subtitleNote: `${author || current.bookAuthor} - A little time, well spent.`,
+          coverImageUrl: cover !== undefined ? cover : current.coverImageUrl,
+          isFullScreenOpen: true,
         });
       },
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Compass, 
   Sparkles, 
@@ -8,7 +8,11 @@ import {
   ChevronRight, 
   TrendingUp, 
   Flame, 
-  Filter
+  Filter,
+  Search,
+  Loader2,
+  X,
+  WifiOff
 } from 'lucide-react';
 import { 
   CURATED_BOOKS, 
@@ -17,6 +21,11 @@ import {
   CuratedBook, 
   SPOTLIGHT_BOOK 
 } from '../../data/curatedBooks';
+import { 
+  bookSearchService, 
+  SuggestedBook, 
+  isOfflineOrNetworkError 
+} from '../../services/bookSearchService';
 
 interface ExploreViewProps {
   onViewBookDetails: (book: {
@@ -36,6 +45,101 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   onStartTimer,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<CuratedCategory>('All');
+
+  // Open Library interactive search state for the dedicated Explore search bar
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setSuggestions([]);
+      setIsSearching(false);
+      setIsOffline(false);
+      return;
+    }
+
+    setIsSearching(true);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // Check offline immediately
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOffline(true);
+      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+      setSuggestions(localMatches);
+      setIsSearching(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const results = await bookSearchService.searchBooks(query, controller.signal);
+        setSuggestions(results);
+        setIsOffline(false);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          if (isOfflineOrNetworkError(err)) {
+            setIsOffline(true);
+            const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+            setSuggestions(localMatches);
+          } else {
+            console.warn('Search error in ExploreView:', err);
+          }
+        }
+      } finally {
+        setIsSearching(false);
+      }
+    }, 320);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [searchQuery]);
+
+  // Click outside listener to dismiss search results dropdown
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  const handleSelectBook = (book: SuggestedBook) => {
+    setShowResults(false);
+    onViewBookDetails({
+      title: book.title,
+      author: book.author,
+      coverImageUrl: book.coverImageUrl,
+      firstPublishYear: book.firstPublishYear,
+      workKey: book.workKey,
+    });
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSuggestions([]);
+    setShowResults(false);
+    setIsSearching(false);
+  };
 
   // Filter books according to selected category
   const filteredBooks = selectedCategory === 'All'
@@ -344,15 +448,140 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         </div>
       )}
 
-      {/* Gentle Footer Invitation */}
-      <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 text-center space-y-3 shadow-soft">
-        <Sparkles className="w-6 h-6 text-vibe-accent mx-auto" />
-        <h3 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
-          Looking for a specific book?
-        </h3>
-        <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto leading-relaxed">
-          Use the search bar at the very top of your screen to search millions of books on Open Library with live cover previews and AI summaries.
-        </p>
+      {/* Looking for a specific book? Card with Integrated Search Bar */}
+      <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 text-center space-y-5 shadow-soft relative overflow-visible">
+        <div className="space-y-2">
+          <Sparkles className="w-6 h-6 text-vibe-accent mx-auto" />
+          <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink tracking-tight">
+            Looking for a specific book?
+          </h3>
+          <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto leading-relaxed">
+            Search millions of books on Open Library with live cover previews and AI summaries.
+          </p>
+        </div>
+
+        {/* Integrated Search Bar */}
+        <div ref={searchContainerRef} className="max-w-xl mx-auto relative text-left">
+          <div className="relative flex items-center">
+            <Search className="w-4 h-4 text-vibe-ink-muted absolute left-4 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowResults(true);
+              }}
+              onFocus={() => {
+                if (searchQuery.trim().length >= 2) setShowResults(true);
+              }}
+              placeholder="Search by title, author, or keyword (e.g. Sapiens, Virginia Woolf)..."
+              className="w-full h-12 pl-11 pr-11 rounded-2xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all shadow-xs"
+            />
+            {isSearching ? (
+              <Loader2 className="w-4 h-4 text-vibe-accent animate-spin absolute right-4 pointer-events-none" />
+            ) : searchQuery ? (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+                className="absolute right-3.5 p-1 rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            ) : null}
+          </div>
+
+          {/* Results Dropdown */}
+          {showResults && searchQuery.trim().length >= 2 && (
+            <div className="absolute left-0 right-0 top-full mt-2 z-30 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-80 overflow-y-auto backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+              <div className="px-3.5 py-2.5 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-xs text-vibe-ink-muted font-medium">
+                {isOffline ? (
+                  <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                    <WifiOff className="w-3.5 h-3.5" />
+                    Offline Search
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
+                    <BookOpen className="w-4 h-4 text-vibe-accent" />
+                    Open Library Results
+                  </span>
+                )}
+                {isSearching ? (
+                  <span className="flex items-center gap-1.5 text-vibe-accent text-[11px]">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Searching...
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-vibe-ink-muted">
+                    {suggestions.length} {suggestions.length === 1 ? 'book' : 'books'} found
+                  </span>
+                )}
+              </div>
+
+              {isSearching && suggestions.length === 0 ? (
+                <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-2">
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto text-vibe-accent" />
+                  <p>Searching Open Library for "{searchQuery}"...</p>
+                </div>
+              ) : suggestions.length > 0 ? (
+                <div className="divide-y divide-vibe-border/50">
+                  {suggestions.map((book) => (
+                    <div
+                      key={book.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleSelectBook(book)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSelectBook(book);
+                        }
+                      }}
+                      className="p-3 hover:bg-vibe-card-subtle/80 flex items-center justify-between gap-3 transition-colors group cursor-pointer outline-none focus-visible:bg-vibe-card-subtle text-left"
+                      title={`View book details for "${book.title}"`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
+                          {book.coverThumbnailUrl ? (
+                            <img
+                              src={book.coverThumbnailUrl}
+                              alt={book.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                            {book.title}
+                          </p>
+                          <p className="text-[11px] text-vibe-ink-muted truncate">
+                            by {book.author}
+                            {book.firstPublishYear && (
+                              <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
+                                {book.firstPublishYear}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0 pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-1">
+                  <p className="font-semibold text-vibe-ink">No books found for "{searchQuery}"</p>
+                  <p className="text-[11px] text-vibe-ink-muted/80">Try checking the spelling or searching another title or author.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
     </div>

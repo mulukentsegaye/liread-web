@@ -68,7 +68,7 @@ export const App: React.FC = () => {
   } | null>(null);
 
   const { isPopoverOpen, closePopover, theme } = useTheme();
-  const { isFullScreenOpen, setFullScreenOpen, setBook, startTimer } = useTimerStore();
+  const { isFullScreenOpen, setFullScreenOpen, setBook, startTimer, prepareTimerForBook } = useTimerStore();
   const { user, isAuthenticated, isGuest, authReady, updateUser, initAuth } = useAuthStore();
   const { fetchPosts } = useFeedStore();
   const isOnline = useOnlineStatus();
@@ -280,9 +280,7 @@ export const App: React.FC = () => {
   };
 
   const handleSelectBookForTimer = (title: string, author: string, cover?: string) => {
-    setBook(title, author, undefined, cover);
-    startTimer(title, author, cover);
-    setFullScreenOpen(true);
+    prepareTimerForBook(title, author, cover);
   };
 
   const handleAdjustGoal = () => {

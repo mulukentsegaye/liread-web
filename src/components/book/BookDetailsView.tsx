@@ -29,6 +29,110 @@ interface BookDetailsViewProps {
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
+
+function renderFormattedInline(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    const token = match[0];
+    if (token.startsWith('**') && token.endsWith('**')) {
+      parts.push(
+        <strong key={match.index} className="font-semibold text-vibe-ink">
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (token.startsWith('*') && token.endsWith('*')) {
+      parts.push(
+        <em key={match.index} className="italic text-vibe-ink/90">
+          {token.slice(1, -1)}
+        </em>
+      );
+    }
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
+function renderMarkdownSynopsis(rawContent: string, fontClass: string): React.ReactNode {
+  let clean = rawContent
+    .replace(/\r\n/g, '\n')
+    .replace(/###\s*How to Apply These Insights Today[\s\S]*/gi, '')
+    .replace(/1\.\s*\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+    .replace(/\*\*Establish a Daily Sanctuary\*\*[\s\S]*/gi, '')
+    .trim();
+
+  // Ensure double newline before and after headings
+  clean = clean.replace(/([^\n])\n(###\s+)/g, '$1\n\n$2');
+  clean = clean.replace(/(###[^\n]+)\n([^\n#])/g, '$1\n\n$2');
+
+  const blocks = clean.split(/\n\n+/).filter((b) => b.trim().length > 0);
+
+  return (
+    <div className="space-y-4">
+      {blocks.map((block, idx) => {
+        const trimmed = block.trim();
+
+        // 1. Heading block (### Title)
+        if (trimmed.startsWith('### ')) {
+          const headingText = trimmed.replace(/^###\s+/, '');
+          return (
+            <h4
+              key={idx}
+              className="font-heading text-base sm:text-lg font-bold text-vibe-ink pt-4 pb-1 border-b border-vibe-border/40 tracking-tight"
+            >
+              {headingText}
+            </h4>
+          );
+        }
+
+        // 2. Check if block contains list items (e.g. 1. **Title**: ... or - **Title**: ...)
+        const lines = trimmed.split('\n').filter((l) => l.trim().length > 0);
+        const isList = lines.length > 1 && lines.every((l) => /^(\d+\.|\-|\*)\s+/.test(l.trim()));
+
+        if (isList) {
+          return (
+            <div key={idx} className="space-y-2.5 my-3 pl-1">
+              {lines.map((line, lIdx) => {
+                const m = line.trim().match(/^(\d+\.|\-|\*)\s+(.*)/);
+                const prefix = m ? m[1] : '';
+                const body = m ? m[2] : line;
+                return (
+                  <div key={lIdx} className="flex items-start gap-2.5">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-md bg-vibe-accent-subtle text-vibe-accent font-mono text-[11px] font-bold flex items-center justify-center mt-0.5">
+                      {prefix.replace(/\./, '')}
+                    </span>
+                    <div className={`${fontClass} leading-relaxed`}>
+                      {renderFormattedInline(body)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        // 3. Regular paragraph
+        return (
+          <p key={idx} className={`${fontClass} leading-relaxed`}>
+            {renderFormattedInline(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   book,
   onBack,
@@ -50,6 +154,27 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   // Bookshelf status state
   const [bookshelfStatus, setBookshelfStatus] = useState<'none' | 'want_to_read' | 'currently_reading' | 'finished'>('none');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+
+  // Reading typography vibe: 'serif' (Newsreader) or 'sans' (Inter)
+  const [readingFont, setReadingFont] = useState<'serif' | 'sans'>(() => {
+    try {
+      return (localStorage.getItem('readers_hub_reading_font') as 'serif' | 'sans') || 'serif';
+    } catch {
+      return 'serif';
+    }
+  });
+
+  const handleFontChange = (font: 'serif' | 'sans') => {
+    setReadingFont(font);
+    try {
+      localStorage.setItem('readers_hub_reading_font', font);
+    } catch {}
+  };
+
+  const bodyFontClass =
+    readingFont === 'serif'
+      ? 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90 selection:bg-vibe-accent/20'
+      : 'font-sans text-sm sm:text-base leading-relaxed text-vibe-ink-secondary selection:bg-vibe-accent/20';
 
   const summarySectionRef = useRef<HTMLDivElement>(null);
 
@@ -163,7 +288,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           
           {/* Left: Book Cover Showcase */}
           <div className="md:col-span-4 flex flex-col items-center">
-            <div className="relative group w-36 sm:w-44 h-52 sm:h-64 rounded-2xl overflow-hidden shadow-2xl border border-vibe-border bg-vibe-card-subtle transition-transform duration-300 group-hover:scale-[1.02]">
+            <div className="relative w-36 sm:w-44 h-52 sm:h-64 rounded-2xl overflow-hidden shadow-sm border border-vibe-border bg-vibe-card-subtle">
               {detailedBook.coverImageUrl ? (
                 <img
                   src={detailedBook.coverImageUrl}
