@@ -1,4 +1,5 @@
 import { BookDetailsData } from '../types';
+import { CURATED_BOOKS, SPOTLIGHT_BOOK } from '../data/curatedBooks';
 
 export interface SuggestedBook {
   id: string;
@@ -11,15 +12,64 @@ export interface SuggestedBook {
   workKey?: string;
 }
 
+/**
+ * Custom error thrown when a book search request fails specifically because
+ * the device has no internet connection or network connectivity was lost.
+ */
+export class OfflineSearchError extends Error {
+  readonly isOffline = true;
+
+  constructor(message = 'Network connection is offline') {
+    super(message);
+    this.name = 'OfflineSearchError';
+    Object.setPrototypeOf(this, OfflineSearchError.prototype);
+  }
+}
+
+/**
+ * Helper to identify whether an error originated from offline status or broken network pipe.
+ */
+export function isOfflineOrNetworkError(err: unknown): boolean {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return true;
+  }
+  if (err && typeof err === 'object') {
+    if ('isOffline' in err && (err as any).isOffline === true) {
+      return true;
+    }
+    if ((err as any).name === 'OfflineSearchError') {
+      return true;
+    }
+  }
+  if (err instanceof TypeError) {
+    const msg = err.message.toLowerCase();
+    return (
+      msg.includes('fetch') ||
+      msg.includes('network') ||
+      msg.includes('failed') ||
+      msg.includes('offline') ||
+      msg.includes('load') ||
+      msg.includes('internet')
+    );
+  }
+  return false;
+}
+
 export const bookSearchService = {
   /**
    * Search Open Library by query string and return normalized book suggestions
    * with high-resolution and thumbnail cover image URLs.
+   * Throws `OfflineSearchError` when offline so UI can accurately explain
+   * that connection is missing instead of reporting "book not found".
    */
   async searchBooks(query: string, signal?: AbortSignal): Promise<SuggestedBook[]> {
     const trimmed = query.trim();
     if (!trimmed || trimmed.length < 2) {
       return [];
+    }
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      throw new OfflineSearchError('You are currently offline');
     }
 
     const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&limit=8`;
@@ -43,9 +93,6 @@ export const bookSearchService = {
         let coverThumbnailUrl: string | undefined;
 
         if (doc.cover_i) {
-          // Open Library Cover API by Cover ID:
-          // -L is large / high-resolution
-          // -M is medium (ideal for thumbnails / cards)
           coverImageUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
           coverThumbnailUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`;
         } else if (doc.cover_edition_key) {
@@ -69,12 +116,52 @@ export const bookSearchService = {
       });
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        // Request cancelled by user typing faster
-        return [];
+        throw err;
+      }
+      if (isOfflineOrNetworkError(err)) {
+        throw new OfflineSearchError('Open Library search failed because you are offline');
       }
       console.warn('Open Library search error:', err);
       return [];
     }
+  },
+
+  /**
+   * Search local curated catalog when offline so famous books still show up
+   * even without an internet connection.
+   */
+  searchLocalCuratedBooks(query: string): SuggestedBook[] {
+    const trimmed = query.toLowerCase().trim();
+    if (!trimmed) return [];
+
+    const allCurated = [SPOTLIGHT_BOOK, ...CURATED_BOOKS];
+    const seen = new Set<string>();
+    const matches: SuggestedBook[] = [];
+
+    for (const b of allCurated) {
+      const normTitle = b.title.toLowerCase();
+      const normAuthor = b.author.toLowerCase();
+      if (seen.has(normTitle)) continue;
+
+      if (
+        normTitle.includes(trimmed) ||
+        normAuthor.includes(trimmed) ||
+        trimmed.includes(normTitle)
+      ) {
+        seen.add(normTitle);
+        matches.push({
+          id: b.id,
+          title: b.title,
+          author: b.author,
+          coverImageUrl: b.coverImageUrl,
+          coverThumbnailUrl: b.coverImageUrl,
+          firstPublishYear: b.firstPublishYear,
+          workKey: b.workKey,
+        });
+      }
+    }
+
+    return matches;
   },
 
   /**
@@ -91,6 +178,25 @@ export const bookSearchService = {
     let publishYear: number | undefined;
     let description: string | undefined;
     let subjects: string[] = [];
+
+    // If offline, check local curated collection first
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const match = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
+        (b) => b.title.toLowerCase() === title.toLowerCase()
+      );
+      if (match) {
+        return {
+          title: match.title,
+          author: match.author,
+          coverImageUrl: match.coverImageUrl || resolvedCover,
+          firstPublishYear: match.firstPublishYear,
+          workKey: match.workKey || resolvedWorkKey,
+          description: match.tagline,
+          subjects: [match.categoryLabel],
+          ratingAverage: match.ratingAverage,
+        };
+      }
+    }
 
     try {
       // If workKey is not known, query search to resolve it
