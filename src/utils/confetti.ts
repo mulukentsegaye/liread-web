@@ -1,7 +1,7 @@
 import confetti from 'canvas-confetti';
 
 /**
- * Triggers a tasteful, celebratory burst of confetti matching the Readers Hub brand palette.
+ * Triggers a tasteful, celebratory burst of confetti matching the Liread brand palette.
  */
 export function triggerCelebrationConfetti(): void {
   // Respect prefers-reduced-motion
@@ -9,7 +9,7 @@ export function triggerCelebrationConfetti(): void {
     return;
   }
 
-  // Readers Hub Palette: Mint-Emerald, Deep Emerald, Gold, Sky, Rose
+  // Liread Palette: Mint-Emerald, Deep Emerald, Gold, Sky, Rose
   const colors = ['#059669', '#34D399', '#10B981', '#FBBF24', '#F59E0B', '#38BDF8', '#F43F5E'];
 
   // Burst 1: Center upward fountain

@@ -137,7 +137,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <h2 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
                   {tab === 'account' 
                     ? (isGuest ? 'Guest Account' : 'Your Account')
-                    : (tab === 'signup' ? 'Create Reader Account' : 'Sign In to Readers Hub')}
+                    : (tab === 'signup' ? 'Create Reader Account' : 'Sign In to Liread')}
                 </h2>
               </div>
             </div>

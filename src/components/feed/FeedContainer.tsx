@@ -71,7 +71,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
       >
         <img
           src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
-          alt={isRealUser ? (user?.fullName ?? 'User avatar') : 'Readers Hub avatar'}
+          alt={isRealUser ? (user?.fullName ?? 'User avatar') : 'Liread avatar'}
           className="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
         />
         <div className="flex-1 min-w-0">

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Readers Hub - Remove the verification account created during integration
+-- Liread - Remove the verification account created during integration
 -- ==============================================================================
 -- This removes the single account created while wiring up Supabase auth, so the
 -- database contains only accounts that real readers sign up for themselves.

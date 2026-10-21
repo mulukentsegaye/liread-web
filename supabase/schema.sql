@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Readers Hub - Supabase Database Schema, Indexes, RLS Policies & Triggers
+-- Liread - Supabase Database Schema, Indexes, RLS Policies & Triggers
 -- ==============================================================================
 
 -- 1. EXTENSIONS

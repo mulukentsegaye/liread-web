@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Readers Hub - Complete Supabase Setup & Demo Accounts Seed Script
+-- Liread - Complete Supabase Setup & Demo Accounts Seed Script
 -- ==============================================================================
 -- This script is 100% self-contained and idempotent. It:
 --   1. Ensures required PostgreSQL extensions exist (uuid-ossp, pgcrypto).
@@ -16,11 +16,11 @@
 --   5. Creates RPC aggregation functions (get_daily/weekly/lifetime_leaderboard).
 --   6. Configures public storage buckets (book-covers, avatars).
 --   7. Seeds 5 authentic demo accounts with password 'Password123!':
---        - demo@readershub.com (Primary Demo User: Alex Miller)
---        - elena@readershub.com (Elena Rostova - Master of Tomes)
---        - marcus@readershub.com (Marcus Vance - Literary Scholar)
---        - sophia@readershub.com (Sophia Chen - Bookworm)
---        - lucas@readershub.com (Lucas Gray - Novice Reader)
+--        - demo@liread.com (Primary Demo User: Alex Miller)
+--        - elena@liread.com (Elena Rostova - Master of Tomes)
+--        - marcus@liread.com (Marcus Vance - Literary Scholar)
+--        - sophia@liread.com (Sophia Chen - Bookworm)
+--        - lucas@liread.com (Lucas Gray - Novice Reader)
 --   8. Seeds realistic reading sessions (powers the 7-day chart & daily goal gauge).
 --   9. Seeds bookshelf library items, community posts, bookmarks, and comments.
 -- ==============================================================================
@@ -583,7 +583,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'authenticated',
         'authenticated',
-        'demo@readershub.com',
+        'demo@liread.com',
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
@@ -597,7 +597,7 @@ VALUES
         'b2222222-2222-2222-2222-222222222222',
         'authenticated',
         'authenticated',
-        'elena@readershub.com',
+        'elena@liread.com',
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
@@ -611,7 +611,7 @@ VALUES
         'c3333333-3333-3333-3333-333333333333',
         'authenticated',
         'authenticated',
-        'marcus@readershub.com',
+        'marcus@liread.com',
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
@@ -625,7 +625,7 @@ VALUES
         'd4444444-4444-4444-4444-444444444444',
         'authenticated',
         'authenticated',
-        'sophia@readershub.com',
+        'sophia@liread.com',
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
@@ -639,7 +639,7 @@ VALUES
         'e5555555-5555-5555-5555-555555555555',
         'authenticated',
         'authenticated',
-        'lucas@readershub.com',
+        'lucas@liread.com',
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
@@ -660,20 +660,20 @@ BEGIN
     ) THEN
         INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
         VALUES 
-            ('a1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', jsonb_build_object('sub', 'a1111111-1111-1111-1111-111111111111', 'email', 'demo@readershub.com'), 'email', 'a1111111-1111-1111-1111-111111111111', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('b2222222-2222-2222-2222-222222222222', 'b2222222-2222-2222-2222-222222222222', jsonb_build_object('sub', 'b2222222-2222-2222-2222-222222222222', 'email', 'elena@readershub.com'), 'email', 'b2222222-2222-2222-2222-222222222222', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('c3333333-3333-3333-3333-333333333333', 'c3333333-3333-3333-3333-333333333333', jsonb_build_object('sub', 'c3333333-3333-3333-3333-333333333333', 'email', 'marcus@readershub.com'), 'email', 'c3333333-3333-3333-3333-333333333333', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('d4444444-4444-4444-4444-444444444444', 'd4444444-4444-4444-4444-444444444444', jsonb_build_object('sub', 'd4444444-4444-4444-4444-444444444444', 'email', 'sophia@readershub.com'), 'email', 'd4444444-4444-4444-4444-444444444444', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('e5555555-5555-5555-5555-555555555555', 'e5555555-5555-5555-5555-555555555555', jsonb_build_object('sub', 'e5555555-5555-5555-5555-555555555555', 'email', 'lucas@readershub.com'), 'email', 'e5555555-5555-5555-5555-555555555555', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now()))
+            ('a1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', jsonb_build_object('sub', 'a1111111-1111-1111-1111-111111111111', 'email', 'demo@liread.com'), 'email', 'a1111111-1111-1111-1111-111111111111', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('b2222222-2222-2222-2222-222222222222', 'b2222222-2222-2222-2222-222222222222', jsonb_build_object('sub', 'b2222222-2222-2222-2222-222222222222', 'email', 'elena@liread.com'), 'email', 'b2222222-2222-2222-2222-222222222222', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('c3333333-3333-3333-3333-333333333333', 'c3333333-3333-3333-3333-333333333333', jsonb_build_object('sub', 'c3333333-3333-3333-3333-333333333333', 'email', 'marcus@liread.com'), 'email', 'c3333333-3333-3333-3333-333333333333', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('d4444444-4444-4444-4444-444444444444', 'd4444444-4444-4444-4444-444444444444', jsonb_build_object('sub', 'd4444444-4444-4444-4444-444444444444', 'email', 'sophia@liread.com'), 'email', 'd4444444-4444-4444-4444-444444444444', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('e5555555-5555-5555-5555-555555555555', 'e5555555-5555-5555-5555-555555555555', jsonb_build_object('sub', 'e5555555-5555-5555-5555-555555555555', 'email', 'lucas@liread.com'), 'email', 'e5555555-5555-5555-5555-555555555555', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now()))
         ON CONFLICT (id) DO NOTHING;
     ELSE
         INSERT INTO auth.identities (id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
         VALUES 
-            ('a1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', jsonb_build_object('sub', 'a1111111-1111-1111-1111-111111111111', 'email', 'demo@readershub.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('b2222222-2222-2222-2222-222222222222', 'b2222222-2222-2222-2222-222222222222', jsonb_build_object('sub', 'b2222222-2222-2222-2222-222222222222', 'email', 'elena@readershub.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('c3333333-3333-3333-3333-333333333333', 'c3333333-3333-3333-3333-333333333333', jsonb_build_object('sub', 'c3333333-3333-3333-3333-333333333333', 'email', 'marcus@readershub.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('d4444444-4444-4444-4444-444444444444', 'd4444444-4444-4444-4444-444444444444', jsonb_build_object('sub', 'd4444444-4444-4444-4444-444444444444', 'email', 'sophia@readershub.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
-            ('e5555555-5555-5555-5555-555555555555', 'e5555555-5555-5555-5555-555555555555', jsonb_build_object('sub', 'e5555555-5555-5555-5555-555555555555', 'email', 'lucas@readershub.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now()))
+            ('a1111111-1111-1111-1111-111111111111', 'a1111111-1111-1111-1111-111111111111', jsonb_build_object('sub', 'a1111111-1111-1111-1111-111111111111', 'email', 'demo@liread.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('b2222222-2222-2222-2222-222222222222', 'b2222222-2222-2222-2222-222222222222', jsonb_build_object('sub', 'b2222222-2222-2222-2222-222222222222', 'email', 'elena@liread.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('c3333333-3333-3333-3333-333333333333', 'c3333333-3333-3333-3333-333333333333', jsonb_build_object('sub', 'c3333333-3333-3333-3333-333333333333', 'email', 'marcus@liread.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('d4444444-4444-4444-4444-444444444444', 'd4444444-4444-4444-4444-444444444444', jsonb_build_object('sub', 'd4444444-4444-4444-4444-444444444444', 'email', 'sophia@liread.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now())),
+            ('e5555555-5555-5555-5555-555555555555', 'e5555555-5555-5555-5555-555555555555', jsonb_build_object('sub', 'e5555555-5555-5555-5555-555555555555', 'email', 'lucas@liread.com'), 'email', timezone('utc'::text, now()), timezone('utc'::text, now()), timezone('utc'::text, now()))
         ON CONFLICT (id) DO NOTHING;
     END IF;
 EXCEPTION WHEN OTHERS THEN
@@ -843,7 +843,7 @@ INSERT INTO public.bookshelf (
     rating
 )
 VALUES
-    -- Alex Miller's Bookshelf (demo@readershub.com)
+    -- Alex Miller's Bookshelf (demo@liread.com)
     (
         'a1111111-1111-1111-1111-111111111111',
         'The Creative Act: A Way of Being',

@@ -79,7 +79,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
           setSuccessMsg(null);
           return;
         }
-        setSuccessMsg('Account created successfully! Welcome to Readers Hub.');
+        setSuccessMsg('Account created successfully! Welcome to Liread.');
         setTimeout(() => onSuccess(), 800);
       } else {
         await signIn(email, password);
@@ -147,7 +147,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
               <BookOpen className="w-4 h-4 text-white" />
             </div>
             <span className="font-display text-lg font-bold tracking-tight text-vibe-ink">
-              Readers Hub
+              Liread
             </span>
           </button>
         </div>
@@ -171,7 +171,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-display text-2xl font-bold tracking-tight text-vibe-ink group-hover:text-vibe-accent transition-colors">
-                  Readers Hub
+                  Liread
                 </span>
               </button>
               <p className="text-xs text-vibe-ink-secondary leading-relaxed">
@@ -381,7 +381,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="reader@readershub.app"
+                    placeholder="reader@liread.app"
                     required
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
                   />
@@ -482,7 +482,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
             {/* Footer Notice */}
             <p className="mt-6 text-center text-[11px] text-vibe-ink-muted leading-relaxed">
-              By continuing, you agree to Readers Hub's{' '}
+              By continuing, you agree to Liread's{' '}
               <a href="#terms" onClick={(e) => { e.preventDefault(); openInfoModal('terms'); }} className="text-vibe-accent underline hover:opacity-80 transition-opacity">
                 Terms of Service
               </a>{' '}
@@ -498,7 +498,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
       {/* 3. Sleek Footer */}
       <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 text-center text-xs text-vibe-ink-muted">
-        <span>© 2026 Readers Hub · Crafted for book lovers and quiet focus</span>
+        <span>© 2026 Liread · Crafted for book lovers and quiet focus</span>
       </footer>
 
       {/* 4. Forgot Password Modal */}

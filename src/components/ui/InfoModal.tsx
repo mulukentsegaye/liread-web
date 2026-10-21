@@ -149,7 +149,7 @@ export const InfoModal: React.FC = () => {
                   1. Respectful & Thoughtful Community
                 </h4>
                 <p className="text-xs text-vibe-ink-secondary">
-                  Readers Hub is a peaceful sanctuary for book lovers. We expect all members to treat fellow readers with kindness, constructive engagement, and open-minded appreciation for diverse perspectives.
+                  Liread is a peaceful sanctuary for book lovers. We expect all members to treat fellow readers with kindness, constructive engagement, and open-minded appreciation for diverse perspectives.
                 </p>
               </div>
 
@@ -169,7 +169,7 @@ export const InfoModal: React.FC = () => {
                   3. Quoting & Fair Use
                 </h4>
                 <p className="text-xs text-vibe-ink-secondary">
-                  When sharing passages and quotes from books, attribute the original author and title. Readers Hub honors the creative works of authors around the world.
+                  When sharing passages and quotes from books, attribute the original author and title. Liread honors the creative works of authors around the world.
                 </p>
               </div>
             </div>

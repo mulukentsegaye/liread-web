@@ -142,7 +142,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
       aria-label="Distraction-free reading timer"
       className={`fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto bg-vibe-bg text-vibe-ink backdrop-blur-md transition-colors duration-500 ${transitionClass}`}
     >
-      {/* Signature Readers Hub Ambient Top Beam during Transition */}
+      {/* Signature Liread Ambient Top Beam during Transition */}
       {transitionStage !== 'idle' && (
         <div className="peaceful-top-beam" aria-hidden="true" />
       )}

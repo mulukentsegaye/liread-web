@@ -305,7 +305,7 @@ export const App: React.FC = () => {
       showAlertModal({
         type: 'guest',
         title: 'Guest Mode is Read-Only',
-        message: 'Create a free Readers Hub account to set daily reading goals, protect your reading streaks, and climb the leaderboard.',
+        message: 'Create a free Liread account to set daily reading goals, protect your reading streaks, and climb the leaderboard.',
         confirmLabel: 'Create Account',
         cancelLabel: 'Keep Browsing',
         onConfirm: () => openAuthModal('signup'),

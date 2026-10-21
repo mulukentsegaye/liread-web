@@ -111,7 +111,7 @@ export const useFeedStore = create<FeedStore>()(
           useNoticeStore.getState().showAlertModal({
             type: 'guest',
             title: 'Create an Account',
-            message: 'Create a free Readers Hub account to share reading moments, passages, and reflections with the community.',
+            message: 'Create a free Liread account to share reading moments, passages, and reflections with the community.',
             confirmLabel: 'Create Account',
             cancelLabel: 'Keep Browsing',
             onConfirm: () => useAuthStore.getState().openAuthModal('signup'),
@@ -166,7 +166,7 @@ export const useFeedStore = create<FeedStore>()(
       },
     }),
     {
-      name: 'readers_hub_feed_state_v4',
+      name: 'liread_feed_state_v1',
       partialize: (state) => ({
         posts: state.posts,
         feedTab: state.feedTab,

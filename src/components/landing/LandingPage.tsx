@@ -90,7 +90,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </div>
             <div>
               <span className="font-display text-xl sm:text-2xl font-bold tracking-tight text-vibe-ink">
-                Readers Hub
+                Liread
               </span>
             </div>
           </div>
@@ -836,8 +836,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <div className="w-7 h-7 rounded-lg bg-vibe-accent flex items-center justify-center text-white shadow-xs">
               <BookOpen className="w-4 h-4" />
             </div>
-            <span className="font-display text-base font-bold text-vibe-ink">Readers Hub</span>
-            <span className="text-[11px]">© 2026 Readers Hub Inc. All rights reserved.</span>
+            <span className="font-display text-base font-bold text-vibe-ink">Liread</span>
+            <span className="text-[11px]">© 2026 Liread Inc. All rights reserved.</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">

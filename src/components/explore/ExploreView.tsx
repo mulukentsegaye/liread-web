@@ -343,13 +343,13 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       {selectedCategory === 'All' ? (
         <div className="space-y-14 sm:space-y-16">
           
-          {/* Shelf 1: Trending on Readers Hub */}
+          {/* Shelf 1: Trending on Liread */}
           <div className="space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-amber-500 fill-current" />
                 <h2 className="font-serif text-lg sm:text-xl font-semibold text-vibe-ink">
-                  Trending on Readers Hub
+                  Trending on Liread
                 </h2>
               </div>
               <span className="text-xs text-vibe-accent font-medium">Popular This Week</span>

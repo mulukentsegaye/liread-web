@@ -6,8 +6,8 @@ import { Database } from '../types/database.types';
 // 2. Vite environment variables (.env / .env.local)
 // 3. Fallback placeholder
 export const getSupabaseConfig = () => {
-  const localUrl = typeof window !== 'undefined' ? localStorage.getItem('readers_hub_supabase_url') : null;
-  const localKey = typeof window !== 'undefined' ? localStorage.getItem('readers_hub_supabase_anon_key') : null;
+  const localUrl = typeof window !== 'undefined' ? localStorage.getItem('liread_supabase_url') : null;
+  const localKey = typeof window !== 'undefined' ? localStorage.getItem('liread_supabase_anon_key') : null;
 
   const url = localUrl || import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
   const anonKey = localKey || import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key';
@@ -35,11 +35,11 @@ export let supabase: SupabaseClient = createClient(
 export const reconfigureSupabase = (url: string, anonKey: string) => {
   if (typeof window !== 'undefined') {
     if (url && anonKey) {
-      localStorage.setItem('readers_hub_supabase_url', url);
-      localStorage.setItem('readers_hub_supabase_anon_key', anonKey);
+      localStorage.setItem('liread_supabase_url', url);
+      localStorage.setItem('liread_supabase_anon_key', anonKey);
     } else {
-      localStorage.removeItem('readers_hub_supabase_url');
-      localStorage.removeItem('readers_hub_supabase_anon_key');
+      localStorage.removeItem('liread_supabase_url');
+      localStorage.removeItem('liread_supabase_anon_key');
     }
   }
 

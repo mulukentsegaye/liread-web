@@ -133,7 +133,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
                       <div className="w-full h-full p-4 flex flex-col justify-between relative" style={{ backgroundColor: coverColor }}>
                         <div className="w-6 h-1 rounded-full opacity-60" style={{ backgroundColor: coverAccent }} />
                         <div><span className="font-heading font-bold text-white text-sm line-clamp-2 leading-tight">{b.title}</span><span className="text-[11px] text-white/70 block mt-1">{b.author}</span></div>
-                        <div className="text-[9px] uppercase tracking-widest text-white/40 font-mono">Readers Hub</div>
+                        <div className="text-[9px] uppercase tracking-widest text-white/40 font-mono">Liread</div>
                       </div>
                     )}
                     <div className="absolute top-2.5 right-2.5 z-10">

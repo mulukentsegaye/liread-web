@@ -81,7 +81,7 @@ export const VIBES: Record<ThemeMode, VibeConfig> = {
 
 export const VIBE_DEFINITIONS = VIBES;
 export const DEFAULT_VIBE: ThemeMode = 'light';
-const STORAGE_KEY = 'readers_hub_theme';
+const STORAGE_KEY = 'liread_theme';
 
 export interface ThemeContextValue {
   theme: ThemeMode;
@@ -135,13 +135,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setThemeState(mode);
     try {
       localStorage.setItem(STORAGE_KEY, mode);
-      localStorage.setItem('readers_hub_vibe', mode);
+      localStorage.setItem('liread_vibe', mode);
     } catch (e) {
       console.warn('Failed to save theme to localStorage:', e);
     }
     applyThemeToDocument(mode);
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('readers-hub-theme-changed', { detail: { theme: mode } }));
+      window.dispatchEvent(new CustomEvent('liread-theme-changed', { detail: { theme: mode } }));
     }
   };
 

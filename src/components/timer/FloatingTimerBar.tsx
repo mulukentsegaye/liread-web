@@ -56,7 +56,7 @@ export const FloatingTimerBar: React.FC = () => {
     }
   };
 
-  const bookInitial = bookTitle ? bookTitle.slice(0, 3).toUpperCase() : 'HUB';
+  const bookInitial = bookTitle ? bookTitle.slice(0, 3).toUpperCase() : 'LIR';
 
   return (
     <div 

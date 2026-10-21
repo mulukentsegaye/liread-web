@@ -12,15 +12,15 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: (typeof window !== 'undefined' && localStorage.getItem('readers_hub_theme') === 'dark') ? 'dark' : 'light',
-      isDark: (typeof window !== 'undefined' && localStorage.getItem('readers_hub_theme') === 'dark'),
+      theme: (typeof window !== 'undefined' && localStorage.getItem('liread_theme') === 'dark') ? 'dark' : 'light',
+      isDark: (typeof window !== 'undefined' && localStorage.getItem('liread_theme') === 'dark'),
       setTheme: (theme: ThemeMode) => {
         const isDark = theme === 'dark';
         set({ theme, isDark });
         if (typeof document !== 'undefined') {
           document.documentElement.setAttribute('data-theme', theme);
           document.documentElement.classList.toggle('dark', isDark);
-          window.dispatchEvent(new CustomEvent('readers-hub-theme-changed', { detail: { theme } }));
+          window.dispatchEvent(new CustomEvent('liread-theme-changed', { detail: { theme } }));
         }
       },
       toggleTheme: () => {
@@ -29,13 +29,13 @@ export const useThemeStore = create<ThemeState>()(
       },
     }),
     {
-      name: 'readers_hub_theme_store_v2',
+      name: 'liread_theme_store_v2',
     }
   )
 );
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('readers-hub-theme-changed', (e: any) => {
+  window.addEventListener('liread-theme-changed', (e: any) => {
     if (e.detail?.theme) {
       useThemeStore.setState({
         theme: e.detail.theme,

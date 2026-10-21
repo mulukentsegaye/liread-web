@@ -288,7 +288,7 @@ export const useAuthStore = create<AuthStore>()(
       },
     }),
     {
-      name: 'readers_hub_user_profile_v3',
+      name: 'liread_user_profile_v1',
       partialize: (state) => ({
         user: state.user,
         todayMinutesRead: state.todayMinutesRead,

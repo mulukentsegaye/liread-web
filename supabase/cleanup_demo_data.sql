@@ -1,5 +1,5 @@
 -- ==============================================================================
--- Readers Hub - Optional cleanup of legacy demo data
+-- Liread - Optional cleanup of legacy demo data
 -- ==============================================================================
 -- Run this ONCE in the Supabase SQL Editor if your database still contains the
 -- demo users, posts, sessions and bookshelf rows from the old seed file.

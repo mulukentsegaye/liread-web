@@ -160,7 +160,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   // Reading typography vibe: 'serif' (Newsreader) or 'sans' (Inter)
   const [readingFont, setReadingFont] = useState<'serif' | 'sans'>(() => {
     try {
-      return (localStorage.getItem('readers_hub_reading_font') as 'serif' | 'sans') || 'serif';
+      return (localStorage.getItem('liread_reading_font') as 'serif' | 'sans') || 'serif';
     } catch {
       return 'serif';
     }
@@ -169,7 +169,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   const handleFontChange = (font: 'serif' | 'sans') => {
     setReadingFont(font);
     try {
-      localStorage.setItem('readers_hub_reading_font', font);
+      localStorage.setItem('liread_reading_font', font);
     } catch {}
   };
 
@@ -796,7 +796,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               <div className="space-y-1">
                 <p className="font-heading font-semibold text-sm text-vibe-ink">No reader posts yet for this title</p>
                 <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
-                  Be the first member of Readers Hub to share a favorite quotation, rating, or personal reflection.
+                  Be the first member of Liread to share a favorite quotation, rating, or personal reflection.
                 </p>
               </div>
               <button

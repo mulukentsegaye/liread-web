@@ -1,6 +1,6 @@
-# Supabase Backend Setup for Readers Hub
+# Supabase Backend Setup for Liread
 
-This directory contains the database schema, security policies, and triggers for the Readers Hub application powered by Supabase. There is no demo seed data — all content belongs to real users.
+This directory contains the database schema, security policies, and triggers for the Liread application powered by Supabase. There is no demo seed data — all content belongs to real users.
 
 ---
 
@@ -9,7 +9,7 @@ This directory contains the database schema, security policies, and triggers for
 ### Step 1: Create a Free Supabase Project
 1. Go to [supabase.com](https://supabase.com) and create an account.
 2. Click **New Project** and select your organization.
-3. Name your project (e.g. `readers-hub-db`), choose a database password, and select your preferred region.
+3. Name your project (e.g. `liread-db`), choose a database password, and select your preferred region.
 
 ---
 
@@ -44,7 +44,7 @@ This directory contains the database schema, security policies, and triggers for
 ---
 
 ### Step 3: (No seed data required)
-Readers Hub ships **no demo accounts**. Every profile, post, bookshelf entry, and
+Liread ships **no demo accounts**. Every profile, post, bookshelf entry, and
 leaderboard position must belong to a real user who signs up through the app.
 
 - `seed.sql` is intentionally empty — do not add fake users to it.
@@ -93,7 +93,7 @@ Note that the built-in Supabase email service is rate limited. If sign-ups fail 
 ---
 
 ## 🛠️ Testing Your Backend Connection
-In the Readers Hub web interface:
+In the Liread web interface:
 1. Click the status pill in the top-right header (`Live`, `Guest`, or `Offline`).
 2. Switch to the **Account** tab.
 3. Click **Ping Database** or enter your credentials and click **Save & Connect**.

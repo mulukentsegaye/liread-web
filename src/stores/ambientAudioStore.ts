@@ -121,7 +121,7 @@ export const useAmbientAudioStore = create<AmbientAudioState>()(
       },
     }),
     {
-      name: 'readers_hub_ambient_audio_v1',
+      name: 'liread_ambient_audio_v1',
       partialize: (state) => ({
         volume: state.volume,
         isMuted: state.isMuted,
@@ -134,7 +134,7 @@ export const useAmbientAudioStore = create<AmbientAudioState>()(
 
 // Listen for global theme changes to automatically transition ambient audio
 if (typeof window !== 'undefined') {
-  window.addEventListener('readers-hub-theme-changed', (e: Event) => {
+  window.addEventListener('liread-theme-changed', (e: Event) => {
     const customEvent = e as CustomEvent<{ theme: ThemeId }>;
     if (customEvent.detail?.theme) {
       useAmbientAudioStore.getState().syncWithTheme(customEvent.detail.theme);

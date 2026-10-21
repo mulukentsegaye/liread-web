@@ -400,13 +400,13 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={onGoToLanding}
           className="flex items-center gap-2.5 flex-shrink-0 group outline-none cursor-pointer"
-          title="Readers Hub — Home"
+          title="Liread — Home"
         >
           <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
             <BookOpen className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
           <span className="font-display text-lg sm:text-xl font-semibold tracking-tight text-vibe-ink hidden sm:block">
-            Readers Hub
+            Liread
           </span>
         </button>
 
@@ -523,7 +523,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                   <div className="space-y-2 text-xs">
                     <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border/60">
-                      <p className="font-medium text-vibe-ink">Welcome to Readers Hub</p>
+                      <p className="font-medium text-vibe-ink">Welcome to Liread</p>
                       <p className="text-vibe-ink-muted text-[11px] mt-0.5 leading-relaxed">
                         Start your reading timer today to log your first streak session and climb the weekly leaderboard.
                       </p>

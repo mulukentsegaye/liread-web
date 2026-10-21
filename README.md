@@ -1,4 +1,4 @@
-# Readers Hub
+# Liread
 
 A modern, responsive community and utility web application for book lovers to share book recommendations, post favorite quotes, track active reading time with a persistent distraction-free timer, and climb daily, weekly, and lifetime community leaderboards.
 
@@ -42,7 +42,7 @@ See the complete database schema in [`supabase/schema.sql`](supabase/schema.sql)
 
 ## Accounts & Guest Mode
 
-Readers Hub has **no demo accounts**. Every profile, post, bookshelf entry, and
+Liread has **no demo accounts**. Every profile, post, bookshelf entry, and
 leaderboard position belongs to a real user created through the app.
 
 - **Create Account / Sign In** — the only way to get a full account. A profile row

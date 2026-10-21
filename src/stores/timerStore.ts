@@ -123,7 +123,7 @@ export const useTimerStore = create<TimerStore>()(
       setFullScreenOpen: (isOpen) => set({ isFullScreenOpen: isOpen }),
     }),
     {
-      name: 'readers_hub_timer_state_v2',
+      name: 'liread_timer_state_v1',
     }
   )
 );

@@ -1,4 +1,4 @@
-# Readers Hub Development & Interaction Rules
+# Liread Development & Interaction Rules
 
 ## Teaching & Learning Protocol
 Whenever solving a problem, adding a feature, or fixing a bug:
