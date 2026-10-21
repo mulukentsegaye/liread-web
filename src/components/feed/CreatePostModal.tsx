@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Star, ArrowLeft, Search, BookOpen, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, Star, ArrowLeft, Search, BookOpen, Loader2, CheckCircle2, WifiOff } from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
 import { PostType } from '../../types';
-import { bookSearchService, SuggestedBook } from '../../services/bookSearchService';
+import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../../services/bookSearchService';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -33,6 +33,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const [selectedBook, setSelectedBook] = useState<SuggestedBook | null>(null);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     if (query.length < 2) {
       setSuggestions([]);
       setIsSearching(false);
+      setIsOffline(false);
       return;
     }
 
@@ -79,14 +81,32 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    // Check offline immediately
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOffline(true);
+      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+      setSuggestions(localMatches);
+      setShowSuggestions(true);
+      setIsSearching(false);
+      return;
+    }
+
     const timer = setTimeout(async () => {
       try {
         const results = await bookSearchService.searchBooks(query, controller.signal);
         setSuggestions(results);
+        setIsOffline(false);
         setShowSuggestions(true);
       } catch (err: any) {
         if (err.name !== 'AbortError') {
-          console.warn('Search error in CreatePostModal:', err);
+          if (isOfflineOrNetworkError(err)) {
+            setIsOffline(true);
+            const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+            setSuggestions(localMatches);
+            setShowSuggestions(true);
+          } else {
+            console.warn('Search error in CreatePostModal:', err);
+          }
         }
       } finally {
         setIsSearching(false);
@@ -301,16 +321,27 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                 {showSuggestions && bookTitle.trim().length >= 2 && (
                   <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-72 overflow-y-auto">
                     <div className="px-3 py-2 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-[11px] text-vibe-ink-muted font-medium">
-                      <span className="flex items-center gap-1.5 text-vibe-ink">
-                        <BookOpen className="w-3.5 h-3.5 text-vibe-accent" />
-                        Open Library Suggestions
-                      </span>
-                      {isSearching && (
+                      {isOffline ? (
+                        <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                          <WifiOff className="w-3.5 h-3.5" />
+                          Offline Search
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-vibe-ink">
+                          <BookOpen className="w-3.5 h-3.5 text-vibe-accent" />
+                          Open Library Suggestions
+                        </span>
+                      )}
+                      {isSearching ? (
                         <span className="flex items-center gap-1 text-vibe-accent text-[10px]">
                           <Loader2 className="w-3 h-3 animate-spin" />
                           Searching...
                         </span>
-                      )}
+                      ) : isOffline ? (
+                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                          {suggestions.length > 0 ? `${suggestions.length} offline matches` : 'Offline'}
+                        </span>
+                      ) : null}
                     </div>
 
                     {isSearching && suggestions.length === 0 ? (
@@ -368,6 +399,18 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                             </div>
                           </button>
                         ))}
+                      </div>
+                    ) : isOffline ? (
+                      <div className="p-4 text-center text-xs space-y-2">
+                        <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400">
+                          <WifiOff className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-vibe-ink">You are currently offline</p>
+                          <p className="text-[11px] mt-0.5 text-vibe-ink-muted leading-relaxed">
+                            Open Library auto-suggest is unavailable offline. You can still type the author manually below.
+                          </p>
+                        </div>
                       </div>
                     ) : (
                       <div className="p-4 text-center text-xs text-vibe-ink-muted">
