@@ -166,9 +166,6 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
             <h2 className="font-heading text-xs sm:text-sm font-semibold text-vibe-ink">
               Distraction-Free Reading
             </h2>
-            <p className="text-[10px] sm:text-[11px] text-vibe-ink-muted">
-              Immerse yourself in every sentence
-            </p>
           </div>
         </div>
 

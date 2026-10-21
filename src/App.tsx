@@ -18,6 +18,11 @@ import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { AuthModal } from './components/auth/AuthModal';
 import { CelebrationToast } from './components/ui/CelebrationToast';
+import { ToastContainer } from './components/ui/ToastContainer';
+import { AlertModal } from './components/ui/AlertModal';
+import { GoalAdjustModal } from './components/ui/GoalAdjustModal';
+import { InfoModal } from './components/ui/InfoModal';
+import { useNoticeStore } from './stores/noticeStore';
 import { WifiOff } from 'lucide-react';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useTimerStore } from './stores/timerStore';
@@ -60,7 +65,6 @@ export const App: React.FC = () => {
   const [selectedBookDetails, setSelectedBookDetails] = useState<BookDetailsData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [preSelectedBook, setPreSelectedBook] = useState<{
     title: string;
     author: string;
@@ -69,7 +73,19 @@ export const App: React.FC = () => {
 
   const { isPopoverOpen, closePopover, theme } = useTheme();
   const { isFullScreenOpen, setFullScreenOpen, setBook, startTimer, prepareTimerForBook } = useTimerStore();
-  const { user, isAuthenticated, isGuest, authReady, updateUser, initAuth } = useAuthStore();
+  const { 
+    user, 
+    isAuthenticated, 
+    isGuest, 
+    authReady, 
+    updateUser, 
+    initAuth,
+    isAuthModalOpen,
+    authModalTab,
+    openAuthModal,
+    closeAuthModal,
+  } = useAuthStore();
+  const { showAlertModal, openGoalModal } = useNoticeStore();
   const { fetchPosts } = useFeedStore();
   const isOnline = useOnlineStatus();
 
@@ -286,17 +302,20 @@ export const App: React.FC = () => {
   const handleAdjustGoal = () => {
     if (!user) return;
     if (isGuest) {
-      alert('Guest mode is read-only. Create an account to set a daily goal.');
+      showAlertModal({
+        type: 'guest',
+        title: 'Guest Mode is Read-Only',
+        message: 'Create a free Readers Hub account to set daily reading goals, protect your reading streaks, and climb the leaderboard.',
+        confirmLabel: 'Create Account',
+        cancelLabel: 'Keep Browsing',
+        onConfirm: () => openAuthModal('signup'),
+      });
       return;
     }
     const current = user.dailyGoalMinutes || 60;
-    const input = prompt('Set your daily reading goal in minutes:', current.toString());
-    if (input) {
-      const parsed = parseInt(input, 10);
-      if (!isNaN(parsed) && parsed > 0) {
-        updateUser({ dailyGoalMinutes: parsed });
-      }
-    }
+    openGoalModal(current, (newMinutes) => {
+      updateUser({ dailyGoalMinutes: newMinutes });
+    });
   };
 
   const handleOpenCreateModal = (initialBook?: { title: string; author: string; coverImageUrl?: string }) => {
@@ -338,6 +357,9 @@ export const App: React.FC = () => {
           onGoBack={handleGoToLanding}
           onGuest={handleGuestEnterApp}
         />
+        <ToastContainer />
+        <AlertModal />
+        <InfoModal />
       </div>
     );
   }
@@ -382,6 +404,9 @@ export const App: React.FC = () => {
       <div className={`w-full min-h-screen ${transitionClass}`}>
         {transitionStage !== 'idle' && <div className="peaceful-top-beam" aria-hidden="true" />}
         <LoginPage onSuccess={handleEnterApp} onGoBack={handleGoToLanding} onGuest={handleGuestEnterApp} />
+        <ToastContainer />
+        <AlertModal />
+        <InfoModal />
       </div>
     );
   }
@@ -417,7 +442,7 @@ export const App: React.FC = () => {
           }
         }}
         onGoToLanding={handleGoToLanding}
-        onGoToLogin={() => setAuthModalOpen(true)}
+        onGoToLogin={() => openAuthModal('account')}
         onSelectBookForTimer={handleSelectBookForTimer}
         onShareBook={(book) => handleOpenCreateModal(book)}
         onViewBookDetails={handleViewBookDetails}
@@ -433,7 +458,7 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onGoToLanding={handleGoToLanding}
-          onGoToLogin={() => setAuthModalOpen(true)}
+          onGoToLogin={() => openAuthModal('account')}
         />
 
         <main
@@ -526,8 +551,14 @@ export const App: React.FC = () => {
 
       <AuthModal
         isOpen={isAuthModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        defaultTab={authModalTab}
+        onClose={closeAuthModal}
       />
+
+      <ToastContainer />
+      <AlertModal />
+      <GoalAdjustModal />
+      <InfoModal />
 
       <MobileNav
         activeTab={activeTab}

@@ -91,11 +91,6 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
               <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">Personal Library</span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">{activeSubTab === 'bookshelf' ? 'My Bookshelf' : 'Saved Passages'}</h1>
-            <p className="text-xs sm:text-sm mt-1 text-vibe-ink-secondary">
-              {activeSubTab === 'bookshelf'
-                ? (isGuest ? 'Create an account to build your bookshelf.' : `${mappedBooks.length} titles in your reading collection.`)
-                : `${savedPosts.length} inspiring passages kept in your commonplace book.`}
-            </p>
           </div>
           <div className="flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle">
             <button onClick={() => setActiveSubTab('bookshelf')} className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${activeSubTab === 'bookshelf' ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border' : 'text-vibe-ink-muted hover:text-vibe-ink'}`}>

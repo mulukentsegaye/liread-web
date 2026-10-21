@@ -139,11 +139,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     ? (isGuest ? 'Guest Account' : 'Your Account')
                     : (tab === 'signup' ? 'Create Reader Account' : 'Sign In to Readers Hub')}
                 </h2>
-                <p className="text-[11px] text-vibe-ink-muted truncate">
-                  {tab === 'account'
-                    ? (isGuest ? 'Local browsing session' : 'Member profile & active session')
-                    : 'Track reading moments, timers & streaks'}
-                </p>
               </div>
             </div>
 

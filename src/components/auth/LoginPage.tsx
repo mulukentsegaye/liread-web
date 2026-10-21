@@ -17,6 +17,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useNoticeStore } from '../../stores/noticeStore';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { describeAuthError } from '../../lib/authErrors';
 
@@ -28,6 +29,7 @@ interface LoginPageProps {
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGuest }) => {
   const { signIn, signUp, signInAsGuest, pendingConfirmationEmail, clearPendingConfirmation } = useAuthStore();
+  const { openInfoModal } = useNoticeStore();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   
   // Form fields
@@ -481,11 +483,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
             {/* Footer Notice */}
             <p className="mt-6 text-center text-[11px] text-vibe-ink-muted leading-relaxed">
               By continuing, you agree to Readers Hub's{' '}
-              <a href="#terms" onClick={(e) => { e.preventDefault(); alert("Readers Hub Terms of Service:\nRespectful community conduct and genuine reading session tracking."); }} className="text-vibe-accent underline">
+              <a href="#terms" onClick={(e) => { e.preventDefault(); openInfoModal('terms'); }} className="text-vibe-accent underline hover:opacity-80 transition-opacity">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="#privacy" onClick={(e) => { e.preventDefault(); alert("Readers Hub Privacy Policy:\nYour reading logs and personal notes remain private to your account."); }} className="text-vibe-accent underline">
+              <a href="#privacy" onClick={(e) => { e.preventDefault(); openInfoModal('privacy'); }} className="text-vibe-accent underline hover:opacity-80 transition-opacity">
                 Privacy Policy
               </a>.
             </p>

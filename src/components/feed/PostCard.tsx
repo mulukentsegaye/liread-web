@@ -3,6 +3,7 @@ import { Heart, MessageSquare, Bookmark, MoreHorizontal, Star, BookOpen } from '
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
+import { toast } from '../../stores/noticeStore';
 import { AnimatedCounter } from '../ui/AnimatedCounter';
 
 interface PostCardProps {
@@ -89,9 +90,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
             e.stopPropagation();
             if (navigator?.clipboard?.writeText) {
               navigator.clipboard.writeText(`"${post.quoteText}" — ${post.bookTitle} (${post.bookAuthor})`);
-              alert(`Copied passage from "${post.bookTitle}" to clipboard!`);
+              toast.success(`Copied passage from "${post.bookTitle}" to clipboard.`, 'Copied to Clipboard');
             } else {
-              alert(`Reading: "${post.bookTitle}" by ${post.bookAuthor}`);
+              toast.info(`"${post.bookTitle}" by ${post.bookAuthor}`, 'Reading');
             }
           }}
           title="Copy passage to clipboard"
@@ -228,7 +229,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
 
           {/* Comment */}
           <button
-            onClick={() => alert(`Comments for "${post.bookTitle}":\nJoin the discussion!`)}
+            onClick={() => toast.info(`Community discussion threads for "${post.bookTitle}" are opening soon!`, 'Discussion')}
             aria-label="Comment"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-colors"
           >

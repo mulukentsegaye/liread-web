@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, Star, ArrowLeft, Search, BookOpen, Loader2, CheckCircle2, WifiOff } from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
+import { toast } from '../../stores/noticeStore';
 import { PostType } from '../../types';
 import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../../services/bookSearchService';
 
@@ -161,7 +162,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookTitle.trim()) {
-      alert('Please enter a book title');
+      toast.warning('Please enter a book title to publish your post.', 'Title Required');
       return;
     }
 

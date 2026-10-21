@@ -62,11 +62,6 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
-        <p className="text-xs sm:text-sm text-vibe-ink-secondary mt-1">
-          {posts.length === 0
-            ? 'Real reading moments from real readers will appear here.'
-            : 'Discover what readers around you are exploring right now.'}
-        </p>
       </div>
 
       {/* Share bar / write prompt */}

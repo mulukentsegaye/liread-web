@@ -220,9 +220,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-vibe-ink">
           Explore Books
         </h1>
-        <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-lg leading-relaxed">
-          A calm collection of timeless literature, foundational philosophy, and transformative ideas.
-        </p>
       </div>
 
       {/* Featured Spotlight Card */}
@@ -455,9 +452,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink tracking-tight">
             Looking for a specific book?
           </h3>
-          <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto leading-relaxed">
-            Search millions of books on Open Library with live cover previews and AI summaries.
-          </p>
         </div>
 
         {/* Integrated Search Bar */}

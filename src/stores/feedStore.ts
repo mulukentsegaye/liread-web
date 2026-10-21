@@ -4,6 +4,8 @@ import { Post } from '../types';
 import { DEFAULT_USER_AVATAR, DEMO_POSTS } from '../data/defaults';
 import { postsService } from '../services/postsService';
 import { isSupabaseConfigured } from '../lib/supabase';
+import { useNoticeStore, toast } from './noticeStore';
+import { useAuthStore } from './authStore';
 
 interface FeedStore {
   posts: Post[];
@@ -106,11 +108,18 @@ export const useFeedStore = create<FeedStore>()(
 
       addPost: async (postData: Partial<Post>, currentUserId?: string) => {
         if (!currentUserId || currentUserId === 'guest-user') {
-          alert('Create an account to share reading moments. Guests can only browse.');
+          useNoticeStore.getState().showAlertModal({
+            type: 'guest',
+            title: 'Create an Account',
+            message: 'Create a free Readers Hub account to share reading moments, passages, and reflections with the community.',
+            confirmLabel: 'Create Account',
+            cancelLabel: 'Keep Browsing',
+            onConfirm: () => useAuthStore.getState().openAuthModal('signup'),
+          });
           return;
         }
         if (!isSupabaseConfigured()) {
-          alert('Supabase is not configured.');
+          toast.warning('Database is running in local preview mode. Cloud sync is unavailable.', 'Preview Mode');
           return;
         }
         const tempId = `post-${Date.now()}`;
@@ -152,7 +161,7 @@ export const useFeedStore = create<FeedStore>()(
           console.warn('Could not persist new post to Supabase:', err);
           // Remove temp post on failure to avoid phantom data
           set((state) => ({ posts: state.posts.filter((p) => p.id !== tempId) }));
-          alert('Failed to publish. Please try again.');
+          toast.error('Could not publish your post. Please check your connection and try again.', 'Publish Failed');
         }
       },
     }),

@@ -114,9 +114,6 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
           <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
             Your Reading Journey
           </h1>
-          <p className="text-xs sm:text-sm mt-1 text-vibe-ink-secondary max-w-xl">
-            Insights from your real reading history. No sample data — only what you have logged.
-          </p>
         </div>
       </div>
 

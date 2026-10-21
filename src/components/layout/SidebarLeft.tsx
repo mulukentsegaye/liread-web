@@ -13,6 +13,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useNoticeStore } from '../../stores/noticeStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
@@ -27,6 +28,7 @@ interface SidebarLeftProps {
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding, onGoToLogin }) => {
   const { user } = useAuthStore();
+  const { openInfoModal } = useNoticeStore();
 
   const mainNavItems = [
     { id: 'feed' as NavigationTab,        label: 'Community Feed', icon: MessageSquare, },
@@ -126,7 +128,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
 
         {/* Help */}
         <button
-          onClick={() => alert("Readers Hub Help:\n- Track your reading time with the timer\n- Share passages from books you love\n- Climb the weekly leaderboard\n- Build a 7-day reading streak!")}
+          onClick={() => openInfoModal('help')}
           title="Help & community"
           aria-label="Help & community"
           className="w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle rounded-xl transition-colors"

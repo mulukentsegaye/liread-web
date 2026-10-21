@@ -64,9 +64,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
             <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
               Readers Leaderboard
             </h1>
-            <p className="text-xs sm:text-sm mt-1 text-vibe-ink-secondary">
-              Rankings are driven entirely by real reading sessions from creators.
-            </p>
           </div>
 
           <div className="flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle">
@@ -168,7 +165,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
                     <div className="w-9 h-9 rounded-full font-bold text-xs flex items-center justify-center flex-shrink-0 bg-vibe-accent text-white shadow-xs">{userStanding.initials}</div>
                     <div className="min-w-0">
                       <p className="text-xs sm:text-sm font-semibold truncate text-vibe-ink">{userStanding.fullName} <span className="text-[11px] font-normal text-vibe-accent">(You)</span></p>
-                      <p className="text-[11px] truncate text-vibe-ink-muted">Keep reading today to climb the ranks!</p>
+                      <p className="text-[11px] truncate text-vibe-ink-muted">@{user?.username || 'you'}</p>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0 pl-3">

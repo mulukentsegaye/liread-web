@@ -18,6 +18,7 @@ import { BookDetailsData, BookSummaryData } from '../../types';
 import { aiSummaryService } from '../../services/aiSummaryService';
 import { bookSearchService } from '../../services/bookSearchService';
 import { useAuthStore } from '../../stores/authStore';
+import { useNoticeStore } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { PostCard } from '../feed/PostCard';
 
@@ -140,7 +141,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   onShareBook,
   onViewBookDetails,
 }) => {
-  const { user, isGuest } = useAuthStore();
+  const { user, isGuest, openAuthModal } = useAuthStore();
+  const { showAlertModal } = useNoticeStore();
   const { posts } = useFeedStore();
 
   const [detailedBook, setDetailedBook] = useState<BookDetailsData>(book);
@@ -253,7 +255,14 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
   const handleBookshelfToggle = (status: 'want_to_read' | 'currently_reading' | 'finished') => {
     if (isGuest) {
-      alert('Sign in to track books on your personal bookshelf.');
+      showAlertModal({
+        type: 'guest',
+        title: 'Sign In Required',
+        message: 'Create a free account or sign in to track books on your personal bookshelf across your devices.',
+        confirmLabel: 'Sign In',
+        cancelLabel: 'Keep Browsing',
+        onConfirm: () => openAuthModal('signin'),
+      });
       return;
     }
     setBookshelfStatus(status);
@@ -569,9 +578,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                         <BookOpen className="w-4 h-4 text-vibe-accent" />
                         <span>Chapter Summary & Synopsis</span>
                       </h3>
-                      <p className="text-xs text-vibe-ink-muted mt-0.5">
-                        In-depth narrative breakdown and core takeaways
-                      </p>
                     </div>
 
                     {/* Editorial Reading Font Switcher */}
@@ -679,10 +685,9 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
             <div>
-              <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink mb-1">
+              <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
                 About {detailedBook.title}
               </h3>
-              <p className="text-xs text-vibe-ink-muted">Published archive description and editorial notes</p>
             </div>
 
             {/* Editorial Reading Font Switcher */}

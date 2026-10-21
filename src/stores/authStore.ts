@@ -18,7 +18,11 @@ interface AuthStore {
   isBackendConnected: boolean;
   authReady: boolean;
   pendingConfirmationEmail: string | null;
+  isAuthModalOpen: boolean;
+  authModalTab: 'signin' | 'signup' | 'account';
 
+  openAuthModal: (tab?: 'signin' | 'signup' | 'account') => void;
+  closeAuthModal: () => void;
   initAuth: () => Promise<void>;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, username: string, fullName: string) => Promise<void>;
@@ -41,6 +45,11 @@ export const useAuthStore = create<AuthStore>()(
       isBackendConnected: isSupabaseConfigured(),
       authReady: false,
       pendingConfirmationEmail: null,
+      isAuthModalOpen: false,
+      authModalTab: 'signin',
+
+      openAuthModal: (tab = 'signin') => set({ isAuthModalOpen: true, authModalTab: tab }),
+      closeAuthModal: () => set({ isAuthModalOpen: false }),
 
       initAuth: async () => {
         const configured = isSupabaseConfigured();
