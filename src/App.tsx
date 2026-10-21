@@ -470,6 +470,7 @@ export const App: React.FC = () => {
 
             {activeTab === 'book_details' && selectedBookDetails && (
               <BookDetailsView
+                key={`${selectedBookDetails.title}-${selectedBookDetails.author}`}
                 book={selectedBookDetails}
                 onBack={() => handleTabChange(previousTab || 'feed')}
                 onStartTimer={handleSelectBookForTimer}

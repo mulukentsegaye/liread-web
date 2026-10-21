@@ -53,6 +53,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
   const summarySectionRef = useRef<HTMLDivElement>(null);
 
+  // Sync detailedBook state whenever book prop changes
+  useEffect(() => {
+    setDetailedBook(book);
+  }, [book.title, book.author, book.coverImageUrl, book.description]);
+
   // Fetch deeper book details from Open Library if description is missing
   useEffect(() => {
     let isMounted = true;
@@ -67,13 +72,13 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             book.coverImageUrl
           );
           if (isMounted) {
-            setDetailedBook((prev) => ({
-              ...prev,
-              description: fullData.description || prev.description,
-              subjects: fullData.subjects || prev.subjects,
-              firstPublishYear: fullData.firstPublishYear || prev.firstPublishYear,
-              coverImageUrl: fullData.coverImageUrl || prev.coverImageUrl,
-            }));
+            setDetailedBook({
+              ...book,
+              description: fullData.description || book.description,
+              subjects: fullData.subjects || (book.subjects && book.subjects.length > 0 ? book.subjects : ['Literature', 'Philosophy', 'Focus']),
+              firstPublishYear: fullData.firstPublishYear || book.firstPublishYear,
+              coverImageUrl: book.coverImageUrl || fullData.coverImageUrl,
+            });
           }
         } catch (err) {
           console.warn('Failed to fetch full book details:', err);
@@ -86,7 +91,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [book]);
+  }, [book.title, book.author, book.coverImageUrl, book.description, book.workKey]);
 
   // Load summary on mount or when requested
   useEffect(() => {

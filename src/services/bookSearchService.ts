@@ -179,48 +179,61 @@ export const bookSearchService = {
     let description: string | undefined;
     let subjects: string[] = [];
 
-    // If offline, check local curated collection first
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      const match = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
-        (b) => b.title.toLowerCase() === title.toLowerCase()
-      );
-      if (match) {
-        return {
-          title: match.title,
-          author: match.author,
-          coverImageUrl: match.coverImageUrl || resolvedCover,
-          firstPublishYear: match.firstPublishYear,
-          workKey: match.workKey || resolvedWorkKey,
-          description: match.tagline,
-          subjects: [match.categoryLabel],
-          ratingAverage: match.ratingAverage,
-        };
-      }
+    // 1. Check local verified curated collection first for instant 100% precision
+    const cleanT = title.trim().toLowerCase();
+    const curatedMatch = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
+      (b) => b.title.toLowerCase() === cleanT || 
+             (cleanT.length > 5 && b.title.toLowerCase().includes(cleanT)) ||
+             (cleanT.length > 5 && cleanT.includes(b.title.toLowerCase()))
+    );
+
+    if (curatedMatch) {
+      return {
+        title: curatedMatch.title,
+        author: curatedMatch.author,
+        coverImageUrl: curatedMatch.coverImageUrl || resolvedCover,
+        firstPublishYear: curatedMatch.firstPublishYear,
+        workKey: curatedMatch.workKey || resolvedWorkKey,
+        description: curatedMatch.description || curatedMatch.tagline,
+        subjects: [curatedMatch.categoryLabel, 'Literature', 'Essential Read'],
+        ratingAverage: curatedMatch.ratingAverage,
+      };
     }
 
     try {
-      // If workKey is not known, query search to resolve it
+      // 2. If workKey is not known, query search to resolve it accurately
       if (!resolvedWorkKey) {
-        const searchRes = await fetch(
-          `https://openlibrary.org/search.json?q=${encodeURIComponent(`${title} ${author}`)}&limit=1`
-        );
+        const queryParams = new URLSearchParams({
+          title: title.trim(),
+          ...(author.trim() ? { author: author.trim() } : {}),
+          limit: '3'
+        });
+
+        const searchRes = await fetch(`https://openlibrary.org/search.json?${queryParams.toString()}`);
         if (searchRes.ok) {
           const searchData = await searchRes.json();
-          const doc = searchData.docs?.[0];
-          if (doc) {
-            resolvedWorkKey = doc.key;
-            publishYear = doc.first_publish_year;
-            if (!resolvedCover && doc.cover_i) {
-              resolvedCover = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+          const docs: any[] = searchData.docs || [];
+          
+          // Verify candidate actually matches the requested title
+          const matchingDoc = docs.find((d) => {
+            const dTitle = (d.title || '').toLowerCase();
+            return dTitle.includes(cleanT) || cleanT.includes(dTitle);
+          }) || docs[0];
+
+          if (matchingDoc) {
+            resolvedWorkKey = matchingDoc.key;
+            publishYear = matchingDoc.first_publish_year;
+            if (!resolvedCover && matchingDoc.cover_i) {
+              resolvedCover = `https://covers.openlibrary.org/b/id/${matchingDoc.cover_i}-L.jpg`;
             }
-            if (Array.isArray(doc.subject)) {
-              subjects = doc.subject.slice(0, 5);
+            if (Array.isArray(matchingDoc.subject)) {
+              subjects = matchingDoc.subject.slice(0, 5);
             }
           }
         }
       }
 
-      // Fetch work JSON if workKey available
+      // 3. Fetch work JSON if workKey available
       if (resolvedWorkKey) {
         const workUrl = resolvedWorkKey.startsWith('http')
           ? `${resolvedWorkKey}.json`

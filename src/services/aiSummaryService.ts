@@ -216,6 +216,50 @@ To achieve deep relaxation and cognitive recovery, you must establish a clear en
     ],
     cached: true,
   },
+
+  'show your work': {
+    bookTitle: 'Show Your Work!',
+    bookAuthor: 'Austin Kleon',
+    readTimeMinutes: 5,
+    oneSentenceTakeaway:
+      'Generosity beats genius: by sharing small, daily dispatches of your creative process in public, you cultivate an authentic community without traditional self-promotion.',
+    keyIdeas: [
+      {
+        title: '1. You Don’t Have to Be a Genius',
+        description:
+          'Find a "scenius"—the intelligence of a whole community. Embrace the amateur spirit, learn in public, and share what you love rather than pretending to be an expert.',
+      },
+      {
+        title: '2. Think Process, Not Product',
+        description:
+          'Document what you do every day: snapshots of work in progress, sketches, reading notes, and mistakes. People want to see how the craft actually happens.',
+      },
+      {
+        title: '3. Share Something Small Every Day',
+        description:
+          'Put out a small piece of your process consistently. Over months and years, small daily dispatches accumulate into a substantial body of work.',
+      },
+      {
+        title: '4. Tell Good Stories',
+        description:
+          'Work does not speak for itself. Personal narrative, honesty about struggles, and human storytelling make work memorable and emotionally resonant.',
+      },
+    ],
+    fullSummaryMarkdown: `### The Power of Being an Amateur
+Austin Kleon argues that the myth of the "lone genius" is outdated. In the digital era, creativity is communal. The best way to get discovered is not through aggressive networking or shameless advertising, but by simply turning your process into content and sharing what you find fascinating.
+
+### Share Your Scraps & Work in Progress
+Don't wait until a project is finished to show it. Open up your studio, your reading notebook, and your sketches. Showing the labor and curiosity behind the work invites others to follow along on the journey.
+
+### The "So What?" Rule
+Before posting or sharing something, ask yourself: *"Is this helpful, entertaining, or generous to others?"* If it's just ego gratification, hold it back. If it teaches something or inspires curiosity, release it.`,
+    notableQuotes: [
+      '“You don’t have to be a genius.”',
+      '“Share what you love, and the people who love the same things will find you.”',
+      '“The best way to get started on the path to sharing your work is to think about what you want to learn, and make a commitment to learning it in front of others.”',
+    ],
+    cached: true,
+  },
 };
 
 export const aiSummaryService = {
