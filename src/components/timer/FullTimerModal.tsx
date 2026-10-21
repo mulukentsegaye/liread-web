@@ -28,6 +28,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
     isRunning,
     bookTitle,
     bookAuthor,
+    coverImageUrl,
     pauseTimer,
     resumeTimer,
     resetTimer,
@@ -189,17 +190,27 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
       <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto space-y-4 sm:space-y-6 my-auto py-6 relative z-10 timer-element-reveal-2">
         
         {/* Book Jacket Art */}
-        <div className="relative w-24 h-36 sm:w-32 sm:h-48 rounded-lg shadow-vibe-elevated border border-vibe-border bg-vibe-card flex flex-col items-center justify-between p-3 sm:p-4 text-center">
-          <span className="font-mono text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-vibe-ink line-clamp-2">
-            {bookTitle}
-          </span>
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-vibe-border flex items-center justify-center">
-            <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-vibe-accent/40"></span>
-          </div>
-          <span className="text-[8px] sm:text-[9px] font-medium text-vibe-ink-muted truncate w-full">
-            {bookAuthor}
-          </span>
-          <div className="absolute left-1.5 sm:left-2 top-0 bottom-0 w-[2px] bg-black/10 dark:bg-white/10"></div>
+        <div className="relative w-24 h-36 sm:w-32 sm:h-48 rounded-lg shadow-vibe-elevated border border-vibe-border bg-vibe-card overflow-hidden flex flex-col items-center justify-between text-center">
+          {coverImageUrl ? (
+            <img
+              src={coverImageUrl}
+              alt={bookTitle}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full p-3 sm:p-4 flex flex-col items-center justify-between">
+              <span className="font-mono text-[9px] sm:text-[10px] font-bold tracking-widest uppercase text-vibe-ink line-clamp-2">
+                {bookTitle}
+              </span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-vibe-border flex items-center justify-center">
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-vibe-accent/40"></span>
+              </div>
+              <span className="text-[8px] sm:text-[9px] font-medium text-vibe-ink-muted truncate w-full">
+                {bookAuthor}
+              </span>
+              <div className="absolute left-1.5 sm:left-2 top-0 bottom-0 w-[2px] bg-black/10 dark:bg-white/10"></div>
+            </div>
+          )}
         </div>
 
         {/* Current Book Info */}
@@ -232,7 +243,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
 
           <button
             onClick={isRunning ? pauseTimer : resumeTimer}
-            aria-label={isRunning ? 'Pause reading' : 'Resume reading'}
+            aria-label={isRunning ? 'Pause reading' : (seconds > 0 ? 'Resume reading' : 'Start reading')}
             className="min-h-[48px] flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-sm sm:text-base font-semibold shadow-lg transition-all active:scale-95"
           >
             {isRunning ? (
@@ -243,7 +254,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
             ) : (
               <>
                 <Play className="w-5 h-5 fill-current" />
-                <span>Resume Reading</span>
+                <span>{seconds > 0 ? 'Resume Reading' : 'Start Reading'}</span>
               </>
             )}
           </button>

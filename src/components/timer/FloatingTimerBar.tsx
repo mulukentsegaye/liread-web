@@ -82,7 +82,7 @@ export const FloatingTimerBar: React.FC = () => {
           <div className="flex items-center gap-1.5">
             <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 bg-vibe-accent ${isRunning ? 'animate-pulse' : 'opacity-40'}`} />
             <span className="font-mono text-[10px] font-bold tracking-widest uppercase truncate text-vibe-accent">
-              {isRunning ? 'Reading Now' : 'Timer Paused'}
+              {isRunning ? 'Reading Now' : (seconds > 0 ? 'Timer Paused' : 'Ready to Start')}
             </span>
           </div>
 
@@ -113,7 +113,7 @@ export const FloatingTimerBar: React.FC = () => {
         <button
           type="button"
           onClick={handleTogglePlay}
-          aria-label={isRunning ? 'Pause timer' : 'Resume timer'}
+          aria-label={isRunning ? 'Pause timer' : (seconds > 0 ? 'Resume timer' : 'Start timer')}
           className="h-9 px-3 sm:px-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-1.5"
         >
           {isRunning ? (
@@ -124,7 +124,7 @@ export const FloatingTimerBar: React.FC = () => {
           ) : (
             <>
               <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-              <span className="hidden sm:inline">Resume</span>
+              <span className="hidden sm:inline">{seconds > 0 ? 'Resume' : 'Start'}</span>
             </>
           )}
         </button>
