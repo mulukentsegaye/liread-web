@@ -57,11 +57,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-              <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">
+              <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
                 Community Rankings
               </span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
               Readers Leaderboard
             </h1>
           </div>
@@ -73,7 +73,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
                 onClick={() => setFilter(tab)}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium capitalize transition-all active:scale-95 ${
                   filter === tab
-                    ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
+                    ? 'bg-vibe-card text-vibe-accent font-medium shadow-xs border border-vibe-border'
                     : 'text-vibe-ink-muted hover:text-vibe-ink'
                 }`}
               >

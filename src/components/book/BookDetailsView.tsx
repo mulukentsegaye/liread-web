@@ -90,7 +90,7 @@ function renderMarkdownSynopsis(rawContent: string, fontClass: string): React.Re
           return (
             <h4
               key={idx}
-              className="font-heading text-base sm:text-lg font-bold text-vibe-ink pt-4 pb-1 border-b border-vibe-border/40 tracking-tight"
+              className="font-heading text-base sm:text-lg font-semibold text-vibe-ink pt-4 pb-1 border-b border-vibe-border/40 tracking-tight"
             >
               {headingText}
             </h4>
@@ -325,7 +325,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             <div>
               {/* Category & Year Tags */}
               <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
                   {detailedBook.subjects?.[0] || 'Literature'}
                 </span>
                 {detailedBook.firstPublishYear && (
@@ -334,14 +334,14 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   </span>
                 )}
                 <span className="text-vibe-border">·</span>
-                <span className="flex items-center gap-1 text-xs text-amber-500 font-semibold">
+                <span className="flex items-center gap-1 text-xs text-amber-500 font-medium">
                   <Star className="w-3.5 h-3.5 fill-current" />
                   4.8 Community Rating
                 </span>
               </div>
 
               {/* Title & Author */}
-              <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
+              <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
                 {detailedBook.title}
               </h1>
               <p className="text-sm sm:text-base text-vibe-ink-secondary mt-1 font-normal">
@@ -353,15 +353,15 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             <div className="grid grid-cols-3 gap-2 py-2.5 border-y border-vibe-border">
               <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
                 <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Est. Read</span>
-                <span className="text-xs font-mono font-semibold text-vibe-ink">~5.5 Hours</span>
+                <span className="text-xs font-mono font-medium text-vibe-ink">~5.5 Hours</span>
               </div>
               <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
                 <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Overview</span>
-                <span className="text-xs font-mono font-semibold text-vibe-accent">6–8 Mins</span>
+                <span className="text-xs font-mono font-medium text-vibe-accent">6–8 Mins</span>
               </div>
               <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
                 <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Pacing</span>
-                <span className="text-xs font-semibold text-vibe-ink">Mindful Flow</span>
+                <span className="text-xs font-medium text-vibe-ink">Mindful Flow</span>
               </div>
             </div>
 
@@ -372,7 +372,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               <button
                 type="button"
                 onClick={handleScrollToSummary}
-                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-98 flex items-center justify-center gap-1.5 group"
+                className="h-10 px-3 rounded-xl text-xs font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-98 flex items-center justify-center gap-1.5 group"
               >
                 <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform flex-shrink-0" />
                 <span className="truncate">Overview</span>
@@ -382,7 +382,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               <button
                 type="button"
                 onClick={() => onStartTimer(detailedBook.title, detailedBook.author, detailedBook.coverImageUrl)}
-                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
+                className="h-10 px-3 rounded-xl text-xs font-medium bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <Clock className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0" />
                 <span className="truncate">Start Timer</span>
@@ -393,7 +393,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="w-full h-10 px-2.5 rounded-xl text-xs font-semibold border border-vibe-border bg-vibe-card text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-between gap-1 shadow-xs"
+                  className="w-full h-10 px-2.5 rounded-xl text-xs font-medium border border-vibe-border bg-vibe-card text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-between gap-1 shadow-xs"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Bookmark className={`w-3.5 h-3.5 flex-shrink-0 ${bookshelfStatus !== 'none' ? 'fill-current text-vibe-accent' : 'text-vibe-ink-muted'}`} />
@@ -445,7 +445,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   author: detailedBook.author,
                   coverImageUrl: detailedBook.coverImageUrl,
                 })}
-                className="h-10 px-3 rounded-xl text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
+                className="h-10 px-3 rounded-xl text-xs font-medium bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-center gap-1.5 shadow-xs"
                 title={`Share a passage or moment from "${detailedBook.title}"`}
               >
                 <Share2 className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0" />
@@ -464,7 +464,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('summary')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
             activeTab === 'summary'
               ? 'bg-vibe-accent text-white shadow-xs'
               : 'text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle'
@@ -477,7 +477,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('synopsis')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
             activeTab === 'synopsis'
               ? 'bg-vibe-accent text-white shadow-xs'
               : 'text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle'
@@ -490,7 +490,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab('quotes')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
             activeTab === 'quotes'
               ? 'bg-vibe-accent text-white shadow-xs'
               : 'text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle'
@@ -548,7 +548,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               {/* Core Ideas / Themes Grid (Only when verified key ideas exist) */}
               {summary.keyIdeas && summary.keyIdeas.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
+                  <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
                     Key Themes
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -557,7 +557,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                         key={idx}
                         className="rounded-2xl border border-vibe-border bg-vibe-card p-5 space-y-2 shadow-xs hover:border-vibe-accent/40 transition-colors"
                       >
-                        <h4 className="font-heading text-sm font-semibold text-vibe-ink">
+                        <h4 className="font-sans text-sm font-medium text-vibe-ink">
                           {idea.title}
                         </h4>
                         <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-normal">
@@ -574,7 +574,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
                     <div>
-                      <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink flex items-center gap-2">
+                      <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-vibe-accent" />
                         <span>Chapter Summary & Synopsis</span>
                       </h3>
@@ -618,7 +618,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               {/* Notable Quotes Card (Only when verified quotes exist) */}
               {summary.notableQuotes && summary.notableQuotes.length > 0 && (
                 <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft space-y-4">
-                  <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink flex items-center gap-2">
+                  <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
                     <Quote className="w-4 h-4 text-vibe-accent" />
                     <span>Notable Quotes</span>
                   </h3>
@@ -654,7 +654,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-accent font-bold">
                   Take The Full Journey
                 </span>
-                <h4 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
+                <h4 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
                   Ready to read the complete work?
                 </h4>
                 <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto">
@@ -664,7 +664,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onStartTimer(detailedBook.title, detailedBook.author, detailedBook.coverImageUrl)}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95"
                   >
                     <Clock className="w-4 h-4" />
                     <span>Launch Reading Timer with {detailedBook.title}</span>
@@ -685,7 +685,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
             <div>
-              <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
+              <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
                 About {detailedBook.title}
               </h3>
             </div>
@@ -738,7 +738,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
           {detailedBook.subjects && detailedBook.subjects.length > 0 && (
             <div className="pt-4 border-t border-vibe-border space-y-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted block font-semibold">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted block font-medium">
                 Indexed Subjects & Themes
               </span>
               <div className="flex flex-wrap gap-2">

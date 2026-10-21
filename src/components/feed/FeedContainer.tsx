@@ -56,10 +56,10 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
 
       {/* Page header */}
       <div className="pt-1 pb-1">
-        <p className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted mb-1">
+        <p className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80 mb-1">
           Today's Reading Feed
         </p>
-        <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
+        <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
       </div>
@@ -78,7 +78,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
           <p className="text-sm font-medium text-vibe-ink transition-colors">
             {userFirstName ? (
               <>
-                What are you reading, <span className="font-semibold text-vibe-ink">{userFirstName}</span>?
+                What are you reading, <span className="font-medium text-vibe-ink">{userFirstName}</span>?
               </>
             ) : (
               'What are you reading?'
@@ -88,9 +88,9 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         </div>
         <button
           onClick={(e) => { e.stopPropagation(); onOpenCreateModal(); }}
-          className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-colors"
+          className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-medium shadow-xs transition-colors"
         >
-          <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
+          <Plus className="w-3.5 h-3.5" strokeWidth={2} />
           <span>Share</span>
         </button>
       </div>
@@ -100,7 +100,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         <div className="flex items-center gap-1 bg-vibe-card border border-vibe-border rounded-xl p-1 shadow-xs">
           <button
             onClick={() => setFeedTab('for_you')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               feedTab === 'for_you'
                 ? 'bg-vibe-accent text-white shadow-xs'
                 : 'text-vibe-ink-secondary hover:text-vibe-ink'
@@ -111,7 +111,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
           </button>
           <button
             onClick={() => setFeedTab('following')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               feedTab === 'following'
                 ? 'bg-vibe-accent text-white shadow-xs'
                 : 'text-vibe-ink-secondary hover:text-vibe-ink'

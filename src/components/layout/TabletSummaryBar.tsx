@@ -64,10 +64,10 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
                 <circle cx="18" cy="18" r="14" className="stroke-vibe-border" strokeWidth="3.5" fill="transparent" />
                 <circle cx="18" cy="18" r="14" className="stroke-vibe-accent transition-all duration-700" strokeWidth="3.5" strokeDasharray={2 * Math.PI * 14} strokeDashoffset={2 * Math.PI * 14 * (1 - progressPercent / 100)} strokeLinecap="round" fill="transparent" />
               </svg>
-              <span className="absolute font-mono text-[10px] font-bold text-vibe-ink">{todayMinutesRead}m</span>
+              <span className="absolute font-mono text-[10px] font-medium text-vibe-ink">{todayMinutesRead}m</span>
             </div>
             <div>
-              <p className="font-heading text-xs font-semibold leading-tight text-vibe-ink">Daily Goal</p>
+              <p className="font-sans text-xs font-medium leading-tight text-vibe-ink">Daily Goal</p>
               <p className="font-mono text-[11px] text-vibe-ink-muted">{progressPercent}% of {goal}m</p>
             </div>
           </div>
@@ -78,7 +78,7 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
               <Flame className="w-4 h-4 fill-current" />
             </div>
             <div>
-              <p className="font-heading text-xs font-semibold leading-tight text-vibe-ink">{user?.currentStreak ?? 0}-Day Streak</p>
+              <p className="font-sans text-xs font-medium leading-tight text-vibe-ink">{user?.currentStreak ?? 0}-Day Streak</p>
               <p className="text-[11px] text-vibe-ink-muted">{(user?.currentStreak ?? 0) > 0 ? 'Active & running' : 'Log a session to begin'}</p>
             </div>
           </div>
@@ -89,7 +89,7 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
               <Trophy className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-heading text-xs font-semibold leading-tight text-vibe-ink">
+              <p className="font-sans text-xs font-medium leading-tight text-vibe-ink">
                 {userStanding ? `#${userStanding.rank} This Week` : 'Unranked This Week'}
               </p>
               <p className="text-[11px] font-mono text-vibe-ink-muted">

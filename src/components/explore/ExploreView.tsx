@@ -213,11 +213,11 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-vibe-accent/80" />
-          <span className="font-mono text-[11px] font-bold tracking-widest uppercase text-vibe-ink-muted">
+          <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
             Curated Recommendations
           </span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-vibe-ink">
+        <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-vibe-ink">
           Explore Books
         </h1>
       </div>
@@ -250,7 +250,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           {/* Spotlight Details */}
           <div className="md:col-span-8 space-y-4 text-left">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent text-white shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-medium bg-vibe-accent text-white shadow-xs">
                 <Sparkles className="w-3.5 h-3.5" />
                 Curator's Spotlight
               </span>
@@ -260,7 +260,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </div>
 
             <div className="space-y-1">
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-vibe-ink tracking-tight group-hover:text-vibe-accent transition-colors">
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight group-hover:text-vibe-accent transition-colors">
                 {SPOTLIGHT_BOOK.title}
               </h2>
               <p className="text-sm sm:text-base text-vibe-ink-secondary font-medium">
@@ -348,7 +348,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-amber-500 fill-current" />
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-serif text-lg sm:text-xl font-semibold text-vibe-ink">
                   Trending on Readers Hub
                 </h2>
               </div>
@@ -366,7 +366,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-serif text-lg sm:text-xl font-semibold text-vibe-ink">
                   Habits, Craft & High Cognition
                 </h2>
               </div>
@@ -390,7 +390,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-sky-500" />
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-serif text-lg sm:text-xl font-semibold text-vibe-ink">
                   Philosophy, Contemplation & Stoicism
                 </h2>
               </div>
@@ -414,7 +414,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-purple-500" />
-                <h2 className="font-serif text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-serif text-lg sm:text-xl font-semibold text-vibe-ink">
                   Masterpiece Fiction & Sci-Fi
                 </h2>
               </div>

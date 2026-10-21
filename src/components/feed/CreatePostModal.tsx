@@ -220,7 +220,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
               <div className="flex items-center gap-2 text-vibe-accent">
                 <Sparkles className="w-5 h-5 flex-shrink-0" />
-                <h2 className="font-heading text-lg sm:text-xl font-bold text-vibe-ink">
+                <h2 className="font-heading text-lg sm:text-xl font-semibold text-vibe-ink">
                   Share a Reading Moment
                 </h2>
               </div>
@@ -239,7 +239,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setPostType('passage')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-semibold rounded-xl border transition-all ${
+              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
                 postType === 'passage'
                   ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
                   : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
@@ -250,7 +250,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setPostType('finished_book')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-semibold rounded-xl border transition-all ${
+              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
                 postType === 'finished_book'
                   ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
                   : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
@@ -261,7 +261,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setPostType('recommendation')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-semibold rounded-xl border transition-all ${
+              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
                 postType === 'recommendation'
                   ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
                   : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
@@ -278,7 +278,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               {/* Book Title with Open Library Auto-Suggest */}
               <div className="relative" ref={searchContainerRef}>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">
+                  <label className="block text-[10.5px] font-medium uppercase tracking-wider text-vibe-ink-muted/80">
                     Book Title *
                   </label>
                   <span className="text-[10px] text-vibe-accent font-medium flex items-center gap-1">
@@ -425,7 +425,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
               {/* Author Input */}
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
+                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
                   Author
                 </label>
                 <input
@@ -486,7 +486,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             {/* Page Number & Tag */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
+                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
                   Page #
                 </label>
                 <input
@@ -499,7 +499,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
+                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
                   Genre / Tag
                 </label>
                 <select
@@ -520,7 +520,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             {/* Star Rating */}
             {postType === 'finished_book' && (
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
+                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
                   Your Rating
                 </label>
                 <div className="flex items-center gap-2 text-vibe-secondary">
@@ -559,14 +559,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           <button
             type="button"
             onClick={handleClose}
-            className="min-h-[44px] px-4 py-2.5 text-xs sm:text-sm font-semibold text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+            className="min-h-[44px] px-4 py-2.5 text-xs sm:text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink transition-colors"
           >
             Cancel
           </button>
           <button
             form="create-post-form"
             type="submit"
-            className="min-h-[44px] px-6 py-2.5 text-xs sm:text-sm font-semibold rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-colors active:scale-95"
+            className="min-h-[44px] px-6 py-2.5 text-xs sm:text-sm font-medium rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-colors active:scale-95"
           >
             Publish Moment
           </button>

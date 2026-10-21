@@ -28,11 +28,11 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
             aria-label={item.label}
             className={`min-w-[52px] h-11 flex flex-col items-center justify-center gap-0.5 px-2.5 rounded-xl transition-all duration-200 active:scale-95 ${
               isActive 
-                ? 'bg-vibe-accent text-white shadow-xs font-semibold' 
+                ? 'bg-vibe-accent text-white shadow-xs font-medium' 
                 : 'text-vibe-ink-muted hover:text-vibe-ink'
             }`}
           >
-            <Icon className={`w-4 h-4 ${isActive ? 'stroke-[2.5]' : ''}`} />
+            <Icon className={`w-4 h-4 ${isActive ? 'stroke-[2]' : 'stroke-[1.5]'}`} />
             <span className="text-[10px] leading-tight tracking-tight">{item.label}</span>
           </button>
         );

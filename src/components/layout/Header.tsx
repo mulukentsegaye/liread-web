@@ -403,7 +403,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="w-8 h-8 rounded-xl bg-vibe-accent flex items-center justify-center shadow-sm transition-all group-hover:scale-105 group-active:scale-95">
             <BookOpen className="w-4 h-4 text-white" strokeWidth={2.5} />
           </div>
-          <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-vibe-ink hidden sm:block">
+          <span className="font-display text-lg sm:text-xl font-semibold tracking-tight text-vibe-ink hidden sm:block">
             Readers Hub
           </span>
         </button>
@@ -459,7 +459,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onGoToLogin}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs cursor-pointer"
             >
               Sign In
             </button>
@@ -487,13 +487,13 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Streak badge (mobile) */}
           <div className="flex sm:hidden items-center gap-1 px-2 py-1 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="font-mono text-xs font-bold leading-none">{user?.currentStreak ?? 0}</span>
+            <span className="font-mono text-xs font-semibold leading-none">{user?.currentStreak ?? 0}</span>
           </div>
 
           {/* Streak badge (desktop) */}
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent">
             <Flame className="w-3.5 h-3.5 fill-current" />
-            <span className="font-mono text-xs font-bold">{user?.currentStreak ?? 0}d</span>
+            <span className="font-mono text-xs font-semibold">{user?.currentStreak ?? 0}d</span>
           </div>
 
           {/* Notifications */}
@@ -516,12 +516,12 @@ export const Header: React.FC<HeaderProps> = ({
                 />
                 <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl bg-vibe-card border border-vibe-border shadow-vibe-elevated p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                   <div className="flex items-center justify-between pb-2 mb-2 border-b border-vibe-border">
-                    <span className="font-heading text-xs font-bold text-vibe-ink">Notifications</span>
+                    <span className="font-sans text-xs font-medium uppercase tracking-wider text-vibe-ink">Notifications</span>
                     <span className="text-[10px] text-vibe-ink-muted">All caught up</span>
                   </div>
                   <div className="space-y-2 text-xs">
                     <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border/60">
-                      <p className="font-semibold text-vibe-ink">Welcome to Readers Hub</p>
+                      <p className="font-medium text-vibe-ink">Welcome to Readers Hub</p>
                       <p className="text-vibe-ink-muted text-[11px] mt-0.5 leading-relaxed">
                         Start your reading timer today to log your first streak session and climb the weekly leaderboard.
                       </p>

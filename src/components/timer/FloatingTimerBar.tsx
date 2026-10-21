@@ -81,12 +81,12 @@ export const FloatingTimerBar: React.FC = () => {
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 bg-vibe-accent ${isRunning ? 'animate-pulse' : 'opacity-40'}`} />
-            <span className="font-mono text-[10px] font-bold tracking-widest uppercase truncate text-vibe-accent">
+            <span className="font-sans text-[10px] font-medium tracking-wider uppercase truncate text-vibe-accent">
               {isRunning ? 'Reading Now' : (seconds > 0 ? 'Timer Paused' : 'Ready to Start')}
             </span>
           </div>
 
-          <h3 className="font-heading text-xs sm:text-sm font-semibold truncate max-w-[120px] sm:max-w-[200px] text-vibe-ink leading-tight">
+          <h3 className="font-sans text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-[200px] text-vibe-ink leading-tight">
             {bookTitle}
           </h3>
 
@@ -101,7 +101,7 @@ export const FloatingTimerBar: React.FC = () => {
         <AmbientAudioController compact />
 
         <div className="text-right">
-          <div className="font-mono text-sm sm:text-base font-bold tracking-tight leading-none text-vibe-ink tabular-nums">
+          <div className="font-mono text-sm sm:text-base font-semibold tracking-tight leading-none text-vibe-ink tabular-nums">
             {formatTime(seconds)}
           </div>
           <span className="hidden sm:inline-block text-[10px] font-medium text-vibe-ink-muted">
@@ -114,7 +114,7 @@ export const FloatingTimerBar: React.FC = () => {
           type="button"
           onClick={handleTogglePlay}
           aria-label={isRunning ? 'Pause timer' : (seconds > 0 ? 'Resume timer' : 'Start timer')}
-          className="h-9 px-3 sm:px-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-1.5"
+          className="h-9 px-3 sm:px-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-medium shadow-xs active:scale-95 transition-all flex items-center gap-1.5"
         >
           {isRunning ? (
             <>

@@ -68,7 +68,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-            <h2 className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink">
+            <h2 className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink">
               Today's Goal
             </h2>
           </div>
@@ -89,13 +89,13 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
               <circle cx={size / 2} cy={size / 2} r={radius} className="stroke-vibe-accent transition-all duration-1000 ease-out" strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" fill="transparent" />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="font-mono text-3xl font-bold text-vibe-ink leading-none tracking-tight">{todayMinutesRead}</span>
+              <span className="font-mono text-3xl font-semibold text-vibe-ink leading-none tracking-tight">{todayMinutesRead}</span>
               <span className="font-mono text-[11px] font-medium text-vibe-ink-muted mt-1">of {goal} min</span>
             </div>
           </div>
 
           <div className="text-center mt-2.5">
-            <p className="text-xs font-semibold text-vibe-ink">
+            <p className="text-xs font-medium text-vibe-ink">
               {progressPercent >= 100 ? 'Daily goal completed!' : `${minutesLeft} min remaining today`}
             </p>
             <p className="text-[11px] text-vibe-ink-muted mt-0.5">
@@ -111,7 +111,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
               <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
                 <Flame className="w-3.5 h-3.5 fill-current" />
               </div>
-              <span className="text-xs font-semibold text-vibe-ink">{user?.currentStreak ?? 0}-day streak</span>
+              <span className="text-xs font-medium text-vibe-ink">{user?.currentStreak ?? 0}-day streak</span>
             </div>
             <span className="text-[10px] font-mono font-medium text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
               {(user?.currentStreak ?? 0) > 0 ? 'Active' : 'Start today'}
@@ -145,7 +145,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <Trophy className="w-3.5 h-3.5 text-vibe-secondary" />
-            <h2 className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink">Weekly Leaders</h2>
+            <h2 className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink">Weekly Leaders</h2>
           </div>
         </div>
         <p className="text-[11px] text-vibe-ink-muted mb-3.5">Readers logging the most active time</p>
@@ -159,8 +159,8 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
             leaders.map((entry) => (
               <div key={entry.userId} className="flex items-center justify-between text-xs py-1.5 px-2 rounded-xl hover:bg-vibe-card-subtle transition-colors group">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className={`w-4 text-center font-mono text-[11px] font-bold ${entry.rank === 1 ? 'text-amber-500' : entry.rank === 2 ? 'text-slate-400' : entry.rank === 3 ? 'text-amber-700' : 'text-vibe-ink-muted'}`}>{entry.rank}</span>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${entry.rank === 1 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'bg-vibe-card-subtle text-vibe-ink border border-vibe-border'}`}>{entry.initials}</div>
+                  <span className={`w-4 text-center font-mono text-[11px] font-medium ${entry.rank === 1 ? 'text-amber-500' : entry.rank === 2 ? 'text-slate-400' : entry.rank === 3 ? 'text-amber-700' : 'text-vibe-ink-muted'}`}>{entry.rank}</span>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium flex-shrink-0 ${entry.rank === 1 ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'bg-vibe-card-subtle text-vibe-ink border border-vibe-border'}`}>{entry.initials}</div>
                   <span className="font-medium text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">{entry.fullName}</span>
                 </div>
                 <span className="font-mono text-[11px] tabular-nums text-vibe-ink-muted flex-shrink-0 ml-2">{entry.formattedTime}</span>
@@ -172,10 +172,10 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
             <div className="mt-3 pt-2">
               <div className="bg-vibe-accent-subtle/70 border border-vibe-accent/25 rounded-xl px-3 py-2 flex items-center justify-between text-xs font-medium text-vibe-ink">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-mono font-bold text-[11px] text-vibe-accent">#{userStanding.rank}</span>
-                  <span className="truncate font-semibold text-vibe-ink">You</span>
+                  <span className="font-mono font-medium text-[11px] text-vibe-accent">#{userStanding.rank}</span>
+                  <span className="truncate font-medium text-vibe-ink">You</span>
                 </div>
-                <span className="font-mono text-[11px] font-bold text-vibe-accent flex-shrink-0">{userStanding.formattedTime}</span>
+                <span className="font-mono text-[11px] font-medium text-vibe-accent flex-shrink-0">{userStanding.formattedTime}</span>
               </div>
             </div>
           )}
@@ -184,7 +184,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="mt-3.5 pt-3 border-t border-vibe-border-subtle">
           <button
             onClick={onViewLeaderboard}
-            className="w-full py-2 px-3 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-vibe-accent hover:text-vibe-accent-hover hover:bg-vibe-accent-subtle/50 rounded-xl transition-all group"
+            className="w-full py-2 px-3 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-vibe-accent hover:text-vibe-accent-hover hover:bg-vibe-accent-subtle/50 rounded-xl transition-all group"
           >
             <span>View full leaderboard</span>
             <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
@@ -198,7 +198,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
           <div className="w-6 h-6 rounded-lg bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">Community Note</span>
+          <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">Community Note</span>
         </div>
         <h3 className="font-display italic text-base leading-snug font-normal text-vibe-ink mb-1.5">
           "A reader lives a thousand lives before he dies."

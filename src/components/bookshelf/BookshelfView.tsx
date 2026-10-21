@@ -88,15 +88,15 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-              <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">Personal Library</span>
+              <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">Personal Library</span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">{activeSubTab === 'bookshelf' ? 'My Bookshelf' : 'Saved Passages'}</h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">{activeSubTab === 'bookshelf' ? 'My Bookshelf' : 'Saved Passages'}</h1>
           </div>
           <div className="flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle">
-            <button onClick={() => setActiveSubTab('bookshelf')} className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${activeSubTab === 'bookshelf' ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border' : 'text-vibe-ink-muted hover:text-vibe-ink'}`}>
+            <button onClick={() => setActiveSubTab('bookshelf')} className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${activeSubTab === 'bookshelf' ? 'bg-vibe-card text-vibe-accent font-medium shadow-xs border border-vibe-border' : 'text-vibe-ink-muted hover:text-vibe-ink'}`}>
               <BookOpen className="w-3.5 h-3.5" /><span>Bookshelf ({mappedBooks.length})</span>
             </button>
-            <button onClick={() => setActiveSubTab('saved')} className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${activeSubTab === 'saved' ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border' : 'text-vibe-ink-muted hover:text-vibe-ink'}`}>
+            <button onClick={() => setActiveSubTab('saved')} className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${activeSubTab === 'saved' ? 'bg-vibe-card text-vibe-accent font-medium shadow-xs border border-vibe-border' : 'text-vibe-ink-muted hover:text-vibe-ink'}`}>
               <Bookmark className="w-3.5 h-3.5" /><span>Saved ({savedPosts.length})</span>
             </button>
           </div>

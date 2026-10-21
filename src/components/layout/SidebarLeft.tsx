@@ -49,7 +49,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
 
         {/* Primary Navigation */}
         <nav className="space-y-0.5">
-          <p className="hidden lg:block px-3 text-[10px] font-mono font-bold tracking-widest uppercase text-vibe-ink-muted mb-2">
+          <p className="hidden lg:block px-3 text-[10.5px] font-sans font-medium tracking-wider uppercase text-vibe-ink-muted/80 mb-2">
             Navigation
           </p>
           {mainNavItems.map((item) => {
@@ -61,13 +61,13 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 aria-label={item.label}
-                className={`w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 rounded-xl text-sm font-medium transition-colors duration-150 ${
+                className={`w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 rounded-xl text-[13.5px] transition-colors duration-150 ${
                   isActive
-                    ? 'bg-vibe-accent text-white shadow-xs'
-                    : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
+                    ? 'bg-vibe-accent text-white font-medium shadow-xs'
+                    : 'text-vibe-ink-secondary font-normal hover:bg-vibe-card-subtle hover:text-vibe-ink'
                 }`}
               >
-                <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2.5 : 1.75} />
+                <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2 : 1.5} />
                 <span className="hidden lg:inline truncate">{item.label}</span>
               </button>
             );
@@ -76,7 +76,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
 
         {/* Library Section */}
         <nav className="space-y-0.5">
-          <p className="hidden lg:block px-3 text-[10px] font-mono font-bold tracking-widest uppercase text-vibe-ink-muted mb-2">
+          <p className="hidden lg:block px-3 text-[10.5px] font-sans font-medium tracking-wider uppercase text-vibe-ink-muted/80 mb-2">
             Library
           </p>
           {libraryItems.map((item) => {
@@ -88,18 +88,18 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 aria-label={item.label}
-                className={`w-full h-10 flex items-center justify-center lg:justify-between px-3 rounded-xl text-sm font-medium transition-colors duration-150 ${
+                className={`w-full h-10 flex items-center justify-center lg:justify-between px-3 rounded-xl text-[13.5px] transition-colors duration-150 ${
                   isActive
-                    ? 'bg-vibe-accent text-white shadow-xs'
-                    : 'text-vibe-ink-secondary hover:bg-vibe-card-subtle hover:text-vibe-ink'
+                    ? 'bg-vibe-accent text-white font-medium shadow-xs'
+                    : 'text-vibe-ink-secondary font-normal hover:bg-vibe-card-subtle hover:text-vibe-ink'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2.5 : 1.75} />
+                  <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={isActive ? 2 : 1.5} />
                   <span className="hidden lg:inline truncate">{item.label}</span>
                 </div>
                 {item.badge !== undefined && (
-                  <span className={`hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md font-mono text-[10px] font-semibold transition-colors ${
+                  <span className={`hidden lg:inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md font-mono text-[10px] font-medium transition-colors ${
                     isActive ? 'bg-white/20 text-white' : 'bg-vibe-card text-vibe-ink-muted border border-vibe-border'
                   }`}>
                     {item.badge}
@@ -131,9 +131,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
           onClick={() => openInfoModal('help')}
           title="Help & community"
           aria-label="Help & community"
-          className="w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle rounded-xl transition-colors"
+          className="w-full h-10 flex items-center justify-center lg:justify-start gap-3 px-3 text-[13.5px] font-normal text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle rounded-xl transition-colors"
         >
-          <HelpCircle className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={1.75} />
+          <HelpCircle className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={1.5} />
           <span className="hidden lg:inline">Help & community</span>
         </button>
 
@@ -156,7 +156,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
               className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
             />
             <div className="hidden lg:block text-left min-w-0">
-              <p className="text-xs font-semibold text-vibe-ink leading-tight truncate">
+              <p className="text-xs font-medium text-vibe-ink leading-tight truncate">
                 {user?.fullName ?? 'Guest Explorer'}
               </p>
               <p className="text-[11px] text-vibe-ink-muted mt-0.5 truncate">

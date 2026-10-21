@@ -70,13 +70,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-heading text-sm font-semibold text-vibe-ink">{post.authorName}</span>
+              <span className="font-sans text-[13.5px] font-medium text-vibe-ink">{post.authorName}</span>
               <span className="text-xs text-vibe-ink-muted">{post.actionText}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="font-mono text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
               <span className="text-vibe-border">·</span>
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
+              <span className="font-sans text-[10px] font-medium uppercase tracking-wider text-vibe-accent bg-vibe-accent-subtle px-2 py-0.5 rounded-full">
                 {post.tag}
               </span>
             </div>
@@ -128,7 +128,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
               >
                 {/* Spine line */}
                 <div className="absolute left-2 top-0 bottom-0 w-px opacity-30" style={{ backgroundColor: coverAccent }} />
-                <span className="text-[9px] font-bold tracking-wide text-center leading-tight line-clamp-3 z-10" style={{ color: coverAccent }}>
+                <span className="text-[9px] font-semibold tracking-wide text-center leading-tight line-clamp-3 z-10" style={{ color: coverAccent }}>
                   {post.bookTitle.toUpperCase()}
                 </span>
                 <span className="text-[8px] opacity-60 text-center z-10" style={{ color: coverAccent }}>
@@ -182,7 +182,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
               strokeWidth={1.5}
             />
           ))}
-          <span className="ml-1.5 font-mono text-xs font-semibold text-vibe-ink-muted">{post.rating}.0</span>
+          <span className="ml-1.5 font-mono text-xs font-medium text-vibe-ink-muted">{post.rating}.0</span>
         </div>
       )}
 

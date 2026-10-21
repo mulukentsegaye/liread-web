@@ -107,11 +107,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-            <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-vibe-ink-muted">
+            <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
               Personal Analytics
             </span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-vibe-ink leading-tight">
+          <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
             Your Reading Journey
           </h1>
         </div>
@@ -123,13 +123,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 1: Today */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Today</span>
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Today</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
               {todayMinutesRead} <span className="text-xs font-sans font-normal text-vibe-ink-muted">min</span>
             </div>
             <p className="text-xs text-vibe-ink-muted mt-1.5 flex items-center justify-between font-mono">
@@ -144,13 +144,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 2: Streak */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Streak</span>
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Streak</span>
             <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
               <Flame className="w-4 h-4 fill-current" />
             </div>
           </div>
           <div>
-            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
               {user.currentStreak} <span className="text-xs font-sans font-normal text-vibe-ink-muted">days</span>
             </div>
             <p className="text-xs font-medium text-vibe-accent mt-1.5 flex items-center gap-1 font-mono">
@@ -162,13 +162,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 3: Rank Tier */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-heading text-xl sm:text-2xl font-bold text-vibe-ink leading-tight truncate">
+            <div className="font-heading text-xl sm:text-2xl font-semibold text-vibe-ink leading-tight truncate">
               {user.rankTier}
             </div>
             <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">
@@ -180,13 +180,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         {/* Card 4: Bookshelf */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-heading text-xs font-semibold uppercase tracking-wider text-vibe-ink-muted">Library</span>
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Library</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
               <BookOpen className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink leading-tight">
+            <div className="font-mono text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
               {user.bookshelfCount} <span className="text-xs font-sans font-normal text-vibe-ink-muted">books</span>
             </div>
             <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">

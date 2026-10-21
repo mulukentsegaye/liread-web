@@ -212,7 +212,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
 
         {/* Current Book Info */}
         <div className="space-y-0.5">
-          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-vibe-ink break-words">
+          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-normal leading-tight text-vibe-ink break-words">
             {bookTitle}
           </h1>
           <p className="text-xs text-vibe-ink-muted">
@@ -221,7 +221,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
         </div>
 
         {/* Digital Clock */}
-        <div className="font-mono text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider py-2 select-none drop-shadow-sm text-vibe-ink">
+        <div className="font-mono text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-semibold tracking-wider py-2 select-none drop-shadow-sm text-vibe-ink">
           <span>{formatHours}</span>:
           <span>{formatMins}</span>:
           <span>{formatSecs}</span>
@@ -241,7 +241,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
           <button
             onClick={isRunning ? pauseTimer : resumeTimer}
             aria-label={isRunning ? 'Pause reading' : (seconds > 0 ? 'Resume reading' : 'Start reading')}
-            className="min-h-[48px] flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-sm sm:text-base font-semibold shadow-lg transition-all active:scale-95"
+            className="min-h-[48px] flex items-center gap-2 px-6 sm:px-8 py-3.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-sm sm:text-base font-medium shadow-lg transition-all active:scale-95"
           >
             {isRunning ? (
               <>
