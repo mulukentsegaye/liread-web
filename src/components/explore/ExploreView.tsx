@@ -324,22 +324,12 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         })}
         className="group relative flex flex-col p-3 rounded-2xl bg-vibe-card border border-vibe-border shadow-xs hover:border-vibe-accent/40 transition-colors duration-200 cursor-pointer w-full min-w-0"
       >
-        {/* Cover Thumbnail: stays still, no buttons or badges overlaid */}
-        <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 border border-vibe-border/60 bg-vibe-card-subtle shadow-xs">
-          {book.coverImageUrl ? (
-            <img
-              src={book.coverImageUrl}
-              alt={book.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-vibe-card-subtle">
-              <BookOpen className="w-6 h-6 text-vibe-accent mb-1" />
-              <p className="font-serif text-xs font-bold text-vibe-ink line-clamp-2">{book.title}</p>
-            </div>
-          )}
-        </div>
+        {/* Cover Thumbnail: rendered with resilient BookCardCover */}
+        <BookCardCover
+          title={book.title}
+          author={book.author}
+          coverImageUrl={book.coverImageUrl}
+        />
 
         {/* Quiet, uncluttered book details */}
         <div className="space-y-1 min-w-0">
