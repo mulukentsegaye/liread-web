@@ -658,7 +658,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <div className="space-y-1.5">
                     {[
                       { goal: '100% of plan', name: 'Elena Rostova', streak: '28d streak', badge: '✨' },
-                      { goal: '100% of plan', name: 'Alex Miller', streak: '19d streak', badge: '✨' },
+                      { goal: '100% of plan', name: 'Julian Reed', streak: '19d streak', badge: '✨' },
                       { goal: '100% of plan', name: 'Sophia Chen', streak: '21d streak', badge: '✨' },
                     ].map((reader) => (
                       <div key={reader.name} className="flex items-center justify-between p-2 rounded-xl bg-vibe-card-subtle text-xs">

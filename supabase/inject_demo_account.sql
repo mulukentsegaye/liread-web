@@ -21,7 +21,7 @@ DELETE FROM public.post_upvotes WHERE user_id = 'a1111111-1111-1111-1111-1111111
 DELETE FROM public.reading_sessions WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM public.bookshelf WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM public.posts WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
-DELETE FROM public.profiles WHERE id = 'a1111111-1111-1111-1111-111111111111' OR username = 'alex_miller' OR username = 'demoreader';
+DELETE FROM public.profiles WHERE id = 'a1111111-1111-1111-1111-111111111111' OR username = 'julian_reed' OR username = 'alex_miller' OR username = 'demoreader';
 DELETE FROM auth.identities WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM auth.users WHERE email = 'demo@liread.com' OR id = 'a1111111-1111-1111-1111-111111111111';
 
@@ -52,7 +52,7 @@ VALUES (
     crypt('test1234', gen_salt('bf')),
     timezone('utc'::text, now()),
     '{"provider":"email","providers":["email"]}',
-    '{"username":"alex_miller","full_name":"Alex Miller","avatar_url":"https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}',
+    '{"username":"julian_reed","full_name":"Julian Reed","avatar_url":"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80"}',
     timezone('utc'::text, now() - INTERVAL '30 days'),
     timezone('utc'::text, now()),
     '',
@@ -150,9 +150,9 @@ INSERT INTO public.profiles (
 )
 VALUES (
     'a1111111-1111-1111-1111-111111111111',
-    'alex_miller',
-    'Alex Miller',
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    'julian_reed',
+    'Julian Reed',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80',
     'Avid reader exploring philosophy, craft & slow living.',
     385,
     7,
@@ -375,5 +375,5 @@ SELECT
     'Demo account successfully injected!' AS status,
     'demo@liread.com' AS email,
     'test1234' AS password,
-    'Alex Miller' AS full_name,
+    'Julian Reed' AS full_name,
     '385 minutes (7-day streak)' AS reading_stats;

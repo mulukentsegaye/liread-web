@@ -587,7 +587,7 @@ VALUES
         crypt('Password123!', gen_salt('bf')),
         timezone('utc'::text, now()),
         '{"provider":"email","providers":["email"]}',
-        '{"username":"alex_miller","full_name":"Alex Miller","avatar_url":"https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}',
+        '{"username":"julian_reed","full_name":"Julian Reed","avatar_url":"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80"}',
         timezone('utc'::text, now()),
         timezone('utc'::text, now()),
         ''
@@ -700,9 +700,9 @@ INSERT INTO public.profiles (
 VALUES
     (
         'a1111111-1111-1111-1111-111111111111',
-        'alex_miller',
-        'Alex Miller',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+        'julian_reed',
+        'Julian Reed',
+        'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80',
         'Avid reader exploring philosophy, craft & slow living.',
         1420,
         7,

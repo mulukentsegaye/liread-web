@@ -12,7 +12,7 @@ DELETE FROM public.post_upvotes WHERE user_id = 'a1111111-1111-1111-1111-1111111
 DELETE FROM public.reading_sessions WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM public.bookshelf WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM public.posts WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
-DELETE FROM public.profiles WHERE id = 'a1111111-1111-1111-1111-111111111111' OR username = 'alex_miller' OR username = 'demoreader';
+DELETE FROM public.profiles WHERE id = 'a1111111-1111-1111-1111-111111111111' OR username = 'julian_reed' OR username = 'alex_miller' OR username = 'demoreader';
 DELETE FROM auth.identities WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
 DELETE FROM auth.users WHERE email = 'demo@liread.com' OR id = 'a1111111-1111-1111-1111-111111111111';
 
