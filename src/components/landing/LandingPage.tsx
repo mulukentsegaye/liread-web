@@ -27,6 +27,7 @@ import { AmbientSoundId } from '../../types/theme';
 import { useAuthStore } from '../../stores/authStore';
 import { ReadingImpactCalculator } from './ReadingImpactCalculator';
 import { ScrollTurnedBookExperience } from './ScrollTurnedBookExperience';
+import { DailyRitualDeck } from './DailyRitualDeck';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -101,6 +102,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
             <a href="#experience" className="hover:text-vibe-accent transition-colors">
               3D Book
+            </a>
+            <a href="#ritual" className="hover:text-vibe-accent transition-colors">
+              Daily Ritual
             </a>
             <a href="#timer" className="hover:text-vibe-accent transition-colors">
               Timer
@@ -227,6 +231,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
         onOpenTimer={onOpenTimer}
         onGoToLogin={onGoToLogin}
         onGuest={handleGuest}
+      />
+
+      {/* ==============================================================================
+          STICKY PINNED "A DAY IN THE LIFE" INTERACTIVE DECK
+          ============================================================================== */}
+      <DailyRitualDeck
+        onStartRitual={() => (onGoToLogin ? onGoToLogin() : handleGuest())}
+        onExploreGuest={handleGuest}
       />
 
       {/* ==============================================================================
@@ -869,6 +881,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
             <a href="#experience" className="hover:text-vibe-ink transition-colors">3D Book</a>
+            <a href="#ritual" className="hover:text-vibe-ink transition-colors">Ritual</a>
             <a href="#timer" className="hover:text-vibe-ink transition-colors">Timer</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Soundscapes</a>
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
