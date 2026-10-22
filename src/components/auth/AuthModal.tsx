@@ -17,6 +17,7 @@ import {
   Mail
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useNoticeStore } from '../../stores/noticeStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { describeAuthError } from '../../lib/authErrors';
 
@@ -41,6 +42,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     isLoading,
     resendConfirmationEmail
   } = useAuthStore();
+  const { showToast } = useNoticeStore();
 
   const [tab, setTab] = useState<'signin' | 'signup' | 'account'>(
     isAuthenticated ? 'account' : defaultTab
@@ -67,8 +69,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         type: 'info',
         text: `Confirmation link resent to ${email}! Check your inbox and spam folder.`,
       });
+      showToast({
+        type: 'success',
+        title: 'Confirmation Email Sent',
+        message: `Fresh verification link dispatched to ${email}.`,
+      });
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: describeAuthError(err) });
+      const msg = describeAuthError(err);
+      setStatusMessage({ type: 'error', text: msg });
+      showToast({ type: 'error', title: 'Error Sending Link', message: msg });
     } finally {
       setIsResending(false);
     }
@@ -93,11 +102,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       await signIn(email, password);
       setStatusMessage({ type: 'success', text: 'Welcome back! Signed in successfully.' });
+      showToast({
+        type: 'success',
+        title: 'Signed In',
+        message: 'Welcome back to Liread!',
+      });
       setTimeout(() => {
         onClose();
       }, 900);
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: describeAuthError(err) });
+      const msg = describeAuthError(err);
+      setStatusMessage({ type: 'error', text: msg });
+      showToast({ type: 'error', title: 'Sign In Notice', message: msg });
     }
   };
 
@@ -114,7 +130,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       if (useAuthStore.getState().pendingConfirmationEmail) {
         setStatusMessage({
           type: 'info',
-          text: 'Account created! Check your email to confirm the address, then sign in.',
+          text: 'Account created! Check your email to confirm your address, then sign in.',
+        });
+        showToast({
+          type: 'info',
+          title: 'Verification Email Sent',
+          message: `Check your inbox at ${email} to activate your account.`,
+          duration: 8000,
         });
         setTimeout(() => { onClose(); }, 2500);
         return;
@@ -123,11 +145,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         type: 'success',
         text: 'Account created! You are now signed in.'
       });
+      showToast({
+        type: 'success',
+        title: 'Account Created',
+        message: 'Welcome to Liread!',
+      });
       setTimeout(() => {
         onClose();
       }, 1000);
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: describeAuthError(err) });
+      const msg = describeAuthError(err);
+      setStatusMessage({ type: 'error', text: msg });
+      showToast({ type: 'error', title: 'Registration Notice', message: msg });
     }
   };
 

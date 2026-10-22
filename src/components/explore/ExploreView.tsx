@@ -497,7 +497,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                 ) : (
                   <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
                     <BookOpen className="w-4 h-4 text-vibe-accent" />
-                    Open Library Results
+                    Search Results
                   </span>
                 )}
                 {suggestions.length > 0 && (

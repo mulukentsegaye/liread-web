@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
-import { DEFAULT_USER_AVATAR } from '../../data/defaults';
+import { getUserAvatar } from '../../utils/avatar';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
 export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details' | 'reader';
@@ -28,7 +28,7 @@ interface SidebarLeftProps {
 }
 
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange, onGoToLanding, onGoToLogin }) => {
-  const { user } = useAuthStore();
+  const { user, isGuest, isAuthenticated } = useAuthStore();
   const { openInfoModal } = useNoticeStore();
 
   const mainNavItems = [
@@ -40,7 +40,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
   ];
 
   const libraryItems = [
-    { id: 'reader' as NavigationTab,    label: 'ReadEra E-Reader', icon: BookOpen, },
+    { id: 'reader' as NavigationTab,    label: 'E-Reader', icon: BookOpen, },
     { id: 'bookshelf' as NavigationTab, label: 'My Bookshelf', icon: Library,  badge: user?.bookshelfCount ?? 0 },
     { id: 'saved' as NavigationTab,     label: 'Saved Passages', icon: Bookmark, badge: user?.savedPassagesCount ?? 0 },
   ];
@@ -153,7 +153,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
         >
           <div className="flex items-center gap-3 min-w-0">
             <img
-              src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
+              src={getUserAvatar(user)}
               alt={user?.fullName ?? 'Guest'}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
             />
@@ -162,7 +162,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
                 {user?.fullName ?? 'Guest Explorer'}
               </p>
               <p className="text-[11px] text-vibe-ink-muted mt-0.5 truncate">
-                {user?.subtitle ?? 'Browsing as guest'}
+                {(isGuest || !isAuthenticated || !user || user.id === 'guest-user') ? 'Browsing as guest' : (user.subtitle || (user.username ? `@${user.username}` : user.rankTier || 'Reader'))}
               </p>
             </div>
           </div>

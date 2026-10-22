@@ -15,6 +15,10 @@ export const describeAuthError = (error: unknown): string => {
   const code = err.code || '';
   const lower = message.toLowerCase();
 
+  if (lower.includes('supabase') || lower.includes('postgrest') || lower.includes('failed to fetch') || lower.includes('networkrequestfailed')) {
+    return 'Unable to reach the authentication service. Please check your connection and try again.';
+  }
+
   if (code === 'over_email_send_rate_limit' || lower.includes('email rate limit')) {
     return 'Email rate limit reached. Please wait a few minutes and try again.';
   }

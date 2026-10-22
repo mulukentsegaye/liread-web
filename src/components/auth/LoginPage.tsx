@@ -38,7 +38,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
     clearPendingConfirmation,
     resendConfirmationEmail
   } = useAuthStore();
-  const { openInfoModal } = useNoticeStore();
+  const { openInfoModal, showToast } = useNoticeStore();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   
   // Form fields
@@ -68,8 +68,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
     try {
       await resendConfirmationEmail(targetEmail.trim());
       setSuccessMsg(`Confirmation email sent to ${targetEmail}! Please check your inbox and spam folder.`);
+      showToast({
+        type: 'success',
+        title: 'Confirmation Email Sent',
+        message: `A fresh activation link was sent to ${targetEmail}.`,
+      });
     } catch (err: any) {
-      setErrorMsg(describeAuthError(err));
+      const msg = describeAuthError(err);
+      setErrorMsg(msg);
+      showToast({
+        type: 'error',
+        title: 'Unable to Send Email',
+        message: msg,
+      });
     } finally {
       setIsResending(false);
     }
@@ -99,17 +110,39 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
         if (useAuthStore.getState().pendingConfirmationEmail) {
           // Account created but email confirmation is required — stay on this page
           setSuccessMsg(null);
+          showToast({
+            type: 'info',
+            title: 'Confirmation Link Dispatched',
+            message: `Check your inbox at ${email} to activate your reader account.`,
+            duration: 8000,
+          });
           return;
         }
         setSuccessMsg('Account created successfully! Welcome to Liread.');
+        showToast({
+          type: 'success',
+          title: 'Welcome to Liread',
+          message: 'Your account was created successfully!',
+        });
         setTimeout(() => onSuccess(), 800);
       } else {
         await signIn(email, password);
         setSuccessMsg('Signed in successfully! Opening your library...');
+        showToast({
+          type: 'success',
+          title: 'Welcome Back',
+          message: 'Opening your personal library...',
+        });
         setTimeout(() => onSuccess(), 600);
       }
     } catch (err: any) {
-      setErrorMsg(describeAuthError(err));
+      const msg = describeAuthError(err);
+      setErrorMsg(msg);
+      showToast({
+        type: 'error',
+        title: 'Authentication Notice',
+        message: msg,
+      });
     } finally {
       setLoading(false);
     }

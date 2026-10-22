@@ -19,7 +19,7 @@ const TAB_NAME_MAP: Record<NavigationTab, string> = {
   bookshelf: 'My Bookshelf',
   saved: 'Saved Passages',
   book_details: 'Book Info',
-  reader: 'ReadEra E-Reader',
+  reader: 'E-Reader',
 };
 
 export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'feed' }) => {

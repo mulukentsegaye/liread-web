@@ -316,7 +316,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             {/* Subtle Open Library Attribution */}
             <span className="text-[10px] text-vibe-ink-muted mt-3 inline-flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-              Verified Open Library record
+              Verified literary edition
             </span>
           </div>
 
@@ -730,7 +730,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 renderMarkdownSynopsis(detailedBook.description, bodyFontClass)
               ) : (
                 <p className="italic text-vibe-ink-muted">
-                  No editorial description is currently recorded in the Open Library archive for this specific edition.
+                  No editorial description is currently recorded for this specific edition.
                 </p>
               )}
             </div>

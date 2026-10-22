@@ -119,7 +119,7 @@ export const useFeedStore = create<FeedStore>()(
           return;
         }
         if (!isSupabaseConfigured()) {
-          toast.warning('Database is running in local preview mode. Cloud sync is unavailable.', 'Preview Mode');
+          toast.warning('Unable to publish at this time. Please check your connection and try again.', 'Posting Unavailable');
           return;
         }
         const tempId = `post-${Date.now()}`;

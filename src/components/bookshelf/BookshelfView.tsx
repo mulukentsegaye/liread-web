@@ -148,7 +148,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
                       <h3
                         onClick={() => onViewBookDetails?.(b.title, b.author, b.coverUrl)}
                         className="font-heading text-base font-semibold text-vibe-ink line-clamp-1 group-hover:text-vibe-accent transition-colors cursor-pointer hover:underline"
-                        title={`View book info and AI summary for "${b.title}"`}
+                        title={`View book info and overview for "${b.title}"`}
                       >
                         {b.title}
                       </h3>

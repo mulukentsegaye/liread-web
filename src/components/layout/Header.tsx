@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight, WifiOff, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
-import { DEFAULT_USER_AVATAR } from '../../data/defaults';
+import { getUserAvatar } from '../../utils/avatar';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../../services/bookSearchService';
 
@@ -197,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
               <BookOpen className="w-4 h-4 text-vibe-accent" />
-              Open Library Suggestions
+              Book Suggestions
             </span>
           )}
 
@@ -309,7 +309,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="space-y-1">
                 <p className="font-semibold text-vibe-ink text-sm">You are offline</p>
                 <p className="text-[11px] text-vibe-ink-muted max-w-xs mx-auto leading-relaxed">
-                  Open Library cannot be reached to search for <span className="font-semibold text-vibe-ink">"{searchVal}"</span> without an internet connection.
+                  Connect to the internet to search for <span className="font-semibold text-vibe-ink">"{searchVal}"</span>.
                 </p>
               </div>
               <div className="pt-1 flex items-center justify-center">
@@ -542,8 +542,8 @@ export const Header: React.FC<HeaderProps> = ({
             title={`${user?.fullName ?? 'Guest'} — Account settings`}
           >
             <img
-              src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
-              alt={user?.fullName ?? 'Guest'}
+              src={getUserAvatar(user)}
+              alt={user?.fullName ?? 'User avatar'}
               className="w-full h-full object-cover"
             />
           </button>

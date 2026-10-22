@@ -58,7 +58,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
       const file = files[i];
       try {
         const imported = await importBookFile(file);
-        toast.success(`Imported "${imported.title}".`, 'ReadEra Library');
+        toast.success(`Imported "${imported.title}".`, 'E-Reader Library');
       } catch {
         toast.error(`Failed to import "${file.name}".`);
       }
@@ -96,11 +96,8 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
             </span>
           </div>
           <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
-            ReadEra E-Reader
+            E-Reader Library
           </h1>
-          <p className="text-xs text-vibe-ink-muted mt-1">
-            Read your local PDF, EPUB, and TXT files distraction-free with zero ads.
-          </p>
         </div>
 
         {/* Upload Button */}

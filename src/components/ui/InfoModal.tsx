@@ -194,7 +194,7 @@ export const InfoModal: React.FC = () => {
                   2. Secure Storage & Privacy
                 </h4>
                 <p className="text-xs text-vibe-ink-secondary">
-                  All account details and sessions are protected with industry-standard encryption and Supabase row-level security policies.
+                  All account details and sessions are protected with industry-standard encryption and strict privacy-first security policies.
                 </p>
               </div>
 

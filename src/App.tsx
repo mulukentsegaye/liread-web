@@ -524,7 +524,7 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'reader' && (
-              <React.Suspense fallback={<div className="py-16 text-center text-xs text-vibe-ink-muted">Loading ReadEra Library...</div>}>
+              <React.Suspense fallback={<div className="py-16 text-center text-xs text-vibe-ink-muted">Loading E-Reader Library...</div>}>
                 <ReadEraLibraryView />
               </React.Suspense>
             )}

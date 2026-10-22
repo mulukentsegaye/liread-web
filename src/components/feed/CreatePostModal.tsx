@@ -339,7 +339,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                       ) : (
                         <span className="flex items-center gap-1.5 text-vibe-ink">
                           <BookOpen className="w-3.5 h-3.5 text-vibe-accent" />
-                          Open Library Suggestions
+                          Book Suggestions
                         </span>
                       )}
                       {isOffline ? (
@@ -425,13 +425,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                         <div>
                           <p className="font-semibold text-vibe-ink">You are currently offline</p>
                           <p className="text-[11px] mt-0.5 text-vibe-ink-muted leading-relaxed">
-                            Open Library auto-suggest is unavailable offline. You can still type the author manually below.
+                            Book auto-suggest is unavailable offline. You can still type the author manually below.
                           </p>
                         </div>
                       </div>
                     ) : (
                       <div className="p-4 text-center text-xs text-vibe-ink-muted">
-                        <p>No matches found on Open Library.</p>
+                        <p>No matching books found.</p>
                         <p className="text-[11px] mt-1 text-vibe-ink-muted/80">You can type the author manually below.</p>
                       </div>
                     )}
@@ -468,7 +468,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                   <div className="min-w-0">
                     <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mb-1">
                       <CheckCircle2 className="w-3 h-3" />
-                      <span>Cover auto-fetched from Open Library</span>
+                      <span>Edition cover found</span>
                     </div>
                     <p className="text-xs font-bold text-vibe-ink truncate">{bookTitle || 'Selected Book'}</p>
                     <p className="text-[11px] text-vibe-ink-muted truncate">by {bookAuthor || 'Unknown Author'}</p>
