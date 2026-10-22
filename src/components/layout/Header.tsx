@@ -525,7 +525,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border/60">
                       <p className="font-medium text-vibe-ink">Welcome to Liread</p>
                       <p className="text-vibe-ink-muted text-[11px] mt-0.5 leading-relaxed">
-                        Start your reading timer today to log your first streak session and climb the weekly leaderboard.
+                        Start your reading timer today to log your first streak session and join the Consistent Circle.
                       </p>
                     </div>
                   </div>

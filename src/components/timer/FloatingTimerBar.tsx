@@ -3,6 +3,7 @@ import { Pause, Play, Square, Maximize2 } from 'lucide-react';
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useCelebrationStore } from '../../stores/celebrationStore';
+import { useReflectionStore } from '../../stores/reflectionStore';
 import { AmbientAudioController } from './AmbientAudioController';
 
 export const FloatingTimerBar: React.FC = () => {
@@ -10,6 +11,7 @@ export const FloatingTimerBar: React.FC = () => {
     isRunning,
     isFullScreenOpen,
     bookTitle,
+    bookAuthor,
     subtitleNote,
     coverImageUrl,
     pauseTimer,
@@ -43,7 +45,7 @@ export const FloatingTimerBar: React.FC = () => {
     const minutesRead = stopTimer();
     if (minutesRead > 0) {
       logSessionMinutes(minutesRead, bookTitle);
-      showCelebration(minutesRead, bookTitle);
+      useReflectionStore.getState().openReflection(minutesRead, bookTitle, bookAuthor);
     }
   };
 

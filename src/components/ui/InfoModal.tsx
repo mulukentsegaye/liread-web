@@ -6,6 +6,7 @@ import {
   FileText, 
   Timer, 
   BookOpen, 
+  Users,
   Trophy, 
   Flame, 
   CheckCircle2, 
@@ -116,12 +117,12 @@ export const InfoModal: React.FC = () => {
 
               <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-start gap-3.5">
                 <div className="w-8 h-8 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Trophy className="w-4.5 h-4.5" />
+                  <Users className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <h4 className="font-heading font-semibold text-vibe-ink text-sm">Weekly Leaderboards</h4>
+                  <h4 className="font-heading font-semibold text-vibe-ink text-sm">Reading Sanctuary & Consistency</h4>
                   <p className="text-xs text-vibe-ink-secondary mt-1">
-                    Friendly accountability with fellow bibliophiles. Track total minutes read each week and celebrate milestones together.
+                    Calm, pressure-free community accountability. Meet your personal daily reading commitment and join the Consistent Circle.
                   </p>
                 </div>
               </div>
@@ -159,7 +160,7 @@ export const InfoModal: React.FC = () => {
                   2. Honest Reading Logs
                 </h4>
                 <p className="text-xs text-vibe-ink-secondary">
-                  Reading sessions and leaderboard minutes should reflect genuine reading time. The community spirit thrives when everyone logs time sincerely.
+                  Reading sessions and daily commitment minutes should reflect genuine reading time. The community spirit thrives when everyone logs time sincerely.
                 </p>
               </div>
 

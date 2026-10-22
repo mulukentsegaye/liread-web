@@ -259,7 +259,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                 <div className="w-6 h-6 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0">
                   <Clock className="w-3.5 h-3.5" />
                 </div>
-                <span>Track active minutes and compete on leaderboards</span>
+                <span>Track active minutes and celebrate consistency in the Sanctuary</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <div className="w-6 h-6 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0">

@@ -689,33 +689,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   </div>
                 </div>
 
-                {/* Friendly Community Leaderboard Preview */}
+                {/* Friendly Community Consistent Circle Preview */}
                 <div className="space-y-2 pt-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-heading font-bold text-vibe-ink flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                      Weekly Readers Circle
+                      <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                      Consistent Readers Circle
                     </span>
-                    <span className="text-[11px] text-vibe-ink-muted">Friendly & Burnout-free</span>
+                    <span className="text-[11px] text-vibe-ink-muted">Self-paced & Equal</span>
                   </div>
 
                   <div className="space-y-1.5">
                     {[
-                      { rank: '1', name: 'Top Reader', time: 'This week', badge: '🥇' },
-                      { rank: '2', name: 'Second Reader', time: 'This week', badge: '🥈' },
-                      { rank: '3', name: 'Third Reader', time: 'This week', badge: '🥉' },
+                      { goal: '100% of plan', name: 'Elena Rostova', streak: '28d streak', badge: '✨' },
+                      { goal: '100% of plan', name: 'Alex Miller', streak: '19d streak', badge: '✨' },
+                      { goal: '100% of plan', name: 'Sophia Chen', streak: '21d streak', badge: '✨' },
                     ].map((reader) => (
-                      <div key={reader.rank} className="flex items-center justify-between p-2 rounded-xl bg-vibe-card-subtle text-xs">
+                      <div key={reader.name} className="flex items-center justify-between p-2 rounded-xl bg-vibe-card-subtle text-xs">
                         <div className="flex items-center gap-2">
                           <span className="text-sm">{reader.badge}</span>
                           <span className="font-medium text-vibe-ink">{reader.name}</span>
                         </div>
-                        <span className="font-mono text-[11px] text-vibe-ink-muted">{reader.time}</span>
+                        <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">{reader.goal}</span>
                       </div>
                     ))}
                   </div>
                   <p className="text-[10px] text-vibe-ink-muted pt-1">
-                    Rankings update continuously as community reading sessions are logged.
+                    Every reader who fulfills their personal daily plan is celebrated equally.
                   </p>
                 </div>
 
@@ -734,7 +734,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               </h2>
 
               <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Track your consistency with elegant circular gauges, 7-day and 30-day bar charts, and friendly community leaderboards designed to inspire rather than create burnout.
+                Track your consistency with elegant circular gauges, 7-day and 30-day bar charts, and the calm Community Sanctuary designed to inspire rather than create burnout.
               </p>
 
               <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">

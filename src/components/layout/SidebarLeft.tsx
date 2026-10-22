@@ -4,6 +4,7 @@ import {
   MessageSquare,
   Clock,
   BarChart3,
+  Users,
   Trophy,
   Library,
   Bookmark,
@@ -18,7 +19,7 @@ import { useNoticeStore } from '../../stores/noticeStore';
 import { getUserAvatar } from '../../utils/avatar';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
-export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details' | 'reader';
+export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'sanctuary' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details' | 'reader';
 
 interface SidebarLeftProps {
   activeTab: NavigationTab;
@@ -36,7 +37,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
     { id: 'explore' as NavigationTab,     label: 'Explore Books',  icon: Compass,        },
     { id: 'timer' as NavigationTab,       label: 'Reading Timer',  icon: Clock,    },
     { id: 'analytics' as NavigationTab,   label: 'My Progress',    icon: BarChart3,},
-    { id: 'leaderboard' as NavigationTab, label: 'Leaderboard',    icon: Trophy,   },
+    { id: 'sanctuary' as NavigationTab,   label: 'Sanctuary',      icon: Users,    },
   ];
 
   const libraryItems = [
@@ -56,7 +57,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
           </p>
           {mainNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (item.id === 'sanctuary' && activeTab === 'leaderboard');
             return (
               <button
                 key={item.id}
@@ -83,7 +84,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
           </p>
           {libraryItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (item.id === 'sanctuary' && activeTab === 'leaderboard');
             return (
               <button
                 key={item.id}

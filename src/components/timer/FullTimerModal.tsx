@@ -3,6 +3,7 @@ import { X, Play, Pause, Square, RotateCcw, BookOpen, ArrowLeft } from 'lucide-r
 import { useTimerStore } from '../../stores/timerStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useCelebrationStore } from '../../stores/celebrationStore';
+import { useReflectionStore } from '../../stores/reflectionStore';
 import { AmbientAudioController } from './AmbientAudioController';
 import { NavigationTab } from '../layout/SidebarLeft';
 
@@ -15,7 +16,8 @@ const TAB_NAME_MAP: Record<NavigationTab, string> = {
   explore: 'Explore Books',
   timer: 'reading feed',
   analytics: 'My Progress',
-  leaderboard: 'Leaderboard',
+  leaderboard: 'Reading Sanctuary',
+  sanctuary: 'Reading Sanctuary',
   bookshelf: 'My Bookshelf',
   saved: 'Saved Passages',
   book_details: 'Book Info',
@@ -123,7 +125,7 @@ export const FullTimerModal: React.FC<FullTimerModalProps> = ({ previousTab = 'f
       const mins = stopTimer();
       if (mins > 0) {
         logSessionMinutes(mins, bookTitle);
-        showCelebration(mins, bookTitle);
+        useReflectionStore.getState().openReflection(mins, bookTitle, bookAuthor);
       }
     });
   };

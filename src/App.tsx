@@ -9,7 +9,7 @@ import { CreatePostModal } from './components/feed/CreatePostModal';
 import { FloatingTimerBar } from './components/timer/FloatingTimerBar';
 import { FullTimerModal } from './components/timer/FullTimerModal';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
-import { LeaderboardView } from './components/leaderboard/LeaderboardView';
+import { SanctuaryView } from './components/sanctuary/SanctuaryView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { BookDetailsView } from './components/book/BookDetailsView';
 import { ExploreView } from './components/explore/ExploreView';
@@ -26,6 +26,7 @@ import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { AuthModal } from './components/auth/AuthModal';
 import { CelebrationToast } from './components/ui/CelebrationToast';
+import { SessionReflectionModal } from './components/timer/SessionReflectionModal';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { AlertModal } from './components/ui/AlertModal';
 import { GoalAdjustModal } from './components/ui/GoalAdjustModal';
@@ -316,7 +317,7 @@ export const App: React.FC = () => {
       showAlertModal({
         type: 'guest',
         title: 'Guest Mode is Read-Only',
-        message: 'Create a free Liread account to set daily reading goals, protect your reading streaks, and climb the leaderboard.',
+        message: 'Create a free Liread account to set daily reading goals, protect your reading streaks, and join the Reading Sanctuary.',
         confirmLabel: 'Create Account',
         cancelLabel: 'Keep Browsing',
         onConfirm: () => openAuthModal('signup'),
@@ -478,7 +479,7 @@ export const App: React.FC = () => {
         >
 
           <TabletSummaryBar
-            onViewLeaderboard={() => handleTabChange('leaderboard')}
+            onViewLeaderboard={() => handleTabChange('sanctuary')}
             onAdjustGoal={handleAdjustGoal}
           />
 
@@ -519,8 +520,12 @@ export const App: React.FC = () => {
               <AnalyticsView onBack={() => handleTabChange('feed')} />
             )}
 
-            {activeTab === 'leaderboard' && (
-              <LeaderboardView onBack={() => handleTabChange('feed')} />
+            {(activeTab === 'sanctuary' || activeTab === 'leaderboard') && (
+              <SanctuaryView
+                onBack={() => handleTabChange('feed')}
+                onStartTimer={handleSelectBookForTimer}
+                onAdjustGoal={handleAdjustGoal}
+              />
             )}
 
             {activeTab === 'reader' && (
@@ -542,13 +547,14 @@ export const App: React.FC = () => {
         </main>
 
         <SidebarRight
-          onViewLeaderboard={() => handleTabChange('leaderboard')}
+          onViewLeaderboard={() => handleTabChange('sanctuary')}
           onAdjustGoal={handleAdjustGoal}
         />
 
       </div>
 
       <CelebrationToast />
+      <SessionReflectionModal />
       <FloatingTimerBar />
       <FullTimerModal previousTab={activeTab} />
 

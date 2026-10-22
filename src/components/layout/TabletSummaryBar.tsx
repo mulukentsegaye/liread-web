@@ -90,10 +90,10 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
             </div>
             <div>
               <p className="font-sans text-xs font-medium leading-tight text-vibe-ink">
-                {userStanding ? `#${userStanding.rank} This Week` : 'Unranked This Week'}
+                {progressPercent >= 100 ? 'Circle Complete' : 'In Progress'}
               </p>
               <p className="text-[11px] font-mono text-vibe-ink-muted">
-                {userStanding ? `${userStanding.formattedTime} read` : 'No sessions logged'}
+                {progressPercent}% of {goal}m goal
               </p>
             </div>
           </div>
@@ -132,9 +132,9 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
           {/* Right: Top Weekly Readers */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="font-heading text-xs font-semibold text-vibe-ink">Top Weekly Readers</span>
-              <button onClick={onViewLeaderboard} className="text-xs font-semibold text-vibe-accent hover:underline flex items-center gap-1">
-                <span>Full Leaderboard</span><ArrowRight className="w-3 h-3" />
+              <span className="font-heading text-xs font-semibold text-vibe-ink">Reading Sanctuary</span>
+              <button onClick={onViewLeaderboard} className="text-xs font-semibold text-vibe-accent hover:underline flex items-center gap-1 cursor-pointer">
+                <span>Enter Sanctuary</span><ArrowRight className="w-3 h-3" />
               </button>
             </div>
             <div className="space-y-1.5 pt-0.5">
