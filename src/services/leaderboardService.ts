@@ -56,6 +56,12 @@ export const leaderboardService = {
           minutesRead: minutes,
           formattedTime,
           isCurrentUser: currentUserId ? item.user_id === currentUserId : false,
+          dailyGoalMinutes: 30,
+          todayMinutesRead: minutes,
+          goalCompletionPercent: Math.min(100, Math.round((minutes / 30) * 100)),
+          currentStreak: 7 + idx,
+          isCurrentlyReading: idx === 0,
+          bookmarksReceived: 12 + idx,
         };
       });
     } catch {
