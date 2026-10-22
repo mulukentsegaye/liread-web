@@ -118,10 +118,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1.35fr_1fr] gap-3.5 sm:gap-4 items-stretch">
         
         {/* Card 1: Today */}
-        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Today</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
@@ -142,7 +142,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         </div>
 
         {/* Card 2: Streak */}
-        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Streak</span>
             <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
@@ -160,7 +160,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         </div>
 
         {/* Card 3: Rank Tier */}
-        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
@@ -168,7 +168,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
             </div>
           </div>
           <div>
-            <div className="font-heading text-xl sm:text-2xl font-semibold text-vibe-ink leading-tight truncate">
+            <div className="font-heading text-base sm:text-[17px] xl:text-[19px] 2xl:text-xl font-semibold text-vibe-ink leading-snug tracking-tight break-words">
               {user.rankTier}
             </div>
             <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">
@@ -178,7 +178,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         </div>
 
         {/* Card 4: Bookshelf */}
-        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:p-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
+        <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Library</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
