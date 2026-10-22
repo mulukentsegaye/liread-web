@@ -38,7 +38,10 @@ INSERT INTO auth.users (
     raw_user_meta_data,
     created_at,
     updated_at,
-    confirmation_token
+    confirmation_token,
+    recovery_token,
+    email_change_token_new,
+    email_change
 )
 VALUES (
     '00000000-0000-0000-0000-000000000000',
@@ -52,8 +55,47 @@ VALUES (
     '{"username":"alex_miller","full_name":"Alex Miller","avatar_url":"https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}',
     timezone('utc'::text, now() - INTERVAL '30 days'),
     timezone('utc'::text, now()),
+    '',
+    '',
+    '',
     ''
 );
+
+-- Ensure all internal auth token/string columns are non-null empty strings
+-- (GoTrue Go scanner throws HTTP 500 "Database error querying schema" if any token column is NULL)
+DO $$
+DECLARE
+    col text;
+    token_cols text[] := ARRAY[
+        'confirmation_token', 
+        'recovery_token', 
+        'email_change_token_new', 
+        'email_change_token_current', 
+        'email_change', 
+        'phone_change', 
+        'phone_change_token', 
+        'reauthentication_token'
+    ];
+BEGIN
+    FOREACH col IN ARRAY token_cols LOOP
+        IF EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_schema = 'auth' AND table_name = 'users' AND column_name = col
+        ) THEN
+            EXECUTE format('UPDATE auth.users SET %I = '''' WHERE id = ''a1111111-1111-1111-1111-111111111111'' AND %I IS NULL', col, col);
+        END IF;
+    END LOOP;
+
+    -- Also guarantee confirmed_at timestamp is set if present in schema
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'auth' AND table_name = 'users' AND column_name = 'confirmed_at'
+    ) THEN
+        UPDATE auth.users 
+        SET confirmed_at = timezone('utc'::text, now()) 
+        WHERE id = 'a1111111-1111-1111-1111-111111111111' AND confirmed_at IS NULL;
+    END IF;
+END $$;
 
 -- 3. LINK IDENTITY IN auth.identities
 DO $$
