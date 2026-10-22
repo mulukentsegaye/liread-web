@@ -26,6 +26,7 @@ import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId } from '../../types/theme';
 import { useAuthStore } from '../../stores/authStore';
 import { ReadingImpactCalculator } from './ReadingImpactCalculator';
+import { ScrollTurnedBookExperience } from './ScrollTurnedBookExperience';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -98,6 +99,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           {/* Center Navigation Links (Hidden on mobile) */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
+            <a href="#experience" className="hover:text-vibe-accent transition-colors">
+              3D Book
+            </a>
             <a href="#timer" className="hover:text-vibe-accent transition-colors">
               Timer
             </a>
@@ -203,16 +207,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           <button
             onClick={() => {
-              const el = document.getElementById('features');
+              const el = document.getElementById('experience');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
             className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Explore Features</span>
+            <span>Turn the Pages</span>
+            <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
           </button>
         </div>
 
       </section>
+
+      {/* ==============================================================================
+          THE SCROLL-TURNED 3D BOOK EXPERIENCE
+          ============================================================================== */}
+      <ScrollTurnedBookExperience
+        onEnterApp={onEnterApp}
+        onOpenTimer={onOpenTimer}
+        onGoToLogin={onGoToLogin}
+        onGuest={handleGuest}
+      />
 
       {/* ==============================================================================
           3. CORE PRODUCT ARCHITECTURE: INTRO BANNER
@@ -853,6 +868,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
+            <a href="#experience" className="hover:text-vibe-ink transition-colors">3D Book</a>
             <a href="#timer" className="hover:text-vibe-ink transition-colors">Timer</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Soundscapes</a>
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
