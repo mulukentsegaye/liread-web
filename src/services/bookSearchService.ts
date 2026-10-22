@@ -12,6 +12,17 @@ export interface SuggestedBook {
   workKey?: string;
 }
 
+export interface SearchBooksResult {
+  books: SuggestedBook[];
+  totalFound: number;
+}
+
+export interface SearchBooksOptions {
+  limit?: number;
+  page?: number;
+  signal?: AbortSignal;
+}
+
 /**
  * Custom error thrown when a book search request fails specifically because
  * the device has no internet connection or network connectivity was lost.
@@ -58,21 +69,39 @@ export function isOfflineOrNetworkError(err: unknown): boolean {
 export const bookSearchService = {
   /**
    * Search Open Library by query string and return normalized book suggestions
-   * with high-resolution and thumbnail cover image URLs.
+   * with high-resolution and thumbnail cover image URLs, along with the accurate
+   * total count of matching books (`totalFound`).
    * Throws `OfflineSearchError` when offline so UI can accurately explain
    * that connection is missing instead of reporting "book not found".
    */
-  async searchBooks(query: string, signal?: AbortSignal): Promise<SuggestedBook[]> {
+  async searchBooks(
+    query: string,
+    optionsOrSignal?: AbortSignal | SearchBooksOptions
+  ): Promise<SearchBooksResult> {
     const trimmed = query.trim();
     if (!trimmed || trimmed.length < 2) {
-      return [];
+      return { books: [], totalFound: 0 };
     }
 
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       throw new OfflineSearchError('You are currently offline');
     }
 
-    const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&limit=8`;
+    let signal: AbortSignal | undefined;
+    let limit = 8;
+    let page = 1;
+
+    if (optionsOrSignal) {
+      if (optionsOrSignal instanceof AbortSignal) {
+        signal = optionsOrSignal;
+      } else {
+        if (optionsOrSignal.signal) signal = optionsOrSignal.signal;
+        if (typeof optionsOrSignal.limit === 'number') limit = optionsOrSignal.limit;
+        if (typeof optionsOrSignal.page === 'number') page = optionsOrSignal.page;
+      }
+    }
+
+    const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&limit=${limit}&page=${page}`;
 
     try {
       const response = await fetch(url, { signal });
@@ -82,8 +111,14 @@ export const bookSearchService = {
 
       const data = await response.json();
       const docs: any[] = data.docs || [];
+      const totalFound: number =
+        typeof data.numFound === 'number'
+          ? data.numFound
+          : typeof data.num_found === 'number'
+          ? data.num_found
+          : docs.length;
 
-      return docs.map((doc: any): SuggestedBook => {
+      const books = docs.map((doc: any): SuggestedBook => {
         const title = (doc.title || 'Untitled Book').trim();
         const author = Array.isArray(doc.author_name) && doc.author_name.length > 0
           ? doc.author_name[0]
@@ -114,6 +149,11 @@ export const bookSearchService = {
           workKey: doc.key,
         };
       });
+
+      return {
+        books,
+        totalFound,
+      };
     } catch (err: any) {
       if (err.name === 'AbortError') {
         throw err;
@@ -122,7 +162,7 @@ export const bookSearchService = {
         throw new OfflineSearchError('Open Library search failed because you are offline');
       }
       console.warn('Open Library search error:', err);
-      return [];
+      return { books: [], totalFound: 0 };
     }
   },
 

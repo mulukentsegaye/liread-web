@@ -104,8 +104,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
     const timer = setTimeout(async () => {
       try {
-        const results = await bookSearchService.searchBooks(query, controller.signal);
-        setSuggestions(results);
+        const { books } = await bookSearchService.searchBooks(query, controller.signal);
+        setSuggestions(books);
         setIsOffline(false);
         setShowSuggestions(true);
       } catch (err: any) {

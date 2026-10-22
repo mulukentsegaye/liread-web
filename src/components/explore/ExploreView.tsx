@@ -85,7 +85,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     const timer = setTimeout(async () => {
       try {
         const results = await bookSearchService.searchBooks(query, controller.signal);
-        setSuggestions(results);
+        setSuggestions(results.books);
         setIsOffline(false);
       } catch (err: any) {
         if (err.name !== 'AbortError') {

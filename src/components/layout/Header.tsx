@@ -7,6 +7,7 @@ import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../..
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
+  onSeeAll?: (query: string) => void;
   onGoToLanding?: () => void;
   onGoToLogin?: () => void;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ 
   onSearch, 
+  onSeeAll,
   onGoToLanding, 
   onGoToLogin,
   onSelectBookForTimer,
@@ -29,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Open Library interactive search state
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
+  const [totalFound, setTotalFound] = useState<number>(0);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
@@ -44,13 +47,15 @@ export const Header: React.FC<HeaderProps> = ({
       setIsOffline(true);
       const localMatches = bookSearchService.searchLocalCuratedBooks(query);
       setSuggestions(localMatches);
+      setTotalFound(localMatches.length);
       setIsSearching(false);
       return;
     }
 
     try {
-      const results = await bookSearchService.searchBooks(query, signal);
-      setSuggestions(results);
+      const { books, totalFound: count } = await bookSearchService.searchBooks(query, signal);
+      setSuggestions(books);
+      setTotalFound(count);
       setIsOffline(false);
     } catch (err: any) {
       if (err.name === 'AbortError') {
@@ -60,8 +65,10 @@ export const Header: React.FC<HeaderProps> = ({
         setIsOffline(true);
         const localMatches = bookSearchService.searchLocalCuratedBooks(query);
         setSuggestions(localMatches);
+        setTotalFound(localMatches.length);
       } else {
         setSuggestions([]);
+        setTotalFound(0);
         setIsOffline(false);
       }
     } finally {
@@ -75,6 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
 
     if (query.length < 2) {
       setSuggestions([]);
+      setTotalFound(0);
       setIsSearching(false);
       setShowDropdown(false);
       setIsOffline(false);
@@ -160,6 +168,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleClearSearch = () => {
     setSearchVal('');
     setSuggestions([]);
+    setTotalFound(0);
     setShowDropdown(false);
     setIsOffline(false);
     onSearch?.('');
@@ -175,6 +184,25 @@ export const Header: React.FC<HeaderProps> = ({
     const controller = new AbortController();
     abortControllerRef.current = controller;
     executeSearch(query, controller.signal);
+  };
+
+  const handleSeeAll = () => {
+    const trimmed = searchVal.trim();
+    if (!trimmed) return;
+    setShowDropdown(false);
+    setMobileSearchOpen(false);
+    if (onSeeAll) {
+      onSeeAll(trimmed);
+    } else if (onSearch) {
+      onSearch(trimmed);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSeeAll();
+    }
   };
 
   const handleViewDetails = (book: SuggestedBook) => {
@@ -207,10 +235,21 @@ export const Header: React.FC<HeaderProps> = ({
                 ? `${suggestions.length} offline ${suggestions.length === 1 ? 'match' : 'matches'}`
                 : 'Offline'}
             </span>
-          ) : suggestions.length > 0 ? (
-            <span className="text-[11px] text-vibe-ink-muted">
-              {suggestions.length} {suggestions.length === 1 ? 'book' : 'books'} found
-            </span>
+          ) : totalFound > 0 ? (
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-vibe-ink-muted font-medium">
+                {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
+              </span>
+              <button
+                type="button"
+                onClick={handleSeeAll}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-95 cursor-pointer"
+                title={`See all ${totalFound.toLocaleString()} books for "${searchVal}"`}
+              >
+                <span>See all</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
           ) : null}
         </div>
 
@@ -379,6 +418,25 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
             ))}
+
+            {/* Bottom "See all" action button for seamless UX navigation */}
+            {totalFound > suggestions.length && (
+              <div className="p-2 border-t border-vibe-border bg-vibe-card-subtle/80 sticky bottom-0 backdrop-blur-md">
+                <button
+                  type="button"
+                  onClick={handleSeeAll}
+                  className="w-full py-2 px-3 rounded-xl bg-vibe-accent/10 hover:bg-vibe-accent text-vibe-accent hover:text-white border border-vibe-accent/20 text-xs font-semibold flex items-center justify-between transition-all group cursor-pointer shadow-xs active:scale-[0.99]"
+                >
+                  <span className="truncate">
+                    See all <span className="font-bold underline decoration-vibe-accent/30">{totalFound.toLocaleString()}</span> books for "{searchVal}"
+                  </span>
+                  <span className="flex items-center gap-1 font-bold text-[11px] flex-shrink-0 ml-2">
+                    <span>View all</span>
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           /* Normal online: no books found */
@@ -422,6 +480,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="text"
               value={searchVal}
               onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
               onFocus={() => {
                 if (suggestions.length > 0 || searchVal.trim().length >= 2) {
                   setShowDropdown(true);
@@ -565,6 +624,7 @@ export const Header: React.FC<HeaderProps> = ({
               autoFocus
               value={searchVal}
               onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
               onFocus={() => {
                 if (suggestions.length > 0 || searchVal.trim().length >= 2) {
                   setShowDropdown(true);
