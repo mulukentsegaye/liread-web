@@ -168,7 +168,7 @@ export const bookSearchService = {
 
   /**
    * Search local curated catalog when offline so famous books still show up
-   * even without an internet connection.
+   * even without an internet connection. Matches by title, author, category, or keyword.
    */
   searchLocalCuratedBooks(query: string): SuggestedBook[] {
     const trimmed = query.toLowerCase().trim();
@@ -181,12 +181,16 @@ export const bookSearchService = {
     for (const b of allCurated) {
       const normTitle = b.title.toLowerCase();
       const normAuthor = b.author.toLowerCase();
+      const normCat = (b.category || '').toLowerCase();
+      const normCatLabel = (b.categoryLabel || '').toLowerCase();
       if (seen.has(normTitle)) continue;
 
       if (
         normTitle.includes(trimmed) ||
         normAuthor.includes(trimmed) ||
-        trimmed.includes(normTitle)
+        normCat.includes(trimmed) ||
+        normCatLabel.includes(trimmed) ||
+        trimmed.includes(normCat)
       ) {
         seen.add(normTitle);
         matches.push({
@@ -202,6 +206,122 @@ export const bookSearchService = {
     }
 
     return matches;
+  },
+
+  /**
+   * Fetch books for a specific category/subject with pagination and total count from Open Library.
+   */
+  async getBooksByCategory(
+    subjectSlug: string,
+    options?: { page?: number; limit?: number; signal?: AbortSignal }
+  ): Promise<SearchBooksResult> {
+    const page = options?.page ?? 1;
+    const limit = options?.limit ?? 20;
+    const signal = options?.signal;
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const local = this.searchLocalCuratedBooks(subjectSlug);
+      return {
+        books: local.slice((page - 1) * limit, page * limit),
+        totalFound: local.length,
+      };
+    }
+
+    const clean = encodeURIComponent(subjectSlug.trim().toLowerCase());
+    const url = `https://openlibrary.org/search.json?subject=${clean}&limit=${limit}&page=${page}`;
+
+    try {
+      const response = await fetch(url, {
+        signal,
+        headers: { 'User-Agent': 'LireadApp/1.0 (https://liread.vercel.app)' },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Open Library category search returned status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const docs: any[] = data.docs || [];
+      const totalFound: number =
+        typeof data.numFound === 'number'
+          ? data.numFound
+          : typeof data.num_found === 'number'
+          ? data.num_found
+          : docs.length;
+
+      const books = docs.map((doc: any): SuggestedBook => {
+        const title = (doc.title || 'Untitled Book').trim();
+        const author = Array.isArray(doc.author_name) && doc.author_name.length > 0
+          ? doc.author_name[0]
+          : 'Unknown Author';
+
+        let coverImageUrl: string | undefined;
+        let coverThumbnailUrl: string | undefined;
+
+        if (doc.cover_i) {
+          coverImageUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+          coverThumbnailUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`;
+        } else if (doc.cover_edition_key) {
+          coverImageUrl = `https://covers.openlibrary.org/b/olid/${doc.cover_edition_key}-L.jpg`;
+          coverThumbnailUrl = `https://covers.openlibrary.org/b/olid/${doc.cover_edition_key}-M.jpg`;
+        } else if (Array.isArray(doc.isbn) && doc.isbn.length > 0) {
+          coverImageUrl = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`;
+          coverThumbnailUrl = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-M.jpg`;
+        }
+
+        return {
+          id: doc.key || `${title}-${author}-${doc.cover_i || Math.random()}`,
+          title,
+          author,
+          coverImageUrl,
+          coverThumbnailUrl,
+          firstPublishYear: doc.first_publish_year,
+          coverId: doc.cover_i,
+          workKey: doc.key,
+        };
+      });
+
+      return {
+        books,
+        totalFound,
+      };
+    } catch (err: any) {
+      if (err.name === 'AbortError') throw err;
+      console.warn('Category fetch fallback for subject:', subjectSlug, err);
+      const local = this.searchLocalCuratedBooks(subjectSlug);
+      return {
+        books: local.slice((page - 1) * limit, page * limit),
+        totalFound: local.length > 0 ? local.length : 12,
+      };
+    }
+  },
+
+  /**
+   * Helper to retrieve books for horizontal shelf with dual in-memory / sessionStorage caching.
+   */
+  async getShelfBooks(subjectSlug: string, limit = 16): Promise<SuggestedBook[]> {
+    const cacheKey = `liread_shelf_${subjectSlug}`;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+
+    try {
+      const { books } = await this.getBooksByCategory(subjectSlug, { page: 1, limit });
+      if (books && books.length > 0) {
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify(books));
+        } catch {}
+        return books;
+      }
+    } catch (err) {
+      console.warn(`Shelf fetch error for ${subjectSlug}:`, err);
+    }
+
+    return this.searchLocalCuratedBooks(subjectSlug).slice(0, limit);
   },
 
   /**
