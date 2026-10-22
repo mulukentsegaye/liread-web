@@ -3,13 +3,11 @@ import {
   Sparkles, 
   Coffee, 
   Bookmark, 
-  Check, 
   Heart, 
   BookOpen, 
-  Eye, 
   Feather, 
-  Sliders, 
-  RefreshCw,
+  RotateCcw,
+  CheckCircle2,
   Info
 } from 'lucide-react';
 
@@ -19,90 +17,52 @@ interface ReadingDeskAssemblyProps {
 
 export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpenBook }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
-  const [manualScrub, setManualScrub] = useState<number | null>(null);
+  const [isAssembled, setIsAssembled] = useState<boolean>(false);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [isQuoteLiked, setIsQuoteLiked] = useState<boolean>(false);
   const [likeCount, setLikeCount] = useState<number>(38);
+  const [hasEverTriggered, setHasEverTriggered] = useState<boolean>(false);
 
-  // Scroll tracking to calculate assembly progress
+  // Trigger assembly precisely when the desk is centered in the user's viewport
   useEffect(() => {
-    let rafId: number | null = null;
+    const el = containerRef.current;
+    if (!el) return;
 
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      if (manualScrub !== null) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // When at least 30% of the desk is comfortably visible in the user's viewport
+          if (entry.isIntersecting) {
+            // Slight delay so the user is settled looking at the section
+            const timer = setTimeout(() => {
+              setIsAssembled(true);
+              setHasEverTriggered(true);
+            }, 180);
+            return () => clearTimeout(timer);
+          } else {
+            // When user scrolls completely away, reset so it re-assembles when returning
+            if (entry.boundingClientRect.top > window.innerHeight) {
+              setIsAssembled(false);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.32,
+        rootMargin: '0px 0px -10% 0px'
+      }
+    );
 
-      const rect = containerRef.current.getBoundingClientRect();
-      const windowH = window.innerHeight;
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-      // Start assembling as top of container enters window (85% from top)
-      // Fully assembled when container is centered (30% from top)
-      const startPoint = windowH * 0.85;
-      const endPoint = windowH * 0.28;
-
-      const raw = (startPoint - rect.top) / (startPoint - endPoint);
-      const clamped = Math.max(0, Math.min(1, raw));
-
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        setScrollProgress(clamped);
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [manualScrub]);
-
-  // Active progress (manual or scroll-driven)
-  const effectiveProgress = manualScrub !== null ? manualScrub : scrollProgress;
-
-  // Spring easing curve for snappy tactile motion
-  const easeProgress = 1 - Math.pow(1 - effectiveProgress, 3);
-  const scatterFactor = 1 - easeProgress;
-
-  // Parallax offsets for each scattered item
-  const glassesTransform = {
-    x: -85 * scatterFactor,
-    y: -65 * scatterFactor,
-    rotate: -6 + -28 * scatterFactor,
-    scale: 0.95 + 0.05 * easeProgress,
-    opacity: 0.5 + 0.5 * easeProgress
-  };
-
-  const mugTransform = {
-    x: 90 * scatterFactor,
-    y: -60 * scatterFactor,
-    rotate: 4 + 22 * scatterFactor,
-    scale: 0.95 + 0.05 * easeProgress,
-    opacity: 0.5 + 0.5 * easeProgress
-  };
-
-  const penTransform = {
-    x: -80 * scatterFactor,
-    y: 75 * scatterFactor,
-    rotate: 28 + -45 * scatterFactor,
-    scale: 0.95 + 0.05 * easeProgress,
-    opacity: 0.5 + 0.5 * easeProgress
-  };
-
-  const bookmarkTransform = {
-    x: 85 * scatterFactor,
-    y: 70 * scatterFactor,
-    rotate: -12 + 35 * scatterFactor,
-    scale: 0.95 + 0.05 * easeProgress,
-    opacity: 0.5 + 0.5 * easeProgress
-  };
-
-  const bookTransform = {
-    y: -30 * scatterFactor,
-    scale: 0.94 + 0.06 * easeProgress,
-    opacity: 0.7 + 0.3 * easeProgress
+  // Replay animation on demand
+  const handleReplayAssembly = () => {
+    setIsAssembled(false);
+    setTimeout(() => {
+      setIsAssembled(true);
+    }, 120);
   };
 
   return (
@@ -110,7 +70,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
       ref={containerRef}
       className="relative w-full rounded-3xl bg-gradient-to-b from-vibe-card to-vibe-card-subtle border border-vibe-border p-4 sm:p-8 shadow-xl overflow-hidden select-none"
     >
-      {/* Decorative CSS keyframe for gentle rising tea steam */}
+      {/* Decorative CSS keyframe for rising tea steam */}
       <style>{`
         @keyframes teaSteamWaft {
           0% { transform: translateY(0) scaleX(1); opacity: 0; }
@@ -128,7 +88,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
         }
       `}</style>
 
-      {/* Desk Stage Header with Interactive Scrubber */}
+      {/* Desk Stage Header with Live Status & Replay Button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center shadow-xs">
@@ -139,36 +99,31 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
               The Reader's Desk Assembly
             </h4>
             <p className="text-[11px] text-vibe-ink-muted">
-              {effectiveProgress >= 0.92 
-                ? '✦ Desk in perfect harmony · Tap items to interact' 
-                : 'Scroll to assemble the scattered tools into place'}
+              {isAssembled 
+                ? '✦ Desk assembled in flow · Tap items to explore' 
+                : 'Scattered tools gather into place as you arrive'}
             </p>
           </div>
         </div>
 
-        {/* Assembly state badge & manual test toggle */}
+        {/* Live status badge & Replay button */}
         <div className="flex items-center gap-2 self-end sm:self-center">
           <div className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold border transition-all ${
-            effectiveProgress >= 0.92
+            isAssembled
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
               : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400'
           }`}>
-            {Math.round(effectiveProgress * 100)}% Assembled
+            {isAssembled ? 'Assembled 100%' : 'Scattered State'}
           </div>
 
           <button
             type="button"
-            onClick={() => {
-              if (manualScrub !== null) {
-                setManualScrub(null);
-              } else {
-                setManualScrub(effectiveProgress >= 0.9 ? 0.1 : 1.0);
-              }
-            }}
-            className="p-1.5 rounded-lg border border-vibe-border text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card transition-all active:scale-95"
-            title={manualScrub !== null ? 'Reset to scroll physics' : 'Toggle manual test'}
+            onClick={handleReplayAssembly}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card transition-all active:scale-95 shadow-xs cursor-pointer"
+            title="Watch the tools scatter and assemble again"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3.5 h-3.5 text-vibe-accent" />
+            <span>Replay</span>
           </button>
         </div>
       </div>
@@ -176,7 +131,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
       {/* ==============================================================================
           THE PHYSICAL DESK MAT STAGE
           ============================================================================== */}
-      <div className="relative w-full h-[480px] sm:h-[530px] my-4 rounded-2xl bg-amber-950/[0.03] dark:bg-black/30 border border-amber-900/10 dark:border-white/5 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[490px] sm:h-[540px] my-4 rounded-2xl bg-amber-950/[0.03] dark:bg-black/30 border border-amber-900/10 dark:border-white/5 flex items-center justify-center overflow-hidden">
         
         {/* Leather / Felt Desk Mat with Stitched Border */}
         <div 
@@ -194,18 +149,21 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
 
         {/* ----------------------------------------------------------------------------
             ITEM 1: SLEEK TORTOISESHELL READING GLASSES (Top Left)
+            Floats in from top-left with elastic spring physics
             ---------------------------------------------------------------------------- */}
         <div
           onClick={() => setActiveTooltip(activeTooltip === 'glasses' ? null : 'glasses')}
-          className="absolute left-6 sm:left-12 top-8 sm:top-12 z-20 cursor-pointer group transition-transform hover:scale-105"
+          className="absolute left-4 sm:left-12 top-6 sm:top-12 z-20 cursor-pointer group hover:scale-105"
           style={{
-            transform: `translate(${glassesTransform.x}px, ${glassesTransform.y}px) rotate(${glassesTransform.rotate}deg) scale(${glassesTransform.scale})`,
-            opacity: glassesTransform.opacity,
-            transition: manualScrub !== null ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s' : 'none',
-            filter: 'drop-shadow(0 10px 12px rgba(0,0,0,0.12))'
+            transform: isAssembled 
+              ? 'translate(0px, 0px) rotate(-6deg) scale(1)' 
+              : 'translate(-120px, -95px) rotate(-42deg) scale(0.88)',
+            opacity: isAssembled ? 1 : 0.25,
+            transition: 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 140ms, opacity 0.5s ease 140ms',
+            filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.15))'
           }}
         >
-          <div className="relative p-2.5 rounded-2xl bg-vibe-card/90 backdrop-blur-md border border-amber-900/20 shadow-md">
+          <div className="relative p-2.5 rounded-2xl bg-vibe-card/95 backdrop-blur-md border border-amber-900/20 shadow-md">
             {/* SVG Glasses Icon Graphic */}
             <div className="flex items-center gap-1.5 px-2 py-1">
               {/* Left Lens */}
@@ -230,7 +188,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
             {activeTooltip === 'glasses' && (
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-48 p-2 rounded-xl bg-vibe-ink text-vibe-bg text-[10px] shadow-xl z-30 font-sans pointer-events-none text-center">
                 <p className="font-bold">✦ Clarity & Reduced Glare</p>
-                <p className="opacity-80">Filters notifications for pure book immersion.</p>
+                <p className="opacity-80">Filters digital distractions for pure literary immersion.</p>
               </div>
             )}
           </div>
@@ -238,18 +196,21 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
 
         {/* ----------------------------------------------------------------------------
             ITEM 2: STEAMING PORCELAIN TEA MUG (Top Right)
+            Floats in from top-right with elastic spring physics
             ---------------------------------------------------------------------------- */}
         <div
           onClick={() => setActiveTooltip(activeTooltip === 'mug' ? null : 'mug')}
-          className="absolute right-6 sm:right-12 top-8 sm:top-12 z-20 cursor-pointer group transition-transform hover:scale-105"
+          className="absolute right-4 sm:right-12 top-6 sm:top-12 z-20 cursor-pointer group hover:scale-105"
           style={{
-            transform: `translate(${mugTransform.x}px, ${mugTransform.y}px) rotate(${mugTransform.rotate}deg) scale(${mugTransform.scale})`,
-            opacity: mugTransform.opacity,
-            transition: manualScrub !== null ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s' : 'none',
-            filter: 'drop-shadow(0 12px 14px rgba(0,0,0,0.14))'
+            transform: isAssembled 
+              ? 'translate(0px, 0px) rotate(4deg) scale(1)' 
+              : 'translate(120px, -85px) rotate(32deg) scale(0.88)',
+            opacity: isAssembled ? 1 : 0.25,
+            transition: 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 280ms, opacity 0.5s ease 280ms',
+            filter: 'drop-shadow(0 12px 16px rgba(0,0,0,0.16))'
           }}
         >
-          <div className="relative p-3 rounded-2xl bg-vibe-card/90 backdrop-blur-md border border-amber-900/20 shadow-md flex flex-col items-center">
+          <div className="relative p-3 rounded-2xl bg-vibe-card/95 backdrop-blur-md border border-amber-900/20 shadow-md flex flex-col items-center">
             
             {/* Animated Rising Steam Wisps */}
             <div className="absolute -top-5 flex items-center gap-1.5 h-6 pointer-events-none">
@@ -283,18 +244,21 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
 
         {/* ----------------------------------------------------------------------------
             ITEM 3: CLASSIC FOUNTAIN PEN & MARGIN NOTEPAD (Bottom Left)
+            Floats in from bottom-left with elastic spring physics
             ---------------------------------------------------------------------------- */}
         <div
           onClick={() => setActiveTooltip(activeTooltip === 'pen' ? null : 'pen')}
-          className="absolute left-6 sm:left-12 bottom-8 sm:bottom-12 z-20 cursor-pointer group transition-transform hover:scale-105"
+          className="absolute left-4 sm:left-12 bottom-6 sm:bottom-12 z-20 cursor-pointer group hover:scale-105"
           style={{
-            transform: `translate(${penTransform.x}px, ${penTransform.y}px) rotate(${penTransform.rotate}deg) scale(${penTransform.scale})`,
-            opacity: penTransform.opacity,
-            transition: manualScrub !== null ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s' : 'none',
-            filter: 'drop-shadow(0 10px 12px rgba(0,0,0,0.12))'
+            transform: isAssembled 
+              ? 'translate(0px, 0px) rotate(28deg) scale(1)' 
+              : 'translate(-110px, 110px) rotate(-65deg) scale(0.88)',
+            opacity: isAssembled ? 1 : 0.25,
+            transition: 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 420ms, opacity 0.5s ease 420ms',
+            filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.15))'
           }}
         >
-          <div className="relative p-2.5 rounded-2xl bg-vibe-card/90 backdrop-blur-md border border-amber-900/20 shadow-md space-y-1">
+          <div className="relative p-2.5 rounded-2xl bg-vibe-card/95 backdrop-blur-md border border-amber-900/20 shadow-md space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-amber-900/10 text-amber-800 dark:text-amber-400 flex items-center justify-center">
                 <Feather className="w-4 h-4" />
@@ -321,18 +285,21 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
 
         {/* ----------------------------------------------------------------------------
             ITEM 4: SILK RIBBON BOOKMARK (Bottom Right)
+            Floats in from bottom-right with elastic spring physics
             ---------------------------------------------------------------------------- */}
         <div
           onClick={() => setActiveTooltip(activeTooltip === 'bookmark' ? null : 'bookmark')}
-          className="absolute right-6 sm:right-12 bottom-8 sm:bottom-12 z-20 cursor-pointer group transition-transform hover:scale-105"
+          className="absolute right-4 sm:right-12 bottom-6 sm:bottom-12 z-20 cursor-pointer group hover:scale-105"
           style={{
-            transform: `translate(${bookmarkTransform.x}px, ${bookmarkTransform.y}px) rotate(${bookmarkTransform.rotate}deg) scale(${bookmarkTransform.scale})`,
-            opacity: bookmarkTransform.opacity,
-            transition: manualScrub !== null ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s' : 'none',
-            filter: 'drop-shadow(0 10px 12px rgba(0,0,0,0.12))'
+            transform: isAssembled 
+              ? 'translate(0px, 0px) rotate(-12deg) scale(1)' 
+              : 'translate(115px, 100px) rotate(45deg) scale(0.88)',
+            opacity: isAssembled ? 1 : 0.25,
+            transition: 'transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 560ms, opacity 0.5s ease 560ms',
+            filter: 'drop-shadow(0 10px 14px rgba(0,0,0,0.15))'
           }}
         >
-          <div className="relative p-2.5 rounded-2xl bg-vibe-card/90 backdrop-blur-md border border-amber-900/20 shadow-md flex items-center gap-2">
+          <div className="relative p-2.5 rounded-2xl bg-vibe-card/95 backdrop-blur-md border border-amber-900/20 shadow-md flex items-center gap-2">
             {/* Ribbon Graphic with Chevron Tail */}
             <div 
               className="w-4 h-9 bg-emerald-700 dark:bg-emerald-600 rounded-t-sm shadow-xs flex items-center justify-center text-amber-300"
@@ -350,7 +317,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
             {activeTooltip === 'bookmark' && (
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-48 p-2 rounded-xl bg-vibe-ink text-vibe-bg text-[10px] shadow-xl z-30 font-sans pointer-events-none text-center">
                 <p className="font-bold">🔖 Memory Keeper</p>
-                <p className="opacity-80">Automatically bookmarks your exact page depth.</p>
+                <p className="opacity-80">Automatically bookmarks your exact reading depth.</p>
               </div>
             )}
           </div>
@@ -358,13 +325,14 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
 
         {/* ----------------------------------------------------------------------------
             ITEM 5: THE ASSEMBLED OPEN BOOK & MARGINALIA PASSAGE (Desk Centerpiece)
+            Lands smoothly in center with soft settling drop
             ---------------------------------------------------------------------------- */}
         <div
-          className="relative z-10 w-[92%] sm:w-[460px] lg:w-[500px] transition-all duration-300"
+          className="relative z-10 w-[92%] sm:w-[460px] lg:w-[500px]"
           style={{
-            transform: `translateY(${bookTransform.y}px) scale(${bookTransform.scale})`,
-            opacity: bookTransform.opacity,
-            transition: manualScrub !== null ? 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s' : 'none',
+            transform: isAssembled ? 'translateY(0px) scale(1)' : 'translateY(-50px) scale(0.92)',
+            opacity: isAssembled ? 1 : 0.4,
+            transition: 'transform 0.9s cubic-bezier(0.34, 1.35, 0.64, 1) 50ms, opacity 0.6s ease 50ms',
             filter: 'drop-shadow(0 20px 25px rgba(0, 0, 0, 0.22))'
           }}
         >
@@ -463,32 +431,17 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
       <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-vibe-ink-muted">
         <div className="flex items-center gap-2">
           <Info className="w-3.5 h-3.5 text-vibe-accent" />
-          <span>Interactive physical spring assembly. Tap glasses, tea mug, pen, or bookmark to explore.</span>
+          <span>Tap glasses, tea mug, fountain pen, or bookmark to explore their ritual purpose.</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px]">Assembly:</span>
           <button
             type="button"
-            onClick={() => setManualScrub(0)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
-              effectiveProgress < 0.2
-                ? 'bg-vibe-accent text-white font-bold'
-                : 'bg-vibe-card-subtle text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border'
-            }`}
+            onClick={handleReplayAssembly}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all active:scale-95 shadow-xs cursor-pointer"
           >
-            Scatter
-          </button>
-          <button
-            type="button"
-            onClick={() => setManualScrub(1)}
-            className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
-              effectiveProgress >= 0.9
-                ? 'bg-vibe-accent text-white font-bold'
-                : 'bg-vibe-card-subtle text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border'
-            }`}
-          >
-            Assemble
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Watch Desk Assemble Again</span>
           </button>
         </div>
       </div>
