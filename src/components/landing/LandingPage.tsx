@@ -25,6 +25,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId } from '../../types/theme';
 import { useAuthStore } from '../../stores/authStore';
+import { ReadingImpactCalculator } from './ReadingImpactCalculator';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -108,6 +109,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </a>
             <a href="#analytics" className="hover:text-vibe-accent transition-colors">
               Analytics
+            </a>
+            <a href="#calculator" className="hover:text-vibe-accent transition-colors">
+              Impact
             </a>
             <a href="#quotes" className="hover:text-vibe-accent transition-colors">
               Philosophy
@@ -760,6 +764,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
+          INTERACTIVE ANNUAL READING IMPACT CALCULATOR
+          ============================================================================== */}
+      <ReadingImpactCalculator
+        onStartHabit={() => (onGoToLogin ? onGoToLogin() : handleGuest())}
+        onContinueGuest={handleGuest}
+      />
+
+      {/* ==============================================================================
           5. PHILOSOPHY & LITERARY QUOTES
           ============================================================================== */}
       <section id="quotes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
@@ -845,6 +857,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Soundscapes</a>
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
             <a href="#analytics" className="hover:text-vibe-ink transition-colors">Analytics</a>
+            <a href="#calculator" className="hover:text-vibe-ink transition-colors">Impact</a>
             <a href="#quotes" className="hover:text-vibe-ink transition-colors">Philosophy</a>
             <button 
               onClick={handleGuest} 
