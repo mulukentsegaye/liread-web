@@ -6,13 +6,13 @@
 --   Password: test1234
 --
 -- How to run:
---   1. Open your Supabase Dashboard: https://supabase.com/dashboard/project/zlrrnnoqektzirwrgftj
---   2. Click "SQL Editor" in the left navigation.
---   3. Paste this entire script and click "Run" (or Ctrl+Enter).
---   4. Immediately sign in at your app with:
---        Email:    demo@liread.com
---        Password: test1234
+--   1. Open Supabase Dashboard -> SQL Editor
+--   2. Click "+" to create a NEW clean query (or Ctrl+A -> Backspace to clear)
+--   3. Paste this script and click "Run"
 -- ==============================================================================
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 1. CLEANUP PREVIOUS DEMO DATA (Safe rerun)
 DELETE FROM public.post_comments WHERE user_id = 'a1111111-1111-1111-1111-111111111111';
