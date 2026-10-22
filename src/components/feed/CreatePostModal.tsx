@@ -4,6 +4,7 @@ import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
 import { toast } from '../../stores/noticeStore';
 import { PostType } from '../../types';
+import { getUserAvatar } from '../../utils/avatar';
 import { bookSearchService, SuggestedBook, isOfflineOrNetworkError } from '../../services/bookSearchService';
 
 interface CreatePostModalProps {
@@ -187,7 +188,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         recommendationText: recommendationText.trim() || undefined,
         rating: postType === 'finished_book' ? rating : undefined,
         authorName: user?.fullName,
-        authorAvatar: user?.avatarUrl,
+        authorAvatar: getUserAvatar(user),
       },
       user?.id
     );

@@ -14,11 +14,14 @@ import {
   Bookmark,
   ShieldCheck,
   Loader2,
-  Mail
+  Mail,
+  Camera,
+  Upload,
+  Trash2
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
-import { DEFAULT_USER_AVATAR } from '../../data/defaults';
+import { getUserAvatar, isCustomAvatar } from '../../utils/avatar';
 import { describeAuthError } from '../../lib/authErrors';
 
 interface AuthModalProps {
@@ -40,7 +43,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     signUp, 
     signOut, 
     isLoading,
-    resendConfirmationEmail
+    resendConfirmationEmail,
+    updateUser
   } = useAuthStore();
   const { showToast } = useNoticeStore();
 
@@ -56,6 +60,54 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isResending, setIsResending] = useState(false);
 
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setStatusMessage({ type: 'error', text: 'Please select an image file (PNG, JPG, WebP).' });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setStatusMessage({ type: 'error', text: 'Please choose an image under 5MB.' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const rawDataUrl = event.target?.result as string;
+      if (!rawDataUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const size = 256;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const minDim = Math.min(img.width, img.height);
+        const startX = (img.width - minDim) / 2;
+        const startY = (img.height - minDim) / 2;
+
+        ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size);
+        const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+        updateUser({ avatarUrl: optimizedDataUrl });
+        setStatusMessage({ type: 'success', text: 'Profile photo updated successfully!' });
+      };
+      img.src = rawDataUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveAvatar = () => {
+    updateUser({ avatarUrl: '' });
+    setStatusMessage({ type: 'info', text: 'Profile photo removed. Showing your personalized initial icon.' });
+  };
 
   const handleResendInModal = async () => {
     if (!email.trim()) {
@@ -243,13 +295,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {tab === 'account' && isAuthenticated && !isGuest && user && (
             <div className="space-y-4">
               
-              {/* Profile Card */}
-              <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-center gap-3.5">
-                <img
-                  src={user.avatarUrl || DEFAULT_USER_AVATAR}
-                  alt={user.fullName}
-                  className="w-13 h-13 rounded-full object-cover ring-2 ring-vibe-accent/30 flex-shrink-0"
-                />
+              {/* Profile Card with Photo Upload */}
+              <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-center gap-4">
+                <div className="relative group flex-shrink-0">
+                  <img
+                    src={getUserAvatar(user)}
+                    alt={user.fullName}
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-vibe-accent/30 flex-shrink-0 bg-vibe-card shadow-xs"
+                  />
+                  <label
+                    htmlFor="account-avatar-file-input"
+                    className="absolute inset-0 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-opacity"
+                    title="Upload profile photo"
+                  >
+                    <Camera className="w-4 h-4" />
+                    <span className="text-[8px] font-semibold mt-0.5">Edit</span>
+                  </label>
+                  <input
+                    id="account-avatar-file-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarFileChange}
+                    className="hidden"
+                  />
+                </div>
+
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-heading text-sm font-bold text-vibe-ink truncate">
@@ -262,6 +332,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <p className="text-xs text-vibe-ink-muted truncate mt-0.5">
                     @{user.username}
                   </p>
+
+                  {/* Photo actions */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <label
+                      htmlFor="account-avatar-file-input"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-vibe-accent hover:underline cursor-pointer"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>{isCustomAvatar(user.avatarUrl) ? 'Change photo' : 'Upload photo'}</span>
+                    </label>
+
+                    {isCustomAvatar(user.avatarUrl) && (
+                      <>
+                        <span className="text-vibe-border text-xs">·</span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveAvatar}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-500 hover:underline cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Remove</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -324,7 +419,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
                 <div className="flex items-center gap-3">
                   <img
-                    src={DEFAULT_USER_AVATAR}
+                    src={getUserAvatar(null)}
                     alt="Guest"
                     className="w-12 h-12 rounded-full object-cover ring-1 ring-vibe-border flex-shrink-0"
                   />
