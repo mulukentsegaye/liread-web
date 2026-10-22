@@ -8,7 +8,7 @@ import {
   ResponsiveContainer, 
   Cell 
 } from 'recharts';
-import { Flame, Trophy, Clock, Award, BookOpen, ArrowLeft } from 'lucide-react';
+import { Flame, Trophy, Clock, Award, BookOpen, ArrowLeft, Hourglass } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useTheme } from '../../context/ThemeContext';
 import { sessionsService } from '../../services/sessionsService';
@@ -104,21 +104,30 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
           </button>
         )}
 
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-            <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
-              Personal Analytics
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
+              <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
+                Personal Analytics
+              </span>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
+              Your Reading Journey
+            </h1>
+          </div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border shadow-soft self-start sm:self-auto">
+            <Award className="w-4 h-4 text-vibe-accent flex-shrink-0" />
+            <span className="text-xs font-medium text-vibe-ink">
+              <span className="text-vibe-ink-muted font-normal mr-1">Rank:</span>
+              {user.rankTier}
             </span>
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
-            Your Reading Journey
-          </h1>
         </div>
       </div>
 
       {/* Metric Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1.35fr_1fr] gap-3.5 sm:gap-4 items-stretch">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         
         {/* Card 1: Today */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
@@ -159,20 +168,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Card 3: Rank Tier */}
+        {/* Card 3: Total Time */}
         <div className="bg-vibe-card border border-vibe-border rounded-2xl p-4 sm:px-4.5 sm:py-5 shadow-soft hover:border-vibe-border transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Rank Tier</span>
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink-muted">Total Time</span>
             <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
-              <Award className="w-4 h-4" />
+              <Hourglass className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-heading text-base sm:text-[17px] xl:text-[19px] 2xl:text-xl font-semibold text-vibe-ink leading-snug tracking-tight break-words">
-              {user.rankTier}
+            <div className="font-mono text-2xl sm:text-3xl font-semibold text-vibe-ink leading-tight">
+              {user.totalMinutesRead >= 60 ? (
+                <>
+                  {(user.totalMinutesRead / 60).toFixed(1)} <span className="text-xs font-sans font-normal text-vibe-ink-muted">hrs</span>
+                </>
+              ) : (
+                <>
+                  {user.totalMinutesRead} <span className="text-xs font-sans font-normal text-vibe-ink-muted">min</span>
+                </>
+              )}
             </div>
-            <p className="font-mono text-xs text-vibe-ink-muted mt-1.5">
-              {user.totalMinutesRead.toLocaleString()} total logged mins
+            <p className="font-mono text-xs text-vibe-ink-muted mt-1.5 truncate">
+              {sessions.length > 0 ? `${sessions.length} logged ${sessions.length === 1 ? 'session' : 'sessions'}` : 'All-time reading'}
             </p>
           </div>
         </div>
