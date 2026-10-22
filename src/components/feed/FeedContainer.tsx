@@ -2,7 +2,7 @@ import React from 'react';
 import { Plus, Sparkles, TrendingUp, Clock, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
-import { DEFAULT_USER_AVATAR } from '../../data/defaults';
+import { getUserAvatar } from '../../utils/avatar';
 import { PostCard } from './PostCard';
 
 interface FeedContainerProps {
@@ -70,7 +70,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         onClick={onOpenCreateModal}
       >
         <img
-          src={user?.avatarUrl ?? DEFAULT_USER_AVATAR}
+          src={getUserAvatar(user)}
           alt={isRealUser ? (user?.fullName ?? 'User avatar') : 'Liread avatar'}
           className="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
         />
