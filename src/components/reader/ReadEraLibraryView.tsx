@@ -22,7 +22,7 @@ interface ReadEraLibraryViewProps {
 
 export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBook }) => {
   const { books, isLoadingBooks, loadBooks, openBook, importBookFile, toggleFavorite, deleteBook } = useReaderStore();
-  const [activeTab, setActiveTab] = useState<'reading_now' | 'all' | 'favorites' | 'have_read'>('reading_now');
+  const [activeTab, setActiveTab] = useState<'reading_now' | 'all' | 'favorites' | 'have_read'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -35,17 +35,23 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    let firstImported: StoredBook | null = null;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
         const imported = await importBookFile(file);
-        toast.success(`Added "${imported.title}" to library.`, 'Book Added');
+        if (!firstImported) firstImported = imported;
       } catch {
-        toast.error(`Could not add "${file.name}".`);
+        toast.error(`Could not open "${file.name}".`);
       }
     }
 
     if (fileInputRef.current) fileInputRef.current.value = '';
+
+    if (firstImported) {
+      toast.success(`Opening "${firstImported.title}"...`, 'Opening Book');
+      handleOpenBook(firstImported);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent) => {
@@ -54,14 +60,20 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
     const files = e.dataTransfer.files;
     if (!files || files.length === 0) return;
 
+    let firstImported: StoredBook | null = null;
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
         const imported = await importBookFile(file);
-        toast.success(`Imported "${imported.title}".`, 'E-Reader Library');
+        if (!firstImported) firstImported = imported;
       } catch {
-        toast.error(`Failed to import "${file.name}".`);
+        toast.error(`Failed to open "${file.name}".`);
       }
+    }
+
+    if (firstImported) {
+      toast.success(`Opening "${firstImported.title}"...`, 'Opening Book');
+      handleOpenBook(firstImported);
     }
   };
 
@@ -73,7 +85,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
 
     if (!matchesSearch) return false;
 
-    if (activeTab === 'reading_now') return b.progressPercent > 0 && b.progressPercent < 100;
+    if (activeTab === 'reading_now') return b.progressPercent < 100;
     if (activeTab === 'favorites') return b.isFavorite;
     if (activeTab === 'have_read') return b.progressPercent >= 100;
     return true; // 'all'
@@ -115,8 +127,8 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
             onClick={() => fileInputRef.current?.click()}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-medium shadow-xs transition-all active:scale-95 cursor-pointer"
           >
-            <UploadCloud className="w-4 h-4" />
-            <span>Open / Import Book</span>
+            <BookOpen className="w-4 h-4" />
+            <span>Open Book</span>
           </button>
         </div>
       </div>
@@ -140,10 +152,10 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <BookOpen className="w-6 h-6" />
         </div>
         <p className="text-sm font-medium text-vibe-ink">
-          Drop any <span className="font-semibold text-vibe-accent">PDF, EPUB, TXT, or MOBI</span> file here
+          Click to choose or drop any <span className="font-semibold text-vibe-accent">PDF, EPUB, or TXT</span> book to read
         </p>
         <p className="text-xs text-vibe-ink-muted mt-1">
-          Files are stored locally in your browser's IndexedDB for private, instant offline reading.
+          Opens immediately in the reader and saves to your local offline library.
         </p>
       </div>
 
@@ -153,19 +165,8 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
         <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
           <button
             type="button"
-            onClick={() => setActiveTab('reading_now')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              activeTab === 'reading_now'
-                ? 'bg-vibe-card text-vibe-accent border border-vibe-border shadow-xs'
-                : 'text-vibe-ink-muted hover:text-vibe-ink'
-            }`}
-          >
-            Reading Now ({books.filter((b) => b.progressPercent > 0 && b.progressPercent < 100).length})
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveTab('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-vibe-card text-vibe-accent border border-vibe-border shadow-xs'
                 : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -175,8 +176,19 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('reading_now')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+              activeTab === 'reading_now'
+                ? 'bg-vibe-card text-vibe-accent border border-vibe-border shadow-xs'
+                : 'text-vibe-ink-muted hover:text-vibe-ink'
+            }`}
+          >
+            Reading Now ({books.filter((b) => b.readingStatus === 'reading_now' || b.progressPercent < 100).length})
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('favorites')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'favorites'
                 ? 'bg-vibe-card text-vibe-accent border border-vibe-border shadow-xs'
                 : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -187,7 +199,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <button
             type="button"
             onClick={() => setActiveTab('have_read')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'have_read'
                 ? 'bg-vibe-card text-vibe-accent border border-vibe-border shadow-xs'
                 : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -218,7 +230,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <FolderOpen className="w-10 h-10 text-vibe-ink-muted mx-auto" />
           <h3 className="text-sm font-semibold text-vibe-ink">No books found in this section</h3>
           <p className="text-xs text-vibe-ink-muted">
-            Drop a book above or choose "Open / Import Book" to start reading.
+            Drop a book above or choose "Open Book" to start reading.
           </p>
         </div>
       ) : (
@@ -283,22 +295,37 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
                 </div>
               </div>
 
-              {/* Progress footer */}
-              <div className="pt-3 border-t border-vibe-border space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
-                  <span className="text-[11px]">
-                    {book.progressPercent > 0 ? `Page ${book.currentPage}` : 'Not started'}
-                  </span>
-                  <span className="font-mono text-[11px] font-medium text-vibe-ink">
-                    {book.progressPercent}%
-                  </span>
+              {/* Progress & Read Action Footer */}
+              <div className="pt-3 border-t border-vibe-border flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
+                    <span className="text-[11px] truncate">
+                      {book.progressPercent > 0 ? `Page ${book.currentPage}` : 'Not started'}
+                    </span>
+                    <span className="font-mono text-[11px] font-medium text-vibe-ink ml-1">
+                      {book.progressPercent}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-vibe-card-subtle overflow-hidden">
+                    <div
+                      className="h-full bg-vibe-accent rounded-full transition-all duration-500"
+                      style={{ width: `${Math.max(book.progressPercent, 2)}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-vibe-card-subtle overflow-hidden">
-                  <div
-                    className="h-full bg-vibe-accent rounded-full transition-all duration-500"
-                    style={{ width: `${Math.max(book.progressPercent, 2)}%` }}
-                  />
-                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenBook(book);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-vibe-accent/10 hover:bg-vibe-accent text-vibe-accent hover:text-white text-xs font-medium transition-all shrink-0 cursor-pointer shadow-2xs"
+                  title="Open this book in the reader"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>{book.progressPercent > 0 ? 'Continue' : 'Read'}</span>
+                </button>
               </div>
             </div>
           ))}
