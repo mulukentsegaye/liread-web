@@ -14,11 +14,13 @@ import {
   Flame,
   Clock,
   ShieldCheck,
-  Bookmark
+  Bookmark,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
-import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { describeAuthError } from '../../lib/authErrors';
 
 interface LoginPageProps {
@@ -28,7 +30,14 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGuest }) => {
-  const { signIn, signUp, signInAsGuest, pendingConfirmationEmail, clearPendingConfirmation } = useAuthStore();
+  const { 
+    signIn, 
+    signUp, 
+    signInAsGuest, 
+    pendingConfirmationEmail, 
+    clearPendingConfirmation,
+    resendConfirmationEmail
+  } = useAuthStore();
   const { openInfoModal } = useNoticeStore();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   
@@ -42,11 +51,29 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
   // Status
   const [loading, setLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [isForgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetSent, setResetSent] = useState(false);
+
+  const handleResendConfirmation = async (targetEmail: string) => {
+    if (!targetEmail.trim()) {
+      setErrorMsg('Please enter your email address so we can send the confirmation link.');
+      return;
+    }
+    setIsResending(true);
+    setErrorMsg(null);
+    try {
+      await resendConfirmationEmail(targetEmail.trim());
+      setSuccessMsg(`Confirmation email sent to ${targetEmail}! Please check your inbox and spam folder.`);
+    } catch (err: any) {
+      setErrorMsg(describeAuthError(err));
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +87,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
     if (mode === 'signup' && (!fullName || !username)) {
       setErrorMsg('Please provide your full name and a unique username.');
-      return;
-    }
-
-    if (!isSupabaseConfigured()) {
-      setErrorMsg('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env, or use Guest to explore.');
       return;
     }
 
@@ -102,12 +124,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
     e.preventDefault();
     if (!resetEmail) return;
     setLoading(true);
-    if (isSupabaseConfigured()) {
-      try {
-        await supabase.auth.resetPasswordForEmail(resetEmail);
-      } catch (e) {
-        // Fallback gracefully
-      }
+    try {
+      await supabase.auth.resetPasswordForEmail(resetEmail);
+    } catch (_e) {
+      // Fallback gracefully
     }
     setTimeout(() => {
       setLoading(false);
@@ -186,7 +206,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                 <span className="font-mono text-[10px] uppercase tracking-wider font-bold">Passage of the Day</span>
               </div>
               <blockquote className="font-display italic font-normal text-sm sm:text-base text-vibe-ink leading-relaxed">
-                “A reader lives a thousand lives before he dies. The man who never reads lives only one.”
+                "A reader lives a thousand lives before he dies. The man who never reads lives only one."
               </blockquote>
               <div className="flex items-center justify-between pt-2 border-t border-vibe-border-subtle text-[11px] text-vibe-ink-muted">
                 <span>George R.R. Martin</span>
@@ -272,11 +292,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
             {/* Alert Notifications */}
             {errorMsg && (
-              <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex flex-col gap-2 animate-in fade-in duration-200">
+              <div className="mb-5 p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs flex flex-col gap-2.5 animate-in fade-in duration-200">
                 <div className="flex items-start gap-2.5">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <span className="leading-relaxed flex-1">{errorMsg}</span>
                 </div>
+
                 {mode === 'signup' && (errorMsg.includes('Sign In') || errorMsg.includes('already')) && (
                   <button
                     type="button"
@@ -288,6 +309,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                   >
                     Switch to Sign In →
                   </button>
+                )}
+
+                {/* When email is unconfirmed, offer resend */}
+                {(errorMsg.toLowerCase().includes('not confirmed') || errorMsg.toLowerCase().includes('confirmation')) && (
+                  <div className="ml-6 pt-2.5 border-t border-rose-500/20">
+                    <button
+                      type="button"
+                      disabled={isResending || !email}
+                      onClick={() => handleResendConfirmation(email)}
+                      className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover disabled:opacity-50 transition-colors shadow-xs"
+                    >
+                      {isResending ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Sending link...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>Resend confirmation email</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
@@ -312,18 +357,29 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    clearPendingConfirmation();
-                    setMode('signin');
-                    setEmail(pendingConfirmationEmail);
-                    setErrorMsg(null);
-                  }}
-                  className="w-full min-h-[40px] py-2 rounded-xl border border-vibe-border bg-vibe-card text-vibe-ink text-xs font-semibold hover:bg-vibe-card-subtle transition-colors"
-                >
-                  I have confirmed — go to sign in
-                </button>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearPendingConfirmation();
+                      setMode('signin');
+                      setEmail(pendingConfirmationEmail);
+                      setErrorMsg(null);
+                    }}
+                    className="flex-1 min-h-[38px] py-2 px-3 rounded-xl border border-vibe-border bg-vibe-card text-vibe-ink text-xs font-semibold hover:bg-vibe-card-subtle transition-colors text-center"
+                  >
+                    I have confirmed — go to sign in
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isResending}
+                    onClick={() => handleResendConfirmation(pendingConfirmationEmail)}
+                    className="flex-1 min-h-[38px] py-2 px-3 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    {isResending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                    <span>Resend email</span>
+                  </button>
+                </div>
               </div>
             )}
 

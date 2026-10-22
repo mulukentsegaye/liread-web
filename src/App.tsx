@@ -13,6 +13,14 @@ import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { BookshelfView } from './components/bookshelf/BookshelfView';
 import { BookDetailsView } from './components/book/BookDetailsView';
 import { ExploreView } from './components/explore/ExploreView';
+import { useReaderStore } from './stores/readerStore';
+
+const ReadEraLibraryView = React.lazy(() =>
+  import('./components/reader/ReadEraLibraryView').then((m) => ({ default: m.ReadEraLibraryView }))
+);
+const ReadEraViewer = React.lazy(() =>
+  import('./components/reader/ReadEraViewer').then((m) => ({ default: m.ReadEraViewer }))
+);
 import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
@@ -69,10 +77,13 @@ export const App: React.FC = () => {
     title: string;
     author: string;
     coverImageUrl?: string;
+    quoteText?: string;
+    pageNumber?: number | string;
   } | null>(null);
 
   const { isPopoverOpen, closePopover, theme } = useTheme();
   const { isFullScreenOpen, setFullScreenOpen, setBook, startTimer, prepareTimerForBook } = useTimerStore();
+  const { isReaderOpen } = useReaderStore();
   const { 
     user, 
     isAuthenticated, 
@@ -512,6 +523,12 @@ export const App: React.FC = () => {
               <LeaderboardView onBack={() => handleTabChange('feed')} />
             )}
 
+            {activeTab === 'reader' && (
+              <React.Suspense fallback={<div className="py-16 text-center text-xs text-vibe-ink-muted">Loading ReadEra Library...</div>}>
+                <ReadEraLibraryView />
+              </React.Suspense>
+            )}
+
             {(activeTab === 'bookshelf' || activeTab === 'saved') && (
               <BookshelfView 
                 initialTab={activeTab} 
@@ -564,6 +581,22 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
+
+      {isReaderOpen && (
+        <React.Suspense fallback={null}>
+          <ReadEraViewer
+            onOpenShareModal={(quoteData) => {
+              setPreSelectedBook({
+                title: quoteData.bookTitle,
+                author: quoteData.bookAuthor,
+                quoteText: quoteData.quoteText,
+                pageNumber: quoteData.pageNumber,
+              });
+              setCreateModalOpen(true);
+            }}
+          />
+        </React.Suspense>
+      )}
 
     </div>
   );

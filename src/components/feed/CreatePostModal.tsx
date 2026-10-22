@@ -13,6 +13,8 @@ interface CreatePostModalProps {
     title: string;
     author: string;
     coverImageUrl?: string;
+    quoteText?: string;
+    pageNumber?: number | string;
   } | null;
 }
 
@@ -46,6 +48,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       setBookTitle(initialBook.title);
       setBookAuthor(initialBook.author);
       setCoverImageUrl(initialBook.coverImageUrl);
+      if (initialBook.quoteText) {
+        setQuoteText(initialBook.quoteText);
+        setPostType('passage');
+      }
+      if (initialBook.pageNumber) {
+        setPageNumber(String(initialBook.pageNumber));
+      }
       setSelectedBook({
         id: initialBook.title,
         title: initialBook.title,

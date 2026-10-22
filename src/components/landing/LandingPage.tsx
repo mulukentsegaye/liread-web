@@ -711,7 +711,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                     ))}
                   </div>
                   <p className="text-[10px] text-vibe-ink-muted pt-1">
-                    Rankings appear here once real readers log sessions.
+                    Rankings update continuously as community reading sessions are logged.
                   </p>
                 </div>
 

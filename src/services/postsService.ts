@@ -107,10 +107,6 @@ export const postsService = {
    * Create a new post in Supabase
    */
   async createPost(post: Partial<Post>, userId: string): Promise<Post> {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Supabase is not configured.');
-    }
-
     const newPostRecord = {
       user_id: userId,
       book_title: post.bookTitle || 'Untitled Book',

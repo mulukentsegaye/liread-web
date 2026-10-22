@@ -7,6 +7,7 @@ import {
   Trophy,
   Library,
   Bookmark,
+  BookOpen,
   Sparkles,
   HelpCircle,
   ChevronsUpDown,
@@ -17,7 +18,7 @@ import { useNoticeStore } from '../../stores/noticeStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
 
-export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details';
+export type NavigationTab = 'feed' | 'explore' | 'timer' | 'analytics' | 'leaderboard' | 'bookshelf' | 'saved' | 'book_details' | 'reader';
 
 interface SidebarLeftProps {
   activeTab: NavigationTab;
@@ -39,6 +40,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
   ];
 
   const libraryItems = [
+    { id: 'reader' as NavigationTab,    label: 'ReadEra E-Reader', icon: BookOpen, },
     { id: 'bookshelf' as NavigationTab, label: 'My Bookshelf', icon: Library,  badge: user?.bookshelfCount ?? 0 },
     { id: 'saved' as NavigationTab,     label: 'Saved Passages', icon: Bookmark, badge: user?.savedPassagesCount ?? 0 },
   ];

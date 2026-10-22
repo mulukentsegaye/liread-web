@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Trophy, ArrowLeft } from 'lucide-react';
 import { leaderboardService } from '../../services/leaderboardService';
 import { useAuthStore } from '../../stores/authStore';
@@ -86,12 +86,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
 
       {isGuest && (
         <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 text-center">
-          Guest browsing — leaderboard reflects real readers. Create an account to appear on the board.
+          Guest browsing — create a free account to track your sessions and join the community leaderboard.
         </div>
       )}
 
       {isLoading ? (
-        <div className="py-16 text-center text-sm text-vibe-ink-muted">Loading leaderboard…</div>
+        <div className="py-16 text-center text-sm text-vibe-ink-muted">Loading leaderboard...</div>
       ) : currentList.length === 0 ? (
         <div className="rounded-3xl border border-vibe-border bg-vibe-card p-12 text-center space-y-3 shadow-soft">
           <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center mx-auto">
@@ -99,7 +99,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onBack }) => {
           </div>
           <h3 className="font-heading text-lg font-semibold text-vibe-ink">No readers yet</h3>
           <p className="text-sm text-vibe-ink-muted max-w-md mx-auto">
-            The leaderboard appears once real users log reading sessions. Start a timer and be the first on the board.
+            The leaderboard updates as reading sessions are logged. Start a timer and take the lead!
           </p>
         </div>
       ) : (

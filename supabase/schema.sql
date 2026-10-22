@@ -127,7 +127,7 @@ CREATE INDEX IF NOT EXISTS idx_bookshelf_status ON public.bookshelf(user_id, sta
 CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON public.post_comments(post_id);
 
 -- ==============================================================================
--- 4. ROW LEVEL SECURITY (RLS) POLICIES
+-- 4. ROW LEVEL SECURITY (RLS) POLICIES (Idempotent)
 -- ==============================================================================
 
 -- Enable RLS on all tables
@@ -140,121 +140,133 @@ ALTER TABLE public.bookshelf ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
 
 -- 4.1 PROFILES POLICIES
--- Anyone can view user profiles
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone" 
     ON public.profiles FOR SELECT 
     USING (true);
 
--- Users can only insert their own profile
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile" 
     ON public.profiles FOR INSERT 
     WITH CHECK (auth.uid() = id);
 
--- Users can only update their own profile
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" 
     ON public.profiles FOR UPDATE 
     USING (auth.uid() = id);
 
--- Users can delete their own profile (account self-deletion).
--- Deleting the auth.users row also cascades to this profile.
+DROP POLICY IF EXISTS "Users can delete their own profile" ON public.profiles;
 CREATE POLICY "Users can delete their own profile" 
     ON public.profiles FOR DELETE 
     USING (auth.uid() = id);
 
 -- 4.2 POSTS POLICIES
--- Anyone can view posts
+DROP POLICY IF EXISTS "Posts are viewable by everyone" ON public.posts;
 CREATE POLICY "Posts are viewable by everyone" 
     ON public.posts FOR SELECT 
     USING (true);
 
--- Authenticated users can create posts
+DROP POLICY IF EXISTS "Authenticated users can create posts" ON public.posts;
 CREATE POLICY "Authenticated users can create posts" 
     ON public.posts FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
--- Post owners can update their posts
+DROP POLICY IF EXISTS "Users can update own posts" ON public.posts;
 CREATE POLICY "Users can update own posts" 
     ON public.posts FOR UPDATE 
     USING (auth.uid() = user_id);
 
--- Post owners can delete their posts
+DROP POLICY IF EXISTS "Users can delete own posts" ON public.posts;
 CREATE POLICY "Users can delete own posts" 
     ON public.posts FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- 4.3 POST UPVOTES POLICIES
+DROP POLICY IF EXISTS "Upvotes are viewable by everyone" ON public.post_upvotes;
 CREATE POLICY "Upvotes are viewable by everyone" 
     ON public.post_upvotes FOR SELECT 
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can upvote" ON public.post_upvotes;
 CREATE POLICY "Authenticated users can upvote" 
     ON public.post_upvotes FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can remove their upvote" ON public.post_upvotes;
 CREATE POLICY "Users can remove their upvote" 
     ON public.post_upvotes FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- 4.4 READING SESSIONS POLICIES
--- Users can view their own reading sessions
+DROP POLICY IF EXISTS "Users can view their own reading sessions" ON public.reading_sessions;
 CREATE POLICY "Users can view their own reading sessions" 
     ON public.reading_sessions FOR SELECT 
     USING (auth.uid() = user_id);
 
--- Users can log reading sessions
+DROP POLICY IF EXISTS "Users can insert their own reading sessions" ON public.reading_sessions;
 CREATE POLICY "Users can insert their own reading sessions" 
     ON public.reading_sessions FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
--- Users can update their own reading sessions
+DROP POLICY IF EXISTS "Users can update their own reading sessions" ON public.reading_sessions;
 CREATE POLICY "Users can update their own reading sessions" 
     ON public.reading_sessions FOR UPDATE 
     USING (auth.uid() = user_id);
 
--- Users can delete their own reading sessions
+DROP POLICY IF EXISTS "Users can delete their own reading sessions" ON public.reading_sessions;
 CREATE POLICY "Users can delete their own reading sessions" 
     ON public.reading_sessions FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- 4.5 SAVED POSTS POLICIES
+DROP POLICY IF EXISTS "Users can view their own saved posts" ON public.saved_posts;
 CREATE POLICY "Users can view their own saved posts" 
     ON public.saved_posts FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can save posts" ON public.saved_posts;
 CREATE POLICY "Users can save posts" 
     ON public.saved_posts FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can remove saved posts" ON public.saved_posts;
 CREATE POLICY "Users can remove saved posts" 
     ON public.saved_posts FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- 4.6 BOOKSHELF POLICIES
+DROP POLICY IF EXISTS "Users can view their own bookshelf" ON public.bookshelf;
 CREATE POLICY "Users can view their own bookshelf" 
     ON public.bookshelf FOR SELECT 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can add books to bookshelf" ON public.bookshelf;
 CREATE POLICY "Users can add books to bookshelf" 
     ON public.bookshelf FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own bookshelf" ON public.bookshelf;
 CREATE POLICY "Users can update their own bookshelf" 
     ON public.bookshelf FOR UPDATE 
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can remove books from bookshelf" ON public.bookshelf;
 CREATE POLICY "Users can remove books from bookshelf" 
     ON public.bookshelf FOR DELETE 
     USING (auth.uid() = user_id);
 
 -- 4.7 POST COMMENTS POLICIES
+DROP POLICY IF EXISTS "Comments are viewable by everyone" ON public.post_comments;
 CREATE POLICY "Comments are viewable by everyone" 
     ON public.post_comments FOR SELECT 
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can create comments" ON public.post_comments;
 CREATE POLICY "Authenticated users can create comments" 
     ON public.post_comments FOR INSERT 
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own comments" ON public.post_comments;
 CREATE POLICY "Users can delete own comments" 
     ON public.post_comments FOR DELETE 
     USING (auth.uid() = user_id);
@@ -302,7 +314,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
@@ -370,7 +383,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_reading_session_created
+DROP TRIGGER IF EXISTS on_reading_session_created ON public.reading_sessions;
+CREATE TRIGGER on_reading_session_created
     AFTER INSERT ON public.reading_sessions
     FOR EACH ROW EXECUTE FUNCTION public.handle_reading_session_inserted();
 
@@ -393,11 +407,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_post_upvote_added
+DROP TRIGGER IF EXISTS on_post_upvote_added ON public.post_upvotes;
+CREATE TRIGGER on_post_upvote_added
     AFTER INSERT ON public.post_upvotes
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_upvote_change();
 
-CREATE OR REPLACE TRIGGER on_post_upvote_removed
+DROP TRIGGER IF EXISTS on_post_upvote_removed ON public.post_upvotes;
+CREATE TRIGGER on_post_upvote_removed
     AFTER DELETE ON public.post_upvotes
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_upvote_change();
 
@@ -420,11 +436,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_post_comment_added
+DROP TRIGGER IF EXISTS on_post_comment_added ON public.post_comments;
+CREATE TRIGGER on_post_comment_added
     AFTER INSERT ON public.post_comments
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_comment_change();
 
-CREATE OR REPLACE TRIGGER on_post_comment_removed
+DROP TRIGGER IF EXISTS on_post_comment_removed ON public.post_comments;
+CREATE TRIGGER on_post_comment_removed
     AFTER DELETE ON public.post_comments
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_comment_change();
 
@@ -534,19 +552,23 @@ VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Public read access for book covers and avatars
+DROP POLICY IF EXISTS "Public Read Access for Book Covers" ON storage.objects;
 CREATE POLICY "Public Read Access for Book Covers" 
     ON storage.objects FOR SELECT 
     USING (bucket_id = 'book-covers');
 
+DROP POLICY IF EXISTS "Public Read Access for Avatars" ON storage.objects;
 CREATE POLICY "Public Read Access for Avatars" 
     ON storage.objects FOR SELECT 
     USING (bucket_id = 'avatars');
 
 -- Authenticated users can upload covers and avatars
+DROP POLICY IF EXISTS "Authenticated users can upload book covers" ON storage.objects;
 CREATE POLICY "Authenticated users can upload book covers" 
     ON storage.objects FOR INSERT 
     WITH CHECK (bucket_id = 'book-covers' AND auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can upload avatars" ON storage.objects;
 CREATE POLICY "Authenticated users can upload avatars" 
     ON storage.objects FOR INSERT 
     WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
@@ -564,4 +586,3 @@ EXCEPTION WHEN OTHERS THEN
     -- If publication already includes table or does not exist, continue cleanly
     NULL;
 END $$;
-

@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { UserProfile } from '../types';
 import { DEFAULT_USER_AVATAR } from '../data/defaults';
 
@@ -9,16 +9,13 @@ const getAppOrigin = (): string => {
 
 export const authService = {
   /**
-   * Register a new user with Supabase Auth
+   * Register a new user with Supabase Auth.
+   * Checks username availability first to surface a clear message instead of
+   * a cryptic database-trigger abort.
    */
   async signUp(email: string, password: string, username: string, fullName: string) {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Supabase is not configured. Please enter your credentials in .env or the Supabase Settings.');
-    }
-
     const cleanUsername = username.toLowerCase().replace(/^@/, '').trim();
 
-    // Check if the username is already taken to avoid cryptic database trigger aborts
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id, username')
@@ -26,7 +23,7 @@ export const authService = {
       .maybeSingle();
 
     if (existingProfile) {
-      throw new Error(`The username "@${cleanUsername}" is already registered. If this is your account, please switch to the "Sign In" tab.`);
+      throw new Error(`The username "@${cleanUsername}" is already taken. Please choose a different one, or sign in if this is your account.`);
     }
 
     const { data, error } = await supabase.auth.signUp({
@@ -37,7 +34,6 @@ export const authService = {
           username: cleanUsername,
           full_name: fullName.trim(),
         },
-        // Send the confirmation link back to this app so the session is established here.
         emailRedirectTo: getAppOrigin(),
       },
     });
@@ -47,14 +43,27 @@ export const authService = {
   },
 
   /**
-   * Exchange a confirmation token from the email link for a session.
-   * Supabase's PKCE email templates deliver `?token_hash=...&type=signup`,
-   * which `detectSessionInUrl` does NOT process on its own.
+   * Resend the signup confirmation email for an unconfirmed user.
+   */
+  async resendConfirmationEmail(email: string) {
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: {
+        emailRedirectTo: getAppOrigin(),
+      },
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Exchange a PKCE confirmation token from the email link for a session.
+   * Supabase's `detectSessionInUrl` does NOT handle `?token_hash=...&type=signup`.
    */
   async verifyEmailToken(tokenHash: string, type: string) {
-    if (!isSupabaseConfigured()) return null;
-
-    const normalizedType = (type || 'signup').toUpperCase() as any;
+    const normalizedType = (type || 'signup') as any;
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       type: normalizedType,
@@ -65,13 +74,9 @@ export const authService = {
   },
 
   /**
-   * Log in an existing user with email and password
+   * Log in an existing user with email and password.
    */
   async signIn(email: string, password: string) {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Supabase is not configured. Please enter your credentials in .env or the Supabase Settings.');
-    }
-
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -82,30 +87,26 @@ export const authService = {
   },
 
   /**
-   * Sign out current user
+   * Sign out current user.
    */
   async signOut() {
-    if (!isSupabaseConfigured()) return;
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   },
 
   /**
-   * Get active Supabase session
+   * Get active Supabase session.
    */
   async getSession() {
-    if (!isSupabaseConfigured()) return null;
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     return data.session;
   },
 
   /**
-   * Fetch user profile from public.profiles
+   * Fetch user profile from public.profiles.
    */
   async getUserProfile(userId: string): Promise<UserProfile | null> {
-    if (!isSupabaseConfigured()) return null;
-
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -133,7 +134,7 @@ export const authService = {
   },
 
   /**
-   * Update profile metadata (e.g. dailyGoalMinutes, fullName, bio, avatar)
+   * Update profile metadata (e.g. dailyGoalMinutes, fullName, bio, avatar).
    */
   async updateProfile(userId: string, updates: Partial<{
     full_name: string;
@@ -141,8 +142,6 @@ export const authService = {
     bio: string;
     daily_goal_minutes: number;
   }>) {
-    if (!isSupabaseConfigured()) return;
-
     const { error } = await supabase
       .from('profiles')
       .update(updates)
@@ -152,11 +151,9 @@ export const authService = {
   },
 
   /**
-   * Subscribe to auth state changes
+   * Subscribe to auth state changes.
    */
   onAuthStateChange(callback: (session: any) => void) {
-    if (!isSupabaseConfigured()) return { unsubscribe: () => {} };
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       callback(session);
     });

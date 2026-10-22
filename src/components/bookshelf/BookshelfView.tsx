@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { bookshelfService, BookshelfItem } from '../../services/bookshelfService';
-import { isSupabaseConfigured } from '../../lib/supabase';
+
 
 interface BookshelfViewProps {
   initialTab?: 'bookshelf' | 'saved';
@@ -32,7 +32,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user || isGuest || !isSupabaseConfigured()) { setDbBooks([]); return; }
+    if (!user || isGuest) { setDbBooks([]); return; }
     setLoading(true);
     bookshelfService.getBookshelf(user.id).then((items) => setDbBooks(items || [])).finally(() => setLoading(false));
   }, [user?.id, isGuest]);
@@ -115,7 +115,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({ initialTab = 'book
           <div className="rounded-3xl p-12 text-center border border-vibe-border bg-vibe-card space-y-3 shadow-soft max-w-lg mx-auto">
             <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center mx-auto"><BookOpen className="w-6 h-6" /></div>
             <h3 className="font-heading text-lg font-semibold text-vibe-ink">Your bookshelf is empty</h3>
-            <p className="text-xs text-vibe-ink-muted leading-relaxed">Books you add will appear here. Real library, no demo titles — start by tracking a book with the Reading Timer.</p>
+            <p className="text-xs text-vibe-ink-muted leading-relaxed">Books you add will appear here. Start by tracking a book with the Reading Timer or saving a book from Explore.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { SlidersHorizontal, Flame, Trophy, Check, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { leaderboardService } from '../../services/leaderboardService';
@@ -153,7 +153,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <div className="space-y-2">
           {leaders.length === 0 ? (
             <p className="text-[11px] text-vibe-ink-muted py-3 text-center">
-              No leaderboard entries yet. Real readers appear here once they log sessions.
+              No leaderboard entries yet. Active readers will appear here as reading sessions are logged.
             </p>
           ) : (
             leaders.map((entry) => (
@@ -203,7 +203,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <h3 className="font-display italic text-base leading-snug font-normal text-vibe-ink mb-1.5">
           "A reader lives a thousand lives before he dies."
         </h3>
-        <p className="text-[11px] text-vibe-ink-muted">— George R.R. Martin</p>
+        <p className="text-[11px] text-vibe-ink-muted">â€” George R.R. Martin</p>
         <div className="mt-3 pt-2.5 border-t border-vibe-border-subtle flex items-center gap-2 text-[11px] text-vibe-ink-secondary">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

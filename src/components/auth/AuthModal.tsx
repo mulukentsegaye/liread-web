@@ -12,7 +12,9 @@ import {
   User, 
   RefreshCw, 
   Bookmark,
-  ShieldCheck
+  ShieldCheck,
+  Loader2,
+  Mail
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { DEFAULT_USER_AVATAR } from '../../data/defaults';
@@ -36,7 +38,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     signIn, 
     signUp, 
     signOut, 
-    isLoading 
+    isLoading,
+    resendConfirmationEmail
   } = useAuthStore();
 
   const [tab, setTab] = useState<'signin' | 'signup' | 'account'>(
@@ -48,8 +51,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
+  const [isResending, setIsResending] = useState(false);
 
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+
+  const handleResendInModal = async () => {
+    if (!email.trim()) {
+      setStatusMessage({ type: 'error', text: 'Please enter your email address to receive the confirmation link.' });
+      return;
+    }
+    setIsResending(true);
+    try {
+      await resendConfirmationEmail(email.trim());
+      setStatusMessage({
+        type: 'info',
+        text: `Confirmation link resent to ${email}! Check your inbox and spam folder.`,
+      });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: describeAuthError(err) });
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -154,7 +177,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* Status Message Banner */}
           {statusMessage && (
             <div 
-              className={`mb-4 p-3 rounded-xl text-xs flex items-start gap-2 border ${
+              className={`mb-4 p-3 rounded-xl text-xs flex flex-col gap-2 border ${
                 statusMessage.type === 'success'
                   ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                   : statusMessage.type === 'error'
@@ -162,12 +185,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30'
               }`}
             >
-              {statusMessage.type === 'success' ? (
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              ) : (
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2">
+                {statusMessage.type === 'success' ? (
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                )}
+                <span className="leading-snug flex-1">{statusMessage.text}</span>
+              </div>
+
+              {statusMessage.text.toLowerCase().includes('not confirmed') && (
+                <div className="pt-2 border-t border-rose-500/20 ml-6">
+                  <button
+                    type="button"
+                    disabled={isResending || !email}
+                    onClick={handleResendInModal}
+                    className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover disabled:opacity-50 transition-colors shadow-xs"
+                  >
+                    {isResending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+                    <span>Resend confirmation link</span>
+                  </button>
+                </div>
               )}
-              <span className="leading-snug">{statusMessage.text}</span>
             </div>
           )}
 

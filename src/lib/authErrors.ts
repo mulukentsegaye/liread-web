@@ -1,10 +1,5 @@
 /**
  * Translates raw Supabase Auth errors into messages a reader can act on.
- *
- * The most common one on a fresh project is the Auth email rate limit:
- * the built-in Supabase email service allows only a couple of messages per
- * hour for the whole project, so account creation fails until custom SMTP
- * is configured (or email confirmation is turned off for local development).
  */
 
 export const describeAuthError = (error: unknown): string => {
@@ -21,23 +16,27 @@ export const describeAuthError = (error: unknown): string => {
   const lower = message.toLowerCase();
 
   if (code === 'over_email_send_rate_limit' || lower.includes('email rate limit')) {
-    return 'This project has hit the Supabase email sending limit, so the confirmation email could not be sent. Add a custom SMTP provider (or turn off "Confirm email" for local testing) in Authentication → Emails, then try again.';
+    return 'Email rate limit reached. Please wait a few minutes and try again.';
   }
 
   if (code === 'email_address_not_authorized' || lower.includes('cannot be used as it is not authorized')) {
-    return 'The built-in Supabase email service only delivers to your team members. Configure a custom SMTP provider in Authentication → Emails to accept registrations from any address.';
+    return 'This email address is not authorized. Please use a different email or contact support.';
   }
 
   if (code === 'over_request_rate_limit' || lower.includes('request rate limit')) {
-    return 'Too many attempts from this device. Please wait a moment and try again.';
+    return 'Too many attempts. Please wait a moment and try again.';
   }
 
   if (lower.includes('error sending confirmation email')) {
-    return 'Your account was created, but the confirmation email could not be sent. Check your SMTP settings in Authentication → Emails, then request a new confirmation link.';
+    return "Your account was created, but we couldn't send the confirmation email. Please try resending it in a minute.";
   }
 
   if (lower.includes('email not confirmed')) {
-    return 'Your email address is not confirmed yet. Check your inbox for the confirmation link before signing in.';
+    return 'Your email address is not confirmed yet. Check your inbox for the confirmation link, or click "Resend confirmation email" below.';
+  }
+
+  if (lower.includes('token has expired') || lower.includes('invalid token') || lower.includes('email link is invalid') || lower.includes('otp expired')) {
+    return 'This confirmation link has expired or has already been used. Please request a new one below.';
   }
 
   if (lower.includes('invalid login credentials')) {
@@ -45,7 +44,7 @@ export const describeAuthError = (error: unknown): string => {
   }
 
   if (lower.includes('database error saving new user') || lower.includes('profiles_username_key')) {
-    return 'This username or email is already registered. If you already created your account, please switch to the "Sign In" tab.';
+    return 'This username or email is already registered. Try signing in instead.';
   }
 
   if (lower.includes('user already registered') || lower.includes('already been registered')) {

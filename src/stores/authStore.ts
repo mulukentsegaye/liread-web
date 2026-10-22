@@ -15,7 +15,6 @@ interface AuthStore {
   isAuthenticated: boolean;
   isGuest: boolean;
   isLoading: boolean;
-  isBackendConnected: boolean;
   authReady: boolean;
   pendingConfirmationEmail: string | null;
   isAuthModalOpen: boolean;
@@ -32,6 +31,7 @@ interface AuthStore {
   logSessionMinutes: (minutes: number, bookTitle?: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   clearPendingConfirmation: () => void;
+  resendConfirmationEmail: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -42,7 +42,6 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isGuest: false,
       isLoading: false,
-      isBackendConnected: isSupabaseConfigured(),
       authReady: false,
       pendingConfirmationEmail: null,
       isAuthModalOpen: false,
@@ -52,9 +51,6 @@ export const useAuthStore = create<AuthStore>()(
       closeAuthModal: () => set({ isAuthModalOpen: false }),
 
       initAuth: async () => {
-        const configured = isSupabaseConfigured();
-        set({ isBackendConnected: configured });
-
         // If already in guest mode from persisted storage, keep it
         const { isGuest, user: persistedUser } = get();
         if (isGuest && persistedUser) {
@@ -62,7 +58,7 @@ export const useAuthStore = create<AuthStore>()(
           return;
         }
 
-        if (!configured) {
+        if (!isSupabaseConfigured()) {
           // No backend: require guest or real login (no auto-demo)
           set({ isAuthenticated: false, isGuest: false, user: null, authReady: true });
           return;
@@ -123,7 +119,6 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       signIn: async (email, password) => {
-        if (!isSupabaseConfigured()) throw new Error('Supabase is not configured.');
         set({ isLoading: true });
         try {
           const { user } = await authService.signIn(email, password);
@@ -157,7 +152,6 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       signUp: async (email, password, username, fullName) => {
-        if (!isSupabaseConfigured()) throw new Error('Supabase is not configured.');
         set({ isLoading: true });
         try {
           const { user, session } = await authService.signUp(email, password, username, fullName);
@@ -208,6 +202,15 @@ export const useAuthStore = create<AuthStore>()(
 
       clearPendingConfirmation: () => set({ pendingConfirmationEmail: null }),
 
+      resendConfirmationEmail: async (email: string) => {
+        set({ isLoading: true });
+        try {
+          await authService.resendConfirmationEmail(email);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       signInAsGuest: () => {
         set({
           user: { ...GUEST_USER },
@@ -238,7 +241,7 @@ export const useAuthStore = create<AuthStore>()(
       refreshProfile: async () => {
         const { user, isAuthenticated, isGuest } = get();
         if (isGuest) return;
-        if (isAuthenticated && user && isSupabaseConfigured()) {
+        if (isAuthenticated && user) {
           const profile = await authService.getUserProfile(user.id);
           if (profile) set({ user: profile });
         }
@@ -251,7 +254,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ user: updated });
 
         if (isGuest) return; // guest: local only
-        if (isAuthenticated && isSupabaseConfigured()) {
+        if (isAuthenticated) {
           try {
             await authService.updateProfile(user.id, {
               full_name: partial.fullName,
@@ -276,7 +279,7 @@ export const useAuthStore = create<AuthStore>()(
         });
 
         if (isGuest) return; // guest sessions are local only
-        if (isAuthenticated && isSupabaseConfigured()) {
+        if (isAuthenticated) {
           try {
             await sessionsService.logSession({ bookTitle, durationMinutes: minutes, durationSeconds: minutes * 60 }, user.id);
             const updatedProfile = await authService.getUserProfile(user.id);
