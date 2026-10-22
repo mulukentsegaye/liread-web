@@ -6,6 +6,7 @@ import {
   BookOpen, 
   Star, 
   ChevronRight, 
+  ChevronLeft,
   TrendingUp, 
   Flame, 
   Filter,
@@ -42,6 +43,89 @@ interface ExploreViewProps {
   onClearInitialSearch?: () => void;
 }
 
+const PAGE_SIZE = 20;
+
+function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 3) {
+    return [1, 2, 3, 4, 'ellipsis', total];
+  }
+  if (current >= total - 2) {
+    return [1, 'ellipsis', total - 3, total - 2, total - 1, total];
+  }
+  return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total];
+}
+
+const BookCardCover: React.FC<{
+  title: string;
+  author: string;
+  coverImageUrl?: string;
+  coverThumbnailUrl?: string;
+}> = ({ title, author, coverImageUrl, coverThumbnailUrl }) => {
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const src = coverImageUrl || coverThumbnailUrl;
+
+  const palette = React.useMemo(() => {
+    const styles = [
+      { bg: 'from-amber-950 via-stone-900 to-amber-900', border: 'border-amber-600/30', foil: 'text-amber-300' },
+      { bg: 'from-emerald-950 via-slate-900 to-teal-950', border: 'border-emerald-600/30', foil: 'text-emerald-300' },
+      { bg: 'from-slate-950 via-zinc-900 to-indigo-950', border: 'border-indigo-500/30', foil: 'text-indigo-300' },
+      { bg: 'from-rose-950 via-neutral-900 to-stone-950', border: 'border-rose-500/30', foil: 'text-rose-300' },
+      { bg: 'from-blue-950 via-slate-900 to-cyan-950', border: 'border-sky-500/30', foil: 'text-sky-300' },
+    ];
+    let hash = 0;
+    for (let i = 0; i < title.length; i++) hash = (hash << 5) - hash + title.charCodeAt(i);
+    return styles[Math.abs(hash) % styles.length];
+  }, [title]);
+
+  if (!src || hasError) {
+    return (
+      <div className={`relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 p-3.5 flex flex-col justify-between bg-gradient-to-br ${palette.bg} border ${palette.border} shadow-md select-none`}>
+        <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-black/50 via-white/10 to-transparent pointer-events-none" />
+        <div className="flex items-center justify-between text-[10px] font-mono tracking-widest uppercase text-white/50 pl-1">
+          <span>Liread</span>
+          <BookOpen className={`w-3.5 h-3.5 ${palette.foil}`} />
+        </div>
+        <div className="space-y-1.5 pl-1 my-auto">
+          <p className="font-serif text-xs sm:text-sm font-bold text-white line-clamp-3 leading-snug drop-shadow-xs">
+            {title}
+          </p>
+          <p className="text-[10px] uppercase font-sans tracking-wider text-white/70 line-clamp-1">
+            {author}
+          </p>
+        </div>
+        <div className="pl-1 pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-white/40">
+          <span>Edition</span>
+          <span className="font-serif italic text-white/60">Classic</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 border border-vibe-border/60 bg-vibe-card-subtle shadow-xs">
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-vibe-border/30 animate-pulse flex items-center justify-center">
+          <BookOpen className="w-5 h-5 text-vibe-ink-muted/50" />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={title}
+        loading="lazy"
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setHasError(true)}
+        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+    </div>
+  );
+};
+
 export const ExploreView: React.FC<ExploreViewProps> = ({
   onViewBookDetails,
   onStartTimer,
@@ -54,17 +138,22 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
   const [totalFound, setTotalFound] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [jumpPageInput, setJumpPageInput] = useState<string>('');
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const pageCacheRef = useRef<Map<number, SuggestedBook[]>>(new Map());
 
   // Synchronize when initialSearchQuery prop changes (e.g. from Header search)
   useEffect(() => {
     if (typeof initialSearchQuery === 'string' && initialSearchQuery !== searchQuery) {
       setSearchQuery(initialSearchQuery);
+      pageCacheRef.current.clear();
+      setCurrentPage(1);
       if (initialSearchQuery.trim().length >= 2) {
         setShowResults(false);
       }
@@ -76,8 +165,18 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     if (query.length < 2) {
       setSuggestions([]);
       setTotalFound(0);
+      setCurrentPage(1);
+      pageCacheRef.current.clear();
       setIsSearching(false);
       setIsOffline(false);
+      return;
+    }
+
+    // Check if current page is already cached
+    const cachedPage = pageCacheRef.current.get(currentPage);
+    if (cachedPage && cachedPage.length > 0) {
+      setSuggestions(cachedPage);
+      setIsSearching(false);
       return;
     }
 
@@ -93,7 +192,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
       const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-      setSuggestions(localMatches);
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
+      setSuggestions(pageSlice);
       setTotalFound(localMatches.length);
       setIsSearching(false);
       return;
@@ -102,10 +203,12 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     const timer = setTimeout(async () => {
       try {
         const { books, totalFound: count } = await bookSearchService.searchBooks(query, {
-          limit: 24,
+          limit: PAGE_SIZE,
+          page: currentPage,
           signal: controller.signal,
         });
         setSuggestions(books);
+        pageCacheRef.current.set(currentPage, books);
         setTotalFound(count);
         setIsOffline(false);
       } catch (err: any) {
@@ -113,7 +216,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           if (isOfflineOrNetworkError(err)) {
             setIsOffline(true);
             const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-            setSuggestions(localMatches);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
+            setSuggestions(pageSlice);
             setTotalFound(localMatches.length);
           } else {
             console.warn('Search error in ExploreView:', err);
@@ -122,13 +227,13 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       } finally {
         setIsSearching(false);
       }
-    }, 320);
+    }, 300);
 
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [searchQuery]);
+  }, [searchQuery, currentPage]);
 
   // Click outside listener to dismiss search results dropdown
   useEffect(() => {
@@ -145,6 +250,32 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     };
   }, []);
 
+  const totalPages = Math.max(1, Math.ceil(totalFound / PAGE_SIZE));
+  const paginationRange = getPaginationRange(currentPage, totalPages);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+    setCurrentPage(newPage);
+
+    const topEl = document.getElementById('search-results-top');
+    if (topEl) {
+      topEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      const mainEl = document.getElementById('main-viewport');
+      if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleJumpPage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const pageNum = parseInt(jumpPageInput.trim(), 10);
+    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+      handlePageChange(pageNum);
+      setJumpPageInput('');
+    }
+  };
+
   const handleSelectBook = (book: SuggestedBook) => {
     setShowResults(false);
     onViewBookDetails({
@@ -160,6 +291,8 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     setSearchQuery('');
     setSuggestions([]);
     setTotalFound(0);
+    setCurrentPage(1);
+    pageCacheRef.current.clear();
     setShowResults(false);
     setIsSearching(false);
     onClearInitialSearch?.();
@@ -237,21 +370,12 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         onClick={() => handleSelectBook(book)}
         className="group relative flex flex-col p-3 rounded-2xl bg-vibe-card border border-vibe-border shadow-xs hover:border-vibe-accent/40 transition-colors duration-200 cursor-pointer w-full min-w-0"
       >
-        <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 border border-vibe-border/60 bg-vibe-card-subtle shadow-xs">
-          {book.coverImageUrl || book.coverThumbnailUrl ? (
-            <img
-              src={book.coverImageUrl || book.coverThumbnailUrl}
-              alt={book.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-vibe-card-subtle">
-              <BookOpen className="w-6 h-6 text-vibe-accent mb-1" />
-              <p className="font-serif text-xs font-bold text-vibe-ink line-clamp-2">{book.title}</p>
-            </div>
-          )}
-        </div>
+        <BookCardCover
+          title={book.title}
+          author={book.author}
+          coverImageUrl={book.coverImageUrl}
+          coverThumbnailUrl={book.coverThumbnailUrl}
+        />
 
         <div className="space-y-1 min-w-0 flex-1">
           <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
@@ -284,34 +408,67 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       
       {searchQuery.trim().length >= 2 ? (
         /* =========================================================================
-           VIEW: SEARCH RESULTS FOR SPECIFIC QUERY (Exact Count & Grid)
+           VIEW: SEARCH RESULTS FOR SPECIFIC QUERY (OceanofPDF Page-by-Page Style)
            ========================================================================= */
         <div className="space-y-8 animate-in fade-in duration-200">
-          {/* Search Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vibe-border">
+          {/* Search Header Bar with quick navigation */}
+          <div id="search-results-top" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vibe-border scroll-mt-20">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-vibe-accent" />
                 <span className="font-sans text-[10.5px] font-semibold tracking-wider uppercase text-vibe-ink-muted">
                   Search Results
                 </span>
+                {totalPages > 1 && (
+                  <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-vibe-accent/10 text-vibe-accent font-semibold border border-vibe-accent/20">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                )}
               </div>
               <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight">
                 "{searchQuery}"
               </h2>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {isSearching ? (
                 <div className="flex items-center gap-2 text-xs text-vibe-ink-muted">
                   <Loader2 className="w-3.5 h-3.5 text-vibe-accent animate-spin" />
-                  <span>Searching library...</span>
+                  <span>Loading books...</span>
                 </div>
               ) : (
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink shadow-2xs">
                   {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
                 </span>
               )}
+
+              {/* Quick prev/next top controls */}
+              {totalPages > 1 && (
+                <div className="inline-flex items-center rounded-xl border border-vibe-border bg-vibe-card p-0.5 shadow-2xs">
+                  <button
+                    type="button"
+                    disabled={currentPage <= 1 || isSearching}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="p-1 rounded-lg text-vibe-ink hover:bg-vibe-card-subtle disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    title="Previous page"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="px-2 text-xs font-mono font-medium text-vibe-ink">
+                    {currentPage}/{totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={currentPage >= totalPages || isSearching}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="p-1 rounded-lg text-vibe-ink hover:bg-vibe-card-subtle disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    title="Next page"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={handleClearSearch}
@@ -335,10 +492,99 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               ))}
             </div>
           ) : suggestions.length > 0 ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
+            <div className="space-y-8">
+              <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7 transition-opacity duration-200 ${isSearching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                 {suggestions.map(renderSuggestedBookCard)}
               </div>
+
+              {/* OceanofPDF Style Page-by-Page Pagination Bar */}
+              {totalPages > 1 && (
+                <div className="pt-8 pb-4 border-t border-vibe-border flex flex-col md:flex-row items-center justify-between gap-4">
+                  {/* Range summary text */}
+                  <div className="text-xs text-vibe-ink-muted text-center md:text-left">
+                    Showing <span className="font-semibold text-vibe-ink">{(currentPage - 1) * PAGE_SIZE + 1}</span>–<span className="font-semibold text-vibe-ink">{Math.min(currentPage * PAGE_SIZE, totalFound)}</span> of <span className="font-semibold text-vibe-ink">{totalFound.toLocaleString()}</span> books
+                    <span className="ml-2 px-2.5 py-0.5 rounded-full bg-vibe-card-subtle text-[11px] font-mono border border-vibe-border">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </div>
+
+                  {/* OceanofPDF Pagination Button Strip */}
+                  <div className="flex flex-wrap items-center justify-center gap-1.5">
+                    {/* Previous Button */}
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1 || isSearching}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-vibe-card border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink shadow-2xs active:scale-95"
+                      title="Previous Page"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Previous</span>
+                    </button>
+
+                    {/* Numbered Page Buttons */}
+                    {paginationRange.map((item, idx) => {
+                      if (item === 'ellipsis') {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-vibe-ink-muted select-none">
+                            …
+                          </span>
+                        );
+                      }
+                      const isActive = item === currentPage;
+                      return (
+                        <button
+                          key={item}
+                          type="button"
+                          disabled={isSearching}
+                          onClick={() => handlePageChange(item)}
+                          className={`min-w-8 h-8 px-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center shadow-2xs active:scale-95 ${
+                            isActive
+                              ? 'bg-vibe-accent text-white shadow-xs font-bold scale-105'
+                              : 'bg-vibe-card border border-vibe-border text-vibe-ink hover:bg-vibe-card-subtle'
+                          }`}
+                        >
+                          {item}
+                        </button>
+                      );
+                    })}
+
+                    {/* Next Button */}
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages || isSearching}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all border cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-vibe-card border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink shadow-2xs active:scale-95"
+                      title="Next Page"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Quick Jump to Page (when totalPages > 5) */}
+                  {totalPages > 5 && (
+                    <form onSubmit={handleJumpPage} className="flex items-center gap-1.5 text-xs text-vibe-ink-muted">
+                      <span>Go to:</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={totalPages}
+                        value={jumpPageInput}
+                        onChange={(e) => setJumpPageInput(e.target.value)}
+                        placeholder={`${currentPage}`}
+                        className="w-14 px-2 py-1 rounded-lg bg-vibe-card border border-vibe-border text-center text-xs text-vibe-ink focus:outline-none focus:border-vibe-accent shadow-2xs"
+                      />
+                      <button
+                        type="submit"
+                        className="px-2.5 py-1 rounded-lg bg-vibe-card hover:bg-vibe-card-subtle border border-vibe-border text-xs font-semibold text-vibe-ink hover:text-vibe-accent transition-colors cursor-pointer shadow-2xs"
+                      >
+                        Go
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="py-16 text-center space-y-3 bg-vibe-card rounded-3xl border border-vibe-border p-8">
@@ -616,7 +862,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => {
-                setSearchQuery(e.target.value);
+                const val = e.target.value;
+                setSearchQuery(val);
+                pageCacheRef.current.clear();
+                setCurrentPage(1);
                 setShowResults(true);
               }}
               onFocus={() => {
