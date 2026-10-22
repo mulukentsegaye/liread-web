@@ -168,28 +168,24 @@ export const DEMO_POSTS: Post[] = [
 ];
 
 /**
- * Authentic reading champions displayed on Weekly Leaders and Leaderboard.
+ * Dedicated readers in the Consistent Circle who hit 100% of their daily reading plan.
+ * A 15-minute reader is placed on the exact same footing as a 60-minute reader!
  */
-export const DEMO_LEADERS: LeaderboardEntry[] = [
+export const DEMO_CONSISTENT_READERS: ConsistentReader[] = [
   {
     userId: 'demo-user-3',
     username: 'elena_rostova',
     fullName: 'Elena Rostova',
     initials: 'ER',
     avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-    rank: 1,
-    minutesRead: 340,
-    formattedTime: '5h 40m',
-  },
-  {
-    userId: 'demo-user-4',
-    username: 'marcus_vance',
-    fullName: 'Marcus Vance',
-    initials: 'MV',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    rank: 2,
-    minutesRead: 255,
-    formattedTime: '4h 15m',
+    dailyGoalMinutes: 45,
+    todayMinutesRead: 50,
+    goalCompletionPercent: 111,
+    currentStreak: 28,
+    isCurrentlyReading: true,
+    currentlyReadingBook: 'Deep Work',
+    currentlyReadingAuthor: 'Cal Newport',
+    bookmarksReceived: 42,
   },
   {
     userId: 'demo-user-1',
@@ -197,9 +193,29 @@ export const DEMO_LEADERS: LeaderboardEntry[] = [
     fullName: 'Alex Miller',
     initials: 'AM',
     avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80',
-    rank: 3,
-    minutesRead: 190,
-    formattedTime: '3h 10m',
+    dailyGoalMinutes: 20,
+    todayMinutesRead: 20,
+    goalCompletionPercent: 100,
+    currentStreak: 19,
+    isCurrentlyReading: true,
+    currentlyReadingBook: 'The Creative Act',
+    currentlyReadingAuthor: 'Rick Rubin',
+    bookmarksReceived: 35,
+  },
+  {
+    userId: 'demo-user-4',
+    username: 'marcus_vance',
+    fullName: 'Marcus Vance',
+    initials: 'MV',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    dailyGoalMinutes: 30,
+    todayMinutesRead: 35,
+    goalCompletionPercent: 116,
+    currentStreak: 14,
+    isCurrentlyReading: false,
+    currentlyReadingBook: 'Meditations',
+    currentlyReadingAuthor: 'Marcus Aurelius',
+    bookmarksReceived: 29,
   },
   {
     userId: 'demo-user-5',
@@ -207,9 +223,14 @@ export const DEMO_LEADERS: LeaderboardEntry[] = [
     fullName: 'Sophia Chen',
     initials: 'SC',
     avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-    rank: 4,
-    minutesRead: 145,
-    formattedTime: '2h 25m',
+    dailyGoalMinutes: 15,
+    todayMinutesRead: 15,
+    goalCompletionPercent: 100,
+    currentStreak: 21,
+    isCurrentlyReading: true,
+    currentlyReadingBook: 'Klara and the Sun',
+    currentlyReadingAuthor: 'Kazuo Ishiguro',
+    bookmarksReceived: 18,
   },
   {
     userId: 'demo-user-6',
@@ -217,8 +238,129 @@ export const DEMO_LEADERS: LeaderboardEntry[] = [
     fullName: 'Lucas Gray',
     initials: 'LG',
     avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-    rank: 5,
-    minutesRead: 105,
-    formattedTime: '1h 45m',
+    dailyGoalMinutes: 60,
+    todayMinutesRead: 60,
+    goalCompletionPercent: 100,
+    currentStreak: 9,
+    isCurrentlyReading: false,
+    currentlyReadingBook: 'Atomic Habits',
+    currentlyReadingAuthor: 'James Clear',
+    bookmarksReceived: 23,
+  },
+  {
+    userId: 'demo-user-2',
+    username: 'maya_lin',
+    fullName: 'Maya Lin',
+    initials: 'ML',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    dailyGoalMinutes: 25,
+    todayMinutesRead: 30,
+    goalCompletionPercent: 120,
+    currentStreak: 34,
+    isCurrentlyReading: true,
+    currentlyReadingBook: 'Exhalation',
+    currentlyReadingAuthor: 'Ted Chiang',
+    bookmarksReceived: 31,
   },
 ];
+
+/**
+ * Readers currently immersed in a calm, ambient focus session.
+ */
+export const DEMO_LIVE_CO_READERS: LiveCoReader[] = [
+  {
+    userId: 'demo-user-3',
+    username: 'elena_rostova',
+    fullName: 'Elena Rostova',
+    initials: 'ER',
+    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'Deep Work',
+    bookAuthor: 'Cal Newport',
+    sessionStartedMinutesAgo: 18,
+  },
+  {
+    userId: 'demo-user-1',
+    username: 'alex_miller',
+    fullName: 'Alex Miller',
+    initials: 'AM',
+    avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'The Creative Act',
+    bookAuthor: 'Rick Rubin',
+    sessionStartedMinutesAgo: 12,
+  },
+  {
+    userId: 'demo-user-5',
+    username: 'sophia_chen',
+    fullName: 'Sophia Chen',
+    initials: 'SC',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'Klara and the Sun',
+    bookAuthor: 'Kazuo Ishiguro',
+    sessionStartedMinutesAgo: 24,
+  },
+  {
+    userId: 'demo-user-2',
+    username: 'maya_lin',
+    fullName: 'Maya Lin',
+    initials: 'ML',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'Exhalation',
+    bookAuthor: 'Ted Chiang',
+    sessionStartedMinutesAgo: 31,
+  },
+];
+
+/**
+ * Top weekly wisdom curators whose shared takeaways and notes were bookmarked most.
+ */
+export const DEMO_TOP_CURATORS: WeeklyCuratorInsight[] = [
+  {
+    id: 'curator-insight-1',
+    userId: 'demo-user-1',
+    authorName: 'Alex Miller',
+    authorUsername: 'alex_miller',
+    authorAvatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'The Creative Act: A Way of Being',
+    bookAuthor: 'Rick Rubin',
+    quoteOrInsight: 'The object isn’t to make art, it’s to be in that wonderful state which makes art inevitable.',
+    actionableApplication: 'Starting each morning with 15 minutes of silent journaling before checking digital notifications.',
+    savedCount: 48,
+    createdAt: '2d ago',
+  },
+  {
+    id: 'curator-insight-2',
+    userId: 'demo-user-3',
+    authorName: 'Elena Rostova',
+    authorUsername: 'elena_rostova',
+    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'Deep Work',
+    bookAuthor: 'Cal Newport',
+    quoteOrInsight: 'Clarity about what matters provides clarity about what does not.',
+    actionableApplication: 'Batching all community replies into a single 30-minute afternoon block rather than reacting all day.',
+    savedCount: 41,
+    createdAt: '3d ago',
+  },
+  {
+    id: 'curator-insight-3',
+    userId: 'demo-user-6',
+    authorName: 'Lucas Gray',
+    authorUsername: 'lucas_gray',
+    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
+    bookTitle: 'Atomic Habits',
+    bookAuthor: 'James Clear',
+    quoteOrInsight: 'You do not rise to the level of your goals. You fall to the level of your systems.',
+    actionableApplication: 'Stacking evening reading immediately after placing dinner dishes in the rack.',
+    savedCount: 36,
+    createdAt: '4d ago',
+  },
+];
+
+/**
+ * Backward compatibility alias for any legacy imports
+ */
+export const DEMO_LEADERS: LeaderboardEntry[] = DEMO_CONSISTENT_READERS.map((r, i) => ({
+  ...r,
+  rank: i + 1,
+  minutesRead: r.todayMinutesRead,
+  formattedTime: `${r.todayMinutesRead}m`,
+}));
