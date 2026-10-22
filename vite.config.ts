@@ -9,7 +9,11 @@ export default defineConfig({
     preserveSymlinks: true,
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'epubjs': path.resolve(__dirname, './node_modules/epubjs/dist/epub.js'),
     },
+  },
+  optimizeDeps: {
+    include: ['epubjs'],
   },
   server: {
     port: 3000,
