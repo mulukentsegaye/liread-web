@@ -38,17 +38,22 @@ interface ExploreViewProps {
   }) => void;
   onStartTimer: (title: string, author: string, cover?: string) => void;
   onShareBook: (book: { title: string; author: string; coverImageUrl?: string }) => void;
+  initialSearchQuery?: string;
+  onClearInitialSearch?: () => void;
 }
 
 export const ExploreView: React.FC<ExploreViewProps> = ({
   onViewBookDetails,
   onStartTimer,
+  initialSearchQuery,
+  onClearInitialSearch,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<CuratedCategory>('All');
 
   // Open Library interactive search state for the dedicated Explore search bar
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
+  const [totalFound, setTotalFound] = useState<number>(0);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
@@ -56,10 +61,21 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Synchronize when initialSearchQuery prop changes (e.g. from Header search)
+  useEffect(() => {
+    if (typeof initialSearchQuery === 'string' && initialSearchQuery !== searchQuery) {
+      setSearchQuery(initialSearchQuery);
+      if (initialSearchQuery.trim().length >= 2) {
+        setShowResults(false);
+      }
+    }
+  }, [initialSearchQuery]);
+
   useEffect(() => {
     const query = searchQuery.trim();
     if (query.length < 2) {
       setSuggestions([]);
+      setTotalFound(0);
       setIsSearching(false);
       setIsOffline(false);
       return;
@@ -78,14 +94,19 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       setIsOffline(true);
       const localMatches = bookSearchService.searchLocalCuratedBooks(query);
       setSuggestions(localMatches);
+      setTotalFound(localMatches.length);
       setIsSearching(false);
       return;
     }
 
     const timer = setTimeout(async () => {
       try {
-        const results = await bookSearchService.searchBooks(query, controller.signal);
-        setSuggestions(results.books);
+        const { books, totalFound: count } = await bookSearchService.searchBooks(query, {
+          limit: 24,
+          signal: controller.signal,
+        });
+        setSuggestions(books);
+        setTotalFound(count);
         setIsOffline(false);
       } catch (err: any) {
         if (err.name !== 'AbortError') {
@@ -93,6 +114,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             setIsOffline(true);
             const localMatches = bookSearchService.searchLocalCuratedBooks(query);
             setSuggestions(localMatches);
+            setTotalFound(localMatches.length);
           } else {
             console.warn('Search error in ExploreView:', err);
           }
@@ -137,8 +159,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const handleClearSearch = () => {
     setSearchQuery('');
     setSuggestions([]);
+    setTotalFound(0);
     setShowResults(false);
     setIsSearching(false);
+    onClearInitialSearch?.();
   };
 
   // Filter books according to selected category
@@ -206,10 +230,140 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     );
   };
 
+  const renderSuggestedBookCard = (book: SuggestedBook) => {
+    return (
+      <div
+        key={book.id}
+        onClick={() => handleSelectBook(book)}
+        className="group relative flex flex-col p-3 rounded-2xl bg-vibe-card border border-vibe-border shadow-xs hover:border-vibe-accent/40 transition-colors duration-200 cursor-pointer w-full min-w-0"
+      >
+        <div className="relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 border border-vibe-border/60 bg-vibe-card-subtle shadow-xs">
+          {book.coverImageUrl || book.coverThumbnailUrl ? (
+            <img
+              src={book.coverImageUrl || book.coverThumbnailUrl}
+              alt={book.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-vibe-card-subtle">
+              <BookOpen className="w-6 h-6 text-vibe-accent mb-1" />
+              <p className="font-serif text-xs font-bold text-vibe-ink line-clamp-2">{book.title}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1 min-w-0 flex-1">
+          <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
+            <span className="truncate">{book.firstPublishYear ? `Year ${book.firstPublishYear}` : 'Literature'}</span>
+            <span className="flex items-center gap-0.5 text-amber-500 font-semibold font-mono flex-shrink-0">
+              <Star className="w-3 h-3 fill-current" />
+              4.8
+            </span>
+          </div>
+
+          <h3 className="font-serif text-xs sm:text-sm font-semibold text-vibe-ink line-clamp-1 group-hover:text-vibe-accent transition-colors">
+            {book.title}
+          </h3>
+
+          <p className="text-[11px] text-vibe-ink-muted truncate">
+            {book.author}
+          </p>
+        </div>
+
+        <div className="mt-3 pt-2 border-t border-vibe-border/50 flex items-center justify-between text-[11px] text-vibe-accent font-medium group-hover:text-vibe-accent-hover">
+          <span>View Details</span>
+          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto space-y-12 sm:space-y-16 animate-in fade-in duration-300 pb-20 px-1 sm:px-2">
       
-      {/* Page Header: Quiet literary intro */}
+      {searchQuery.trim().length >= 2 ? (
+        /* =========================================================================
+           VIEW: SEARCH RESULTS FOR SPECIFIC QUERY (Exact Count & Grid)
+           ========================================================================= */
+        <div className="space-y-8 animate-in fade-in duration-200">
+          {/* Search Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vibe-border">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-vibe-accent" />
+                <span className="font-sans text-[10.5px] font-semibold tracking-wider uppercase text-vibe-ink-muted">
+                  Search Results
+                </span>
+              </div>
+              <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight">
+                "{searchQuery}"
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {isSearching ? (
+                <div className="flex items-center gap-2 text-xs text-vibe-ink-muted">
+                  <Loader2 className="w-3.5 h-3.5 text-vibe-accent animate-spin" />
+                  <span>Searching library...</span>
+                </div>
+              ) : (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border text-vibe-ink shadow-2xs">
+                  {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-vibe-card hover:bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:text-vibe-accent transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>Clear search</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search Results Grid */}
+          {isSearching && suggestions.length === 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="p-3 rounded-2xl bg-vibe-card border border-vibe-border space-y-3 animate-pulse">
+                  <div className="aspect-[2/3] w-full bg-vibe-border/50 rounded-xl" />
+                  <div className="h-3.5 bg-vibe-border/50 rounded w-3/4" />
+                  <div className="h-2.5 bg-vibe-border/30 rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : suggestions.length > 0 ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-7">
+                {suggestions.map(renderSuggestedBookCard)}
+              </div>
+            </div>
+          ) : (
+            <div className="py-16 text-center space-y-3 bg-vibe-card rounded-3xl border border-vibe-border p-8">
+              <BookOpen className="w-8 h-8 text-vibe-ink-muted mx-auto" />
+              <p className="font-serif text-lg font-semibold text-vibe-ink">
+                No books found for "{searchQuery}"
+              </p>
+              <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
+                We couldn't find matching titles in Open Library. Try searching with another keyword, author name, or title.
+              </p>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="px-4 py-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-all cursor-pointer shadow-xs"
+                >
+                  Explore Curated Books
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Page Header: Quiet literary intro */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-vibe-accent/80" />
@@ -500,9 +654,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                     Search Results
                   </span>
                 )}
-                {suggestions.length > 0 && (
+                {totalFound > 0 && (
                   <span className="text-[11px] text-vibe-ink-muted">
-                    {suggestions.length} {suggestions.length === 1 ? 'book' : 'books'} found
+                    {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
                   </span>
                 )}
               </div>
@@ -580,6 +734,8 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           )}
         </div>
       </div>
+        </>
+      )}
 
     </div>
   );

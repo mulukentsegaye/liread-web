@@ -73,6 +73,7 @@ export const App: React.FC = () => {
   const [previousTab, setPreviousTab] = useState<NavigationTab>('feed');
   const [selectedBookDetails, setSelectedBookDetails] = useState<BookDetailsData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [exploreSearchQuery, setExploreSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [preSelectedBook, setPreSelectedBook] = useState<{
     title: string;
@@ -358,6 +359,14 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleSeeAllBooks = (query: string) => {
+    setExploreSearchQuery(query);
+    setActiveTab('explore');
+    const mainEl = document.getElementById('main-viewport');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const transitionClass = transitionStage === 'exiting' ? 'page-exit' : (transitionStage === 'entering' ? 'page-enter' : '');
 
   if (currentView === 'login') {
@@ -453,6 +462,7 @@ export const App: React.FC = () => {
             setActiveTab('feed');
           }
         }}
+        onSeeAll={handleSeeAllBooks}
         onGoToLanding={handleGoToLanding}
         onGoToLogin={() => openAuthModal('account')}
         onSelectBookForTimer={handleSelectBookForTimer}
@@ -500,6 +510,8 @@ export const App: React.FC = () => {
                 onViewBookDetails={handleViewBookDetails}
                 onStartTimer={handleSelectBookForTimer}
                 onShareBook={handleOpenCreateModal}
+                initialSearchQuery={exploreSearchQuery}
+                onClearInitialSearch={() => setExploreSearchQuery('')}
               />
             )}
 
