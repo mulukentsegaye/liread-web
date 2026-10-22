@@ -118,6 +118,36 @@ export const authService = {
       return null;
     }
 
+    // Query dynamic counts for bookshelf and saved passages
+    let bookshelfCount = 0;
+    let savedPassagesCount = 0;
+
+    try {
+      const { count } = await supabase
+        .from('bookshelf')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if (typeof count === 'number') {
+        bookshelfCount = count;
+      }
+    } catch {
+      // Fallback to local storage cache if network fails
+      try {
+        const raw = localStorage.getItem(`liread_bookshelf_${userId}`);
+        if (raw) bookshelfCount = JSON.parse(raw).length;
+      } catch {}
+    }
+
+    try {
+      const { count } = await supabase
+        .from('saved_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if (typeof count === 'number') {
+        savedPassagesCount = count;
+      }
+    } catch {}
+
     return {
       id: data.id,
       username: data.username,
@@ -128,8 +158,8 @@ export const authService = {
       currentStreak: data.current_streak,
       dailyGoalMinutes: data.daily_goal_minutes,
       rankTier: (data.rank_tier as UserProfile['rankTier']) || 'Novice Reader',
-      bookshelfCount: 0,
-      savedPassagesCount: 0,
+      bookshelfCount,
+      savedPassagesCount,
     };
   },
 

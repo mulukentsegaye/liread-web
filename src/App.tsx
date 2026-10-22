@@ -553,6 +553,7 @@ export const App: React.FC = () => {
                 onViewBookDetails={(title, author, cover) =>
                   handleViewBookDetails({ title, author, coverImageUrl: cover })
                 }
+                onExploreClick={() => handleTabChange('explore')}
               />
             )}
           </div>

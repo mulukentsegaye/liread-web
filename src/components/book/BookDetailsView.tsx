@@ -12,13 +12,15 @@ import {
   CheckCircle2, 
   Loader2, 
   Plus, 
-  ChevronDown
+  ChevronDown,
+  Trash2
 } from 'lucide-react';
 import { BookDetailsData, BookSummaryData } from '../../types';
 import { aiSummaryService } from '../../services/aiSummaryService';
 import { bookSearchService } from '../../services/bookSearchService';
+import { bookshelfService } from '../../services/bookshelfService';
 import { useAuthStore } from '../../stores/authStore';
-import { useNoticeStore } from '../../stores/noticeStore';
+import { useNoticeStore, toast } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { PostCard } from '../feed/PostCard';
 
@@ -141,12 +143,40 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   onShareBook,
   onViewBookDetails,
 }) => {
-  const { user, isGuest, openAuthModal } = useAuthStore();
+  const { user, isGuest, openAuthModal, refreshProfile } = useAuthStore();
+  const [isUpdatingShelf, setIsUpdatingShelf] = useState(false);
   const { showAlertModal } = useNoticeStore();
   const { posts } = useFeedStore();
 
   const [detailedBook, setDetailedBook] = useState<BookDetailsData>(book);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
+  // Check bookshelf status on mount or when book / user changes
+  useEffect(() => {
+    let isMounted = true;
+    async function checkShelf() {
+      if (!user || isGuest || !detailedBook.title) {
+        setBookshelfStatus('none');
+        return;
+      }
+      try {
+        const item = await bookshelfService.getBookStatus(user.id, detailedBook.title);
+        if (isMounted) {
+          if (item) {
+            setBookshelfStatus(item.status);
+          } else {
+            setBookshelfStatus('none');
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to check bookshelf status:', err);
+      }
+    }
+    checkShelf();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, isGuest, detailedBook.title]);
 
   // Summary State
   const [summary, setSummary] = useState<BookSummaryData | null>(null);
@@ -253,8 +283,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     }
   };
 
-  const handleBookshelfToggle = (status: 'want_to_read' | 'currently_reading' | 'finished') => {
-    if (isGuest) {
+  const handleBookshelfToggle = async (status: 'want_to_read' | 'currently_reading' | 'finished') => {
+    if (isGuest || !user) {
       showAlertModal({
         type: 'guest',
         title: 'Sign In Required',
@@ -265,8 +295,53 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       });
       return;
     }
-    setBookshelfStatus(status);
+
     setShowStatusDropdown(false);
+    setIsUpdatingShelf(true);
+    setBookshelfStatus(status);
+
+    try {
+      await bookshelfService.setBookStatus(user.id, {
+        title: detailedBook.title,
+        author: detailedBook.author,
+        coverImageUrl: detailedBook.coverImageUrl,
+        status,
+        progressPercentage: status === 'finished' ? 100 : status === 'want_to_read' ? 0 : 25,
+      });
+
+      const label =
+        status === 'want_to_read'
+          ? 'Want to Read'
+          : status === 'currently_reading'
+          ? 'Currently Reading'
+          : 'Finished';
+
+      toast.success(`"${detailedBook.title}" added to your ${label} shelf.`, 'Bookshelf Updated');
+      await refreshProfile();
+    } catch (err) {
+      console.error('Failed to update bookshelf:', err);
+      toast.error('Could not save to bookshelf. Please try again.', 'Error');
+    } finally {
+      setIsUpdatingShelf(false);
+    }
+  };
+
+  const handleRemoveFromShelf = async () => {
+    if (isGuest || !user) return;
+    setShowStatusDropdown(false);
+    setIsUpdatingShelf(true);
+    setBookshelfStatus('none');
+
+    try {
+      await bookshelfService.removeBookByTitle(user.id, detailedBook.title);
+      toast.info(`"${detailedBook.title}" removed from your bookshelf.`, 'Removed from Shelf');
+      await refreshProfile();
+    } catch (err) {
+      console.error('Failed to remove from bookshelf:', err);
+      toast.error('Could not remove from bookshelf.', 'Error');
+    } finally {
+      setIsUpdatingShelf(false);
+    }
   };
 
   // Filter community posts that talk about this specific book
@@ -392,23 +467,29 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               <div className="relative">
                 <button
                   type="button"
+                  disabled={isUpdatingShelf}
                   onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="w-full h-10 px-2.5 rounded-xl text-xs font-medium border border-vibe-border bg-vibe-card text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-between gap-1 shadow-xs"
+                  className="w-full h-10 px-2.5 rounded-xl text-xs font-medium border border-vibe-border bg-vibe-card text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card-subtle transition-all active:scale-98 flex items-center justify-between gap-1 shadow-xs disabled:opacity-60"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Bookmark className={`w-3.5 h-3.5 flex-shrink-0 ${bookshelfStatus !== 'none' ? 'fill-current text-vibe-accent' : 'text-vibe-ink-muted'}`} />
                     <span className="truncate">
-                      {bookshelfStatus === 'currently_reading' && 'Reading'}
-                      {bookshelfStatus === 'want_to_read' && 'Want to Read'}
-                      {bookshelfStatus === 'finished' && 'Finished'}
-                      {bookshelfStatus === 'none' && 'Add to Shelf'}
+                      {isUpdatingShelf ? 'Saving…' : (
+                        bookshelfStatus === 'currently_reading' ? 'Reading' :
+                        bookshelfStatus === 'want_to_read' ? 'Want to Read' :
+                        bookshelfStatus === 'finished' ? 'Finished' :
+                        'Add to Shelf'
+                      )}
                     </span>
                   </div>
                   <ChevronDown className="w-3 h-3 text-vibe-ink-muted flex-shrink-0" />
                 </button>
 
                 {showStatusDropdown && (
-                  <div className="absolute right-0 sm:left-0 mt-1.5 w-44 rounded-2xl bg-vibe-card border border-vibe-border shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="absolute right-0 sm:left-0 mt-1.5 w-48 rounded-2xl bg-vibe-card border border-vibe-border shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-vibe-ink-muted">
+                      Shelf Status
+                    </div>
                     <button
                       type="button"
                       onClick={() => handleBookshelfToggle('want_to_read')}
@@ -433,6 +514,19 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                       <span>Finished</span>
                       {bookshelfStatus === 'finished' && <Check className="w-3.5 h-3.5 text-vibe-accent" />}
                     </button>
+
+                    {bookshelfStatus !== 'none' && (
+                      <div className="pt-1 mt-1 border-t border-vibe-border">
+                        <button
+                          type="button"
+                          onClick={handleRemoveFromShelf}
+                          className="w-full text-left px-3 py-2 text-xs rounded-xl text-red-600 hover:bg-red-500/10 transition-colors flex items-center justify-between"
+                        >
+                          <span>Remove from Shelf</span>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
