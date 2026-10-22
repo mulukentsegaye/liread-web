@@ -45,16 +45,63 @@ export interface Post {
   createdAt: string;
 }
 
-export interface LeaderboardEntry {
+export interface ConsistentReader {
   userId: string;
   username: string;
   fullName: string;
   initials: string;
   avatarUrl?: string;
-  rank: number;
-  minutesRead: number;
-  formattedTime: string;
+  dailyGoalMinutes: number;
+  todayMinutesRead: number;
+  goalCompletionPercent: number; // e.g. 100, 115
+  currentStreak: number;          // e.g. 14 for 14d streak
+  isCurrentlyReading: boolean;
+  currentlyReadingBook?: string;
+  currentlyReadingAuthor?: string;
+  bookmarksReceived: number;
   isCurrentUser?: boolean;
+}
+
+export interface LiveCoReader {
+  userId: string;
+  username: string;
+  fullName: string;
+  initials: string;
+  avatarUrl?: string;
+  bookTitle: string;
+  bookAuthor?: string;
+  sessionStartedMinutesAgo: number;
+  isCurrentUser?: boolean;
+}
+
+export interface WeeklyCuratorInsight {
+  id: string;
+  userId: string;
+  authorName: string;
+  authorUsername: string;
+  authorAvatar: string;
+  bookTitle: string;
+  bookAuthor: string;
+  quoteOrInsight: string;
+  actionableApplication?: string; // "How I'm Applying This"
+  savedCount: number;             // bookmarks/saves received
+  createdAt: string;
+}
+
+export interface PrivateInsight {
+  id: string;
+  userId?: string;
+  bookTitle: string;
+  bookAuthor?: string;
+  quoteOrInsight: string;
+  actionableApplication?: string;
+  createdAt: string;
+}
+
+export interface LeaderboardEntry extends ConsistentReader {
+  rank?: number;
+  minutesRead?: number;
+  formattedTime?: string;
 }
 
 export interface ReadingSession {
