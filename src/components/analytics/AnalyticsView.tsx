@@ -258,13 +258,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
                 {/* Active / Today Bar Gradient */}
                 <linearGradient id="barGradientToday" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={vibeConfig.colors.accent} stopOpacity={1} />
-                  <stop offset="100%" stopColor={vibeConfig.isDark ? '#059669' : '#047857'} stopOpacity={0.92} />
+                  <stop offset="100%" stopColor={isDark ? '#059669' : '#047857'} stopOpacity={0.92} />
                 </linearGradient>
 
                 {/* Past Reading Sessions Emerald Gradient - Replaces the old dull grey */}
                 <linearGradient id="barGradientPast" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={vibeConfig.isDark ? '#34D399' : '#10B981'} stopOpacity={0.88} />
-                  <stop offset="100%" stopColor={vibeConfig.isDark ? '#059669' : '#059669'} stopOpacity={0.65} />
+                  <stop offset="0%" stopColor={isDark ? '#34D399' : '#10B981'} stopOpacity={0.88} />
+                  <stop offset="100%" stopColor={isDark ? '#059669' : '#059669'} stopOpacity={0.65} />
                 </linearGradient>
               </defs>
               <XAxis 
