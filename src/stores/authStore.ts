@@ -259,7 +259,7 @@ export const useAuthStore = create<AuthStore>()(
             await authService.updateProfile(user.id, {
               full_name: partial.fullName,
               avatar_url: partial.avatarUrl,
-              bio: partial.subtitle,
+              bio: partial.bio || partial.subtitle,
               daily_goal_minutes: partial.dailyGoalMinutes,
             });
           } catch (err) {

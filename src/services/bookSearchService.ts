@@ -66,6 +66,52 @@ export function isOfflineOrNetworkError(err: unknown): boolean {
   return false;
 }
 
+/**
+ * Normalizes and cleans Open Library cover URLs.
+ * Handles crowd-sourced catalog misattributions (e.g. Deep Work being assigned
+ * Johanna Basford's "Lost Ocean" cover ID 7988607 in Open Library's metadata,
+ * or dark Japanese unjacketed bindings).
+ */
+export function sanitizeOpenLibraryCover(
+  title?: string,
+  author?: string,
+  coverUrl?: string
+): string | undefined {
+  if (!title && !coverUrl) return undefined;
+
+  const t = (title || '').toLowerCase();
+  const url = (coverUrl || '').trim();
+
+  // 1. Deep Work (Cal Newport):
+  // Open Library edition OL26314691M mistakenly has cover_i 7988607 ("Lost Ocean" coloring book).
+  // Replace with the official Deep Work Open Library ISBN cover.
+  if (t.includes('deep work') || url.includes('7988607')) {
+    return 'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg';
+  }
+
+  // 2. Before the Coffee Gets Cold (Toshikazu Kawaguchi):
+  // Cover ID 9334159 is a dark blank Japanese cloth binding.
+  // Map to the widely recognized English edition (10138333).
+  if (t.includes('before the coffee gets cold') && (!url || url.includes('9334159'))) {
+    return 'https://covers.openlibrary.org/b/id/10138333-L.jpg';
+  }
+
+  // 3. Klara and the Sun (Kazuo Ishiguro):
+  // Cover ID 10648686 is the plain silver/foil UK dustjacket without visible cover illustration.
+  // Map to the iconic international edition on Open Library.
+  if (t.includes('klara and the sun') && (!url || url.includes('10648686'))) {
+    return 'https://covers.openlibrary.org/b/isbn/9780593318171-L.jpg';
+  }
+
+  // 4. Meditations (Marcus Aurelius):
+  // Avoid low-res or generic covers
+  if (t.includes('meditations') && (!url || url.includes('12818862') || url.includes('13202688'))) {
+    return 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg';
+  }
+
+  return url || undefined;
+}
+
 export const bookSearchService = {
   /**
    * Search Open Library by query string and return normalized book suggestions
@@ -138,12 +184,15 @@ export const bookSearchService = {
           coverThumbnailUrl = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-M.jpg`;
         }
 
+        const cleanCover = sanitizeOpenLibraryCover(title, author, coverImageUrl);
+        const cleanThumb = sanitizeOpenLibraryCover(title, author, coverThumbnailUrl) || cleanCover;
+
         return {
           id: doc.key || `${title}-${author}-${doc.cover_i || Math.random()}`,
           title,
           author,
-          coverImageUrl,
-          coverThumbnailUrl,
+          coverImageUrl: cleanCover,
+          coverThumbnailUrl: cleanThumb,
           firstPublishYear: doc.first_publish_year,
           coverId: doc.cover_i,
           workKey: doc.key,
@@ -269,12 +318,15 @@ export const bookSearchService = {
           coverThumbnailUrl = `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-M.jpg`;
         }
 
+        const cleanCover = sanitizeOpenLibraryCover(title, author, coverImageUrl);
+        const cleanThumb = sanitizeOpenLibraryCover(title, author, coverThumbnailUrl) || cleanCover;
+
         return {
           id: doc.key || `${title}-${author}-${doc.cover_i || Math.random()}`,
           title,
           author,
-          coverImageUrl,
-          coverThumbnailUrl,
+          coverImageUrl: cleanCover,
+          coverThumbnailUrl: cleanThumb,
           firstPublishYear: doc.first_publish_year,
           coverId: doc.cover_i,
           workKey: doc.key,
@@ -348,10 +400,16 @@ export const bookSearchService = {
     );
 
     if (curatedMatch) {
+      const finalCover = sanitizeOpenLibraryCover(
+        title || curatedMatch.title,
+        author || curatedMatch.author,
+        resolvedCover || curatedMatch.coverImageUrl
+      );
+
       return {
-        title: curatedMatch.title,
-        author: curatedMatch.author,
-        coverImageUrl: curatedMatch.coverImageUrl || resolvedCover,
+        title: title && title.trim().length > 0 ? title.trim() : curatedMatch.title,
+        author: author && author.trim().length > 0 && author !== 'Unknown Author' ? author.trim() : curatedMatch.author,
+        coverImageUrl: finalCover,
         firstPublishYear: curatedMatch.firstPublishYear,
         workKey: curatedMatch.workKey || resolvedWorkKey,
         description: curatedMatch.description || curatedMatch.tagline,
@@ -383,8 +441,14 @@ export const bookSearchService = {
           if (matchingDoc) {
             resolvedWorkKey = matchingDoc.key;
             publishYear = matchingDoc.first_publish_year;
-            if (!resolvedCover && matchingDoc.cover_i) {
-              resolvedCover = `https://covers.openlibrary.org/b/id/${matchingDoc.cover_i}-L.jpg`;
+            if (!resolvedCover) {
+              if (matchingDoc.cover_i) {
+                resolvedCover = `https://covers.openlibrary.org/b/id/${matchingDoc.cover_i}-L.jpg`;
+              } else if (matchingDoc.cover_edition_key) {
+                resolvedCover = `https://covers.openlibrary.org/b/olid/${matchingDoc.cover_edition_key}-L.jpg`;
+              } else if (Array.isArray(matchingDoc.isbn) && matchingDoc.isbn.length > 0) {
+                resolvedCover = `https://covers.openlibrary.org/b/isbn/${matchingDoc.isbn[0]}-L.jpg`;
+              }
             }
             if (Array.isArray(matchingDoc.subject)) {
               subjects = matchingDoc.subject.slice(0, 5);
@@ -409,6 +473,12 @@ export const bookSearchService = {
               description = workData.description.value;
             }
           }
+          if (!resolvedCover && Array.isArray(workData.covers) && workData.covers.length > 0) {
+            const validCoverId = workData.covers.find((id: any) => typeof id === 'number' && id > 0);
+            if (validCoverId) {
+              resolvedCover = `https://covers.openlibrary.org/b/id/${validCoverId}-L.jpg`;
+            }
+          }
           if (Array.isArray(workData.subjects) && subjects.length === 0) {
             subjects = workData.subjects.slice(0, 5);
           }
@@ -418,10 +488,12 @@ export const bookSearchService = {
       console.warn('Could not fetch detailed book metadata from Open Library:', err);
     }
 
+    const finalCover = sanitizeOpenLibraryCover(title, author, resolvedCover);
+
     return {
       title,
       author,
-      coverImageUrl: resolvedCover,
+      coverImageUrl: finalCover,
       firstPublishYear: publishYear,
       workKey: resolvedWorkKey,
       description,

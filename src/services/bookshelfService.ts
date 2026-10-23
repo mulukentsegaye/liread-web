@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { sanitizeOpenLibraryCover } from './bookSearchService';
 
 export interface BookshelfItem {
   id: string;
@@ -23,7 +24,13 @@ export const bookshelfService = {
   getLocalBookshelf(userId: string): BookshelfItem[] {
     try {
       const raw = localStorage.getItem(getLocalKey(userId));
-      return raw ? JSON.parse(raw) : [];
+      if (!raw) return [];
+      const items: BookshelfItem[] = JSON.parse(raw);
+      if (!Array.isArray(items)) return [];
+      return items.map((b) => ({
+        ...b,
+        coverImageUrl: sanitizeOpenLibraryCover(b.title, b.author, b.coverImageUrl),
+      }));
     } catch {
       return [];
     }
@@ -65,17 +72,20 @@ export const bookshelfService = {
       }
 
       if (data) {
-        const mapped: BookshelfItem[] = data.map((b) => ({
-          id: b.id,
-          userId: b.user_id,
-          title: b.title,
-          author: b.author,
-          coverImageUrl: (b.title?.toLowerCase().includes('meditations') && (!b.cover_image_url || b.cover_image_url.includes('12818862') || b.cover_image_url.includes('13202688'))) ? 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg' : (b.cover_image_url || undefined),
-          status: b.status,
-          progressPercentage: b.progress_percentage ?? 0,
-          rating: b.rating || undefined,
-          createdAt: b.created_at,
-        }));
+        const mapped: BookshelfItem[] = data.map((b) => {
+          const cleanCover = sanitizeOpenLibraryCover(b.title, b.author, b.cover_image_url);
+          return {
+            id: b.id,
+            userId: b.user_id,
+            title: b.title,
+            author: b.author,
+            coverImageUrl: cleanCover,
+            status: b.status,
+            progressPercentage: b.progress_percentage ?? 0,
+            rating: b.rating || undefined,
+            createdAt: b.created_at,
+          };
+        });
 
         // Cache the latest server data locally
         this.saveLocalBookshelf(userId, mapped);
@@ -152,6 +162,7 @@ export const bookshelfService = {
   ): Promise<BookshelfItem> {
     const trimmedTitle = book.title.trim();
     const cleanAuthor = (book.author || 'Unknown Author').trim();
+    const cleanCover = sanitizeOpenLibraryCover(trimmedTitle, cleanAuthor, book.coverImageUrl);
     const progress = typeof book.progressPercentage === 'number' ? book.progressPercentage : (book.status === 'finished' ? 100 : 0);
     const now = new Date().toISOString();
 
@@ -160,7 +171,7 @@ export const bookshelfService = {
       userId,
       title: trimmedTitle,
       author: cleanAuthor,
-      coverImageUrl: book.coverImageUrl,
+      coverImageUrl: cleanCover,
       status: book.status,
       progressPercentage: progress,
       createdAt: now,
@@ -178,12 +189,13 @@ export const bookshelfService = {
           .maybeSingle();
 
         if (existing) {
+          const effectiveCover = cleanCover || sanitizeOpenLibraryCover(trimmedTitle, cleanAuthor, existing.cover_image_url);
           const { data: updated, error: updateErr } = await supabase
             .from('bookshelf')
             .update({
               status: book.status,
               author: cleanAuthor || existing.author,
-              cover_image_url: book.coverImageUrl || existing.cover_image_url,
+              cover_image_url: effectiveCover,
               progress_percentage: progress,
               updated_at: now,
             })
@@ -197,7 +209,7 @@ export const bookshelfService = {
               userId: updated.user_id,
               title: updated.title,
               author: updated.author,
-              coverImageUrl: updated.cover_image_url || undefined,
+              coverImageUrl: sanitizeOpenLibraryCover(updated.title, updated.author, updated.cover_image_url),
               status: updated.status,
               progressPercentage: updated.progress_percentage ?? 0,
               rating: updated.rating || undefined,
@@ -211,7 +223,7 @@ export const bookshelfService = {
               user_id: userId,
               title: trimmedTitle,
               author: cleanAuthor,
-              cover_image_url: book.coverImageUrl || null,
+              cover_image_url: cleanCover || null,
               status: book.status,
               progress_percentage: progress,
               created_at: now,
@@ -226,7 +238,7 @@ export const bookshelfService = {
               userId: inserted.user_id,
               title: inserted.title,
               author: inserted.author,
-              coverImageUrl: inserted.cover_image_url || undefined,
+              coverImageUrl: sanitizeOpenLibraryCover(inserted.title, inserted.author, inserted.cover_image_url),
               status: inserted.status,
               progressPercentage: inserted.progress_percentage ?? 0,
               rating: inserted.rating || undefined,

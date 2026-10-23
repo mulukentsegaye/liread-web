@@ -11,6 +11,16 @@ export interface UserProfile {
   fullName: string;
   avatarUrl: string;
   subtitle?: string;
+  bio?: string;
+  location?: string;
+  favoriteGenres?: string[];
+  currentlyReadingBook?: string;
+  currentlyReadingAuthor?: string;
+  currentlyReadingProgress?: number;
+  followersCount?: number;
+  followingCount?: number;
+  isPrivate?: boolean;
+  joinedDate?: string;
   totalMinutesRead: number;
   currentStreak: number;
   dailyGoalMinutes: number;
