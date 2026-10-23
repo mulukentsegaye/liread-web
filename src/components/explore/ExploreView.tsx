@@ -35,7 +35,8 @@ import {
 import { 
   bookSearchService, 
   SuggestedBook, 
-  isOfflineOrNetworkError 
+  isOfflineOrNetworkError,
+  sanitizeOpenLibraryCover
 } from '../../services/bookSearchService';
 
 interface ExploreViewProps {
@@ -107,7 +108,7 @@ const BookCardCover: React.FC<{
 }> = ({ title, author, coverImageUrl, coverThumbnailUrl }) => {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const src = coverImageUrl || coverThumbnailUrl;
+  const src = sanitizeOpenLibraryCover(title, author, coverImageUrl || coverThumbnailUrl);
 
   const palette = React.useMemo(() => {
     const styles = [

@@ -15,6 +15,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { bookshelfService, BookshelfItem } from '../../services/bookshelfService';
+import { sanitizeOpenLibraryCover } from '../../services/bookSearchService';
 import { toast } from '../../stores/noticeStore';
 
 interface BookshelfViewProps {
@@ -24,19 +25,100 @@ interface BookshelfViewProps {
   onExploreClick?: () => void;
 }
 
-function bookCoverColor(title: string): string {
-  const colors = ['#1a3a4a', '#2d4a3e', '#3a2d4a', '#4a2d2d', '#2d3a4a', '#3a4a2d', '#4a3a2d', '#2d2d4a', '#4a2d3a', '#3a2d3a'];
-  let hash = 0; 
-  for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) % colors.length;
-  return colors[Math.abs(hash)];
+interface BookshelfCoverCardProps {
+  title: string;
+  author: string;
+  coverUrl?: string;
+  status: string;
+  statusCode: 'want_to_read' | 'currently_reading' | 'finished';
 }
 
-function bookCoverAccent(title: string): string {
-  const accents = ['#7fb5c8', '#7dc4a0', '#a697c8', '#c87a7a', '#7a97c8', '#a0c87a', '#c8a07a', '#7a7ac8', '#c87aa0', '#a07ac8'];
-  let hash = 0; 
-  for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) % accents.length;
-  return accents[Math.abs(hash)];
-}
+const BookshelfCoverCard: React.FC<BookshelfCoverCardProps> = ({
+  title,
+  author,
+  coverUrl,
+  status,
+  statusCode,
+}) => {
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const isReading = statusCode === 'currently_reading';
+  const isFinished = statusCode === 'finished';
+
+  const palette = React.useMemo(() => {
+    const styles = [
+      { bg: 'from-amber-950 via-stone-900 to-amber-900', border: 'border-amber-600/30', foil: 'text-amber-300' },
+      { bg: 'from-emerald-950 via-slate-900 to-teal-950', border: 'border-emerald-600/30', foil: 'text-emerald-300' },
+      { bg: 'from-slate-950 via-zinc-900 to-indigo-950', border: 'border-indigo-500/30', foil: 'text-indigo-300' },
+      { bg: 'from-rose-950 via-neutral-900 to-stone-950', border: 'border-rose-500/30', foil: 'text-rose-300' },
+      { bg: 'from-blue-950 via-slate-900 to-cyan-950', border: 'border-sky-500/30', foil: 'text-sky-300' },
+    ];
+    let hash = 0;
+    for (let i = 0; i < title.length; i++) hash = (hash << 5) - hash + title.charCodeAt(i);
+    return styles[Math.abs(hash) % styles.length];
+  }, [title]);
+
+  return (
+    <div className="relative aspect-[2/3] w-full max-w-[220px] sm:max-w-none mx-auto rounded-xl overflow-hidden mb-3.5 border border-vibe-border/60 bg-vibe-card-subtle shadow-sm flex items-center justify-center">
+      {coverUrl && !hasError ? (
+        <>
+          {!isLoaded && (
+            <div className="absolute inset-0 bg-vibe-border/30 animate-pulse flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-vibe-ink-muted/50" />
+            </div>
+          )}
+          <img 
+            src={coverUrl} 
+            alt={title} 
+            loading="lazy"
+            onLoad={() => setIsLoaded(true)}
+            onError={() => setHasError(true)}
+            className={`w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-500 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            }`} 
+          />
+          {/* Subtle spine shadow along the left edge for book realism */}
+          <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/40 via-white/5 to-transparent pointer-events-none" />
+        </>
+      ) : (
+        <div className={`relative w-full h-full p-4 flex flex-col justify-between bg-gradient-to-br ${palette.bg} border ${palette.border} select-none`}>
+          <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-black/60 via-white/10 to-transparent pointer-events-none" />
+          <div className="flex items-center justify-between text-[10px] font-mono tracking-widest uppercase text-white/50 pl-1">
+            <span>Liread</span>
+            <BookOpen className={`w-3.5 h-3.5 ${palette.foil}`} />
+          </div>
+          <div className="space-y-1 pl-1 my-auto">
+            <span className="font-heading font-bold text-white text-sm line-clamp-3 leading-snug drop-shadow-xs">
+              {title}
+            </span>
+            <span className="text-[11px] text-white/70 block line-clamp-1">
+              {author}
+            </span>
+          </div>
+          <div className="pl-1 pt-2 border-t border-white/10 flex items-center justify-between text-[9px] text-white/40">
+            <span>Bookshelf</span>
+            <span className="font-serif italic text-white/60">Edition</span>
+          </div>
+        </div>
+      )}
+
+      {/* Status Badge */}
+      <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+        <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-md shadow-xs flex items-center gap-1 ${
+          isReading 
+            ? 'bg-amber-600/90 text-white' 
+            : isFinished 
+            ? 'bg-emerald-600/90 text-white' 
+            : 'bg-vibe-accent/90 text-white'
+        }`}>
+          {isFinished && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+          {status}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 export const BookshelfView: React.FC<BookshelfViewProps> = ({ 
   initialTab = 'bookshelf', 
@@ -113,7 +195,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
     progress: b.progressPercentage,
     status: b.status === 'currently_reading' ? 'Currently Reading' : b.status === 'finished' ? 'Finished' : 'Want to Read',
     statusCode: b.status,
-    coverUrl: (b.title?.toLowerCase().includes('meditations') && (!b.coverImageUrl || b.coverImageUrl.includes('12818862') || b.coverImageUrl.includes('13202688'))) ? 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg' : (b.coverImageUrl || ''),
+    coverUrl: sanitizeOpenLibraryCover(b.title, b.author, b.coverImageUrl) || '',
   })) : (isGuest ? demoBooks : []);
 
   // Shelf category counts
@@ -346,8 +428,6 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {displayedBooks.map((b) => {
-                const coverColor = bookCoverColor(b.title);
-                const coverAccent = bookCoverAccent(b.title);
                 const isFinished = b.statusCode === 'finished';
                 const isReading = b.statusCode === 'currently_reading';
                 const isWantToRead = b.statusCode === 'want_to_read';
@@ -359,45 +439,14 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
                     className="bg-vibe-card border border-vibe-border rounded-2xl p-4 shadow-soft flex flex-col justify-between hover:shadow-float transition-shadow duration-200 group relative"
                   >
                     {/* Book Cover Presentation */}
-                    <div className="relative aspect-[16/10] sm:aspect-[4/3] rounded-xl overflow-hidden mb-3.5 border border-vibe-border/60 shadow-xs flex items-center justify-center">
-                      {b.coverUrl ? (
-                        <>
-                          <img 
-                            src={b.coverUrl} 
-                            alt={b.title} 
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
-                            loading="lazy" 
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
-                        </>
-                      ) : (
-                        <div className="w-full h-full p-4 flex flex-col justify-between relative" style={{ backgroundColor: coverColor }}>
-                          <div className="w-6 h-1 rounded-full opacity-60" style={{ backgroundColor: coverAccent }} />
-                          <div>
-                            <span className="font-heading font-bold text-white text-sm line-clamp-2 leading-tight">
-                              {b.title}
-                            </span>
-                            <span className="text-[11px] text-white/70 block mt-1">
-                              {b.author}
-                            </span>
-                          </div>
-                          <div className="text-[9px] uppercase tracking-widest text-white/40 font-mono">Liread</div>
-                        </div>
-                      )}
-
-                      {/* Status Badge */}
-                      <div className="absolute top-2.5 left-2.5 z-10">
-                        <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-md shadow-xs flex items-center gap-1 ${
-                          isReading 
-                            ? 'bg-amber-600/90 text-white' 
-                            : isFinished 
-                            ? 'bg-emerald-600/90 text-white' 
-                            : 'bg-vibe-accent/90 text-white'
-                        }`}>
-                          {isFinished && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                          {b.status}
-                        </span>
-                      </div>
+                    <div className="relative mb-3.5 group/cover">
+                      <BookshelfCoverCard
+                        title={b.title}
+                        author={b.author}
+                        coverUrl={b.coverUrl}
+                        status={b.status}
+                        statusCode={b.statusCode}
+                      />
 
                       {/* Quick Actions Dropdown Button */}
                       {!isGuest && (

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { BookDetailsData, BookSummaryData } from '../../types';
 import { aiSummaryService } from '../../services/aiSummaryService';
-import { bookSearchService } from '../../services/bookSearchService';
+import { bookSearchService, sanitizeOpenLibraryCover } from '../../services/bookSearchService';
 import { bookshelfService } from '../../services/bookshelfService';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore, toast } from '../../stores/noticeStore';
@@ -186,6 +186,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   // Bookshelf status state
   const [bookshelfStatus, setBookshelfStatus] = useState<'none' | 'want_to_read' | 'currently_reading' | 'finished'>('none');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   // Reading typography vibe: 'serif' (Newsreader) or 'sans' (Inter)
   const [readingFont, setReadingFont] = useState<'serif' | 'sans'>(() => {
@@ -212,7 +213,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
   // Sync detailedBook state whenever book prop changes
   useEffect(() => {
-    setDetailedBook(book);
+    setCoverError(false);
+    setDetailedBook({
+      ...book,
+      coverImageUrl: sanitizeOpenLibraryCover(book.title, book.author, book.coverImageUrl),
+    });
   }, [book.title, book.author, book.coverImageUrl, book.description]);
 
   // Fetch deeper book details from Open Library if description is missing
@@ -234,7 +239,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               description: fullData.description || book.description,
               subjects: fullData.subjects || (book.subjects && book.subjects.length > 0 ? book.subjects : ['Literature', 'Philosophy', 'Focus']),
               firstPublishYear: fullData.firstPublishYear || book.firstPublishYear,
-              coverImageUrl: book.coverImageUrl || fullData.coverImageUrl,
+              coverImageUrl: sanitizeOpenLibraryCover(book.title, book.author, book.coverImageUrl || fullData.coverImageUrl),
             });
           }
         } catch (err) {
@@ -373,10 +378,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           {/* Left: Book Cover Showcase */}
           <div className="md:col-span-4 flex flex-col items-center">
             <div className="relative w-36 sm:w-44 h-52 sm:h-64 rounded-2xl overflow-hidden shadow-sm border border-vibe-border bg-vibe-card-subtle">
-              {detailedBook.coverImageUrl ? (
+              {detailedBook.coverImageUrl && !coverError ? (
                 <img
                   src={detailedBook.coverImageUrl}
                   alt={detailedBook.title}
+                  onError={() => setCoverError(true)}
                   className="w-full h-full object-cover"
                 />
               ) : (
