@@ -124,51 +124,51 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
-                Community Sanctuary & Pulse
+                Community Sanctuary
               </span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
               Reading Sanctuary
             </h1>
-            <p className="text-xs sm:text-sm text-vibe-ink-muted mt-1 max-w-xl">
-              Competing against yourself, together. Celebrating personal daily commitments, consistency streaks, and shared wisdom over racing the clock.
-            </p>
           </div>
 
           {/* Tab Filter Pills */}
-          <div className="flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle self-start sm:self-auto overflow-x-auto">
+          <div className="inline-flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle shadow-xs shrink-0 self-start sm:self-auto">
             <button
               type="button"
               onClick={() => setActiveTab('circle')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'circle'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
-              Consistent Circle
+              <Users className="w-3.5 h-3.5" />
+              <span>Circle</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('curators')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'curators'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
-              Top Wisdom Curators
+              <Bookmark className="w-3.5 h-3.5" />
+              <span>Curators</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('streaks')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'streaks'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
-              Streak Guardians
+              <Flame className="w-3.5 h-3.5" />
+              <span>Streaks</span>
             </button>
           </div>
         </div>
@@ -340,10 +340,10 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
         <div className="space-y-4">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider text-vibe-ink">
-              Top Weekly Wisdom Curators
+              Wisdom Curators
             </h2>
             <p className="text-xs text-vibe-ink-muted mt-0.5">
-              Recognizing readers whose shared quotes, reflections, and real-world takeaways were bookmarked most by fellow readers.
+              Readers whose shared quotes and reflections were saved most this week.
             </p>
           </div>
 
@@ -412,18 +412,20 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-vibe-border">
             <div>
               <h2 className="text-sm font-semibold text-vibe-ink flex items-center gap-2">
-                <span>The Committed Circle</span>
+                <span>{activeTab === 'streaks' ? 'Streak Leaders' : 'Consistency Circle'}</span>
                 <span className="font-mono text-xs font-normal text-vibe-ink-muted">
                   ({displayReaders.length} readers)
                 </span>
               </h2>
               <p className="text-xs text-vibe-ink-muted mt-0.5">
-                Every reader who honors their personal daily plan is celebrated equally.
+                {activeTab === 'streaks'
+                  ? 'Readers with the longest ongoing daily reading streaks.'
+                  : 'Every reader who honors their personal daily plan is celebrated equally.'}
               </p>
             </div>
 
             <div className="text-xs text-vibe-ink-muted font-medium">
-              Sorted by daily consistency & streak
+              {activeTab === 'streaks' ? 'Sorted by streak length' : 'Sorted by daily consistency'}
             </div>
           </div>
 
