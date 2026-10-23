@@ -10,7 +10,8 @@ import {
   Search,
   CheckCircle2,
   FolderOpen,
-  ArrowRight
+  ArrowRight,
+  Plus
 } from 'lucide-react';
 import { useReaderStore } from '../../stores/readerStore';
 import { StoredBook } from '../../types/reader';
@@ -30,6 +31,51 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
   useEffect(() => {
     loadBooks();
   }, [loadBooks]);
+
+  // Window-level drag event listener so drag-overlay activates anywhere on the screen
+  useEffect(() => {
+    let dragCounter = 0;
+
+    const handleDragEnter = (e: DragEvent) => {
+      if (e.dataTransfer?.types?.includes('Files')) {
+        e.preventDefault();
+        dragCounter++;
+        setIsDragging(true);
+      }
+    };
+
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        setIsDragging(false);
+      }
+    };
+
+    const handleDragOver = (e: DragEvent) => {
+      if (e.dataTransfer?.types?.includes('Files')) {
+        e.preventDefault();
+      }
+    };
+
+    const handleWindowDrop = () => {
+      dragCounter = 0;
+      setIsDragging(false);
+    };
+
+    window.addEventListener('dragenter', handleDragEnter);
+    window.addEventListener('dragleave', handleDragLeave);
+    window.addEventListener('dragover', handleDragOver);
+    window.addEventListener('drop', handleWindowDrop);
+
+    return () => {
+      window.removeEventListener('dragenter', handleDragEnter);
+      window.removeEventListener('dragleave', handleDragLeave);
+      window.removeEventListener('dragover', handleDragOver);
+      window.removeEventListener('drop', handleWindowDrop);
+    };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -97,8 +143,34 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in duration-300 pb-24 px-2 sm:px-4">
-      {/* Header */}
+    <div className="relative w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-300 pb-24 px-2 sm:px-4">
+      {/* Drag & Drop Dynamic Full-Screen Overlay (only shown when dragging a file) */}
+      {isDragging && (
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-6 animate-in fade-in duration-150"
+        >
+          <div className="rounded-3xl border-2 border-dashed border-emerald-400 bg-vibe-card p-8 sm:p-12 text-center max-w-md w-full space-y-4 shadow-2xl scale-100 animate-in zoom-in-95 duration-150">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+              <UploadCloud className="w-8 h-8 animate-bounce" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-heading text-lg font-semibold text-vibe-ink">
+                Drop your file to read
+              </h3>
+              <p className="text-xs text-vibe-ink-muted">
+                Accepts <span className="font-semibold text-vibe-accent">PDF, EPUB, TXT, MOBI, or FB2</span>.
+              </p>
+              <p className="text-[11px] text-vibe-ink-muted/80 pt-1">
+                Opens directly in the reader and saves to your local offline library.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header & Primary Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
@@ -112,8 +184,8 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           </h1>
         </div>
 
-        {/* Upload Button */}
-        <div>
+        {/* Action Button: Sleek Open Book Trigger */}
+        <div className="flex items-center gap-2">
           <input
             ref={fileInputRef}
             type="file"
@@ -125,44 +197,22 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-medium shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer group"
+            title="Open or import a PDF, EPUB, or TXT book"
           >
-            <BookOpen className="w-4 h-4" />
+            <UploadCloud className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
             <span>Open Book</span>
+            <span className="hidden sm:inline-block text-[10px] font-mono opacity-85 px-2 py-0.5 rounded-full bg-black/15">
+              PDF · EPUB · TXT
+            </span>
           </button>
         </div>
-      </div>
-
-      {/* Drag & Drop Zone */}
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-        className={`rounded-3xl border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all duration-200 ${
-          isDragging
-            ? 'border-emerald-500 bg-emerald-500/10 scale-[1.01]'
-            : 'border-vibe-border hover:border-vibe-accent/40 bg-vibe-card-subtle/50'
-        }`}
-      >
-        <div className="w-12 h-12 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center mx-auto mb-3">
-          <BookOpen className="w-6 h-6" />
-        </div>
-        <p className="text-sm font-medium text-vibe-ink">
-          Click to choose or drop any <span className="font-semibold text-vibe-accent">PDF, EPUB, or TXT</span> book to read
-        </p>
-        <p className="text-xs text-vibe-ink-muted mt-1">
-          Opens immediately in the reader and saves to your local offline library.
-        </p>
       </div>
 
       {/* Tabs & Search Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-vibe-border pb-3">
         {/* ReadEra Category Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
@@ -209,7 +259,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           </button>
         </div>
 
-        {/* Search */}
+        {/* Search Input */}
         <div className="relative max-w-xs w-full">
           <Search className="w-3.5 h-3.5 text-vibe-ink-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -222,18 +272,51 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
         </div>
       </div>
 
-      {/* Book Grid */}
+      {/* Book Grid or Empty States */}
       {isLoadingBooks ? (
         <div className="py-16 text-center text-xs text-vibe-ink-muted">Loading your local documents...</div>
+      ) : books.length === 0 ? (
+        /* Entire Library Empty State */
+        <div className="rounded-3xl border border-vibe-border bg-vibe-card p-10 sm:p-14 text-center space-y-4 shadow-soft max-w-md mx-auto my-8">
+          <div className="w-14 h-14 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center mx-auto shadow-xs">
+            <BookOpen className="w-7 h-7" />
+          </div>
+          <div className="space-y-1.5">
+            <h3 className="font-heading text-base sm:text-lg font-semibold text-vibe-ink">Your library is empty</h3>
+            <p className="text-xs text-vibe-ink-muted leading-relaxed max-w-xs mx-auto">
+              Open any PDF, EPUB, or TXT book to start your distraction-free offline reading session.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Open Book File</span>
+          </button>
+        </div>
       ) : filteredBooks.length === 0 ? (
-        <div className="rounded-3xl border border-vibe-border bg-vibe-card p-12 text-center space-y-3 shadow-soft max-w-md mx-auto">
+        /* Filter / Search Match Empty State */
+        <div className="rounded-3xl border border-vibe-border bg-vibe-card p-10 text-center space-y-3 shadow-soft max-w-md mx-auto my-8">
           <FolderOpen className="w-10 h-10 text-vibe-ink-muted mx-auto" />
-          <h3 className="text-sm font-semibold text-vibe-ink">No books found in this section</h3>
+          <h3 className="font-heading text-sm font-semibold text-vibe-ink">No books found in this section</h3>
           <p className="text-xs text-vibe-ink-muted">
-            Drop a book above or choose "Open Book" to start reading.
+            No documents matched your current tab or search query.
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('all');
+              setSearchQuery('');
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-vibe-border bg-vibe-card-subtle text-xs text-vibe-ink font-medium hover:bg-vibe-card transition-colors cursor-pointer mt-1"
+          >
+            Show All Books
+          </button>
         </div>
       ) : (
+        /* Books Grid */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filteredBooks.map((book) => (
             <div
@@ -252,7 +335,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
                     <button
                       type="button"
                       onClick={() => toggleFavorite(book.id)}
-                      className={`p-1.5 rounded-lg transition-colors ${
+                      className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                         book.isFavorite ? 'text-amber-500' : 'text-vibe-ink-muted hover:text-amber-500'
                       }`}
                       title={book.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -262,7 +345,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
                     <button
                       type="button"
                       onClick={() => deleteBook(book.id)}
-                      className="p-1.5 text-vibe-ink-muted hover:text-rose-500 transition-colors"
+                      className="p-1.5 text-vibe-ink-muted hover:text-rose-500 transition-colors cursor-pointer"
                       title="Remove from library"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

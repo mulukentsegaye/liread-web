@@ -20,7 +20,7 @@ interface AnalyticsViewProps {
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
   const { user, todayMinutesRead, isGuest } = useAuthStore();
-  const { vibeConfig } = useTheme();
+  const { vibeConfig, isDark } = useTheme();
   const [timeRange, setTimeRange] = useState<'7days' | '30days'>('7days');
   const [sessions, setSessions] = useState<{ session_date: string; duration_minutes: number }[]>([]);
 
@@ -222,7 +222,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
               Reading Time
             </h2>
             <p className="text-xs sm:text-sm text-vibe-ink-muted mt-0.5">
-              Daily average: <strong className="text-vibe-ink font-semibold">{avgMinutes} min / day</strong>
+              Daily average: <strong className="text-vibe-accent font-semibold">{avgMinutes} min / day</strong>
             </p>
           </div>
 
@@ -254,11 +254,38 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
         <div className="w-full pt-2">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                {/* Active / Today Bar Gradient */}
+                <linearGradient id="barGradientToday" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={vibeConfig.colors.accent} stopOpacity={1} />
+                  <stop offset="100%" stopColor={vibeConfig.isDark ? '#059669' : '#047857'} stopOpacity={0.92} />
+                </linearGradient>
+
+                {/* Past Reading Sessions Emerald Gradient - Replaces the old dull grey */}
+                <linearGradient id="barGradientPast" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={vibeConfig.isDark ? '#34D399' : '#10B981'} stopOpacity={0.88} />
+                  <stop offset="100%" stopColor={vibeConfig.isDark ? '#059669' : '#059669'} stopOpacity={0.65} />
+                </linearGradient>
+              </defs>
               <XAxis 
                 dataKey="day" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fontSize: 12, fill: vibeConfig.colors.inkMuted }} 
+                tick={({ x, y, payload }: any) => {
+                  const isToday = payload.value === 'Today' || payload.value === 'This Wk';
+                  return (
+                    <text 
+                      x={x} 
+                      y={y + 14} 
+                      textAnchor="middle" 
+                      fontSize={12} 
+                      fill={isToday ? vibeConfig.colors.accent : vibeConfig.colors.inkMuted}
+                      fontWeight={isToday ? 700 : 500}
+                    >
+                      {payload.value}
+                    </text>
+                  );
+                }}
               />
               <YAxis 
                 axisLine={false} 
@@ -266,7 +293,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
                 tick={{ fontSize: 11, fill: vibeConfig.colors.inkMuted }} 
               />
               <Tooltip 
-                cursor={{ fill: vibeConfig.colors.accentSubtle, opacity: 0.5 }}
+                cursor={{ fill: vibeConfig.colors.accentSubtle, opacity: 0.6 }}
                 contentStyle={{ 
                   backgroundColor: vibeConfig.colors.card,
                   borderColor: vibeConfig.colors.border,
@@ -280,12 +307,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onBack }) => {
                 formatter={(val: number) => [`${val} minutes`, 'Reading Time']}
               />
               <Bar dataKey="minutes" radius={[6, 6, 0, 0]} maxBarSize={48}>
-                {chartData.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={entry.day === 'Today' || entry.day === 'This Wk' ? vibeConfig.colors.accent : vibeConfig.colors.border} 
-                  />
-                ))}
+                {chartData.map((entry, index) => {
+                  const isToday = entry.day === 'Today' || entry.day === 'This Wk';
+                  return (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={isToday ? "url(#barGradientToday)" : "url(#barGradientPast)"} 
+                    />
+                  );
+                })}
               </Bar>
             </BarChart>
           </ResponsiveContainer>

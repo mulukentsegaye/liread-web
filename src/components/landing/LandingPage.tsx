@@ -632,7 +632,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                           className={`w-full rounded-md transition-all ${
                             item.today 
                               ? 'bg-vibe-accent shadow-xs' 
-                              : 'bg-vibe-accent/30 hover:bg-vibe-accent/50'
+                              : 'bg-vibe-accent/65 hover:bg-vibe-accent/85'
                           }`}
                           style={{ height: item.height }}
                           title={`${item.mins} minutes`}
