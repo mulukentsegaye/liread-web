@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { StoredBook, ReaderSettings, ReaderTheme, ReaderFontFamily, ReadingMode, TocItem, BookFormat } from '../types/reader';
 import { readerStorageService } from '../services/readerStorageService';
+import { extractBookCover, cleanFilenameMeta } from '../services/bookCoverExtractor';
 
 interface ReaderStore {
   books: StoredBook[];
@@ -91,6 +92,46 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
     try {
       const books = await readerStorageService.seedSampleBooksIfEmpty();
       set({ books, isLoadingBooks: false });
+
+      // Automatically extract & generate covers in the background for any books missing covers
+      const missingCovers = books.filter((b) => !b.coverUrl && b.fileBlob);
+      if (missingCovers.length > 0) {
+        (async () => {
+          let updatedAny = false;
+          for (const book of missingCovers) {
+            try {
+              const res = await extractBookCover({
+                fileBlob: book.fileBlob,
+                format: book.format,
+                title: book.title,
+                author: book.author,
+              });
+
+              if (res?.coverUrl) {
+                const updates: Partial<StoredBook> = { coverUrl: res.coverUrl };
+                if (book.author === 'Unknown Author' && res.author) {
+                  updates.author = res.author;
+                }
+                if (res.title && (book.title.toLowerCase().includes('oceanofpdf') || book.title.length < 3)) {
+                  updates.title = res.title;
+                }
+                if (res.totalPages && !book.totalPages) {
+                  updates.totalPages = res.totalPages;
+                }
+                await readerStorageService.updateBook(book.id, updates);
+                updatedAny = true;
+              }
+            } catch (err) {
+              console.warn('Cover extraction failed for existing book:', book.title, err);
+            }
+          }
+
+          if (updatedAny) {
+            const reloaded = await readerStorageService.getAllBooks();
+            set({ books: reloaded });
+          }
+        })();
+      }
     } catch (err) {
       console.warn('Failed to load books from IndexedDB:', err);
       set({ isLoadingBooks: false });
@@ -142,16 +183,48 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
 
   importBookFile: async (file: File): Promise<StoredBook> => {
     const format = detectFormat(file.name);
-    const title = cleanTitleFromFilename(file.name);
+    const cleaned = cleanFilenameMeta(file.name);
     const id = `book-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+    let title = cleaned.title || file.name;
+    let author = cleaned.author || 'Unknown Author';
+    let coverUrl: string | undefined;
+    let totalPages: number | undefined;
+
+    // Immediately extract the cover page from the file
+    try {
+      const extracted = await extractBookCover({
+        fileBlob: file,
+        format,
+        title,
+        author,
+      });
+
+      if (extracted?.coverUrl) {
+        coverUrl = extracted.coverUrl;
+      }
+      if (extracted?.author && author === 'Unknown Author') {
+        author = extracted.author;
+      }
+      if (extracted?.title && (title.toLowerCase().includes('oceanofpdf') || title === file.name)) {
+        title = extracted.title;
+      }
+      if (extracted?.totalPages) {
+        totalPages = extracted.totalPages;
+      }
+    } catch (err) {
+      console.warn('Cover extraction failed during import:', err);
+    }
 
     const newBook: StoredBook = {
       id,
       title,
-      author: 'Unknown Author',
+      author,
       format,
       fileBlob: file,
       fileSize: file.size,
+      coverUrl,
+      totalPages,
       currentPage: 1,
       progressPercent: 0,
       lastReadTimestamp: Date.now(),

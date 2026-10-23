@@ -355,19 +355,27 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
 
                 {/* Cover & Title */}
                 <div className="flex gap-3.5 items-start mb-3">
-                  {book.coverUrl ? (
-                    <div className="w-14 h-20 rounded-lg overflow-hidden border border-vibe-border shadow-xs flex-shrink-0 bg-vibe-card-subtle">
-                      <img src={book.coverUrl} alt={book.title} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-20 rounded-lg border border-vibe-border bg-emerald-900/10 text-vibe-accent flex flex-col items-center justify-center p-1.5 text-center flex-shrink-0">
-                      <FileText className="w-5 h-5 mb-1" />
-                      <span className="text-[8px] font-mono font-bold uppercase tracking-tight">{book.format}</span>
-                    </div>
-                  )}
+                  <div className="w-16 h-22 sm:w-18 sm:h-26 rounded-xl overflow-hidden border border-vibe-border shadow-md flex-shrink-0 bg-vibe-card-subtle relative group-hover:scale-105 transition-transform duration-200">
+                    {book.coverUrl ? (
+                      <img 
+                        src={book.coverUrl} 
+                        alt={book.title} 
+                        className="w-full h-full object-cover" 
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-emerald-950/20 text-vibe-accent flex flex-col items-center justify-center p-2 text-center animate-pulse">
+                        <FileText className="w-6 h-6 mb-1 opacity-70" />
+                        <span className="text-[8px] font-mono font-bold uppercase tracking-tight">{book.format}</span>
+                        <span className="text-[7px] text-vibe-ink-muted mt-0.5">Generating...</span>
+                      </div>
+                    )}
+                    {/* Subtle book spine edge highlight */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none" />
+                  </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-medium text-vibe-ink line-clamp-2 leading-snug group-hover:text-vibe-accent transition-colors">
+                    <h3 className="text-sm font-semibold text-vibe-ink line-clamp-2 leading-snug group-hover:text-vibe-accent transition-colors">
                       {book.title}
                     </h3>
                     <p className="text-xs text-vibe-ink-muted mt-1 truncate">{book.author}</p>
