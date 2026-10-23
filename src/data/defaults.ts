@@ -95,7 +95,7 @@ export const DEMO_POSTS: Post[] = [
     tag: 'Philosophy',
     bookTitle: 'Meditations',
     bookAuthor: 'Marcus Aurelius',
-    coverImageUrl: 'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+    coverImageUrl: 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
     quoteText: 'You have power over your mind - not outside events. Realize this, and you will find strength.',
     pageNumber: 67,
     recommendationText: 'Timeless notes written for oneself in military tents that echo through the centuries.',

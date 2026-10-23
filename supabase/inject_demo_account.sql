@@ -239,7 +239,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Meditations',
         'Marcus Aurelius',
-        'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+        'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
         'currently_reading',
         42,
         4.8,

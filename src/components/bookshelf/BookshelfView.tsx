@@ -102,7 +102,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
       progress: 42,
       status: 'Currently Reading',
       statusCode: 'currently_reading' as const,
-      coverUrl: 'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+      coverUrl: 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
     },
   ];
 
@@ -113,7 +113,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
     progress: b.progressPercentage,
     status: b.status === 'currently_reading' ? 'Currently Reading' : b.status === 'finished' ? 'Finished' : 'Want to Read',
     statusCode: b.status,
-    coverUrl: b.coverImageUrl || '',
+    coverUrl: (b.title?.toLowerCase().includes('meditations') && (!b.coverImageUrl || b.coverImageUrl.includes('12818862') || b.coverImageUrl.includes('13202688'))) ? 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg' : (b.coverImageUrl || ''),
   })) : (isGuest ? demoBooks : []);
 
   // Shelf category counts
@@ -365,10 +365,10 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
                           <img 
                             src={b.coverUrl} 
                             alt={b.title} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
                             loading="lazy" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
                         </>
                       ) : (
                         <div className="w-full h-full p-4 flex flex-col justify-between relative" style={{ backgroundColor: coverColor }}>

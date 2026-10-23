@@ -38,6 +38,14 @@ export const readerStorageService = {
     await db.put('books', book);
   },
 
+  async updateBook(id: string, updates: Partial<StoredBook>): Promise<void> {
+    const db = await getDB();
+    const book = await db.get('books', id);
+    if (!book) return;
+    const merged = { ...book, ...updates };
+    await db.put('books', merged);
+  },
+
   async getBook(id: string): Promise<StoredBook | undefined> {
     const db = await getDB();
     return db.get('books', id);
@@ -139,7 +147,7 @@ export const readerStorageService = {
       format: 'txt',
       fileBlob: new Blob([SAMPLE_MEDITATIONS_TEXT], { type: 'text/plain' }),
       fileSize: SAMPLE_MEDITATIONS_TEXT.length,
-      coverUrl: 'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+      coverUrl: 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
       totalPages: 12,
       currentPage: 1,
       progressPercent: 0,

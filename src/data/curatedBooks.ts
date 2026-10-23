@@ -249,7 +249,7 @@ export const CURATED_BOOKS: CuratedBook[] = [
     author: 'Marcus Aurelius',
     category: 'Philosophy',
     categoryLabel: 'Stoic Philosophy',
-    coverImageUrl: 'https://covers.openlibrary.org/b/id/13202688-L.jpg',
+    coverImageUrl: 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
     firstPublishYear: 180,
     readTimeMinutes: 8,
     fullReadHours: 4,

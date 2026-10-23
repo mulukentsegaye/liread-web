@@ -70,7 +70,7 @@ export const bookshelfService = {
           userId: b.user_id,
           title: b.title,
           author: b.author,
-          coverImageUrl: b.cover_image_url || undefined,
+          coverImageUrl: (b.title?.toLowerCase().includes('meditations') && (!b.cover_image_url || b.cover_image_url.includes('12818862') || b.cover_image_url.includes('13202688'))) ? 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg' : (b.cover_image_url || undefined),
           status: b.status,
           progressPercentage: b.progress_percentage ?? 0,
           rating: b.rating || undefined,

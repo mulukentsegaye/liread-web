@@ -857,7 +857,7 @@ VALUES
         'a1111111-1111-1111-1111-111111111111',
         'Meditations',
         'Marcus Aurelius',
-        'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+        'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
         'currently_reading',
         42,
         4.8
@@ -976,7 +976,7 @@ VALUES
         'c3333333-3333-3333-3333-333333333333',
         'Meditations',
         'Marcus Aurelius',
-        'https://covers.openlibrary.org/b/id/12818862-L.jpg',
+        'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
         'You have power over your mind - not outside events. Realize this, and you will find strength.',
         'Timeless notes written for oneself in military tents that echo through the centuries.',
         67,
