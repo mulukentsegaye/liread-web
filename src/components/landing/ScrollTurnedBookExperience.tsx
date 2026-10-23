@@ -160,10 +160,6 @@ export const ScrollTurnedBookExperience: React.FC<ScrollTurnedBookExperienceProp
         {/* Top Floating Editorial HUD Header */}
         <div className="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left z-20">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20 mb-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Interactive 3D Chronicle</span>
-            </div>
             <h3 className="font-display text-lg sm:text-2xl font-normal text-vibe-ink tracking-tight">
               Turn the pages of your reading sanctuary.
             </h3>

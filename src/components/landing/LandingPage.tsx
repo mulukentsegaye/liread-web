@@ -247,9 +247,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           ============================================================================== */}
       <section id="features" className="w-full pt-16 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-3xl mx-auto text-center space-y-3">
-          <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent block">
-            Engineered For Immersion
-          </span>
           <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Everything You Need to Read More Deeply
           </h2>
@@ -268,10 +265,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             
             {/* Left: Text & Editorial Details */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Feature 01 · Ritual & Focus</span>
-              </div>
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Distraction-Free Immersion Timer
@@ -486,10 +479,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
             {/* Right: Text & Editorial Details */}
             <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-                <Volume2 className="w-3.5 h-3.5" />
-                <span>Feature 02 · Binaural Audio</span>
-              </div>
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Atmospheric Soundscape Engine
@@ -534,10 +523,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
             {/* Left: Text & Editorial Details */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-                <Bookmark className="w-3.5 h-3.5" />
-                <span>Feature 03 · Curation & Margins</span>
-              </div>
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Digital Bookshelf & Saved Quotes
@@ -680,10 +665,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
             {/* Right: Text & Editorial Details */}
             <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>Feature 04 · Mindful Metrics</span>
-              </div>
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Gentle Analytics & Habit Streaks
@@ -754,9 +735,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           ============================================================================== */}
       <section className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border relative overflow-hidden">
         <div className="max-w-3xl mx-auto rounded-3xl border border-vibe-border bg-vibe-card p-8 sm:p-14 text-center shadow-xl space-y-6">
-          <span className="text-[11px] font-mono uppercase tracking-widest font-bold text-vibe-accent block">
-            Begin Your Ritual
-          </span>
 
           <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Reclaim your attention. <br />

@@ -249,11 +249,6 @@ export const DailyRitualDeck: React.FC<DailyRitualDeckProps> = ({
               ============================================================================== */}
           <div className="lg:col-span-5 space-y-6 sm:space-y-8">
             
-            {/* Header Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20 shadow-xs">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>A Day in the Life</span>
-            </div>
 
             {/* Pinned Evocative Headline */}
             <div className="space-y-3">

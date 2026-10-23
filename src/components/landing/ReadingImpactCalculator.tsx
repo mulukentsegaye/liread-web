@@ -129,10 +129,6 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
         
         {/* Section Header */}
         <div className="text-center space-y-4 max-w-2xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono uppercase tracking-widest font-bold bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Interactive Compound Impact</span>
-          </div>
 
           <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Small daily pages. <br />
