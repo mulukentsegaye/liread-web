@@ -28,7 +28,8 @@ import {
   Sliders,
   Sun,
   Moon,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore, toast } from '../../stores/noticeStore';
@@ -242,6 +243,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [isOpen, isAuthenticated, defaultTab]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -317,38 +327,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
-      onClick={onClose}
-    >
+  // FULLSCREEN READER PROFILE & SETTINGS VIEW
+  if (tab === 'account') {
+    return (
       <div 
-        className={`w-full ${tab === 'account' ? 'max-w-xl sm:max-w-2xl' : 'max-w-md'} rounded-2xl sm:rounded-3xl p-5 sm:p-7 bg-vibe-card border border-vibe-border text-vibe-ink shadow-vibe-elevated flex flex-col justify-between max-h-[92vh] overflow-y-auto transition-all`}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 bg-vibe-canvas text-vibe-ink overflow-y-auto animate-in fade-in duration-200 flex flex-col"
+        role="dialog"
+        aria-modal="true"
       >
-        <div>
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-vibe-border pb-3.5 mb-4">
+        {/* Fullscreen Sticky Navigation Header */}
+        <header className="sticky top-0 z-40 bg-vibe-canvas/95 backdrop-blur-md border-b border-vibe-border px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={onClose}
+              type="button"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:border-vibe-border transition-colors group shadow-soft cursor-pointer"
+              aria-label="Back to feed"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back to Feed</span>
+            </button>
+            <div className="h-4 w-px bg-vibe-border hidden sm:block" />
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-vibe-accent/15 text-vibe-accent flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-vibe-accent/15 text-vibe-accent flex items-center justify-center flex-shrink-0">
+                <User className="w-3.5 h-3.5" />
               </div>
-              <div className="min-w-0">
-                <h2 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
-                  {tab === 'account' 
-                    ? (isGuest ? 'Guest Account' : 'Reader Profile & Settings')
-                    : (tab === 'signup' ? 'Create Reader Account' : 'Sign In to Liread')}
-                </h2>
-              </div>
+              <h1 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
+                {isGuest ? 'Guest Account' : 'Reader Profile & Settings'}
+              </h1>
             </div>
+          </div>
 
+          <div className="flex items-center gap-2.5">
             {/* Sub-tabs when on account */}
-            {tab === 'account' && isAuthenticated && !isGuest && (
-              <div className="flex items-center gap-1 p-1 rounded-full bg-vibe-card-subtle border border-vibe-border text-xs mr-2">
+            {isAuthenticated && !isGuest && (
+              <div className="flex items-center gap-1 p-1 rounded-full bg-vibe-card border border-vibe-border text-xs shadow-xs">
                 <button
                   type="button"
                   onClick={() => setAccountView('profile')}
-                  className={`px-3 py-1 rounded-full font-medium transition-all ${
+                  className={`px-3.5 py-1 rounded-full font-medium transition-all cursor-pointer ${
                     accountView === 'profile'
                       ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs'
                       : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -359,13 +376,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setAccountView('settings')}
-                  className={`px-3 py-1 rounded-full font-medium transition-all flex items-center gap-1 ${
+                  className={`px-3.5 py-1 rounded-full font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                     accountView === 'settings'
                       ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs'
                       : 'text-vibe-ink-muted hover:text-vibe-ink'
                   }`}
                 >
-                  <Settings className="w-3 h-3" />
+                  <Settings className="w-3.5 h-3.5" />
                   <span>Settings</span>
                 </button>
               </div>
@@ -373,17 +390,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <button
               onClick={onClose}
-              aria-label="Close modal"
-              className="min-w-[34px] min-h-[34px] flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors flex-shrink-0"
+              type="button"
+              aria-label="Close profile"
+              className="p-1.5 rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card border border-vibe-border transition-colors flex-shrink-0 cursor-pointer shadow-soft"
+              title="Close Profile (Esc)"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
+        </header>
 
+        {/* Fullscreen Body Content */}
+        <main className="flex-1 w-full max-w-4xl mx-auto py-6 sm:py-10 px-4 sm:px-6 space-y-6">
           {/* Status Message Banner */}
           {statusMessage && (
             <div 
-              className={`mb-4 p-3 rounded-xl text-xs flex flex-col gap-2 border ${
+              className={`p-3.5 rounded-2xl text-xs flex flex-col gap-2 border shadow-soft ${
                 statusMessage.type === 'success'
                   ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                   : statusMessage.type === 'error'
@@ -417,42 +439,42 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {/* VIEW 1: AUTHENTICATED MEMBER SOCIAL PROFILE & SETTINGS */}
-          {tab === 'account' && isAuthenticated && !isGuest && user && (
-            <div className="space-y-5">
+          {isAuthenticated && !isGuest && user && (
+            <div className="space-y-6">
               
               {/* SUB-VIEW A: SOCIAL READER PROFILE */}
               {accountView === 'profile' && (
-                <div className="space-y-4 animate-in fade-in duration-150">
+                <div className="space-y-6 animate-in fade-in duration-150">
                   
                   {/* Visual Profile Hero Banner Card */}
-                  <div className="rounded-2xl border border-vibe-border bg-vibe-card-subtle overflow-hidden">
+                  <div className="rounded-3xl border border-vibe-border bg-vibe-card shadow-soft overflow-hidden">
                     {/* Decorative Archival Header Pattern */}
-                    <div className="h-16 w-full bg-gradient-to-r from-emerald-800/15 via-vibe-accent/20 to-amber-500/15 relative p-3 flex items-center justify-between border-b border-vibe-border/60">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted">
+                    <div className="h-20 sm:h-24 w-full bg-gradient-to-r from-emerald-800/15 via-vibe-accent/20 to-amber-500/15 relative p-4 flex items-center justify-between border-b border-vibe-border/60">
+                      <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-ink-muted font-medium">
                         ✦ {user.rankTier} Member
                       </span>
-                      <span className="text-[10px] font-mono text-vibe-ink-muted">
+                      <span className="text-[11px] font-mono text-vibe-ink-muted">
                         {user.joinedDate || 'Member since 2026'}
                       </span>
                     </div>
 
-                    <div className="p-4 sm:p-5 -mt-8 space-y-4">
+                    <div className="p-5 sm:p-7 -mt-10 space-y-5">
                       {/* Avatar, Identity and Photo actions */}
                       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                        <div className="flex items-end gap-3.5">
+                        <div className="flex items-end gap-4">
                           <div className="relative group flex-shrink-0">
                             <img
                               src={getUserAvatar(user)}
                               alt={user.fullName}
-                              className="w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover ring-4 ring-vibe-card flex-shrink-0 bg-vibe-card shadow-md"
+                              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-4 ring-vibe-card flex-shrink-0 bg-vibe-card shadow-md"
                             />
                             <label
                               htmlFor="account-avatar-file-input"
                               className="absolute inset-0 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center cursor-pointer transition-opacity"
                               title="Upload profile photo"
                             >
-                              <Camera className="w-4 h-4" />
-                              <span className="text-[8px] font-semibold mt-0.5">Edit</span>
+                              <Camera className="w-5 h-5" />
+                              <span className="text-[9px] font-semibold mt-0.5">Edit</span>
                             </label>
                             <input
                               id="account-avatar-file-input"
@@ -465,30 +487,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
+                              <h3 className="font-heading text-lg sm:text-xl font-bold text-vibe-ink truncate">
                                 {user.fullName}
                               </h3>
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-vibe-accent/10 text-vibe-accent border border-vibe-accent/20 flex-shrink-0">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-vibe-accent/10 text-vibe-accent border border-vibe-accent/20 flex-shrink-0">
                                 {user.rankTier}
                               </span>
                             </div>
-                            <p className="text-xs text-vibe-ink-muted truncate">
+                            <p className="text-xs sm:text-sm text-vibe-ink-muted truncate mt-0.5">
                               @{user.username}
                             </p>
                             {user.location && (
-                              <p className="text-[11px] text-vibe-ink-secondary flex items-center gap-1 mt-0.5">
-                                <MapPin className="w-3 h-3 text-vibe-ink-muted" />
+                              <p className="text-xs text-vibe-ink-secondary flex items-center gap-1.5 mt-1">
+                                <MapPin className="w-3.5 h-3.5 text-vibe-ink-muted" />
                                 <span>{user.location}</span>
                               </p>
                             )}
                           </div>
                         </div>
 
-                        {/* Quick edit photo & edit profile buttons */}
+                        {/* Quick edit photo buttons */}
                         <div className="flex items-center gap-2 self-start sm:self-auto">
                           <label
                             htmlFor="account-avatar-file-input"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink transition-colors cursor-pointer shadow-xs"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink transition-colors cursor-pointer shadow-xs"
                           >
                             <Camera className="w-3.5 h-3.5 text-vibe-accent" />
                             <span>{isCustomAvatar(user.avatarUrl) ? 'Change Photo' : 'Upload Photo'}</span>
@@ -508,13 +530,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       </div>
 
                       {/* Bio Section */}
-                      <div className="pt-2 border-t border-vibe-border/60 space-y-1.5">
+                      <div className="pt-3 border-t border-vibe-border/60 space-y-2">
                         <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
                           <span>Reader Bio</span>
                           <button
                             type="button"
                             onClick={() => setIsInlineEditingBio(!isInlineEditingBio)}
-                            className="text-[11px] font-sans font-medium text-vibe-accent hover:underline flex items-center gap-1"
+                            className="text-xs font-sans font-medium text-vibe-accent hover:underline flex items-center gap-1"
                           >
                             <Edit3 className="w-3 h-3" />
                             <span>{isInlineEditingBio ? 'Cancel' : 'Edit Bio'}</span>
@@ -527,22 +549,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                               value={editBio}
                               onChange={(e) => setEditBio(e.target.value.slice(0, 240))}
                               rows={3}
-                              className="w-full text-xs p-2.5 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden resize-none leading-relaxed"
+                              className="w-full text-xs sm:text-sm p-3 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden resize-none leading-relaxed"
                               placeholder="Write a few lines about what you love to read, favorite authors, or your reading routine..."
                             />
-                            <div className="flex items-center justify-between text-[11px] text-vibe-ink-muted">
+                            <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
                               <span>{editBio.length} / 240 characters</span>
                               <button
                                 type="button"
                                 onClick={handleSaveProfileChanges}
-                                className="px-3 py-1 rounded-full bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs"
+                                className="px-4 py-1.5 rounded-full bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs"
                               >
                                 Save Bio
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-sans italic">
+                          <p className="text-sm text-vibe-ink-secondary leading-relaxed font-sans italic">
                             “{user.bio || user.subtitle || 'Cultivating daily reading rituals. Exploring philosophy, essays, and timeless classics.'}”
                           </p>
                         )}
@@ -551,75 +573,75 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
 
                   {/* Social Followers & Habit Progress Metrics Strip */}
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-center">
-                      <div className="flex items-center justify-center gap-1 text-vibe-accent mb-0.5">
-                        <Users className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-mono uppercase font-bold">Followers</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                      <div className="flex items-center justify-center gap-1.5 text-vibe-accent mb-2">
+                        <Users className="w-4 h-4" />
+                        <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Followers</span>
                       </div>
-                      <span className="font-mono text-base font-bold text-vibe-ink">
+                      <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
                         {user.followersCount ?? 128}
                       </span>
-                      <span className="block text-[10px] text-vibe-ink-muted">readers</span>
+                      <span className="block text-xs text-vibe-ink-muted mt-1">readers</span>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-center">
-                      <div className="flex items-center justify-center gap-1 text-amber-500 mb-0.5">
-                        <Flame className="w-3.5 h-3.5 fill-current" />
-                        <span className="text-[10px] font-mono uppercase font-bold">Streak</span>
+                    <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                      <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
+                        <Flame className="w-4 h-4 fill-current" />
+                        <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Streak</span>
                       </div>
-                      <span className="font-mono text-base font-bold text-vibe-ink">
+                      <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
                         {user.currentStreak}
                       </span>
-                      <span className="block text-[10px] text-vibe-ink-muted">days</span>
+                      <span className="block text-xs text-vibe-ink-muted mt-1">days</span>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-center">
-                      <div className="flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 mb-0.5">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-mono uppercase font-bold">Shelf</span>
+                    <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                      <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-2">
+                        <BookOpen className="w-4 h-4" />
+                        <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Shelf</span>
                       </div>
-                      <span className="font-mono text-base font-bold text-vibe-ink">
+                      <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
                         {user.bookshelfCount}
                       </span>
-                      <span className="block text-[10px] text-vibe-ink-muted">books</span>
+                      <span className="block text-xs text-vibe-ink-muted mt-1">books</span>
                     </div>
 
-                    <div className="p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-center">
-                      <div className="flex items-center justify-center gap-1 text-sky-500 mb-0.5">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span className="text-[10px] font-mono uppercase font-bold">Time</span>
+                    <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                      <div className="flex items-center justify-center gap-1.5 text-sky-500 mb-2">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Time</span>
                       </div>
-                      <span className="font-mono text-base font-bold text-vibe-ink">
+                      <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
                         {user.totalMinutesRead}
                       </span>
-                      <span className="block text-[10px] text-vibe-ink-muted">mins</span>
+                      <span className="block text-xs text-vibe-ink-muted mt-1">mins</span>
                     </div>
                   </div>
 
                   {/* Currently Reading Book Card */}
-                  <div className="p-3.5 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
+                  <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
                     <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
-                      <div className="flex items-center gap-1.5 text-vibe-accent">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span>Currently Reading</span>
+                      <div className="flex items-center gap-2 text-vibe-accent">
+                        <BookOpen className="w-4 h-4" />
+                        <span className="text-sm font-bold">Currently Reading</span>
                       </div>
-                      <span className="font-mono text-[11px] font-bold text-vibe-accent">
+                      <span className="font-mono text-xs font-bold text-vibe-accent">
                         {editBookProgress}% Complete
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs sm:text-sm">
                       <div className="min-w-0 pr-2">
-                        <h4 className="font-bold text-vibe-ink truncate">{editBookTitle}</h4>
-                        <p className="text-[11px] text-vibe-ink-muted truncate">{editBookAuthor}</p>
+                        <h4 className="font-bold text-base text-vibe-ink truncate">{editBookTitle}</h4>
+                        <p className="text-xs text-vibe-ink-muted truncate mt-0.5">{editBookAuthor}</p>
                       </div>
-                      <span className="text-[10px] font-mono text-vibe-ink-muted flex-shrink-0">
+                      <span className="text-xs font-mono text-vibe-ink-muted self-start sm:self-auto">
                         Goal: {user.dailyGoalMinutes}m / day
                       </span>
                     </div>
 
-                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-vibe-card-subtle border border-vibe-border overflow-hidden p-0.5">
                       <div 
                         className="h-full bg-vibe-accent rounded-full transition-all duration-500"
                         style={{ width: `${editBookProgress}%` }}
@@ -628,13 +650,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
 
                   {/* Favorite Genres & Reading Taste Chips */}
-                  <div className="space-y-2">
+                  <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
                     <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
-                      <span>Favorite Genres & Curations</span>
-                      <span className="text-[10px] font-mono text-vibe-ink-muted">Tap to toggle</span>
+                      <span className="text-sm font-bold">Favorite Genres & Curations</span>
+                      <span className="text-xs font-mono text-vibe-ink-muted">Tap to toggle</span>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2 pt-1">
                       {AVAILABLE_GENRES.map((genre) => {
                         const isSelected = selectedGenres.includes(genre);
                         return (
@@ -642,14 +664,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             key={genre}
                             type="button"
                             onClick={() => handleToggleGenre(genre)}
-                            className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
+                            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-vibe-accent text-white shadow-xs font-semibold'
                                 : 'bg-vibe-card-subtle text-vibe-ink-secondary border border-vibe-border hover:bg-vibe-card hover:text-vibe-ink'
                             }`}
                           >
                             <span>{genre}</span>
-                            {isSelected && <span className="ml-1 text-[9px]">✓</span>}
+                            {isSelected && <span className="ml-1 text-[10px]">✓</span>}
                           </button>
                         );
                       })}
@@ -661,14 +683,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               {/* SUB-VIEW B: SETTINGS, HABIT GOALS & PREFERENCES */}
               {accountView === 'settings' && (
-                <div className="space-y-4 animate-in fade-in duration-150">
+                <div className="space-y-6 animate-in fade-in duration-150">
                   
                   {/* Daily Reading Goal Preference */}
-                  <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
+                  <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-vibe-accent" />
-                        <h4 className="font-heading font-bold text-xs sm:text-sm text-vibe-ink">
+                        <h4 className="font-heading font-bold text-sm sm:text-base text-vibe-ink">
                           Daily Reading Target
                         </h4>
                       </div>
@@ -686,10 +708,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             setEditDailyGoal(mins);
                             updateUser({ dailyGoalMinutes: mins });
                           }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
                             editDailyGoal === mins
                               ? 'bg-vibe-accent text-white font-bold shadow-xs'
-                              : 'bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent'
+                              : 'bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:border-vibe-accent'
                           }`}
                         >
                           {mins}m
@@ -699,19 +721,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
 
                   {/* Profile Metadata Inputs */}
-                  <div className="space-y-3 p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border">
+                  <div className="space-y-4 p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft">
                     <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-vibe-ink">
                       Public Identity Information
                     </h4>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-[11px] font-mono text-vibe-ink-muted">Display Name</label>
                         <input
                           type="text"
                           value={editFullName}
                           onChange={(e) => setEditFullName(e.target.value)}
-                          className="w-full text-xs px-3 py-2 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
                           placeholder="Your Full Name"
                         />
                       </div>
@@ -722,7 +744,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           type="text"
                           value={editUsername}
                           onChange={(e) => setEditUsername(e.target.value)}
-                          className="w-full text-xs px-3 py-2 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
                           placeholder="@username"
                         />
                       </div>
@@ -734,19 +756,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         type="text"
                         value={editLocation}
                         onChange={(e) => setEditLocation(e.target.value)}
-                        className="w-full text-xs px-3 py-2 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
+                        className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
                         placeholder="e.g. Quiet Home Library, Kyoto"
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="text-[11px] font-mono text-vibe-ink-muted">Currently Reading Title</label>
                         <input
                           type="text"
                           value={editBookTitle}
                           onChange={(e) => setEditBookTitle(e.target.value)}
-                          className="w-full text-xs px-3 py-2 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
                           placeholder="Book Title"
                         />
                       </div>
@@ -757,7 +779,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           type="text"
                           value={editBookAuthor}
                           onChange={(e) => setEditBookAuthor(e.target.value)}
-                          className="w-full text-xs px-3 py-2 rounded-xl bg-vibe-card border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
+                          className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:ring-1 focus:ring-vibe-accent focus:outline-hidden"
                           placeholder="Author Name"
                         />
                       </div>
@@ -766,14 +788,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={handleSaveProfileChanges}
-                      className="w-full py-2.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs"
+                      className="w-full py-2.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer"
                     >
                       Save Profile Updates
                     </button>
                   </div>
 
                   {/* Social Privacy Toggles & Theme */}
-                  <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
+                  <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-4">
                     <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-vibe-ink">
                       Preferences & Privacy
                     </h4>
@@ -788,7 +810,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       <button
                         type="button"
                         onClick={toggleTheme}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-vibe-border bg-vibe-card text-xs font-medium text-vibe-ink hover:border-vibe-accent transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-vibe-border bg-vibe-card-subtle text-xs font-medium text-vibe-ink hover:border-vibe-accent transition-colors cursor-pointer"
                       >
                         {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-indigo-500" />}
                         <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
@@ -796,7 +818,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </div>
 
                     {/* Social Activity Toggle */}
-                    <div className="flex items-center justify-between pt-2 border-t border-vibe-border/60">
+                    <div className="flex items-center justify-between pt-3 border-t border-vibe-border/60">
                       <div className="space-y-0.5">
                         <p className="text-xs font-semibold text-vibe-ink">Share Reading in Community</p>
                         <p className="text-[11px] text-vibe-ink-muted">Display your completed goals in Consistent Readers Circle</p>
@@ -815,13 +837,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
 
                   {/* Danger Zone: Sign Out Button */}
-                  <div className="pt-1">
+                  <div className="pt-2">
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="w-full min-h-[40px] inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                     >
-                      <LogOut className="w-3.5 h-3.5" />
+                      <LogOut className="w-4 h-4" />
                       <span>Sign Out of Account</span>
                     </button>
                   </div>
@@ -833,21 +855,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {/* VIEW 2: GUEST ACCOUNT VIEW */}
-          {tab === 'account' && isGuest && (
-            <div className="space-y-4">
-              
+          {isGuest && (
+            <div className="space-y-5">
               {/* Guest Explorer Card */}
-              <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
-                <div className="flex items-center gap-3">
+              <div className="p-6 rounded-3xl bg-vibe-card border border-vibe-border shadow-soft space-y-4">
+                <div className="flex items-center gap-3.5">
                   <img
                     src={getUserAvatar(null)}
                     alt="Guest"
-                    className="w-12 h-12 rounded-full object-cover ring-1 ring-vibe-border flex-shrink-0"
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-vibe-border flex-shrink-0"
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-heading text-sm font-bold text-vibe-ink truncate">Guest Explorer</h3>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      <h3 className="font-heading text-base font-bold text-vibe-ink truncate">Guest Explorer</h3>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                         Guest Mode
                       </span>
                     </div>
@@ -855,32 +876,104 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                 </div>
 
-                <p className="text-xs text-vibe-ink-secondary leading-relaxed">
+                <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
                   Your reading timer history, custom ambience, and shelf items are stored locally in this browser. Create an account to permanently sync your reading progress and unlock community features.
                 </p>
               </div>
 
               {/* Actions */}
-              <div className="space-y-2 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setTab('signup')}
-                  className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
+                  className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
                 >
-                  <UserPlus className="w-3.5 h-3.5" />
+                  <UserPlus className="w-4 h-4" />
                   <span>Create Free Account</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setTab('signin')}
-                  className="w-full min-h-[40px] inline-flex items-center justify-center gap-2 rounded-xl border border-vibe-border text-vibe-ink hover:bg-vibe-card-subtle text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl border border-vibe-border text-vibe-ink hover:bg-vibe-card-subtle text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  <LogIn className="w-3.5 h-3.5" />
+                  <LogIn className="w-4 h-4" />
                   <span>Sign In with Existing Account</span>
                 </button>
               </div>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
 
+  // MODAL AUTH DIALOG (SIGN IN & SIGN UP)
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-7 bg-vibe-card border border-vibe-border text-vibe-ink shadow-vibe-elevated flex flex-col justify-between max-h-[92vh] overflow-y-auto transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-vibe-border pb-3.5 mb-4">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-vibe-accent/15 text-vibe-accent flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
+                  {tab === 'signup' ? 'Create Reader Account' : 'Sign In to Liread'}
+                </h2>
+              </div>
+            </div>
+
+            <button
+              onClick={onClose}
+              aria-label="Close modal"
+              className="min-w-[34px] min-h-[34px] flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors flex-shrink-0 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Status Message Banner */}
+          {statusMessage && (
+            <div 
+              className={`mb-4 p-3 rounded-xl text-xs flex flex-col gap-2 border ${
+                statusMessage.type === 'success'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
+                  : statusMessage.type === 'error'
+                  ? 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30'
+                  : 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30'
+              }`}
+            >
+              <div className="flex items-start gap-2">
+                {statusMessage.type === 'success' ? (
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                )}
+                <span className="leading-snug flex-1">{statusMessage.text}</span>
+              </div>
+
+              {statusMessage.text.toLowerCase().includes('not confirmed') && (
+                <div className="pt-2 border-t border-rose-500/20 ml-6">
+                  <button
+                    type="button"
+                    disabled={isResending || !email}
+                    onClick={handleResendInModal}
+                    className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover disabled:opacity-50 transition-colors shadow-xs cursor-pointer"
+                  >
+                    {isResending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+                    <span>Resend confirmation link</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
