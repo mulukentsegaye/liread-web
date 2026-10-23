@@ -182,7 +182,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
       )}
 
       {/* 1. Live Co-Reading Sanctuary Presence Widget */}
-      <div className="rounded-3xl border border-vibe-border bg-gradient-to-r from-emerald-500/5 via-vibe-card to-emerald-500/5 p-4 sm:p-5 shadow-soft">
+      <div className="rounded-3xl border border-vibe-border bg-vibe-card-subtle p-4 sm:p-5 shadow-soft">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-3 w-3">

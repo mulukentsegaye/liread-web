@@ -64,18 +64,16 @@ export const AlertModal: React.FC = () => {
         className="relative w-full max-w-md rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 celebration-toast-enter"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Ambient Top Glow Line */}
+        {/* Ambient Top Line */}
         <div
-          className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${
-            isGuest
-              ? 'from-emerald-500 via-amber-400 to-emerald-400'
-              : isError
-              ? 'from-rose-500 to-red-400'
+          className={`absolute top-0 left-0 right-0 h-1 ${
+            isError
+              ? 'bg-rose-500'
               : isWarning
-              ? 'from-amber-500 to-orange-400'
-              : isSuccess
-              ? 'from-emerald-500 to-teal-400'
-              : 'from-sky-500 to-indigo-400'
+              ? 'bg-amber-500'
+              : isSuccess || isGuest
+              ? 'bg-emerald-600'
+              : 'bg-vibe-accent'
           }`}
         />
 
@@ -93,15 +91,13 @@ export const AlertModal: React.FC = () => {
           {/* Icon Badge */}
           <div
             className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4.5 shadow-md ${
-              isGuest
-                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
-                : isError
-                ? 'bg-gradient-to-br from-rose-500 to-rose-600 text-white'
+              isError
+                ? 'bg-rose-500 text-white'
                 : isWarning
-                ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white'
-                : isSuccess
-                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
-                : 'bg-gradient-to-br from-sky-500 to-indigo-600 text-white'
+                ? 'bg-amber-500 text-white'
+                : isSuccess || isGuest
+                ? 'bg-emerald-600 text-white'
+                : 'bg-vibe-accent text-white'
             }`}
           >
             {isGuest ? (

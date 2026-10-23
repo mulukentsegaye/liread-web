@@ -46,13 +46,13 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, onDismiss }) => {
     ? 'border-rose-500/30 dark:border-rose-500/40'
     : 'border-sky-500/30 dark:border-sky-500/40';
 
-  const topGlowGradient = isSuccess
-    ? 'from-emerald-500 to-teal-400'
+  const topGlowColor = isSuccess
+    ? 'bg-emerald-600'
     : isWarning
-    ? 'from-amber-500 to-orange-400'
+    ? 'bg-amber-500'
     : isError
-    ? 'from-rose-500 to-red-400'
-    : 'from-sky-500 to-indigo-400';
+    ? 'bg-rose-500'
+    : 'bg-sky-500';
 
   const iconBg = isSuccess
     ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
@@ -68,8 +68,8 @@ const ToastCard: React.FC<ToastCardProps> = ({ toast, onDismiss }) => {
       aria-live="polite"
       className={`relative overflow-hidden rounded-2xl bg-vibe-card/95 backdrop-blur-md border ${accentColorClass} shadow-xl p-3.5 sm:p-4 pointer-events-auto transition-all duration-300 celebration-toast-enter`}
     >
-      {/* Ambient Top Glow Line */}
-      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${topGlowGradient}`} />
+      {/* Top Accent Line */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${topGlowColor}`} />
 
       <div className="flex items-start gap-3">
         {/* Status Icon */}

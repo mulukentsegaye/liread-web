@@ -48,8 +48,8 @@ export const InfoModal: React.FC = () => {
         className="relative w-full max-w-lg rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl overflow-hidden max-h-[85vh] flex flex-col transition-all duration-300 celebration-toast-enter"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Ambient Top Glow Line */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-400" />
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-vibe-accent" />
 
         {/* Modal Header */}
         <div className="flex items-start justify-between p-6 pb-4 border-b border-vibe-border/60">

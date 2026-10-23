@@ -14,13 +14,13 @@ export const CelebrationToast: React.FC = () => {
       className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] w-[92%] sm:w-auto sm:min-w-[390px] max-w-lg pointer-events-auto"
     >
       <div className="relative overflow-hidden rounded-2xl bg-vibe-card/95 backdrop-blur-md border border-emerald-500/30 dark:border-emerald-500/40 shadow-2xl p-4 sm:p-4.5 transition-all duration-300 celebration-toast-enter">
-        {/* Ambient Top Glow Line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-400" />
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-600" />
 
         <div className="flex items-start gap-3.5">
           {/* Trophy / Celebration Icon with Pulse Rings */}
           <div className="relative flex-shrink-0 mt-0.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
               <Trophy className="w-5 h-5 text-amber-200 fill-amber-200/40 animate-bounce-subtle" />
             </div>
             <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center shadow-xs">

@@ -112,11 +112,11 @@ const BookCardCover: React.FC<{
 
   const palette = React.useMemo(() => {
     const styles = [
-      { bg: 'from-amber-950 via-stone-900 to-amber-900', border: 'border-amber-600/30', foil: 'text-amber-300' },
-      { bg: 'from-emerald-950 via-slate-900 to-teal-950', border: 'border-emerald-600/30', foil: 'text-emerald-300' },
-      { bg: 'from-slate-950 via-zinc-900 to-indigo-950', border: 'border-indigo-500/30', foil: 'text-indigo-300' },
-      { bg: 'from-rose-950 via-neutral-900 to-stone-950', border: 'border-rose-500/30', foil: 'text-rose-300' },
-      { bg: 'from-blue-950 via-slate-900 to-cyan-950', border: 'border-sky-500/30', foil: 'text-sky-300' },
+      { bg: 'bg-stone-900', border: 'border-stone-700/50', foil: 'text-stone-300' },
+      { bg: 'bg-zinc-900', border: 'border-zinc-700/50', foil: 'text-zinc-300' },
+      { bg: 'bg-neutral-900', border: 'border-neutral-700/50', foil: 'text-neutral-300' },
+      { bg: 'bg-slate-900', border: 'border-slate-700/50', foil: 'text-slate-300' },
+      { bg: 'bg-stone-950', border: 'border-stone-800/60', foil: 'text-amber-200/80' },
     ];
     let hash = 0;
     for (let i = 0; i < title.length; i++) hash = (hash << 5) - hash + title.charCodeAt(i);
@@ -125,7 +125,7 @@ const BookCardCover: React.FC<{
 
   if (!src || hasError) {
     return (
-      <div className={`relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 p-3.5 flex flex-col justify-between bg-gradient-to-br ${palette.bg} border ${palette.border} shadow-md select-none`}>
+      <div className={`relative aspect-[2/3] w-full rounded-xl overflow-hidden mb-3 p-3.5 flex flex-col justify-between ${palette.bg} border ${palette.border} shadow-md select-none`}>
         <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-black/50 via-white/10 to-transparent pointer-events-none" />
         <div className="flex items-center justify-between text-[10px] font-mono tracking-widest uppercase text-white/50 pl-1">
           <span>Liread</span>
@@ -333,7 +333,7 @@ const HorizontalBookShelf: React.FC<{
         {/* Trailing "Explore All" card in horizontal shelf */}
         <div
           onClick={() => onSeeAll(category)}
-          className="w-36 sm:w-44 flex-shrink-0 snap-start bg-gradient-to-br from-vibe-card to-vibe-card-subtle border border-dashed border-vibe-border hover:border-vibe-accent rounded-2xl p-4 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer group transition-all"
+          className="w-36 sm:w-44 flex-shrink-0 snap-start bg-vibe-card-subtle border border-dashed border-vibe-border hover:border-vibe-accent rounded-2xl p-4 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer group transition-all"
         >
           <div className="w-10 h-10 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
             <ChevronRight className="w-5 h-5" />
@@ -1047,7 +1047,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               workKey: SPOTLIGHT_BOOK.workKey,
               description: SPOTLIGHT_BOOK.description || SPOTLIGHT_BOOK.tagline,
             })}
-            className="group relative rounded-3xl border border-vibe-border bg-gradient-to-br from-vibe-card to-vibe-card-subtle p-6 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
+            className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
           >
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
               <div className="md:col-span-4 flex justify-center md:justify-start">

@@ -53,8 +53,8 @@ export const GoalAdjustModal: React.FC = () => {
         className="relative w-full max-w-md rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl p-6 sm:p-7 overflow-hidden transition-all duration-300 celebration-toast-enter"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Ambient Top Glow Line */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500" />
+        {/* Top Accent Line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-600" />
 
         {/* Close Button */}
         <button
@@ -68,7 +68,7 @@ export const GoalAdjustModal: React.FC = () => {
 
         <div className="flex flex-col items-center text-center mt-2">
           {/* Target Icon */}
-          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center mb-3.5 shadow-md">
+          <div className="w-13 h-13 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-3.5 shadow-md">
             <Target className="w-6.5 h-6.5 text-amber-200 fill-amber-200/30" />
           </div>
 

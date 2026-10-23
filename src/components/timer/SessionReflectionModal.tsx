@@ -111,8 +111,8 @@ export const SessionReflectionModal: React.FC = () => {
         className="relative w-full max-w-lg rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl p-5 sm:p-7 overflow-hidden transition-all duration-300 celebration-toast-enter"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Ambient Top Glow Line */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400" />
+        {/* Accent Top Line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-vibe-accent" />
 
         {/* Close / Skip Button */}
         <button
