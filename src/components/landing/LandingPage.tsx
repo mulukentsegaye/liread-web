@@ -26,9 +26,6 @@ import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
 import { AmbientSoundId } from '../../types/theme';
 import { useAuthStore } from '../../stores/authStore';
 import { ReadingImpactCalculator } from './ReadingImpactCalculator';
-import { ScrollTurnedBookExperience } from './ScrollTurnedBookExperience';
-import { DailyRitualDeck } from './DailyRitualDeck';
-import { ReadingDeskAssembly } from './ReadingDeskAssembly';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -101,11 +98,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           {/* Center Navigation Links (Hidden on mobile) */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
-            <a href="#experience" className="hover:text-vibe-accent transition-colors">
-              3D Book
-            </a>
-            <a href="#ritual" className="hover:text-vibe-accent transition-colors">
-              Daily Ritual
+            <a href="#features" className="hover:text-vibe-accent transition-colors">
+              Features
             </a>
             <a href="#timer" className="hover:text-vibe-accent transition-colors">
               Timer
@@ -212,35 +206,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
           <button
             onClick={() => {
-              const el = document.getElementById('experience');
+              const el = document.getElementById('features');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
             className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
           >
-            <span>Turn the Pages</span>
+            <span>Explore Features</span>
             <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
           </button>
         </div>
 
       </section>
-
-      {/* ==============================================================================
-          THE SCROLL-TURNED 3D BOOK EXPERIENCE
-          ============================================================================== */}
-      <ScrollTurnedBookExperience
-        onEnterApp={onEnterApp}
-        onOpenTimer={onOpenTimer}
-        onGoToLogin={onGoToLogin}
-        onGuest={handleGuest}
-      />
-
-      {/* ==============================================================================
-          STICKY PINNED "A DAY IN THE LIFE" INTERACTIVE DECK
-          ============================================================================== */}
-      <DailyRitualDeck
-        onStartRitual={() => (onGoToLogin ? onGoToLogin() : handleGuest())}
-        onExploreGuest={handleGuest}
-      />
 
       {/* ==============================================================================
           3. CORE PRODUCT ARCHITECTURE: INTRO BANNER
@@ -554,9 +530,81 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               </ul>
             </div>
 
-            {/* Right: The Assembled Reader's Desk with Spring Physics Parallax */}
-            <div className="lg:col-span-6 w-full">
-              <ReadingDeskAssembly onOpenBook={onEnterApp} />
+            {/* Right: Visual Bookshelf + Quote Cards */}
+            <div className="lg:col-span-6 space-y-4">
+              
+              {/* Card 1: Bookshelf Queue Preview */}
+              <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
+                  <div className="flex items-center gap-2">
+                    <Library className="w-4 h-4 text-vibe-accent" />
+                    <span className="text-xs font-heading font-bold uppercase tracking-wider text-vibe-ink">Active Reading Shelf</span>
+                  </div>
+                  <span className="text-[11px] font-mono text-vibe-ink-muted">3 Books in Progress</span>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Book 1 */}
+                  <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-heading font-bold text-vibe-ink">The Creative Act</span>
+                        <span className="text-vibe-ink-muted"> · Rick Rubin</span>
+                      </div>
+                      <span className="font-mono text-[11px] font-bold text-vibe-accent">68%</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
+                      <div className="h-full bg-vibe-accent rounded-full w-[68%]" />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
+                      <span className="font-mono">Page 142 of 210</span>
+                      <span>Updated 2 hours ago</span>
+                    </div>
+                  </div>
+
+                  {/* Book 2 */}
+                  <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-heading font-bold text-vibe-ink">Meditations</span>
+                        <span className="text-vibe-ink-muted"> · Marcus Aurelius</span>
+                      </div>
+                      <span className="font-mono text-[11px] font-bold text-vibe-accent">42%</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
+                      <div className="h-full bg-vibe-accent rounded-full w-[42%]" />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
+                      <span className="font-mono">Book IV · Gregory Hays translation</span>
+                      <span>Yesterday</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Saved Literary Passage Preview */}
+              <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-3 relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-vibe-accent">
+                    <Quote className="w-4 h-4" />
+                    <span>Saved Passage</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-vibe-accent font-medium px-2 py-0.5 rounded-full bg-vibe-accent-subtle border border-vibe-accent/20">
+                    <Bookmark className="w-3 h-3 fill-current" />
+                    <span>In Your Stash</span>
+                  </div>
+                </div>
+
+                <blockquote className="font-display italic text-sm sm:text-base text-vibe-ink leading-relaxed font-normal">
+                  “The art of reading is in great part that of acquiring a better, deeper understanding of life through the words of others.”
+                </blockquote>
+
+                <div className="flex items-center justify-between text-[11px] text-vibe-ink-muted pt-1">
+                  <span>Virginia Woolf · To the Lighthouse</span>
+                  <span className="font-mono">Page 84</span>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -787,8 +835,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
-            <a href="#experience" className="hover:text-vibe-ink transition-colors">3D Book</a>
-            <a href="#ritual" className="hover:text-vibe-ink transition-colors">Ritual</a>
+            <a href="#features" className="hover:text-vibe-ink transition-colors">Features</a>
             <a href="#timer" className="hover:text-vibe-ink transition-colors">Timer</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Soundscapes</a>
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
