@@ -44,6 +44,18 @@ interface BookDetailsViewProps {
 }
 
 
+function getTelegramRequestSlug(title: string): string {
+  if (!title) return 'req_book';
+  const sanitized = title
+    .trim()
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  const prefix = 'req_';
+  const maxSlugLength = 50 - prefix.length;
+  const truncated = sanitized.slice(0, maxSlugLength).replace(/_+$/, '');
+  return `${prefix}${truncated || 'book'}`;
+}
+
 function renderFormattedInline(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
@@ -208,8 +220,10 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   const telegramBotUsername = (
     (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string) || 
     (typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) || 
-    'LireadBooksBot'
+    'lireadbooksbot'
   ).trim().replace(/^@/, '');
+
+  const telegramRequestUrl = `https://t.me/${telegramBotUsername}?start=${getTelegramRequestSlug(detailedBook.title)}`;
 
   const telegramBotUrl = (() => {
     if (detailedBook.telegramMessageId) {
@@ -218,7 +232,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     if (detailedBook.telegramFileUrl) {
       return detailedBook.telegramFileUrl;
     }
-    return `https://t.me/${telegramBotUsername}`;
+    return telegramRequestUrl;
   })();
 
   // Automatically check availability on mount / when title or author changes
@@ -638,13 +652,13 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 /* State 3B: Honest Telegram Request via Bot */
                 <div className="w-full rounded-2xl bg-vibe-card-subtle border border-vibe-border p-2.5 sm:p-3 space-y-1.5">
                   <a
-                    href={`https://t.me/${telegramBotUsername}`}
+                    href={telegramRequestUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
                     <Bell className="w-4 h-4 text-vibe-accent" />
-                    <span>Request This Book on Telegram Bot</span>
+                    <span>Request This Book on Telegram</span>
                   </a>
                   <p className="text-[11px] text-vibe-ink-muted text-center leading-relaxed">
                     Not in our instant cloud yet — request it via our Telegram bot (@{telegramBotUsername}) and we'll upload it for you!
