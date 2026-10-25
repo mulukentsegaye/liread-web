@@ -144,6 +144,7 @@ export interface BookDetailsData {
   pageCount?: number;
   ratingAverage?: number;
   telegramFileUrl?: string;
+  telegramMessageId?: number | string;
 }
 
 export interface BookSummaryData {

@@ -205,10 +205,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'EPUB'>('PDF');
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
-  const telegramChannelUrl = 
-    (import.meta.env.VITE_TELEGRAM_CHANNEL_URL as string) || 
-    (typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL) || 
-    'https://t.me/liread_books';
+  const telegramBotUsername = (
+    (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string) || 
+    (typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME) || 
+    'LireadBooksBot'
+  ).trim().replace(/^@/, '');
+
+  const telegramBotUrl = (() => {
+    if (detailedBook.telegramMessageId) {
+      return `https://t.me/${telegramBotUsername}?start=${detailedBook.telegramMessageId}`;
+    }
+    if (detailedBook.telegramFileUrl) {
+      return detailedBook.telegramFileUrl;
+    }
+    return `https://t.me/${telegramBotUsername}`;
+  })();
 
   // Automatically check availability on mount / when title or author changes
   useEffect(() => {
@@ -607,36 +618,36 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                     <span>Direct free copy ready in cloud. No broken links or waitlists.</span>
                   </div>
                 </div>
-              ) : detailedBook.telegramFileUrl ? (
-                /* State 3A: Manual Telegram File Available */
+              ) : (detailedBook.telegramFileUrl || detailedBook.telegramMessageId) ? (
+                /* State 3A: Manual Telegram File / Message ID Available via Bot */
                 <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2.5 sm:p-3 space-y-1.5">
                   <a
-                    href={detailedBook.telegramFileUrl}
+                    href={telegramBotUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-[#229ED9] hover:bg-[#1f8ec4] text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Download via Telegram Channel</span>
+                    <span>Get on Telegram (@{telegramBotUsername})</span>
                   </a>
                   <p className="text-[11px] text-vibe-ink-muted text-center">
-                    Verified book file hosted on our official community Telegram repository.
+                    Instant delivery via our official @{telegramBotUsername} bot.
                   </p>
                 </div>
               ) : (
-                /* State 3B: Honest Telegram Request Button */
+                /* State 3B: Honest Telegram Request via Bot */
                 <div className="w-full rounded-2xl bg-vibe-card-subtle border border-vibe-border p-2.5 sm:p-3 space-y-1.5">
                   <a
-                    href={telegramChannelUrl}
+                    href={`https://t.me/${telegramBotUsername}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
                     <Bell className="w-4 h-4 text-vibe-accent" />
-                    <span>Request This Book on Telegram</span>
+                    <span>Request This Book on Telegram Bot</span>
                   </a>
                   <p className="text-[11px] text-vibe-ink-muted text-center leading-relaxed">
-                    Not in our instant cloud yet — request it on our Telegram channel and we'll upload it for you!
+                    Not in our instant cloud yet — request it via our Telegram bot (@{telegramBotUsername}) and we'll upload it for you!
                   </p>
                 </div>
               )}
