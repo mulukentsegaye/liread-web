@@ -302,26 +302,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     }, 3000);
   };
 
-  // Reading typography vibe: 'serif' (Newsreader) or 'sans' (Inter)
-  const [readingFont, setReadingFont] = useState<'serif' | 'sans'>(() => {
-    try {
-      return (localStorage.getItem('liread_reading_font') as 'serif' | 'sans') || 'serif';
-    } catch {
-      return 'serif';
-    }
-  });
-
-  const handleFontChange = (font: 'serif' | 'sans') => {
-    setReadingFont(font);
-    try {
-      localStorage.setItem('liread_reading_font', font);
-    } catch {}
-  };
-
-  const bodyFontClass =
-    readingFont === 'serif'
-      ? 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90'
-      : 'font-sans text-sm sm:text-base leading-relaxed text-vibe-ink-secondary';
+  // Editorial typography styling for synopsis and summary
+  const bodyFontClass = 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90';
 
   const summarySectionRef = useRef<HTMLDivElement>(null);
 
@@ -886,41 +868,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               {/* Full Text Synopsis & Chapter Summary */}
               {summary.fullSummaryMarkdown && (
                 <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
-                    <div>
-                      <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-vibe-accent" />
-                        <span>Chapter Summary & Synopsis</span>
-                      </h3>
-                    </div>
-
-                    {/* Editorial Reading Font Switcher */}
-                    <div className="flex items-center gap-1 bg-vibe-card-subtle p-1 rounded-xl border border-vibe-border self-start sm:self-auto">
-                      <button
-                        type="button"
-                        onClick={() => handleFontChange('serif')}
-                        className={`px-3 py-1 rounded-lg text-xs font-serif transition-colors ${
-                          readingFont === 'serif'
-                            ? 'bg-vibe-card text-vibe-ink font-semibold shadow-xs border border-vibe-border'
-                            : 'text-vibe-ink-muted hover:text-vibe-ink'
-                        }`}
-                        title="Editorial Literary Serif (Newsreader)"
-                      >
-                        Aa Serif
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFontChange('sans')}
-                        className={`px-3 py-1 rounded-lg text-xs font-sans transition-colors ${
-                          readingFont === 'sans'
-                            ? 'bg-vibe-card text-vibe-ink font-semibold shadow-xs border border-vibe-border'
-                            : 'text-vibe-ink-muted hover:text-vibe-ink'
-                        }`}
-                        title="Clean Modern Sans (Inter)"
-                      >
-                        Aa Sans
-                      </button>
-                    </div>
+                  <div className="pb-4 border-b border-vibe-border">
+                    <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-vibe-accent" />
+                      <span>Chapter Summary & Synopsis</span>
+                    </h3>
                   </div>
 
                   <div>
@@ -997,40 +949,10 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           ========================================================================= */}
       {activeTab === 'synopsis' && (
         <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
-            <div>
-              <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
-                About {detailedBook.title}
-              </h3>
-            </div>
-
-            {/* Editorial Reading Font Switcher */}
-            <div className="flex items-center gap-1 bg-vibe-card-subtle p-1 rounded-xl border border-vibe-border self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => handleFontChange('serif')}
-                className={`px-3 py-1 rounded-lg text-xs font-serif transition-colors ${
-                  readingFont === 'serif'
-                    ? 'bg-vibe-card text-vibe-ink font-semibold shadow-xs border border-vibe-border'
-                    : 'text-vibe-ink-muted hover:text-vibe-ink'
-                }`}
-                title="Editorial Literary Serif (Newsreader)"
-              >
-                Aa Serif
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFontChange('sans')}
-                className={`px-3 py-1 rounded-lg text-xs font-sans transition-colors ${
-                  readingFont === 'sans'
-                    ? 'bg-vibe-card text-vibe-ink font-semibold shadow-xs border border-vibe-border'
-                    : 'text-vibe-ink-muted hover:text-vibe-ink'
-                }`}
-                title="Clean Modern Sans (Inter)"
-              >
-                Aa Sans
-              </button>
-            </div>
+          <div className="pb-4 border-b border-vibe-border">
+            <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
+              About {detailedBook.title}
+            </h3>
           </div>
 
           {isLoadingDetails ? (
