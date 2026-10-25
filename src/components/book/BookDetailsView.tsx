@@ -14,8 +14,10 @@ import {
   Plus, 
   ChevronDown,
   Trash2,
+  Download,
   Send,
-  ExternalLink
+  Bell,
+  FileText
 } from 'lucide-react';
 import { BookDetailsData, BookSummaryData } from '../../types';
 import { aiSummaryService } from '../../services/aiSummaryService';
@@ -26,6 +28,13 @@ import { useNoticeStore, toast } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { PostCard } from '../feed/PostCard';
 
+interface BookAvailability {
+  available: boolean;
+  primaryFormat?: 'PDF' | 'EPUB';
+  hasPdf?: boolean;
+  hasEpub?: boolean;
+}
+
 interface BookDetailsViewProps {
   book: BookDetailsData;
   onBack: () => void;
@@ -33,12 +42,6 @@ interface BookDetailsViewProps {
   onShareBook: (book: { title: string; author: string; coverImageUrl?: string }) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
-
-const TELEGRAM_BOT_USERNAME = (
-  import.meta.env.VITE_TELEGRAM_BOT_USERNAME ||
-  (import.meta as any).env?.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ||
-  'LiReadBot'
-).trim().replace(/^@/, '');
 
 
 function renderFormattedInline(text: string): React.ReactNode {
@@ -152,20 +155,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   onViewBookDetails,
 }) => {
   const { user, isGuest, openAuthModal, refreshProfile } = useAuthStore();
-
   const [isUpdatingShelf, setIsUpdatingShelf] = useState(false);
   const { showAlertModal } = useNoticeStore();
   const { posts } = useFeedStore();
 
   const [detailedBook, setDetailedBook] = useState<BookDetailsData>(book);
-
-  const telegramLink = (() => {
-    if (!TELEGRAM_BOT_USERNAME) return null;
-    if (detailedBook.telegramMessageId) {
-      return `https://t.me/${TELEGRAM_BOT_USERNAME}?start=${detailedBook.telegramMessageId}`;
-    }
-    return `https://t.me/${TELEGRAM_BOT_USERNAME}`;
-  })();
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
   // Check bookshelf status on mount or when book / user changes
@@ -205,6 +199,109 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [coverError, setCoverError] = useState(false);
 
+  // Zero Broken Promises: Instant Book Availability & Download State
+  const [availability, setAvailability] = useState<BookAvailability | null>(null);
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState<boolean>(true);
+  const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'EPUB'>('PDF');
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
+
+  const telegramChannelUrl = 
+    (import.meta.env.VITE_TELEGRAM_CHANNEL_URL as string) || 
+    (typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL) || 
+    'https://t.me/liread_books';
+
+  // Automatically check availability on mount / when title or author changes
+  useEffect(() => {
+    let isMounted = true;
+    const title = detailedBook.title?.trim();
+    const author = detailedBook.author?.trim();
+
+    if (!title) {
+      setIsCheckingAvailability(false);
+      setAvailability({ available: false });
+      return;
+    }
+
+    setIsCheckingAvailability(true);
+    setAvailability(null);
+
+    const abortController = new AbortController();
+
+    async function checkAvailability() {
+      try {
+        const queryParams = new URLSearchParams({
+          mode: 'check',
+          title,
+          author: author || '',
+        });
+
+        const res = await fetch(`/api/book-file?${queryParams.toString()}`, {
+          signal: abortController.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error(`Availability check returned HTTP ${res.status}`);
+        }
+
+        const data: BookAvailability = await res.json();
+        if (isMounted) {
+          setAvailability(data);
+          if (data.available && data.primaryFormat) {
+            setSelectedFormat(data.primaryFormat);
+          }
+        }
+      } catch (err: any) {
+        if (err.name !== 'AbortError' && isMounted) {
+          setAvailability({ available: false });
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingAvailability(false);
+        }
+      }
+    }
+
+    checkAvailability();
+
+    return () => {
+      isMounted = false;
+      abortController.abort();
+    };
+  }, [detailedBook.title, detailedBook.author]);
+
+  const handleDownload = (formatChoice: 'PDF' | 'EPUB') => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+
+    const title = detailedBook.title.trim();
+    const author = (detailedBook.author || '').trim();
+    const formatParam = formatChoice.toLowerCase();
+
+    const queryParams = new URLSearchParams({
+      mode: 'download',
+      title,
+      author,
+      format: formatParam,
+    });
+
+    const downloadUrl = `/api/book-file?${queryParams.toString()}`;
+
+    // Trigger download via hidden <a> tag so user stays on page
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', '');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success(`Preparing ${formatChoice} instant download for "${title}".`, 'Download Started');
+
+    setTimeout(() => {
+      setIsDownloading(false);
+    }, 3000);
+  };
+
   // Reading typography vibe: 'serif' (Newsreader) or 'sans' (Inter)
   const [readingFont, setReadingFont] = useState<'serif' | 'sans'>(() => {
     try {
@@ -234,9 +331,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     setDetailedBook({
       ...book,
       coverImageUrl: sanitizeOpenLibraryCover(book.title, book.author, book.coverImageUrl),
-      telegramMessageId: book.telegramMessageId,
     });
-  }, [book.title, book.author, book.coverImageUrl, book.description, book.telegramMessageId]);
+  }, [book.title, book.author, book.coverImageUrl, book.description]);
 
   // Fetch deeper book details from Open Library if description is missing
   useEffect(() => {
@@ -258,7 +354,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               subjects: fullData.subjects || (book.subjects && book.subjects.length > 0 ? book.subjects : ['Literature', 'Philosophy', 'Focus']),
               firstPublishYear: fullData.firstPublishYear || book.firstPublishYear,
               coverImageUrl: sanitizeOpenLibraryCover(book.title, book.author, book.coverImageUrl || fullData.coverImageUrl),
-              telegramMessageId: fullData.telegramMessageId || book.telegramMessageId,
             });
           }
         } catch (err) {
@@ -465,6 +560,106 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               </div>
             </div>
 
+            {/* Zero Broken Promises Smart Availability & Action Section */}
+            <div className="pt-0.5">
+              {isCheckingAvailability ? (
+                /* State 1: Subtle disabled button skeleton while checking */
+                <div className="w-full h-11 px-4 rounded-2xl bg-vibe-card-subtle/80 border border-vibe-border/70 flex items-center justify-center gap-2 text-xs sm:text-sm font-medium text-vibe-ink-muted select-none">
+                  <Loader2 className="w-4 h-4 animate-spin text-vibe-accent" />
+                  <span>Checking library availability...</span>
+                </div>
+              ) : availability?.available ? (
+                /* State 2: Instant Download Available */
+                <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2.5 sm:p-3 space-y-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(selectedFormat)}
+                      disabled={isDownloading}
+                      className="flex-1 h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-80"
+                    >
+                      {isDownloading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Downloading {selectedFormat}...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" />
+                          <span>Instant Download ({selectedFormat})</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Format Selector if BOTH PDF and EPUB are available */}
+                    {availability.hasPdf && availability.hasEpub && (
+                      <div className="flex items-center gap-1 p-1 rounded-xl bg-vibe-card border border-vibe-border self-center sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFormat('PDF')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                            selectedFormat === 'PDF'
+                              ? 'bg-vibe-accent text-white font-bold shadow-xs'
+                              : 'text-vibe-ink-muted hover:text-vibe-ink'
+                          }`}
+                        >
+                          PDF
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFormat('EPUB')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
+                            selectedFormat === 'EPUB'
+                              ? 'bg-vibe-accent text-white font-bold shadow-xs'
+                              : 'text-vibe-ink-muted hover:text-vibe-ink'
+                          }`}
+                        >
+                          EPUB
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[11px] text-vibe-ink-muted px-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                    <span>Direct free copy ready in cloud. No broken links or waitlists.</span>
+                  </div>
+                </div>
+              ) : detailedBook.telegramFileUrl ? (
+                /* State 3A: Manual Telegram File Available */
+                <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2.5 sm:p-3 space-y-1.5">
+                  <a
+                    href={detailedBook.telegramFileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Download via Telegram Channel</span>
+                  </a>
+                  <p className="text-[11px] text-vibe-ink-muted text-center">
+                    Verified book file hosted on our official community Telegram repository.
+                  </p>
+                </div>
+              ) : (
+                /* State 3B: Honest Telegram Request Button */
+                <div className="w-full rounded-2xl bg-vibe-card-subtle border border-vibe-border p-2.5 sm:p-3 space-y-1.5">
+                  <a
+                    href={telegramChannelUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent hover:bg-vibe-card transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    <Bell className="w-4 h-4 text-vibe-accent" />
+                    <span>Request This Book on Telegram</span>
+                  </a>
+                  <p className="text-[11px] text-vibe-ink-muted text-center leading-relaxed">
+                    Not in our instant cloud yet — request it on our Telegram channel and we'll upload it for you!
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Standard Unified Action Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
               
@@ -571,45 +766,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 <span className="truncate">Share</span>
               </button>
 
-            </div>
-
-            {/* Telegram Instant PDF Delivery Action */}
-            <div className="pt-2">
-              {telegramLink ? (
-                <a
-                  href={telegramLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full min-h-[46px] px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-[#229ED9] hover:bg-[#1f8ec4] active:bg-[#1b7db0] text-white shadow-sm hover:shadow-md transition-all active:scale-[0.99] flex items-center justify-between gap-3 group border border-sky-400/30"
-                  title={detailedBook.telegramMessageId ? `Get "${detailedBook.title}" PDF instantly via Telegram` : "Open LiRead Telegram Bot"}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                      <Send className="w-3.5 h-3.5 fill-white text-white rotate-[-15deg]" />
-                    </div>
-                    <span className="font-medium tracking-tight truncate">📥 Get PDF on Telegram</span>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-full transition-colors flex-shrink-0">
-                    <span>{detailedBook.telegramMessageId ? 'Instant PDF' : 'Via Bot'}</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </span>
-                </a>
-              ) : (
-                <div
-                  className="w-full min-h-[46px] px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-medium bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted flex items-center justify-between gap-3 opacity-70"
-                  title="Telegram bot is not yet configured"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-vibe-card flex items-center justify-center flex-shrink-0">
-                      <Send className="w-3.5 h-3.5 text-vibe-ink-muted" />
-                    </div>
-                    <span className="truncate">📥 Get PDF on Telegram</span>
-                  </div>
-                  <span className="text-[10px] font-mono uppercase tracking-wider bg-vibe-card px-2 py-0.5 rounded-full border border-vibe-border">
-                    Available Soon
-                  </span>
-                </div>
-              )}
             </div>
 
           </div>
@@ -827,18 +983,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                     <Clock className="w-4 h-4" />
                     <span>Launch Reading Timer with {detailedBook.title}</span>
                   </button>
-
-                  {telegramLink && (
-                    <a
-                      href={telegramLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-[#229ED9] hover:bg-[#1f8ec4] text-white shadow-md transition-all active:scale-95"
-                    >
-                      <Send className="w-4 h-4 fill-white" />
-                      <span>📥 Get PDF on Telegram</span>
-                    </a>
-                  )}
                 </div>
               </div>
 
