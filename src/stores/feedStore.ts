@@ -123,6 +123,21 @@ export const useFeedStore = create<FeedStore>()(
           toast.warning('Unable to publish at this time. Please check your connection and try again.', 'Posting Unavailable');
           return;
         }
+
+        const cleanTitle = (postData.bookTitle || '').trim();
+        const hasQuote = Boolean(postData.quoteText && postData.quoteText.trim().length > 0);
+        const hasRec = Boolean(postData.recommendationText && postData.recommendationText.trim().length > 0);
+        const hasRating = Boolean(postData.rating);
+
+        if (!cleanTitle) {
+          toast.warning('Please enter a book title before publishing.', 'Title Required');
+          return;
+        }
+
+        if (!hasQuote && !hasRec && !hasRating) {
+          toast.warning('Your post cannot be empty. Please write a quote or reflection before publishing.', 'Empty Post');
+          return;
+        }
         const tempId = `post-${Date.now()}`;
         const newPost: Post = {
           id: tempId,
@@ -195,7 +210,15 @@ export const useFeedStore = create<FeedStore>()(
         if (!state) return;
         // Automatically sync demo posts to authentic Open Library book covers and fresh realistic avatars
         const currentPosts = state.posts || [];
-        state.posts = currentPosts.map((p) => {
+        // Filter out any ghost/empty posts that have no quote, reflection, or rating
+        state.posts = currentPosts
+          .filter((p) => {
+            const hasQuote = Boolean(p.quoteText && p.quoteText.trim().length > 0);
+            const hasRec = Boolean(p.recommendationText && p.recommendationText.trim().length > 0);
+            const hasRating = Boolean(p.rating);
+            return hasQuote || hasRec || hasRating;
+          })
+          .map((p) => {
           if (p.id.startsWith('demo-post-')) {
             const freshDemo = DEMO_POSTS.find((d) => d.id === p.id);
             if (freshDemo) {

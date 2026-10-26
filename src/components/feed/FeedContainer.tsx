@@ -168,17 +168,14 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         )}
 
         {sortedPosts.map((post, index) => (
-          <div
+          <PostCard
             key={post.id}
+            post={post}
             className="feed-card-stagger"
             style={{ animationDelay: `${Math.min(index * 65, 390)}ms` }}
-          >
-            <PostCard
-              post={post}
-              onSelectBookForTimer={onSelectBookForTimer}
-              onViewBookDetails={onViewBookDetails}
-            />
-          </div>
+            onSelectBookForTimer={onSelectBookForTimer}
+            onViewBookDetails={onViewBookDetails}
+          />
         ))}
       </div>
 

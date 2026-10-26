@@ -171,9 +171,30 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bookTitle.trim()) {
+    const cleanTitle = bookTitle.trim();
+    const cleanQuote = quoteText.trim();
+    const cleanRecommendation = recommendationText.trim();
+
+    if (!cleanTitle) {
       toast.warning('Please enter a book title to publish your post.', 'Title Required');
       return;
+    }
+
+    if (postType === 'passage') {
+      if (!cleanQuote) {
+        toast.warning('The passage is empty. Please write or paste a quote to share.', 'Quote Required');
+        return;
+      }
+    } else if (postType === 'recommendation') {
+      if (!cleanRecommendation && !cleanQuote) {
+        toast.warning('Please write your thoughts or recommendation before publishing.', 'Thoughts Required');
+        return;
+      }
+    } else if (postType === 'finished_book') {
+      if (!rating && !cleanRecommendation && !cleanQuote) {
+        toast.warning('Please select a star rating or write a thought on your finished book.', 'Rating or Reflection Required');
+        return;
+      }
     }
 
     addPost(
@@ -488,9 +509,14 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
             {/* Quote Section */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
-                Favorite Passage or Quote
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">
+                  Favorite Passage or Quote {postType === 'passage' && <span className="text-rose-500">*</span>}
+                </label>
+                {postType === 'passage' && (
+                  <span className="text-[10px] text-vibe-accent font-medium">Required for passages</span>
+                )}
+              </div>
               <textarea
                 rows={3}
                 value={quoteText}

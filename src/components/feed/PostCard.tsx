@@ -19,6 +19,8 @@ import { useNoticeStore, toast } from '../../stores/noticeStore';
 import { AnimatedCounter } from '../ui/AnimatedCounter';
 
 interface PostCardProps {
+  className?: string;
+  style?: React.CSSProperties;
   post: Post;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
@@ -49,7 +51,13 @@ function bookCoverAccent(title: string): string {
   return accents[Math.abs(hash)];
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, onViewBookDetails }) => {
+export const PostCard: React.FC<PostCardProps> = ({
+  post,
+  className = '',
+  style,
+  onSelectBookForTimer,
+  onViewBookDetails,
+}) => {
   const { toggleUpvote, toggleSave, deletePost } = useFeedStore();
   const { user } = useAuthStore();
   const [isBouncing, setIsBouncing] = useState(false);
@@ -176,7 +184,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
   };
 
   return (
-    <article className="bg-vibe-card border border-vibe-border rounded-2xl relative shadow-soft hover:shadow-float transition-shadow duration-200 group">
+    <article
+      style={style}
+      className={`bg-vibe-card border border-vibe-border rounded-2xl relative shadow-soft hover:shadow-float transition-shadow duration-200 group ${isMenuOpen ? 'z-40' : 'z-0'} ${className}`}
+    >
 
       {/* Author header */}
       <div className="flex items-center justify-between px-3.5 sm:px-5 pt-3.5 sm:pt-4 pb-0">
@@ -201,7 +212,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
         </div>
 
         {/* Three dots overflow menu with Copy and contextual passage actions */}
-        <div className="relative flex-shrink-0 ml-2">
+        <div className={`relative flex-shrink-0 ml-2 ${isMenuOpen ? 'z-50' : ''}`}>
+
           <button
             ref={buttonRef}
             type="button"
@@ -229,7 +241,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
               role="menu"
               aria-label="Passage options menu"
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-full mt-1.5 w-56 rounded-2xl bg-vibe-card border border-vibe-border shadow-elevated p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150 select-none text-left"
+              className="absolute right-0 top-full mt-1.5 w-56 rounded-2xl bg-vibe-card border border-vibe-border shadow-elevated p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 select-none text-left"
             >
               <div className="px-3 py-1 text-[10px] font-mono uppercase tracking-wider text-vibe-ink-muted">
                 Passage Options
@@ -370,15 +382,25 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onSelectBookForTimer, 
 
           {/* Quote block */}
           <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-            <div>
-              {/* Opening mark */}
-              <span className="font-display text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
-                "
-              </span>
-              <blockquote className="font-display italic font-normal text-base sm:text-[18px] text-vibe-ink leading-relaxed break-words">
-                {post.quoteText}
-              </blockquote>
-            </div>
+            {post.quoteText && post.quoteText.trim().length > 0 ? (
+              <div>
+                {/* Opening mark */}
+                <span className="font-display text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
+                  "
+                </span>
+                <blockquote className="font-display italic font-normal text-base sm:text-[18px] text-vibe-ink leading-relaxed break-words">
+                  {post.quoteText}
+                </blockquote>
+              </div>
+            ) : post.recommendationText && post.recommendationText.trim().length > 0 ? (
+              <p className="text-xs sm:text-sm text-vibe-ink leading-relaxed font-normal">
+                {post.recommendationText}
+              </p>
+            ) : (
+              <p className="text-xs italic text-vibe-ink-muted">
+                Shared a reading moment from {post.bookTitle}
+              </p>
+            )}
 
             <div className="flex items-center justify-between mt-3 pt-2 border-t border-vibe-border-subtle">
               <div className="flex items-center gap-1.5">

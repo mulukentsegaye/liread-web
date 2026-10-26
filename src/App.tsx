@@ -332,7 +332,13 @@ export const App: React.FC = () => {
     });
   };
 
-  const handleOpenCreateModal = (initialBook?: { title: string; author: string; coverImageUrl?: string }) => {
+  const handleOpenCreateModal = (initialBook?: {
+    title: string;
+    author: string;
+    coverImageUrl?: string;
+    quoteText?: string;
+    pageNumber?: number | string;
+  }) => {
     setPreSelectedBook(initialBook || null);
     setCreateModalOpen(true);
   };

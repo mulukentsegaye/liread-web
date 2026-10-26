@@ -43,7 +43,7 @@ interface BookDetailsViewProps {
   book: BookDetailsData;
   onBack: () => void;
   onStartTimer: (title: string, author: string, cover?: string) => void;
-  onShareBook: (book: { title: string; author: string; coverImageUrl?: string }) => void;
+  onShareBook: (book: { title: string; author: string; coverImageUrl?: string; quoteText?: string; pageNumber?: number | string }) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
@@ -934,6 +934,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                             title: detailedBook.title,
                             author: detailedBook.author,
                             coverImageUrl: detailedBook.coverImageUrl,
+                            quoteText: quote,
                           })}
                           className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-colors flex-shrink-0 opacity-80 group-hover:opacity-100"
                           title="Share this quote to community"
