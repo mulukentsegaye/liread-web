@@ -164,5 +164,5 @@ The output will be created in the `dist/` directory, ready to deploy to modern h
 
 ---
 
-      Name           ID          Classroom Number
-      Muluken Tsegaye            CTC-1002-26          005
+      Name                ID          Classroom Number
+Muluken Tsegaye       CTC-1002-26          005
