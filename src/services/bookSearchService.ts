@@ -1,4 +1,5 @@
 import { BookDetailsData } from '../types';
+import { getBookOfTheWeek } from '../data/bookOfTheWeek';
 
 export interface SuggestedBook {
   id: string;
@@ -334,82 +335,21 @@ export const bookSearchService = {
   },
 
   /**
-   * Dynamically fetch the featured spotlight book directly from Open Library Works API.
-   * Resolves genuine title, author, description, and cover image from Open Library.
+   * Deterministically returns the active Book of the Week for the current calendar week.
+   * Remains 100% constant and frozen for the full 7-day period (Monday to Sunday) across all users globally.
    */
-  async getSpotlightBook(): Promise<SuggestedBook | null> {
-    const FEATURED_WORKS = [
-      { key: '/works/OL27955361W', fallbackTitle: 'The Creative Act: A Way of Being', fallbackAuthor: 'Rick Rubin', tagline: 'A luminous, meditative course on human presence, deep listening, and reconnecting with childlike wonder.' },
-      { key: '/works/OL17930368W', fallbackTitle: 'Atomic Habits', fallbackAuthor: 'James Clear', tagline: 'An operating manual for compounding 1% daily improvements through identity-based systems.' },
-      { key: '/works/OL30687578W', fallbackTitle: 'Meditations', fallbackAuthor: 'Marcus Aurelius', tagline: 'The private spiritual notebook of the Roman Emperor on inner serenity, duty, and the transience of all things.' },
-      { key: '/works/OL893415W', fallbackTitle: 'Dune', fallbackAuthor: 'Frank Herbert', tagline: 'An epic monumental triumph exploring ecology, religion, power, and human consciousness across Arrakis.' },
-      { key: '/works/OL16013627W', fallbackTitle: 'Steve Jobs', fallbackAuthor: 'Walter Isaacson', tagline: 'The definitive chronicle of the creative genius whose passion for perfection revolutionized six industries.' },
-      { key: '/works/OL17075811W', fallbackTitle: 'Sapiens: A Brief History of Humankind', fallbackAuthor: 'Yuval Noah Harari', tagline: 'How an insignificant ape became the master of planet Earth through the power of collective fiction.' },
-    ];
-
-    const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
-    const featured = FEATURED_WORKS[weekNumber % FEATURED_WORKS.length];
-
-    try {
-      const res = await fetch(`https://openlibrary.org${featured.key}.json`);
-      if (res.ok) {
-        const workData = await res.json();
-        let coverId: number | undefined;
-        if (Array.isArray(workData.covers)) {
-          coverId = workData.covers.find((id: any) => typeof id === 'number' && id > 0);
-        }
-
-        let authorName = featured.fallbackAuthor;
-        if (Array.isArray(workData.authors) && workData.authors.length > 0) {
-          const authorRef = workData.authors[0].author?.key || workData.authors[0].key;
-          if (authorRef) {
-            try {
-              const aRes = await fetch(`https://openlibrary.org${authorRef}.json`);
-              if (aRes.ok) {
-                const aData = await aRes.json();
-                if (aData.name) authorName = aData.name;
-              }
-            } catch {}
-          }
-        }
-
-        let descText = featured.tagline;
-        if (workData.description) {
-          descText = typeof workData.description === 'string'
-            ? workData.description
-            : workData.description.value || featured.tagline;
-        }
-
-        const coverImageUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : undefined;
-        const coverThumbnailUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : undefined;
-
-        return {
-          id: featured.key,
-          title: workData.title || featured.fallbackTitle,
-          author: authorName,
-          coverImageUrl,
-          coverThumbnailUrl,
-          firstPublishYear: workData.first_publish_date ? parseInt(workData.first_publish_date, 10) : undefined,
-          workKey: featured.key,
-          description: descText,
-        };
-      }
-    } catch (err) {
-      console.warn('Could not fetch spotlight from Open Library works API:', err);
-    }
-
-    // Fallback: search Open Library dynamically for the featured title
-    try {
-      const searchRes = await this.searchBooks(featured.fallbackTitle, { limit: 1 });
-      if (searchRes.books.length > 0) {
-        return {
-          ...searchRes.books[0],
-          description: featured.tagline,
-        };
-      }
-    } catch {}
-
-    return null;
+  getSpotlightBook(): SuggestedBook {
+    const b = getBookOfTheWeek();
+    return {
+      id: b.id,
+      title: b.title,
+      author: b.author,
+      coverImageUrl: b.coverImageUrl,
+      coverThumbnailUrl: b.coverImageUrl,
+      firstPublishYear: b.firstPublishYear,
+      workKey: b.workKey,
+      description: b.description || b.tagline,
+    };
   },
 
   /**
