@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BookOpen,
-  UploadCloud,
   FileText,
   Star,
   Trash2,
@@ -153,7 +152,7 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
         >
           <div className="rounded-3xl border-2 border-dashed border-emerald-400 bg-vibe-card p-8 sm:p-12 text-center max-w-md w-full space-y-4 shadow-2xl scale-100 animate-in zoom-in-95 duration-150">
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
-              <UploadCloud className="w-8 h-8 animate-bounce" />
+              <BookOpen className="w-8 h-8 animate-bounce" />
             </div>
             <div className="space-y-1">
               <h3 className="font-heading text-lg font-semibold text-vibe-ink">
@@ -197,14 +196,10 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer group"
-            title="Open or import a PDF, EPUB, or TXT book"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+            title="Open a book from your device"
           >
-            <UploadCloud className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
             <span>Open Book</span>
-            <span className="hidden sm:inline-block text-[10px] font-mono opacity-85 px-2 py-0.5 rounded-full bg-black/15">
-              PDF · EPUB · TXT
-            </span>
           </button>
         </div>
       </div>
@@ -290,10 +285,9 @@ export const ReadEraLibraryView: React.FC<ReadEraLibraryViewProps> = ({ onOpenBo
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs sm:text-sm font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
           >
-            <UploadCloud className="w-4 h-4" />
-            <span>Open Book File</span>
+            <span>Open Book</span>
           </button>
         </div>
       ) : filteredBooks.length === 0 ? (
