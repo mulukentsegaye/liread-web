@@ -74,6 +74,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('feed');
   const [previousTab, setPreviousTab] = useState<NavigationTab>('feed');
   const [selectedBookDetails, setSelectedBookDetails] = useState<BookDetailsData | null>(null);
+  const [viewingProfileUserId, setViewingProfileUserId] = useState<string | null>(null);
   const [exploreSearchQuery, setExploreSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [preSelectedBook, setPreSelectedBook] = useState<{
@@ -318,6 +319,10 @@ export const App: React.FC = () => {
       return;
     }
     setPreviousTab(activeTab);
+    if (tab === 'profile') {
+      // Direct navigation to profile tab defaults to own profile
+      setViewingProfileUserId(null);
+    }
     setActiveTab(tab);
     const mainEl = document.getElementById('main-viewport');
     if (mainEl) {
@@ -326,6 +331,18 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+
+  const handleViewUserProfile = (userId: string) => {
+    if (!userId) return;
+    setPreviousTab(activeTab);
+    setViewingProfileUserId(userId);
+    setActiveTab('profile');
+    const mainEl = document.getElementById('main-viewport');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const handleSelectBookForTimer = (title: string, author: string, cover?: string) => {
     prepareTimerForBook(title, author, cover);
   };
@@ -525,9 +542,10 @@ export const App: React.FC = () => {
               <FeedContainer
                 onOpenCreateModal={handleOpenCreateModal}
                 onSelectBookForTimer={handleSelectBookForTimer}
-                onViewBookDetails={(title, author, cover) =>
+                onViewBookDetails={(title: string, author: string, cover?: string) =>
                   handleViewBookDetails({ title, author, coverImageUrl: cover })
                 }
+                onViewUserProfile={handleViewUserProfile}
               />
             )}
 
@@ -548,9 +566,10 @@ export const App: React.FC = () => {
                 onBack={() => handleTabChange(previousTab || 'feed')}
                 onStartTimer={handleSelectBookForTimer}
                 onShareBook={handleOpenCreateModal}
-                onViewBookDetails={(title, author, cover) =>
+                onViewBookDetails={(title: string, author: string, cover?: string) =>
                   handleViewBookDetails({ title, author, coverImageUrl: cover })
                 }
+                onViewUserProfile={handleViewUserProfile}
               />
             )}
 
@@ -563,6 +582,7 @@ export const App: React.FC = () => {
                 onBack={() => handleTabChange('feed')}
                 onStartTimer={handleSelectBookForTimer}
                 onAdjustGoal={handleAdjustGoal}
+                onViewUserProfile={handleViewUserProfile}
               />
             )}
 
@@ -576,7 +596,7 @@ export const App: React.FC = () => {
               <BookshelfView 
                 initialTab={activeTab} 
                 onBack={() => handleTabChange('feed')} 
-                onViewBookDetails={(title, author, cover) =>
+                onViewBookDetails={(title: string, author: string, cover?: string) =>
                   handleViewBookDetails({ title, author, coverImageUrl: cover })
                 }
                 onExploreClick={() => handleTabChange('explore')}
@@ -585,10 +605,18 @@ export const App: React.FC = () => {
 
             {activeTab === 'profile' && (
               <ProfileView
-                onBack={() => handleTabChange(previousTab || 'feed')}
+                viewingUserId={viewingProfileUserId}
+                onViewUserProfile={handleViewUserProfile}
+                onBack={() => {
+                  setViewingProfileUserId(null);
+                  handleTabChange(previousTab || 'feed');
+                }}
                 onStartTimer={(book) => handleSelectBookForTimer(book.title, book.author, book.coverImageUrl)}
                 onAdjustGoal={handleAdjustGoal}
                 onOpenAuthModal={(t) => openAuthModal(t)}
+                onViewBookDetails={(title: string, author: string, cover?: string) =>
+                  handleViewBookDetails({ title, author, coverImageUrl: cover })
+                }
               />
             )}
           </div>
@@ -597,6 +625,7 @@ export const App: React.FC = () => {
         <SidebarRight
           onViewLeaderboard={() => handleTabChange('sanctuary')}
           onAdjustGoal={handleAdjustGoal}
+          onViewUserProfile={handleViewUserProfile}
         />
 
       </div>

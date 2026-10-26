@@ -83,7 +83,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           1. STICKY EDITORIAL TOP NAVIGATION
           ============================================================================== */}
-      <header className="sticky top-0 z-40 w-full bg-vibe-bg/85 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-12 py-3.5 transition-colors duration-500">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-vibe-bg/95 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-12 py-3.5 transition-all duration-300 shadow-xs">
         <div className="w-full flex items-center justify-between gap-4">
           
           {/* Logo & Manifesto link */}
@@ -169,7 +169,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           2. HERO SECTION: EDITORIAL HEADLINE & ATMOSPHERIC SHOWCASE
           ============================================================================== */}
-      <section className="relative w-full pt-12 sm:pt-20 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
+      <section className="relative w-full pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
         {/* Editorial Title */}
         <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-display font-normal tracking-tight text-vibe-ink leading-[1.15] sm:leading-[1.12] mb-6">
           Where deep reading meets <br />
@@ -220,7 +220,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           3. CORE PRODUCT ARCHITECTURE: INTRO BANNER
           ============================================================================== */}
-      <section id="features" className="w-full pt-16 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="features" className="w-full scroll-mt-20 pt-16 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-3xl mx-auto text-center space-y-3">
           <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
             Everything You Need to Read More Deeply
@@ -234,7 +234,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 1: DISTRACTION-FREE IMMERSION TIMER
           ============================================================================== */}
-      <section id="timer" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="timer" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
@@ -270,17 +270,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 </li>
               </ul>
 
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={onOpenTimer || onEnterApp}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>Launch Reading Timer</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+
             </div>
 
             {/* Right: Interactive Timer Visual Mockup */}
@@ -354,7 +344,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 2: ATMOSPHERIC SOUNDSCAPE ENGINE
           ============================================================================== */}
-      <section id="soundscapes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="soundscapes" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
@@ -496,7 +486,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 3: DIGITAL BOOKSHELF & SAVED QUOTES
           ============================================================================== */}
-      <section id="bookshelf" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="bookshelf" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
@@ -622,7 +612,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           FEATURE 4: GENTLE ANALYTICS & HABIT STREAKS
           ============================================================================== */}
-      <section id="analytics" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="analytics" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
@@ -761,15 +751,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       {/* ==============================================================================
           INTERACTIVE ANNUAL READING IMPACT CALCULATOR
           ============================================================================== */}
-      <ReadingImpactCalculator
-        onStartHabit={() => (onGoToLogin ? onGoToLogin() : handleGuest())}
-        onContinueGuest={handleGuest}
-      />
+      <ReadingImpactCalculator onStartHabit={onEnterApp} onContinueGuest={handleGuest} />
 
       {/* ==============================================================================
           5. PHILOSOPHY & LITERARY QUOTES
           ============================================================================== */}
-      <section id="quotes" className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="quotes" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <ScrollRevealCard delayMs={80} className="max-w-4xl mx-auto text-center space-y-8">
           
           <div className="w-10 h-10 rounded-full bg-vibe-accent-subtle text-vibe-accent mx-auto flex items-center justify-center">

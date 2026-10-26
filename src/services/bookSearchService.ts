@@ -90,43 +90,17 @@ export function isOfflineOrNetworkError(err: unknown): boolean {
  * or dark Japanese unjacketed bindings).
  */
 export function sanitizeOpenLibraryCover(
-  title?: string,
-  author?: string,
+  _title?: string,
+  _author?: string,
   coverUrl?: string
 ): string | undefined {
-  if (!title && !coverUrl) return undefined;
+  if (!coverUrl) return undefined;
 
-  const t = (title || '').toLowerCase();
-  const url = (coverUrl || '').trim();
+  const url = coverUrl.trim();
+  if (!url || url === 'undefined' || url === 'null') return undefined;
 
-  // 1. Deep Work (Cal Newport):
-  // Open Library edition OL26314691M mistakenly has cover_i 7988607 ("Lost Ocean" coloring book).
-  // Replace with the official Deep Work Open Library ISBN cover.
-  if (t.includes('deep work') || url.includes('7988607')) {
-    return 'https://covers.openlibrary.org/b/isbn/9781455586691-L.jpg';
-  }
-
-  // 2. Before the Coffee Gets Cold (Toshikazu Kawaguchi):
-  // Cover ID 9334159 is a dark blank Japanese cloth binding.
-  // Map to the widely recognized English edition (10138333).
-  if (t.includes('before the coffee gets cold') && (!url || url.includes('9334159'))) {
-    return 'https://covers.openlibrary.org/b/id/10138333-L.jpg';
-  }
-
-  // 3. Klara and the Sun (Kazuo Ishiguro):
-  // Cover ID 10648686 is the plain silver/foil UK dustjacket without visible cover illustration.
-  // Map to the iconic international edition on Open Library.
-  if (t.includes('klara and the sun') && (!url || url.includes('10648686'))) {
-    return 'https://covers.openlibrary.org/b/isbn/9780593318171-L.jpg';
-  }
-
-  // 4. Meditations (Marcus Aurelius):
-  // Avoid low-res or generic covers
-  if (t.includes('meditations') && (!url || url.includes('12818862') || url.includes('13202688'))) {
-    return 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg';
-  }
-
-  return url || undefined;
+  // Ensure HTTPS for secure loading
+  return url.replace(/^http:\/\//i, 'https://');
 }
 
 // In-memory cache for book search results (reduces latency & Open Library rate-limiting)
@@ -447,36 +421,10 @@ export const bookSearchService = {
     let description: string | undefined;
     let subjects: string[] = [];
 
-    // 1. Check local verified curated collection first for instant 100% precision
     const cleanT = title.trim().toLowerCase();
-    const curatedMatch = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
-      (b) => b.title.toLowerCase() === cleanT || 
-             (cleanT.length > 5 && b.title.toLowerCase().includes(cleanT)) ||
-             (cleanT.length > 5 && cleanT.includes(b.title.toLowerCase()))
-    );
-
-    if (curatedMatch) {
-      const finalCover = sanitizeOpenLibraryCover(
-        title || curatedMatch.title,
-        author || curatedMatch.author,
-        resolvedCover || curatedMatch.coverImageUrl
-      );
-
-      return {
-        title: title && title.trim().length > 0 ? title.trim() : curatedMatch.title,
-        author: author && author.trim().length > 0 && author !== 'Unknown Author' ? author.trim() : curatedMatch.author,
-        coverImageUrl: finalCover,
-        firstPublishYear: curatedMatch.firstPublishYear,
-        workKey: curatedMatch.workKey || resolvedWorkKey,
-        description: curatedMatch.description || curatedMatch.tagline,
-        subjects: [curatedMatch.categoryLabel, 'Literature', 'Essential Read'],
-        ratingAverage: curatedMatch.ratingAverage,
-        telegramMessageId: curatedMatch.telegramMessageId,
-      };
-    }
 
     try {
-      // 2. If workKey is not known, query search to resolve it accurately
+      // 1. If workKey is not known, query Open Library search to resolve it accurately
       if (!resolvedWorkKey) {
         const queryParams = new URLSearchParams({
           title: title.trim(),
@@ -489,7 +437,7 @@ export const bookSearchService = {
           const searchData = await searchRes.json();
           const docs: any[] = searchData.docs || [];
           
-          // Verify candidate actually matches the requested title
+          // Verify candidate matches the requested title
           const matchingDoc = docs.find((d) => {
             const dTitle = (d.title || '').toLowerCase();
             return dTitle.includes(cleanT) || cleanT.includes(dTitle);
@@ -514,7 +462,7 @@ export const bookSearchService = {
         }
       }
 
-      // 3. Fetch work JSON if workKey available
+      // 2. Fetch work JSON if workKey available to get authentic description
       if (resolvedWorkKey) {
         const workUrl = resolvedWorkKey.startsWith('http')
           ? `${resolvedWorkKey}.json`
@@ -543,6 +491,19 @@ export const bookSearchService = {
       }
     } catch (err) {
       console.warn('Could not fetch detailed book metadata from Open Library:', err);
+    }
+
+    // 3. Fallback to curated catalog ONLY for missing text/description if offline
+    if (!description) {
+      const exactCuratedMatch = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
+        (b) => b.title.toLowerCase() === cleanT
+      );
+      if (exactCuratedMatch) {
+        description = exactCuratedMatch.description || exactCuratedMatch.tagline;
+        if (!resolvedCover) resolvedCover = exactCuratedMatch.coverImageUrl;
+        if (!publishYear) publishYear = exactCuratedMatch.firstPublishYear;
+        if (subjects.length === 0) subjects = [exactCuratedMatch.categoryLabel, 'Literature', 'Essential Read'];
+      }
     }
 
     const finalCover = sanitizeOpenLibraryCover(title, author, resolvedCover);

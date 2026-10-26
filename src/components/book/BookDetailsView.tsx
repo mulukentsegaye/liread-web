@@ -45,6 +45,7 @@ interface BookDetailsViewProps {
   onStartTimer: (title: string, author: string, cover?: string) => void;
   onShareBook: (book: { title: string; author: string; coverImageUrl?: string; quoteText?: string; pageNumber?: number | string }) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
+  onViewUserProfile?: (userId: string) => void;
 }
 
 
@@ -169,6 +170,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   onStartTimer,
   onShareBook,
   onViewBookDetails,
+  onViewUserProfile,
 }) => {
   const { user, isGuest, openAuthModal, refreshProfile } = useAuthStore();
   const [isUpdatingShelf, setIsUpdatingShelf] = useState(false);
@@ -1024,6 +1026,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   post={post}
                   onSelectBookForTimer={onStartTimer}
                   onViewBookDetails={onViewBookDetails}
+                  onViewUserProfile={onViewUserProfile}
                 />
               ))}
             </div>

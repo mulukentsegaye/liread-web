@@ -10,6 +10,7 @@ interface FeedContainerProps {
   onOpenCreateModal: () => void;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
+  onViewUserProfile?: (userId: string) => void;
 }
 
 export const FeedContainer: React.FC<FeedContainerProps> = ({
@@ -17,6 +18,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
   onOpenCreateModal,
   onSelectBookForTimer,
   onViewBookDetails,
+  onViewUserProfile,
 }) => {
   const { user, isGuest, isAuthenticated } = useAuthStore();
   const { posts, feedTab, setFeedTab, sortBy, setSortBy, isLoading } = useFeedStore();
@@ -180,6 +182,7 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
             style={{ animationDelay: `${Math.min(index * 65, 390)}ms` }}
             onSelectBookForTimer={onSelectBookForTimer}
             onViewBookDetails={onViewBookDetails}
+            onViewUserProfile={onViewUserProfile}
           />
         ))}
       </div>

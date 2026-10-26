@@ -23,6 +23,7 @@ interface SanctuaryViewProps {
   onBack?: () => void;
   onStartTimer?: (title: string, author: string, cover?: string) => void;
   onAdjustGoal?: () => void;
+  onViewUserProfile?: (userId: string) => void;
 }
 
 const COMMITMENT_PRESETS = [15, 30, 45, 60];
@@ -31,6 +32,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
   onBack,
   onStartTimer,
   onAdjustGoal,
+  onViewUserProfile,
 }) => {
   const { user, todayMinutesRead, isGuest, updateUser } = useAuthStore();
   const { isRunning, bookTitle: activeTimerBook } = useTimerStore();
@@ -367,14 +369,18 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
                   <div className="space-y-3">
                     {/* Curator info */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0">
+                      <div 
+                        className={`flex items-center gap-2.5 min-w-0 ${onViewUserProfile && curator.userId ? 'cursor-pointer group/curator' : ''}`}
+                        onClick={() => curator.userId && onViewUserProfile?.(curator.userId)}
+                        title={onViewUserProfile && curator.userId ? `View ${curator.authorName}'s profile` : undefined}
+                      >
                         <img
                           src={curator.authorAvatar}
                           alt={curator.authorName}
-                          className="w-7 h-7 rounded-full object-cover border border-vibe-border flex-shrink-0"
+                          className="w-7 h-7 rounded-full object-cover border border-vibe-border flex-shrink-0 group-hover/curator:ring-2 group-hover/curator:ring-vibe-accent transition-all"
                         />
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</p>
+                          <p className="text-xs font-semibold text-vibe-ink truncate group-hover/curator:text-vibe-accent transition-colors">{curator.authorName}</p>
                           <p className="text-[10px] text-vibe-ink-muted truncate">@{curator.authorUsername}</p>
                         </div>
                       </div>
@@ -457,7 +463,9 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
                   }`}
                 >
                   {/* Left: Avatar & Reader info */}
-                  <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`flex items-center gap-3.5 min-w-0 ${onViewUserProfile && reader.userId ? 'cursor-pointer group/reader' : ''}`}
+                    onClick={() => reader.userId && onViewUserProfile?.(reader.userId)}
+                    title={onViewUserProfile ? `View ${reader.fullName}'s profile` : undefined}>
                     <div className="relative flex-shrink-0">
                       {reader.avatarUrl ? (
                         <img

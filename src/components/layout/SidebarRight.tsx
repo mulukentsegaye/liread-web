@@ -9,11 +9,13 @@ import { LiveCoReader, WeeklyCuratorInsight } from '../../types';
 interface SidebarRightProps {
   onViewLeaderboard?: () => void;
   onAdjustGoal?: () => void;
+  onViewUserProfile?: (userId: string) => void;
 }
 
 export const SidebarRight: React.FC<SidebarRightProps> = ({ 
   onViewLeaderboard,
-  onAdjustGoal 
+  onAdjustGoal,
+  onViewUserProfile 
 }) => {
   const { user, todayMinutesRead, isGuest } = useAuthStore();
   const { isRunning, bookTitle: activeTimerBook } = useTimerStore();
@@ -194,7 +196,9 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
             effectiveCoReaders.slice(0, 4).map((reader) => (
               <div
                 key={reader.userId}
-                className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-vibe-card-subtle transition-colors group"
+                onClick={() => reader.userId && onViewUserProfile?.(reader.userId)}
+                className={`flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-vibe-card-subtle transition-colors group ${onViewUserProfile && reader.userId ? 'cursor-pointer' : ''}`}
+                title={onViewUserProfile && reader.userId ? `View ${reader.fullName}'s profile` : undefined}
               >
                 {reader.avatarUrl ? (
                   <img
@@ -241,7 +245,9 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
             weeklyCurators.slice(0, 2).map((curator) => (
               <div
                 key={curator.id}
-                className="p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle space-y-1.5"
+                onClick={() => curator.userId && onViewUserProfile?.(curator.userId)}
+                className={`p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle space-y-1.5 transition-colors ${onViewUserProfile && curator.userId ? 'cursor-pointer hover:border-vibe-accent/40' : ''}`}
+                title={onViewUserProfile && curator.userId ? `View ${curator.authorName}'s profile` : undefined}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</span>

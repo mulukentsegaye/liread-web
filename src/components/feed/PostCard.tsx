@@ -10,7 +10,8 @@ import {
   Check, 
   Timer, 
   Share2, 
-  Trash2 
+  Trash2,
+  User 
 } from 'lucide-react';
 import { Post } from '../../types';
 import { useFeedStore } from '../../stores/feedStore';
@@ -24,6 +25,7 @@ interface PostCardProps {
   post: Post;
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
   onViewBookDetails?: (title: string, author: string, cover?: string) => void;
+  onViewUserProfile?: (userId: string) => void;
 }
 
 // Deterministic cover color from book title
@@ -57,6 +59,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   style,
   onSelectBookForTimer,
   onViewBookDetails,
+  onViewUserProfile,
 }) => {
   const { toggleUpvote, toggleSave, deletePost } = useFeedStore();
   const { user } = useAuthStore();
@@ -191,15 +194,24 @@ export const PostCard: React.FC<PostCardProps> = ({
 
       {/* Author header */}
       <div className="flex items-center justify-between px-3.5 sm:px-5 pt-3.5 sm:pt-4 pb-0">
-        <div className="flex items-center gap-3 min-w-0">
+        <div 
+          className={`flex items-center gap-3 min-w-0 ${onViewUserProfile && post.userId ? 'cursor-pointer group/author' : ''}`}
+          onClick={(e) => {
+            if (onViewUserProfile && post.userId) {
+              e.stopPropagation();
+              onViewUserProfile(post.userId);
+            }
+          }}
+          title={onViewUserProfile && post.userId ? `View ${post.authorName}'s reader profile` : undefined}
+        >
           <img
             src={post.authorAvatar}
             alt={post.authorName}
-            className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border"
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-vibe-border group-hover/author:ring-2 group-hover/author:ring-vibe-accent transition-all"
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-sans text-[13.5px] font-medium text-vibe-ink truncate">{post.authorName}</span>
+              <span className="font-sans text-[13.5px] font-medium text-vibe-ink truncate group-hover/author:text-vibe-accent transition-colors">{post.authorName}</span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="font-mono text-[11px] text-vibe-ink-muted">{post.timeAgo}</span>
@@ -247,6 +259,22 @@ export const PostCard: React.FC<PostCardProps> = ({
                 Passage Options
               </div>
 
+              
+              {/* View Reader Profile */}
+              {onViewUserProfile && post.userId && (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onViewUserProfile(post.userId);
+                  }}
+                  className="w-full px-3 py-2 text-xs font-medium rounded-xl hover:bg-vibe-card-subtle transition-colors flex items-center gap-2.5 text-vibe-ink cursor-pointer group/item"
+                >
+                  <User className="w-4 h-4 text-vibe-ink-muted group-hover/item:text-vibe-accent flex-shrink-0" />
+                  <span className="truncate">View Reader Profile</span>
+                </button>
+              )}
               {/* 1. Copy Passage */}
               <button
                 type="button"

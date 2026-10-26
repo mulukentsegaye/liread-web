@@ -166,7 +166,7 @@ export const readerStorageService = {
       format: 'txt',
       fileBlob: new Blob([SAMPLE_ART_OF_WAR_TEXT], { type: 'text/plain' }),
       fileSize: SAMPLE_ART_OF_WAR_TEXT.length,
-      coverUrl: 'https://covers.openlibrary.org/b/id/8231856-L.jpg',
+      coverUrl: 'https://covers.openlibrary.org/b/isbn/9781590302255-L.jpg',
       totalPages: 8,
       currentPage: 1,
       progressPercent: 0,

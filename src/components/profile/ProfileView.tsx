@@ -16,22 +16,34 @@ import {
   CheckCircle2, 
   AlertCircle, 
   User, 
-  Sparkles,
   UserPlus,
+  UserCheck,
   LogIn,
-  Sliders,
-  Bookmark
+  Bookmark,
+  Lock,
+  Star,
+  Quote,
+  Loader2
 } from 'lucide-react';
+import { Post, UserProfile } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore, toast } from '../../stores/noticeStore';
 import { useTheme } from '../../context/ThemeContext';
 import { getUserAvatar, isCustomAvatar } from '../../utils/avatar';
+import { authService } from '../../services/authService';
+import { followService } from '../../services/followService';
+import { bookshelfService, BookshelfItem } from '../../services/bookshelfService';
+import { postsService } from '../../services/postsService';
+import { PostCard } from '../feed/PostCard';
 
 interface ProfileViewProps {
+  viewingUserId?: string | null;
+  onViewUserProfile?: (userId: string) => void;
   onBack?: () => void;
   onStartTimer?: (book: { title: string; author: string; coverImageUrl?: string }) => void;
   onAdjustGoal?: () => void;
   onOpenAuthModal?: (tab: 'signin' | 'signup') => void;
+  onViewBookDetails?: (title: string, author: string, cover?: string) => void;
 }
 
 const AVAILABLE_GENRES = [
@@ -57,10 +69,13 @@ const AVAILABLE_GENRES = [
 ];
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ 
+  viewingUserId,
+  onViewUserProfile,
   onBack, 
   onStartTimer,
   onAdjustGoal,
-  onOpenAuthModal 
+  onOpenAuthModal,
+  onViewBookDetails
 }) => {
   const { 
     user, 
@@ -71,11 +86,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   } = useAuthStore();
   const { isDark, toggleTheme } = useTheme();
 
-  // Active view inside profile: 'profile' vs 'settings'
+  // Determine whether we are viewing someone else or our own profile
+  const isViewingOther = Boolean(viewingUserId && viewingUserId !== user?.id);
+
+  // States for viewing another user's profile
+  const [targetUser, setTargetUser] = useState<UserProfile | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [targetFollowersCount, setTargetFollowersCount] = useState(0);
+  const [targetFollowingCount, setTargetFollowingCount] = useState(0);
+  const [targetPosts, setTargetPosts] = useState<Post[]>([]);
+  const [targetBooks, setTargetBooks] = useState<BookshelfItem[]>([]);
+  const [isLoadingTarget, setIsLoadingTarget] = useState(false);
+  const [otherActiveTab, setOtherActiveTab] = useState<'quotes' | 'shelf'>('quotes');
+
+  // Own profile view switcher: 'profile' vs 'settings'
   const [accountView, setAccountView] = useState<'profile' | 'settings'>('profile');
   const [isInlineEditingBio, setIsInlineEditingBio] = useState(false);
 
-  // Profile editable form states
+  // Own profile editable form states
   const [editFullName, setEditFullName] = useState('');
   const [editUsername, setEditUsername] = useState('');
   const [editBio, setEditBio] = useState('');
@@ -85,13 +114,51 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [editBookProgress, setEditBookProgress] = useState<number>(68);
   const [editDailyGoal, setEditDailyGoal] = useState<number>(60);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [isSharingActivity, setIsSharingActivity] = useState(true);
+  const [isPrivateProfile, setIsPrivateProfile] = useState(false);
 
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
-  // Initialize editable fields whenever user profile loads
+  // Load target user profile when viewing someone else
   useEffect(() => {
-    if (user) {
+    if (!isViewingOther || !viewingUserId) {
+      setTargetUser(null);
+      return;
+    }
+
+    let mounted = true;
+    setIsLoadingTarget(true);
+
+    Promise.all([
+      authService.getUserProfile(viewingUserId),
+      followService.isFollowing(user?.id, viewingUserId),
+      followService.getFollowCounts(viewingUserId),
+      bookshelfService.getBookshelf(viewingUserId),
+      postsService.getUserPosts(viewingUserId, user?.id),
+    ])
+      .then(([profile, followingStatus, counts, books, posts]) => {
+        if (!mounted) return;
+        setTargetUser(profile);
+        setIsFollowing(followingStatus);
+        setTargetFollowersCount(counts.followersCount);
+        setTargetFollowingCount(counts.followingCount);
+        setTargetBooks(books);
+        setTargetPosts(posts);
+      })
+      .catch((err) => {
+        console.warn('Failed to load profile for user', viewingUserId, err);
+      })
+      .finally(() => {
+        if (mounted) setIsLoadingTarget(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [viewingUserId, isViewingOther, user?.id]);
+
+  // Initialize own editable fields whenever user profile loads
+  useEffect(() => {
+    if (user && !isViewingOther) {
       setEditFullName(user.fullName || '');
       setEditUsername(user.username || '');
       setEditBio(user.bio || user.subtitle || '');
@@ -104,9 +171,45 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         ? user.favoriteGenres 
         : []
       );
-      setIsSharingActivity(user.isPrivate !== true);
+      setIsPrivateProfile(user.isPrivate === true);
     }
-  }, [user]);
+  }, [user, isViewingOther]);
+
+  // Handle follow / unfollow another reader
+  const handleToggleFollow = async () => {
+    if (!user || isGuest) {
+      if (onOpenAuthModal) {
+        onOpenAuthModal('signup');
+      }
+      toast.info('Sign in to follow other readers and see their updates in your feed.', 'Sign In Required');
+      return;
+    }
+    if (!viewingUserId || followLoading) return;
+
+    setFollowLoading(true);
+    const willFollow = !isFollowing;
+
+    // Optimistic UI update
+    setIsFollowing(willFollow);
+    setTargetFollowersCount((prev) => Math.max(0, prev + (willFollow ? 1 : -1)));
+
+    try {
+      if (willFollow) {
+        await followService.follow(user.id, viewingUserId);
+        toast.success(`You are now following @${targetUser?.username || 'reader'}.`, 'Following');
+      } else {
+        await followService.unfollow(user.id, viewingUserId);
+        toast.info(`Unfollowed @${targetUser?.username || 'reader'}.`, 'Unfollowed');
+      }
+    } catch (err: any) {
+      // Revert optimistic state
+      setIsFollowing(!willFollow);
+      setTargetFollowersCount((prev) => Math.max(0, prev + (willFollow ? -1 : 1)));
+      toast.error('Could not update follow status. Please try again.', 'Error');
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -180,7 +283,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         currentlyReadingProgress: editBookProgress,
         dailyGoalMinutes: editDailyGoal,
         favoriteGenres: selectedGenres,
-        isPrivate: !isSharingActivity,
+        isPrivate: isPrivateProfile,
       });
       setIsInlineEditingBio(false);
       setStatusMessage({ type: 'success', text: 'Profile & reading preferences saved!' });
@@ -199,6 +302,410 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     }
   };
 
+  // ==============================================================================
+  // VIEW 1: VISITING ANOTHER READER'S PUBLIC OR PRIVATE PROFILE
+  // ==============================================================================
+  if (isViewingOther) {
+    if (isLoadingTarget) {
+      return (
+        <div className="w-full max-w-4xl mx-auto py-20 text-center space-y-3 animate-in fade-in">
+          <Loader2 className="w-7 h-7 mx-auto animate-spin text-vibe-accent" />
+          <p className="text-xs text-vibe-ink-muted font-medium">Loading reader profile...</p>
+        </div>
+      );
+    }
+
+    if (!targetUser) {
+      return (
+        <div className="w-full max-w-4xl mx-auto space-y-6 pb-12 animate-in fade-in">
+          <div className="border-b border-vibe-border pb-4">
+            {onBack && (
+              <button
+                onClick={onBack}
+                type="button"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back</span>
+              </button>
+            )}
+          </div>
+          <div className="p-12 rounded-3xl bg-vibe-card border border-vibe-border text-center space-y-3">
+            <User className="w-10 h-10 mx-auto text-vibe-ink-muted opacity-40" />
+            <h3 className="font-heading font-bold text-base text-vibe-ink">Reader Profile Not Found</h3>
+            <p className="text-xs text-vibe-ink-muted">This user profile may have been removed or is unavailable.</p>
+          </div>
+        </div>
+      );
+    }
+
+    const isPrivate = targetUser.isPrivate === true;
+
+    return (
+      <div className="w-full max-w-4xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
+        
+        {/* Navigation Bar */}
+        <div className="flex items-center justify-between border-b border-vibe-border pb-4">
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                type="button"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border text-xs font-medium text-vibe-ink-secondary hover:text-vibe-ink hover:border-vibe-accent/40 transition-colors group shadow-soft cursor-pointer"
+                aria-label="Back"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Back</span>
+              </button>
+            )}
+
+            <div>
+              <h1 className="font-heading text-lg sm:text-xl font-bold text-vibe-ink leading-tight truncate">
+                {targetUser.fullName || targetUser.username}
+              </h1>
+              <p className="text-[11px] text-vibe-ink-muted">
+                {isPrivate ? 'Private Reader Profile' : 'Public Reader Profile'}
+              </p>
+            </div>
+          </div>
+
+          {/* Follow / Unfollow Action Button */}
+          <button
+            type="button"
+            onClick={handleToggleFollow}
+            disabled={followLoading}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer ${
+              isFollowing
+                ? 'bg-vibe-card-subtle border border-vibe-border text-vibe-ink hover:border-rose-500/30 hover:text-rose-500 hover:bg-rose-500/10'
+                : 'bg-vibe-accent hover:bg-vibe-accent-hover text-white'
+            }`}
+          >
+            {followLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : isFollowing ? (
+              <>
+                <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Following</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Follow</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Reader Profile Hero Banner Card */}
+        <div className="rounded-3xl border border-vibe-border bg-vibe-card shadow-soft overflow-hidden">
+          {/* Header Strip */}
+          <div className="h-20 sm:h-24 w-full bg-vibe-card-subtle relative p-4 flex items-center justify-between border-b border-vibe-border">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-ink-muted font-medium">
+              ✦ {targetUser.rankTier || 'Reader'}
+            </span>
+            <span className="text-[11px] font-mono text-vibe-ink-muted">
+              {targetUser.joinedDate || 'Member since 2026'}
+            </span>
+          </div>
+
+          <div className="p-5 sm:p-7 -mt-10 space-y-5">
+            {/* Avatar & Identification */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="flex items-end gap-4">
+                <img
+                  src={getUserAvatar(targetUser)}
+                  alt={targetUser.fullName}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-4 ring-vibe-card flex-shrink-0 bg-vibe-card shadow-md"
+                />
+
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-heading text-lg sm:text-xl font-bold text-vibe-ink truncate">
+                      {targetUser.fullName}
+                    </h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-vibe-accent/10 text-vibe-accent border border-vibe-accent/20 flex-shrink-0">
+                      {targetUser.rankTier || 'Reader'}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-vibe-ink-muted truncate mt-0.5">
+                    @{targetUser.username}
+                  </p>
+                  {targetUser.location && (
+                    <p className="text-xs text-vibe-ink-secondary flex items-center gap-1.5 mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-vibe-ink-muted" />
+                      <span>{targetUser.location}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Follower and Following Real Counts */}
+              <div className="flex items-center gap-4 bg-vibe-card-subtle px-4 py-2 rounded-2xl border border-vibe-border text-xs self-start sm:self-auto">
+                <div className="text-center">
+                  <span className="font-mono font-bold text-base text-vibe-ink block">
+                    {targetFollowersCount}
+                  </span>
+                  <span className="text-[10px] font-medium text-vibe-ink-muted uppercase tracking-wider">
+                    Followers
+                  </span>
+                </div>
+                <div className="w-px h-6 bg-vibe-border" />
+                <div className="text-center">
+                  <span className="font-mono font-bold text-base text-vibe-ink block">
+                    {targetFollowingCount}
+                  </span>
+                  <span className="text-[10px] font-medium text-vibe-ink-muted uppercase tracking-wider">
+                    Following
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bio Section */}
+            {targetUser.bio || targetUser.subtitle ? (
+              <div className="pt-3 border-t border-vibe-border/60">
+                <p className="text-sm text-vibe-ink-secondary leading-relaxed font-sans italic">
+                  “{targetUser.bio || targetUser.subtitle}”
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {/* CASE A: PROFILE IS PRIVATE */}
+        {isPrivate ? (
+          <div className="p-8 sm:p-12 rounded-3xl bg-vibe-card border border-vibe-border shadow-soft text-center space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Lock className="w-7 h-7" />
+            </div>
+            <div className="max-w-md mx-auto space-y-1.5">
+              <h3 className="font-heading text-base sm:text-lg font-bold text-vibe-ink">
+                This Reader's Profile is Private
+              </h3>
+              <p className="text-xs sm:text-sm text-vibe-ink-muted leading-relaxed">
+                @{targetUser.username} keeps their bookshelf, reading activity, and statistics private. Follow them to connect in the community.
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* CASE B: PROFILE IS PUBLIC (DEFAULT) */
+          <div className="space-y-6">
+
+            {/* Reader Habit Progress Strip */}
+            <div className="grid grid-cols-3 gap-3.5 sm:gap-4">
+              <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center">
+                <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-1.5">
+                  <BookOpen className="w-4 h-4" />
+                  <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Bookshelf</span>
+                </div>
+                <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  {targetUser.bookshelfCount ?? targetBooks.length}
+                </span>
+                <span className="block text-[11px] text-vibe-ink-muted mt-1">books</span>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center">
+                <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-1.5">
+                  <Flame className="w-4 h-4 fill-current" />
+                  <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Streak</span>
+                </div>
+                <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  {targetUser.currentStreak ?? 0}
+                </span>
+                <span className="block text-[11px] text-vibe-ink-muted mt-1">days</span>
+              </div>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center">
+                <div className="flex items-center justify-center gap-1.5 text-sky-500 mb-1.5">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Focus Time</span>
+                </div>
+                <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  {targetUser.totalMinutesRead ?? 0}
+                </span>
+                <span className="block text-[11px] text-vibe-ink-muted mt-1">mins</span>
+              </div>
+            </div>
+
+            {/* Currently Reading Book (If public & set) */}
+            {targetUser.currentlyReadingBook && (
+              <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
+                <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
+                  <div className="flex items-center gap-2 text-vibe-accent">
+                    <BookOpen className="w-4 h-4" />
+                    <span className="text-sm font-bold">Currently Reading</span>
+                  </div>
+                  {typeof targetUser.currentlyReadingProgress === 'number' && targetUser.currentlyReadingProgress > 0 && (
+                    <span className="font-mono text-xs font-bold text-vibe-accent">
+                      {targetUser.currentlyReadingProgress}% Complete
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm">
+                  <div className="min-w-0 pr-2">
+                    <h4 className="font-bold text-base text-vibe-ink truncate">{targetUser.currentlyReadingBook}</h4>
+                    {targetUser.currentlyReadingAuthor && (
+                      <p className="text-xs text-vibe-ink-muted truncate mt-0.5">{targetUser.currentlyReadingAuthor}</p>
+                    )}
+                  </div>
+                  {onViewBookDetails && (
+                    <button
+                      type="button"
+                      onClick={() => onViewBookDetails(targetUser.currentlyReadingBook!, targetUser.currentlyReadingAuthor || '')}
+                      className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-vibe-card-subtle border border-vibe-border hover:bg-vibe-card text-vibe-ink transition-colors shrink-0 cursor-pointer"
+                    >
+                      View Book
+                    </button>
+                  )}
+                </div>
+
+                {typeof targetUser.currentlyReadingProgress === 'number' && targetUser.currentlyReadingProgress > 0 && (
+                  <div className="w-full h-2 rounded-full bg-vibe-card-subtle border border-vibe-border overflow-hidden p-0.5">
+                    <div 
+                      className="h-full bg-vibe-accent rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(100, targetUser.currentlyReadingProgress)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Favorite Genres Chips (If set) */}
+            {targetUser.favoriteGenres && targetUser.favoriteGenres.length > 0 && (
+              <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
+                <h4 className="text-sm font-heading font-bold text-vibe-ink">Favorite Genres & Topics</h4>
+                <div className="flex flex-wrap gap-2">
+                  {targetUser.favoriteGenres.map((genre) => (
+                    <span
+                      key={genre}
+                      className="px-3 py-1 rounded-full text-xs font-medium bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary"
+                    >
+                      {genre}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sub-tabs: Shared Passages vs Bookshelf */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-vibe-border pb-3">
+                <button
+                  type="button"
+                  onClick={() => setOtherActiveTab('quotes')}
+                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    otherActiveTab === 'quotes'
+                      ? 'bg-vibe-accent text-white font-semibold shadow-xs'
+                      : 'text-vibe-ink-muted hover:text-vibe-ink'
+                  }`}
+                >
+                  Shared Quotes ({targetPosts.length})
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOtherActiveTab('shelf')}
+                  className={`px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                    otherActiveTab === 'shelf'
+                      ? 'bg-vibe-accent text-white font-semibold shadow-xs'
+                      : 'text-vibe-ink-muted hover:text-vibe-ink'
+                  }`}
+                >
+                  Bookshelf ({targetBooks.length})
+                </button>
+              </div>
+
+              {/* TAB 1: Shared Quotes */}
+              {otherActiveTab === 'quotes' && (
+                <div className="space-y-4">
+                  {targetPosts.length === 0 ? (
+                    <div className="p-8 rounded-2xl bg-vibe-card border border-vibe-border text-center text-xs text-vibe-ink-muted">
+                      @{targetUser.username} has not shared any reading quotes or reflections yet.
+                    </div>
+                  ) : (
+                    targetPosts.map((post) => (
+                      <PostCard
+                        key={post.id}
+                        post={post}
+                        onSelectBookForTimer={(title, author, cover) =>
+                          onStartTimer?.({ title, author, coverImageUrl: cover })
+                        }
+                        onViewBookDetails={onViewBookDetails}
+                        onViewUserProfile={onViewUserProfile}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* TAB 2: Bookshelf */}
+              {otherActiveTab === 'shelf' && (
+                <div className="space-y-4">
+                  {targetBooks.length === 0 ? (
+                    <div className="p-8 rounded-2xl bg-vibe-card border border-vibe-border text-center text-xs text-vibe-ink-muted">
+                      No books currently on this bookshelf.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {targetBooks.map((item) => (
+                        <div
+                          key={item.id}
+                          className="p-4 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft flex gap-3.5 items-start hover:border-vibe-accent/40 transition-colors"
+                        >
+                          {item.coverImageUrl ? (
+                            <img
+                              src={item.coverImageUrl}
+                              alt={item.title}
+                              className="w-14 h-20 rounded-lg object-cover flex-shrink-0 shadow-xs border border-vibe-border"
+                            />
+                          ) : (
+                            <div className="w-14 h-20 rounded-lg bg-vibe-card-subtle flex items-center justify-center flex-shrink-0 border border-vibe-border text-vibe-ink-muted">
+                              <BookOpen className="w-5 h-5" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <span className={`inline-block text-[9.5px] font-mono uppercase font-bold px-2 py-0.5 rounded-full ${
+                              item.status === 'finished'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                : item.status === 'currently_reading'
+                                ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20'
+                                : 'bg-vibe-card-subtle text-vibe-ink-muted border border-vibe-border'
+                            }`}>
+                              {item.status === 'finished' ? 'Finished' : item.status === 'currently_reading' ? 'Reading' : 'Want to Read'}
+                            </span>
+                            <h5 className="font-heading font-bold text-xs sm:text-sm text-vibe-ink truncate">
+                              {item.title}
+                            </h5>
+                            <p className="text-[11px] text-vibe-ink-muted truncate">
+                              {item.author}
+                            </p>
+                            {item.rating && (
+                              <div className="flex items-center gap-1 text-amber-500 text-[10px] pt-0.5">
+                                <Star className="w-3 h-3 fill-current" />
+                                <span className="font-mono font-bold">{item.rating}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
+    );
+  }
+
+  // ==============================================================================
+  // VIEW 2: AUTHENTICATED USER'S OWN SOCIAL PROFILE & SETTINGS
+  // ==============================================================================
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
       
@@ -284,7 +791,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       )}
 
-      {/* VIEW 1: AUTHENTICATED MEMBER SOCIAL PROFILE & SETTINGS */}
+      {/* AUTHENTICATED USER'S OWN PROFILE */}
       {isAuthenticated && !isGuest && user && (
         <div className="space-y-6">
           
@@ -349,6 +856,25 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                             <span>{user.location}</span>
                           </p>
                         )}
+                        
+                        {/* Real Followers & Following Counts for Own Profile */}
+                        <div className="flex items-center gap-3 text-xs font-medium text-vibe-ink pt-1.5">
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono font-bold text-sm text-vibe-ink">{user.followersCount ?? 0}</span>
+                            <span className="text-vibe-ink-muted text-[11px]">Followers</span>
+                          </div>
+                          <span className="text-vibe-border">·</span>
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono font-bold text-sm text-vibe-ink">{user.followingCount ?? 0}</span>
+                            <span className="text-vibe-ink-muted text-[11px]">Following</span>
+                          </div>
+                          {user.isPrivate && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-mono">
+                              <Lock className="w-2.5 h-2.5" />
+                              <span>Private</span>
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -669,7 +1195,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 </button>
               </div>
 
-              {/* Social Privacy Toggles & Theme */}
+              {/* Preferences & Privacy Settings */}
               <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-4">
                 <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-vibe-ink">
                   Preferences & Privacy
@@ -692,21 +1218,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   </button>
                 </div>
 
-                {/* Social Activity Toggle */}
+                {/* Profile Privacy Toggle (Public default vs Private) */}
                 <div className="flex items-center justify-between pt-3 border-t border-vibe-border/60">
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-semibold text-vibe-ink">Share Reading in Community</p>
-                    <p className="text-[11px] text-vibe-ink-muted">Display your completed goals in Consistent Readers Circle</p>
+                  <div className="space-y-0.5 pr-4">
+                    <div className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-vibe-accent" />
+                      <p className="text-xs font-semibold text-vibe-ink">Private Reading Profile</p>
+                    </div>
+                    <p className="text-[11px] text-vibe-ink-muted leading-relaxed">
+                      When enabled, your bookshelf, currently reading book, and reading stats are hidden from other visitors. Your bio remains public and readers can still follow you.
+                    </p>
                   </div>
 
                   <input
                     type="checkbox"
-                    checked={isSharingActivity}
+                    checked={isPrivateProfile}
                     onChange={(e) => {
-                      setIsSharingActivity(e.target.checked);
-                      updateUser({ isPrivate: !e.target.checked });
+                      const val = e.target.checked;
+                      setIsPrivateProfile(val);
+                      updateUser({ isPrivate: val });
+                      toast.info(
+                        val ? 'Your reading shelf and stats are now private.' : 'Your reading shelf and stats are now public.',
+                        val ? 'Profile Made Private' : 'Profile Made Public'
+                      );
                     }}
-                    className="w-4 h-4 accent-vibe-accent cursor-pointer"
+                    className="w-4 h-4 accent-vibe-accent cursor-pointer flex-shrink-0"
                   />
                 </div>
               </div>
@@ -729,7 +1265,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       )}
 
-      {/* VIEW 2: GUEST ACCOUNT VIEW */}
+      {/* VIEW 3: GUEST ACCOUNT VIEW */}
       {isGuest && (
         <div className="space-y-5 animate-in fade-in duration-150">
           {/* Guest Explorer Card */}

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 interface ReadingImpactCalculatorProps {
-  onStartHabit: () => void;
+  onStartHabit?: () => void;
   onContinueGuest?: () => void;
 }
 
@@ -313,31 +313,6 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
             </p>
           </div>
 
-          {/* Action CTA Row */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <button
-              type="button"
-              onClick={onStartHabit}
-              className="w-full sm:w-auto px-8 py-4 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 group"
-            >
-              <span>Build this habit with Liread</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </button>
-
-            {onContinueGuest && (
-              <button
-                type="button"
-                onClick={onContinueGuest}
-                className="w-full sm:w-auto px-6 py-4 rounded-full text-xs sm:text-sm font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border active:scale-95 flex items-center justify-center"
-              >
-                <span>Explore as guest first</span>
-              </button>
-            )}
-          </div>
-
-          <p className="text-center text-[11px] text-vibe-ink-muted">
-            Includes gentle habit tracking · Offline web app · Clean focus timer with ambient soundscapes
-          </p>
 
         </div>
         </ScrollRevealCard>
