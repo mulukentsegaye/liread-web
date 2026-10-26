@@ -26,6 +26,7 @@ import { VibeSelector } from './components/theme/VibeSelector';
 import { LandingPage } from './components/landing/LandingPage';
 import { LoginPage } from './components/auth/LoginPage';
 import { AuthModal } from './components/auth/AuthModal';
+import { ResetPasswordModal } from './components/auth/ResetPasswordModal';
 import { CelebrationToast } from './components/ui/CelebrationToast';
 import { SessionReflectionModal } from './components/timer/SessionReflectionModal';
 import { ToastContainer } from './components/ui/ToastContainer';
@@ -97,6 +98,9 @@ export const App: React.FC = () => {
     authModalTab,
     openAuthModal,
     closeAuthModal,
+    isResetPasswordOpen,
+    openResetPasswordModal,
+    closeResetPasswordModal,
   } = useAuthStore();
   const { showAlertModal, openGoalModal } = useNoticeStore();
   const { fetchPosts } = useFeedStore();
@@ -144,15 +148,24 @@ export const App: React.FC = () => {
           clean.searchParams.delete('token');
           clean.searchParams.delete('type');
           window.history.replaceState({}, '', clean.toString());
+          if (type === 'recovery') {
+            openResetPasswordModal();
+          }
         } catch (err) {
-          console.warn('Email confirmation failed:', err);
+          console.warn('Email confirmation/recovery failed:', err);
         }
+      }
+
+      // Check URL hash for recovery or reset-password
+      const hash = window.location.hash || '';
+      if (hash.includes('type=recovery') || hash.includes('reset-password')) {
+        openResetPasswordModal();
       }
 
       if (cancelled) return;
       await initAuth();
 
-      if (!cancelled && tokenHash) {
+      if (!cancelled && tokenHash && type !== 'recovery') {
         const { isAuthenticated } = useAuthStore.getState();
         if (isAuthenticated) navigateWithTransition('app');
       }
@@ -607,6 +620,12 @@ export const App: React.FC = () => {
         isOpen={isAuthModalOpen}
         defaultTab={authModalTab}
         onClose={closeAuthModal}
+      />
+
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={closeResetPasswordModal}
+        onSuccess={() => navigateWithTransition('app')}
       />
 
       <ToastContainer />

@@ -1,109 +1,169 @@
-# Liread
+<div align="center">
 
-A modern, responsive community and utility web application for book lovers to share book recommendations, post favorite quotes, track active reading time with a persistent distraction-free timer, and climb daily, weekly, and lifetime community leaderboards.
+  <img src="public/liread_logo.png" alt="LiRead Logo" width="80" height="80" />
 
-## Tech Stack
-- **Frontend**: React 19 / TypeScript / Vite / Tailwind CSS / Lucide React / Recharts
-- **State & Offline Persistence**: Zustand + localStorage (with background-tab safe timestamp delta calculation)
-- **Backend & Database**: Supabase (PostgreSQL 15+, Supabase Auth, Storage & Realtime subscriptions)
+  # LiRead
 
-## Supabase Backend Architecture
-- `profiles`: User accounts, bio, total minutes read, streak, rank tier, daily goal.
-- `posts`: Recommendations and passage quotes, cover images, page numbers, ratings, upvotes.
-- `post_upvotes`: Upvote enforcement (one per user per post with atomic trigger sync).
-- `reading_sessions`: High-fidelity logged reading sessions with automated profile streak and total minutes computation.
-- `saved_posts`: Bookmarked passages and reading recommendations.
-- `bookshelf`: User personal library shelves tracking progress and status (`currently_reading`, `finished`, `want_to_read`).
-- `post_comments`: Community comments on shared passages with live count synchronization.
-- **RPC Functions**: High-performance leaderboard aggregations (`get_daily_leaderboard`, `get_weekly_leaderboard`, `get_lifetime_leaderboard`).
+  **A mindful sanctuary for readers to build daily reading habits, explore timeless literature, and share thoughtful passages.**
 
-See the complete database schema in [`supabase/schema.sql`](supabase/schema.sql) and the step-by-step setup guide in [`supabase/README.md`](supabase/README.md).
+  [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![Supabase](https://img.shields.io/badge/Supabase-Database_%26_Auth-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
-## Quickstart
+  <br />
 
-1. **Install dependencies**:
+  [Features](#-features) • [Tech Stack](#%EF%B8%8F-tech-stack) • [Getting Started](#-getting-started) • [Architecture](#-repository-structure) • [Environment Variables](#-environment-variables) • [License](#-license)
+
+</div>
+
+---
+
+## 📖 About LiRead
+
+**LiRead** is a modern reading web application created to bring intentionality, focus, and connection back into reading. Designed with an editorial, paper-inspired aesthetic, LiRead combines distraction-free reading sessions with community sharing, habit tracking, and instant access to thousands of public domain literary masterpieces.
+
+Whether tracking active reading minutes with ambient soundscapes, keeping a curated personal bookshelf, or highlighting passages to inspire fellow readers, LiRead offers a distraction-free home for your literary life.
+
+---
+
+## ✨ Features
+
+### ⏱️ Focus Reading Timer & Habit Building
+- **Ambient Soundscapes**: Built-in audio environments (Forest Birds, Gentle Rain, Library Atmosphere) to enhance deep concentration.
+- **Background-Safe Precision**: State calculations use timestamp deltas, ensuring timers remain 100% accurate even if tabs are backgrounded or screens are locked.
+- **Streak & Goal Analytics**: Daily reading targets with interactive streak calendars and lifetime progress statistics.
+
+### 📚 In-Browser Reader & Instant Catalog
+- **ReadEra Viewer Engine**: Read EPUB and PDF books directly in the browser with customizable typography, dark/light paper themes, and page resumption.
+- **Instant Public Domain Downloads**: Verified instant downloads (PDF & EPUB) for timeless classics powered by Open Library and Project Gutenberg CDNs.
+- **Intelligent Book Search**: Query millions of book titles and authors through Open Library API integration.
+
+### 🕊️ Personal Sanctuary & Bookshelf
+- **Organized Shelves**: Manage books by reading status (*Currently Reading*, *Finished*, *Want to Read*).
+- **Saved Passages Vault**: Bookmark quotes and community posts into a personal digital commonplace book.
+- **Reading Velocity & Insights**: Visualize reading habits and completed titles over time.
+
+### 💬 Community Feed & Leaderboards
+- **Passage Quotes & Recommendations**: Share meaningful quotes and editorial thoughts with customizable formatting.
+- **Interactive Community**: Upvote resonant passages, participate in book discussions, and discover books through readers with shared tastes.
+- **Mindful Leaderboards**: Daily, weekly, and lifetime rankings celebrating consistent reading routines rather than vanity metrics.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Core** | React 19, TypeScript, Vite |
+| **Styling & Design** | Tailwind CSS, Syne & Newsreader Typography Tokens, Lucide Icons |
+| **State Management** | Zustand (with persistent local storage and hydration) |
+| **Reading Engines** | EPUB.js, PDF.js (`pdfjs-dist`) |
+| **Data & Charts** | Recharts, Canvas Confetti |
+| **Backend & Auth** | Supabase (PostgreSQL 15+, Row-Level Security, Realtime Subscriptions) |
+| **Serverless APIs** | Vercel Serverless Functions (Node.js runtime with chunked response streaming) |
+| **External APIs** | Open Library REST API, Project Gutenberg CDN |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **npm** or **pnpm** / **yarn**
+- A **Supabase** account (optional for local guest exploration, required for cloud sync)
+
+### Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/mulukentsegaye/liread-web.git
+   cd liread-web
+   ```
+
+2. **Install project dependencies**:
    ```bash
    npm install
    ```
 
-2. **Setup Supabase Backend**:
-   - Create a project on [supabase.com](https://supabase.com).
-   - Run [`supabase/schema.sql`](supabase/schema.sql) in the SQL Editor.
-   - Copy your Project URL and Anon Key to `.env`:
-     ```env
-     VITE_SUPABASE_URL=https://your-project.supabase.co
-     VITE_SUPABASE_ANON_KEY=your-anon-key
-     ```
+3. **Configure Environment Variables**:
+   Create a `.env` file in the root directory:
+   ```env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+   VITE_TELEGRAM_BOT_USERNAME=lireadbooksbot
+   ```
 
-3. **Start local development**:
+4. **Initialize Supabase Database** *(if using a personal Supabase project)*:
+   - Navigate to your Supabase project's **SQL Editor**.
+   - Execute the schema file located in `supabase/schema.sql`.
+
+5. **Start the local development server**:
    ```bash
    npm run dev
    ```
+   Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-## Accounts & Guest Mode
+---
 
-Liread has **no demo accounts**. Every profile, post, bookshelf entry, and
-leaderboard position belongs to a real user created through the app.
-
-- **Create Account / Sign In** — the only way to get a full account. A profile row
-  is created automatically by the `on_auth_user_created` database trigger.
-- **Continue as Guest** — opens the app in read-only exploration mode. Guests can
-  browse the feed, open the timer, and look around, but cannot post, upvote, save
-  passages, or appear on the leaderboard. Guest data is local to the browser and is
-  never written to the database.
-
-### Email confirmation
-
-If your Supabase project has **Confirm email** enabled (the default), a new account
-must confirm its address before it can sign in:
-
-1. The app shows a "Check your inbox" panel after sign-up.
-2. The confirmation link returns to the app, which exchanges the token for a session
-   automatically and signs the user straight in.
-
-For local development you can turn off **Confirm email** in
-**Authentication → Providers → Email** in the Supabase dashboard to skip that step.
-If you keep it on, configure a custom SMTP provider so real emails are delivered.
-
-### ⚠️ Required Supabase configuration for account creation
-
-Supabase's **built-in** email service is not usable for a public sign-up form.
-It allows only **2 emails per hour for the entire project** and only delivers to
-your organization's team members. Until you change this, every "Create Account"
-attempt fails with `email rate limit exceeded`.
-
-Pick one:
-
-| Goal | Setting | Where |
-| --- | --- | --- |
-| **Local development** — instant signup, no email | Turn **off** "Confirm email" | Authentication → Providers → Email |
-| **Production** — real confirmation emails | Enable **custom SMTP**, then raise "Rate limit for sending emails" | Authentication → Emails → SMTP Settings, and Authentication → Rate Limits |
-
-With "Confirm email" off, `supabase.auth.signUp` returns a session immediately and
-the app signs the new reader straight in — no email is sent and no rate limit applies.
-
-Also add your local and production origins to **Authentication → URL Configuration →
-Redirect URLs**, otherwise confirmation links bounce to the wrong place:
+## 📁 Repository Structure
 
 ```
-http://localhost:3000
-http://localhost:5173
-https://your-production-domain.com
+readers-hub-web/
+├── api/                     # Vercel serverless API handlers (streaming downloads, webhooks)
+│   ├── book-file.ts         # High-speed public domain catalog & download proxy
+│   └── telegram.ts          # Telegram bot fulfillment webhook
+├── public/                  # Static assets, branding logos, and PDF worker scripts
+├── src/
+│   ├── components/          # Modular React UI components
+│   │   ├── auth/            # Authentication modals & sign-in views
+│   │   ├── book/            # Book details, synopses, and download action bars
+│   │   ├── bookshelf/       # User library management shelves
+│   │   ├── feed/            # Passage quotes stream, post cards, and composer
+│   │   ├── reader/          # Integrated EPUB & PDF viewer interfaces
+│   │   ├── sanctuary/       # Saved quotes, personal notes, and analytics
+│   │   └── timer/           # Distraction-free reading timer with ambient soundscapes
+│   ├── data/                # Verified public domain registry & curated classics
+│   ├── services/            # Supabase API services & Open Library search integrations
+│   ├── stores/              # Zustand global application stores (Auth, Feed, Timer, Notice)
+│   ├── types/               # TypeScript data models and interface definitions
+│   ├── utils/               # Time formatting, typography helpers, and color utilities
+│   ├── App.tsx              # Root application component with view routing
+│   ├── main.tsx             # Application entry point
+│   └── index.css            # Tailwind design tokens, paper themes, and keyframe animations
+├── supabase/                # PostgreSQL schema definitions, functions, and RLS policies
+└── package.json             # Build configuration and dependency declarations
 ```
 
-### Verifying the backend
+---
 
-`scripts/verify-auth.cjs` exercises the live endpoints against your `.env`:
+## 🔐 Environment Variables
+
+The following environment variables can be configured:
+
+| Variable | Description | Required | Default |
+| :--- | :--- | :---: | :--- |
+| `VITE_SUPABASE_URL` | The HTTPS endpoint for your Supabase project instance | Yes | — |
+| `VITE_SUPABASE_ANON_KEY` | Public anonymous API key for client-side Supabase requests | Yes | — |
+| `VITE_TELEGRAM_BOT_USERNAME` | Username of the optional companion Telegram bot | No | `lireadbooksbot` |
+| `TELEGRAM_BOT_TOKEN` | Bot API token for serverless webhook fulfillment (`api/telegram.ts`) | No | — |
+
+---
+
+## 📦 Build & Deployment
+
+To generate an optimized production bundle:
 
 ```bash
-node scripts/verify-auth.cjs
+npm run build
 ```
 
-It prints the result of a sign-in attempt, a public read, a password recovery, and a
-full sign-up, including whether the `profiles` row was created by the database trigger.
+The output will be created in the `dist/` directory, ready to deploy to modern hosting platforms (such as [Vercel](https://vercel.com), Netlify, or Cloudflare Pages).
 
-### Legacy demo data
+---
 
-`supabase/seed.sql` is intentionally empty. If your database still holds rows from
-an older setup, run [`supabase/cleanup_demo_data.sql`](supabase/cleanup_demo_data.sql)
-once to remove them.
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).

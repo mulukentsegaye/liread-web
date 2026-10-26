@@ -19,7 +19,8 @@ import {
   Sparkles,
   UserPlus,
   LogIn,
-  Sliders
+  Sliders,
+  Bookmark
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore, toast } from '../../stores/noticeStore';
@@ -417,17 +418,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 </div>
               </div>
 
-              {/* Social Followers & Habit Progress Metrics Strip */}
+              {/* Reader Activity & Habit Progress Metrics Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
                 <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
                   <div className="flex items-center justify-center gap-1.5 text-vibe-accent mb-2">
-                    <Users className="w-4 h-4" />
-                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Followers</span>
+                    <Bookmark className="w-4 h-4" />
+                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Saved</span>
                   </div>
                   <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
-                    {user.followersCount ?? 0}
+                    {user.savedPassagesCount ?? 0}
                   </span>
-                  <span className="block text-xs text-vibe-ink-muted mt-1">readers</span>
+                  <span className="block text-xs text-vibe-ink-muted mt-1">passages</span>
                 </div>
 
                 <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">

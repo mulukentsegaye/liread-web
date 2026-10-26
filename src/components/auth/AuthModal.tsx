@@ -7,7 +7,10 @@ import {
   AlertCircle, 
   User, 
   Loader2, 
-  Mail 
+  Mail,
+  Lock,
+  ArrowLeft,
+  KeyRound
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
@@ -16,7 +19,7 @@ import { describeAuthError } from '../../lib/authErrors';
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultTab?: 'signin' | 'signup' | 'account';
+  defaultTab?: 'signin' | 'signup' | 'forgot' | 'account';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ 
@@ -28,12 +31,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     signIn, 
     signUp, 
     isLoading,
-    resendConfirmationEmail
+    resendConfirmationEmail,
+    resetPasswordForEmail
   } = useAuthStore();
   const { showToast } = useNoticeStore();
 
-  const [tab, setTab] = useState<'signin' | 'signup'>(
-    defaultTab === 'signup' ? 'signup' : 'signin'
+  const [tab, setTab] = useState<'signin' | 'signup' | 'forgot'>(
+    defaultTab === 'signup' ? 'signup' : defaultTab === 'forgot' ? 'forgot' : 'signin'
   );
 
   // Sign in / Sign up form states
@@ -42,12 +46,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTab(defaultTab === 'signup' ? 'signup' : 'signin');
+      setTab(defaultTab === 'signup' ? 'signup' : defaultTab === 'forgot' ? 'forgot' : 'signin');
       setStatusMessage(null);
+      setResetSent(false);
     }
   }, [isOpen, defaultTab]);
 
@@ -85,6 +92,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       showToast({ type: 'error', title: 'Error Sending Link', message: msg });
     } finally {
       setIsResending(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusMessage(null);
+    if (!email.trim()) {
+      setStatusMessage({ type: 'error', text: 'Please enter your email address to receive reset instructions.' });
+      return;
+    }
+
+    setIsSendingReset(true);
+    try {
+      await resetPasswordForEmail(email.trim());
+      setResetSent(true);
+      setStatusMessage({
+        type: 'info',
+        text: `Password reset link sent to ${email.trim()}! Please check your inbox and spam folder.`,
+      });
+      showToast({
+        type: 'success',
+        title: 'Reset Link Sent',
+        message: `Password recovery link dispatched to ${email.trim()}.`,
+      });
+    } catch (err: any) {
+      const msg = describeAuthError(err);
+      setStatusMessage({ type: 'error', text: msg });
+      showToast({ type: 'error', title: 'Unable to Send Link', message: msg });
+    } finally {
+      setIsSendingReset(false);
     }
   };
 
@@ -166,11 +203,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="flex items-center justify-between border-b border-vibe-border pb-3.5 mb-4">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-xl bg-vibe-accent/15 text-vibe-accent flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4" />
+                {tab === 'forgot' ? <KeyRound className="w-4 h-4" /> : <User className="w-4 h-4" />}
               </div>
               <div className="min-w-0">
                 <h2 className="font-heading text-base sm:text-lg font-bold text-vibe-ink truncate">
-                  {tab === 'signup' ? 'Create Reader Account' : 'Sign In to Liread'}
+                  {tab === 'signup' 
+                    ? 'Create Reader Account' 
+                    : tab === 'forgot' 
+                    ? 'Reset Password' 
+                    : 'Sign In to Liread'}
                 </h2>
               </div>
             </div>
@@ -236,7 +277,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-vibe-ink">Password</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-vibe-ink">Password</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('forgot');
+                      setStatusMessage(null);
+                      setResetSent(false);
+                    }}
+                    className="text-[11px] font-medium text-vibe-accent hover:underline cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <input
                   type="password"
                   required
@@ -267,6 +321,106 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </button>
               </div>
             </form>
+          )}
+
+          {/* VIEW: FORGOT PASSWORD FORM */}
+          {tab === 'forgot' && (
+            <div className="space-y-4">
+              {resetSent ? (
+                <div className="space-y-4 py-3 text-center animate-in fade-in duration-200">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs sm:text-sm font-semibold text-vibe-ink">
+                      Recovery Link Dispatched
+                    </p>
+                    <p className="text-xs text-vibe-ink-secondary leading-relaxed">
+                      We sent password reset instructions to <strong className="text-vibe-ink">{email}</strong>. Please check your inbox and click the link to set a new password.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTab('signin');
+                        setStatusMessage(null);
+                        setResetSent(false);
+                      }}
+                      className="w-full min-h-[42px] inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Return to Sign In</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-3.5">
+                  <p className="text-xs text-vibe-ink-muted leading-relaxed">
+                    Enter the email address associated with your Liread account and we'll send you a link to reset your password.
+                  </p>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-vibe-ink">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setStatusMessage(null);
+                      }}
+                      className="w-full min-h-[42px] px-3.5 text-xs rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:outline-hidden focus:border-vibe-accent transition-colors"
+                      placeholder="you@example.com"
+                      autoFocus
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSendingReset}
+                    className="w-full min-h-[42px] mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
+                  >
+                    {isSendingReset ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Sending Link...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-4 h-4" />
+                        <span>Send Reset Link</span>
+                      </>
+                    )}
+                  </button>
+
+                  <div className="pt-2 flex items-center justify-between text-xs text-vibe-ink-muted">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTab('signin');
+                        setStatusMessage(null);
+                      }}
+                      className="inline-flex items-center gap-1.5 text-vibe-ink-secondary hover:text-vibe-ink font-medium cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Back to Sign In</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTab('signup');
+                        setStatusMessage(null);
+                      }}
+                      className="text-vibe-accent font-semibold hover:underline cursor-pointer"
+                    >
+                      Create account
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {/* VIEW: SIGN UP FORM */}

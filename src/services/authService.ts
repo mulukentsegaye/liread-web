@@ -87,6 +87,39 @@ export const authService = {
   },
 
   /**
+   * Send a password reset email to a user with a secure recovery link.
+   */
+  async resetPasswordForEmail(email: string) {
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      throw new Error('Please enter your email address.');
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: `${getAppOrigin()}#reset-password`,
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
+   * Update the password for the current user (e.g. during a recovery session).
+   */
+  async updatePassword(newPassword: string) {
+    if (!newPassword || newPassword.length < 6) {
+      throw new Error('Password must be at least 6 characters long.');
+    }
+
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
+  /**
    * Sign out current user.
    */
   async signOut() {
@@ -160,9 +193,9 @@ export const authService = {
       currentlyReadingBook: data.currently_reading_book || undefined,
       currentlyReadingAuthor: data.currently_reading_author || undefined,
       currentlyReadingProgress: typeof data.currently_reading_progress === 'number' ? data.currently_reading_progress : undefined,
-      followersCount: typeof data.followers_count === 'number' ? data.followers_count : 128,
-      followingCount: typeof data.following_count === 'number' ? data.following_count : 84,
-      joinedDate: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'October 2026',
+      followersCount: typeof data.followers_count === 'number' ? data.followers_count : 0,
+      followingCount: typeof data.following_count === 'number' ? data.following_count : 0,
+      joinedDate: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       totalMinutesRead: data.total_minutes_read,
       currentStreak: data.current_streak,
       dailyGoalMinutes: data.daily_goal_minutes,
@@ -238,9 +271,9 @@ export const authService = {
   /**
    * Subscribe to auth state changes.
    */
-  onAuthStateChange(callback: (session: any) => void) {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      callback(session);
+  onAuthStateChange(callback: (session: any, event?: string) => void) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      callback(session, event);
     });
 
     return {

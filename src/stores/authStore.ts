@@ -18,10 +18,13 @@ interface AuthStore {
   authReady: boolean;
   pendingConfirmationEmail: string | null;
   isAuthModalOpen: boolean;
-  authModalTab: 'signin' | 'signup' | 'account';
+  authModalTab: 'signin' | 'signup' | 'forgot' | 'account';
+  isResetPasswordOpen: boolean;
 
-  openAuthModal: (tab?: 'signin' | 'signup' | 'account') => void;
+  openAuthModal: (tab?: 'signin' | 'signup' | 'forgot' | 'account') => void;
   closeAuthModal: () => void;
+  openResetPasswordModal: () => void;
+  closeResetPasswordModal: () => void;
   initAuth: () => Promise<void>;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, username: string, fullName: string) => Promise<void>;
@@ -32,6 +35,8 @@ interface AuthStore {
   refreshProfile: () => Promise<void>;
   clearPendingConfirmation: () => void;
   resendConfirmationEmail: (email: string) => Promise<void>;
+  resetPasswordForEmail: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -46,9 +51,12 @@ export const useAuthStore = create<AuthStore>()(
       pendingConfirmationEmail: null,
       isAuthModalOpen: false,
       authModalTab: 'signin',
+      isResetPasswordOpen: false,
 
       openAuthModal: (tab = 'signin') => set({ isAuthModalOpen: true, authModalTab: tab }),
       closeAuthModal: () => set({ isAuthModalOpen: false }),
+      openResetPasswordModal: () => set({ isResetPasswordOpen: true }),
+      closeResetPasswordModal: () => set({ isResetPasswordOpen: false }),
 
       initAuth: async () => {
         // If already in guest mode from persisted storage, keep it
@@ -94,7 +102,10 @@ export const useAuthStore = create<AuthStore>()(
             authSubscription.unsubscribe();
             authSubscription = null;
           }
-          authSubscription = authService.onAuthStateChange((updatedSession: any) => {
+          authSubscription = authService.onAuthStateChange((updatedSession: any, event?: string) => {
+            if (event === 'PASSWORD_RECOVERY') {
+              set({ isResetPasswordOpen: true });
+            }
             setTimeout(async () => {
               if (updatedSession?.user) {
                 let profile = await authService.getUserProfile(updatedSession.user.id);
@@ -220,6 +231,24 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
+      resetPasswordForEmail: async (email: string) => {
+        set({ isLoading: true });
+        try {
+          await authService.resetPasswordForEmail(email);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updatePassword: async (newPassword: string) => {
+        set({ isLoading: true });
+        try {
+          await authService.updatePassword(newPassword);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
       signInAsGuest: () => {
         set({
           user: { ...GUEST_USER },
@@ -306,6 +335,18 @@ export const useAuthStore = create<AuthStore>()(
         todayMinutesRead: state.todayMinutesRead,
         isAuthenticated: state.isAuthenticated,
         isGuest: state.isGuest,
-      }),    }
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.user) {
+          // Purge any legacy hardcoded demo metrics from browser storage
+          if (state.user.followersCount === 128) {
+            state.user.followersCount = 0;
+          }
+          if (state.user.followingCount === 84) {
+            state.user.followingCount = 0;
+          }
+        }
+      },
+    }
   )
 );

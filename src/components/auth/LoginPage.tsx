@@ -17,7 +17,9 @@ import {
   ShieldCheck,
   Bookmark,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  KeyRound,
+  X
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
@@ -37,7 +39,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
     signInAsGuest, 
     pendingConfirmationEmail, 
     clearPendingConfirmation,
-    resendConfirmationEmail
+    resendConfirmationEmail,
+    resetPasswordForEmail
   } = useAuthStore();
   const { openInfoModal, showToast } = useNoticeStore();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -58,6 +61,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
   const [isForgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetSent, setResetSent] = useState(false);
+  const [isSubmittingReset, setIsSubmittingReset] = useState(false);
+  const [resetErrorMsg, setResetErrorMsg] = useState<string | null>(null);
 
   const handleResendConfirmation = async (targetEmail: string) => {
     if (!targetEmail.trim()) {
@@ -156,17 +161,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resetEmail) return;
-    setLoading(true);
-    try {
-      await supabase.auth.resetPasswordForEmail(resetEmail);
-    } catch (_e) {
-      // Fallback gracefully
+    if (!resetEmail.trim()) {
+      setResetErrorMsg('Please enter your email address.');
+      return;
     }
-    setTimeout(() => {
-      setLoading(false);
+    setIsSubmittingReset(true);
+    setResetErrorMsg(null);
+    try {
+      await resetPasswordForEmail(resetEmail.trim());
       setResetSent(true);
-    }, 500);
+      showToast({
+        type: 'success',
+        title: 'Reset Link Sent',
+        message: `Password reset instructions sent to ${resetEmail.trim()}.`,
+      });
+    } catch (err: any) {
+      const msg = describeAuthError(err);
+      setResetErrorMsg(msg);
+      showToast({
+        type: 'error',
+        title: 'Unable to Send Link',
+        message: msg,
+      });
+    } finally {
+      setIsSubmittingReset(false);
+    }
   };
 
   return (
@@ -497,9 +516,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                       type="button"
                       onClick={() => {
                         setResetEmail(email);
+                        setResetSent(false);
+                        setResetErrorMsg(null);
                         setForgotPasswordOpen(true);
                       }}
-                      className="text-[11px] font-medium text-vibe-accent hover:underline"
+                      className="text-[11px] font-semibold text-vibe-accent hover:text-vibe-accent-hover hover:underline cursor-pointer transition-colors"
                     >
                       Forgot password?
                     </button>
@@ -602,65 +623,124 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
       {/* 4. Forgot Password Modal */}
       {isForgotPasswordOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
           onClick={() => setForgotPasswordOpen(false)}
         >
           <div 
-            className="w-full max-w-sm rounded-3xl bg-white border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200"
+            className="w-full max-w-sm rounded-3xl bg-vibe-card border border-vibe-border shadow-2xl p-6 text-vibe-ink animate-in zoom-in-95 duration-200 relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-vibe-ink mb-1">
-              Reset Your Password
-            </h3>
-            <p className="text-xs text-vibe-ink-muted mb-4">
-              Enter your email address to receive password reset instructions.
-            </p>
+            {/* Top Accent Line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-vibe-accent" />
+
+            {/* Header */}
+            <div className="flex items-start justify-between pb-3 mb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-vibe-accent/15 text-vibe-accent flex items-center justify-center flex-shrink-0">
+                  <KeyRound className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-vibe-ink">
+                    Reset Password
+                  </h3>
+                  <p className="text-[11px] text-vibe-ink-muted">
+                    We'll send you recovery instructions
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setForgotPasswordOpen(false)}
+                aria-label="Close"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             {resetSent ? (
-              <div className="space-y-4 text-center">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5" />
+              <div className="space-y-4 py-3 text-center animate-in fade-in duration-200">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+                  <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <p className="text-xs text-vibe-ink-secondary">
-                  Password reset link sent to <strong>{resetEmail}</strong>. Please check your inbox.
-                </p>
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm font-semibold text-vibe-ink">
+                    Recovery Link Dispatched
+                  </p>
+                  <p className="text-xs text-vibe-ink-secondary leading-relaxed">
+                    Password reset link sent to <strong className="text-vibe-ink">{resetEmail}</strong>. Please check your inbox and click the link to choose a new password.
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     setForgotPasswordOpen(false);
                     setResetSent(false);
                   }}
-                  className="w-full py-2.5 rounded-full bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors"
+                  className="w-full py-2.5 rounded-full bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer"
                 >
                   Done
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5">
-                <input
-                  type="email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="Enter your registered email"
-                  required
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent"
-                />
-                <div className="flex items-center gap-2 pt-1">
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5 pt-1">
+                {resetErrorMsg && (
+                  <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-400 text-xs flex items-start gap-2 animate-in fade-in duration-200">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span className="leading-snug flex-1">{resetErrorMsg}</span>
+                  </div>
+                )}
+
+                <p className="text-xs text-vibe-ink-muted leading-relaxed">
+                  Enter your registered email address and we'll send you a link to reset your password.
+                </p>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-vibe-ink">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-vibe-ink-muted" />
+                    <input
+                      type="email"
+                      value={resetEmail}
+                      onChange={(e) => {
+                        setResetEmail(e.target.value);
+                        setResetErrorMsg(null);
+                      }}
+                      placeholder="reader@liread.app"
+                      required
+                      autoFocus
+                      className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-hidden focus:border-vibe-accent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setForgotPasswordOpen(false)}
-                    className="flex-1 py-2 rounded-full border border-vibe-border text-xs font-semibold text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+                    disabled={isSubmittingReset}
+                    className="flex-1 py-2.5 rounded-full border border-vibe-border text-xs font-semibold text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
-                    className="flex-1 py-2 rounded-full bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors"
+                    disabled={isSubmittingReset || !resetEmail.trim()}
+                    className="flex-1 py-2.5 rounded-full bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
-                    Send Reset Link
+                    {isSubmittingReset ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <span>Send Reset Link</span>
+                    )}
                   </button>
                 </div>
               </form>
