@@ -284,7 +284,11 @@ export const aiSummaryService = {
       const cached = localStorage.getItem(storageKey);
       if (cached) {
         const parsed = JSON.parse(cached);
-        return { ...parsed, cached: true };
+        const takeaway = parsed.oneSentenceTakeaway || '';
+        const fullMarkdown = parsed.fullSummaryMarkdown || '';
+        if (!takeaway.startsWith('A notable work by') && !fullMarkdown.startsWith('An acclaimed work by')) {
+          return { ...parsed, cached: true };
+        }
       }
     } catch {
       // ignore storage error
@@ -319,7 +323,7 @@ export const aiSummaryService = {
       }
     }
 
-    // 4. Generate clean synopsis from verified metadata
+    // 4. Generate clean overview from verified metadata
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const generated = synthesizeBookSummary(cleanTitle, cleanAuthor, description);
@@ -341,26 +345,21 @@ export const aiSummaryService = {
 function synthesizeBookSummary(title: string, author: string, rawDesc?: string): BookSummaryData {
   const cleanDesc = rawDesc ? cleanText(rawDesc) : '';
 
-  // Extract a clean takeaway from the first meaningful sentence
+  // Extract a clean takeaway from the first meaningful sentence only if real description exists
   let takeaway = '';
-  if (cleanDesc) {
+  if (cleanDesc && cleanDesc.length > 40) {
     const sentences = cleanDesc.split(/(?<=[.?!])\s+/);
-    const candidate = sentences.find((s) => s.length > 25 && s.length < 220);
+    const candidate = sentences.find((s) => s.length > 35 && s.length < 240);
     takeaway = candidate ? candidate.trim() : cleanDesc.slice(0, 160) + '...';
-  } else {
-    takeaway = `A notable work by ${author || 'the author'}.`;
   }
 
-  // Use clean description paragraphs
-  let fullText = cleanDesc;
-  if (!fullText) {
-    fullText = `An acclaimed work by ${author || 'the author'}.`;
-  }
+  const fullText = cleanDesc;
+  const wordCount = fullText ? fullText.split(/\s+/).length : 0;
 
   return {
     bookTitle: title,
     bookAuthor: author || 'Unknown Author',
-    readTimeMinutes: Math.max(3, Math.min(10, Math.ceil(fullText.split(/\s+/).length / 200))),
+    readTimeMinutes: Math.max(1, Math.min(10, Math.ceil(wordCount / 200))),
     oneSentenceTakeaway: takeaway,
     keyIdeas: [],
     fullSummaryMarkdown: fullText,

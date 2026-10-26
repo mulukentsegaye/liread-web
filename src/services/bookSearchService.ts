@@ -433,7 +433,7 @@ export const bookSearchService = {
   },
 
   /**
-   * Fetch detailed book metadata including synopsis description from Open Library Works API.
+   * Fetch detailed book metadata including editorial description from Open Library Works API.
    */
   async getBookDetails(
     title: string,

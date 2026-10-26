@@ -94,7 +94,7 @@ function renderFormattedInline(text: string): React.ReactNode {
   return parts.length > 0 ? parts : text;
 }
 
-function renderMarkdownSynopsis(rawContent: string, fontClass: string): React.ReactNode {
+function renderMarkdownContent(rawContent: string, fontClass: string): React.ReactNode {
   let clean = rawContent
     .replace(/\r\n/g, '\n')
     .replace(/###\s*How to Apply These Insights Today[\s\S]*/gi, '')
@@ -208,7 +208,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   // Summary State
   const [summary, setSummary] = useState<BookSummaryData | null>(null);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
-  const [activeTab, setActiveTab] = useState<'summary' | 'synopsis' | 'quotes'>('summary');
+  const [activeTab, setActiveTab] = useState<'about' | 'quotes'>('about');
 
   // Bookshelf status state
   const [bookshelfStatus, setBookshelfStatus] = useState<'none' | 'want_to_read' | 'currently_reading' | 'finished'>('none');
@@ -344,7 +344,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     }, 2500);
   };
 
-  // Editorial typography styling for synopsis and summary
+  // Editorial typography styling for overview and book description
   const bodyFontClass = 'font-serif text-base sm:text-[17px] leading-[1.8] text-vibe-ink/90';
 
   const summarySectionRef = useRef<HTMLDivElement>(null);
@@ -420,7 +420,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   }, [detailedBook.title, detailedBook.author, detailedBook.description]);
 
   const handleScrollToSummary = () => {
-    setActiveTab('summary');
+    setActiveTab('about');
     if (summarySectionRef.current) {
       summarySectionRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -672,8 +672,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 onClick={handleScrollToSummary}
                 className="h-10 px-3 rounded-xl text-xs font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-98 flex items-center justify-center gap-1.5 group"
               >
-                <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform flex-shrink-0" />
-                <span className="truncate">Overview</span>
+                <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate">About Book</span>
               </button>
 
               {/* Start Reading Timer */}
@@ -780,22 +780,9 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       <div className="flex items-center gap-2 border-b border-vibe-border pb-2">
         <button
           type="button"
-          onClick={() => setActiveTab('summary')}
+          onClick={() => setActiveTab('about')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
-            activeTab === 'summary'
-              ? 'bg-vibe-accent text-white shadow-xs'
-              : 'text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle'
-          }`}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Overview</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('synopsis')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
-            activeTab === 'synopsis'
+            activeTab === 'about'
               ? 'bg-vibe-accent text-white shadow-xs'
               : 'text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle'
           }`}
@@ -819,198 +806,190 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       </div>
 
       {/* =========================================================================
-          TAB 1: BOOK OVERVIEW
+          TAB 1: ABOUT THE BOOK & OVERVIEW (MERGED & STREAMLINED)
           ========================================================================= */}
-      {activeTab === 'summary' && (
+      {activeTab === 'about' && (
         <div ref={summarySectionRef} className="space-y-6">
-          
-          {isLoadingSummary ? (
-            <div className="rounded-3xl border border-vibe-border bg-vibe-card p-12 text-center space-y-4 shadow-soft">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-vibe-accent" />
-              <div className="space-y-1">
-                <p className="font-heading font-semibold text-base text-vibe-ink">Loading Overview...</p>
-                <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
-                  Preparing overview and reading insights for {detailedBook.title}.
-                </p>
-              </div>
-            </div>
-          ) : summary ? (
-            <div className="space-y-6">
-              
-              {/* Summary Header Card */}
-              <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-vibe-border">
+
+          {/* 1. Core Takeaway Banner (only when a genuine takeaway exists) */}
+          {summary?.oneSentenceTakeaway &&
+            !summary.oneSentenceTakeaway.startsWith('A notable work') &&
+            !summary.oneSentenceTakeaway.startsWith('An acclaimed work') && (
+              <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-7 shadow-soft space-y-2">
+                <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
                   <div className="flex items-center gap-2 text-xs font-semibold text-vibe-accent">
                     <Sparkles className="w-4 h-4" />
-                    <span>Editorial Overview</span>
+                    <span>Core Takeaway</span>
                   </div>
-                  <span className="font-mono text-xs px-2.5 py-1 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary">
-                    {summary.readTimeMinutes} min read
-                  </span>
-                </div>
-
-                {/* One-Sentence Takeaway */}
-                {summary.oneSentenceTakeaway && (
-                  <div className="py-2 space-y-1.5">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted font-bold block">
-                      Core Takeaway
+                  {summary.readTimeMinutes > 1 && (
+                    <span className="font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
+                      {summary.readTimeMinutes} min overview
                     </span>
-                    <blockquote className="font-display italic text-base sm:text-xl text-vibe-ink leading-relaxed font-normal">
-                      “{summary.oneSentenceTakeaway}”
-                    </blockquote>
-                  </div>
-                )}
+                  )}
+                </div>
+                <blockquote className="font-display italic text-base sm:text-xl text-vibe-ink leading-relaxed font-normal pt-1">
+                  “{summary.oneSentenceTakeaway}”
+                </blockquote>
               </div>
-
-              {/* Core Ideas / Themes Grid (Only when verified key ideas exist) */}
-              {summary.keyIdeas && summary.keyIdeas.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
-                    Key Themes
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {summary.keyIdeas.map((idea, idx) => (
-                      <div
-                        key={idx}
-                        className="rounded-2xl border border-vibe-border bg-vibe-card p-5 space-y-2 shadow-xs hover:border-vibe-accent/40 transition-colors"
-                      >
-                        <h4 className="font-sans text-sm font-medium text-vibe-ink">
-                          {idea.title}
-                        </h4>
-                        <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-normal">
-                          {idea.description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Full Text Synopsis & Chapter Summary */}
-              {summary.fullSummaryMarkdown && (
-                <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
-                  <div className="pb-4 border-b border-vibe-border">
-                    <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-vibe-accent" />
-                      <span>Chapter Summary & Synopsis</span>
-                    </h3>
-                  </div>
-
-                  <div>
-                    {renderMarkdownSynopsis(summary.fullSummaryMarkdown, bodyFontClass)}
-                  </div>
-                </div>
-              )}
-
-              {/* Notable Quotes Card (Only when verified quotes exist) */}
-              {summary.notableQuotes && summary.notableQuotes.length > 0 && (
-                <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft space-y-4">
-                  <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
-                    <Quote className="w-4 h-4 text-vibe-accent" />
-                    <span>Notable Quotes</span>
-                  </h3>
-                  <div className="space-y-3">
-                    {summary.notableQuotes.map((quote, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-start justify-between gap-4 group"
-                      >
-                        <blockquote className="font-display italic text-xs sm:text-sm text-vibe-ink leading-relaxed font-normal">
-                          {quote}
-                        </blockquote>
-                        <button
-                          type="button"
-                          onClick={() => onShareBook({
-                            title: detailedBook.title,
-                            author: detailedBook.author,
-                            coverImageUrl: detailedBook.coverImageUrl,
-                            quoteText: quote,
-                          })}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-colors flex-shrink-0 opacity-80 group-hover:opacity-100"
-                          title="Share this quote to community"
-                        >
-                          Share Quote
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Direct Reading Timer Call to Action */}
-              <div className="rounded-3xl border border-vibe-border bg-vibe-card-subtle p-6 sm:p-8 text-center space-y-3">
-                <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-accent font-bold">
-                  Take The Full Journey
-                </span>
-                <h4 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
-                  Ready to read the complete work?
-                </h4>
-                <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto">
-                  Step into distraction-free reading mode with customizable interval chimes and tranquil ambient soundscapes.
-                </p>
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => onStartTimer(detailedBook.title, detailedBook.author, detailedBook.coverImageUrl)}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95"
-                  >
-                    <Clock className="w-4 h-4" />
-                    <span>Launch Reading Timer with {detailedBook.title}</span>
-                  </button>
-                </div>
-              </div>
-
-            </div>
-          ) : null}
-
-        </div>
-      )}
-
-      {/* =========================================================================
-          TAB 2: ABOUT THE BOOK / ARCHIVE SYNOPSIS
-          ========================================================================= */}
-      {activeTab === 'synopsis' && (
-        <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-6">
-          <div className="pb-4 border-b border-vibe-border">
-            <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
-              About {detailedBook.title}
-            </h3>
-          </div>
-
-          {isLoadingDetails ? (
-            <div className="py-12 text-center text-xs text-vibe-ink-muted flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-vibe-accent" />
-              <span>Fetching archive details...</span>
-            </div>
-          ) : (
-            <div>
-              {detailedBook.description ? (
-                renderMarkdownSynopsis(detailedBook.description, bodyFontClass)
-              ) : (
-                <p className="italic text-vibe-ink-muted">
-                  No editorial description is currently recorded for this specific edition.
-                </p>
-              )}
-            </div>
           )}
 
-          {detailedBook.subjects && detailedBook.subjects.length > 0 && (
-            <div className="pt-4 border-t border-vibe-border space-y-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted block font-medium">
-                Indexed Subjects & Themes
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {detailedBook.subjects.map((subject, idx) => (
-                  <span
+          {/* 2. Main Editorial Description & Book Overview */}
+          <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
+            <div className="pb-3 border-b border-vibe-border flex items-center justify-between">
+              <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-vibe-accent" />
+                <span>About {detailedBook.title}</span>
+              </h3>
+              {detailedBook.firstPublishYear && (
+                <span className="font-mono text-xs text-vibe-ink-muted">
+                  First published {detailedBook.firstPublishYear}
+                </span>
+              )}
+            </div>
+
+            {isLoadingDetails ? (
+              <div className="py-8 text-center text-xs text-vibe-ink-muted flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-vibe-accent" />
+                <span>Loading book details...</span>
+              </div>
+            ) : detailedBook.description ? (
+              <div>
+                {renderMarkdownContent(detailedBook.description, bodyFontClass)}
+              </div>
+            ) : summary?.fullSummaryMarkdown &&
+               summary.fullSummaryMarkdown.length > 50 &&
+               !summary.fullSummaryMarkdown.startsWith('An acclaimed work by') ? (
+              <div>
+                {renderMarkdownContent(summary.fullSummaryMarkdown, bodyFontClass)}
+              </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border-subtle text-xs text-vibe-ink-secondary leading-relaxed">
+                <p>
+                  {detailedBook.title} is an acclaimed work by {detailedBook.author || 'the author'}. You can start reading directly with the timer or add it to your shelf.
+                </p>
+              </div>
+            )}
+
+            {/* Indexed Subjects & Themes */}
+            {detailedBook.subjects && detailedBook.subjects.length > 0 && (
+              <div className="pt-4 border-t border-vibe-border space-y-2">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted block font-medium">
+                  Subjects & Themes
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {detailedBook.subjects.map((subject, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-lg text-xs bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary"
+                    >
+                      {subject}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. Deep-Dive Chapter Summary & Reading Guide (when distinct and curated) */}
+          {summary?.fullSummaryMarkdown &&
+            summary.fullSummaryMarkdown.length > 100 &&
+            summary.fullSummaryMarkdown !== detailedBook.description &&
+            !summary.fullSummaryMarkdown.startsWith('An acclaimed work by') && (
+              <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
+                <div className="pb-3 border-b border-vibe-border">
+                  <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-vibe-accent" />
+                    <span>Summary & Chapter Overview</span>
+                  </h3>
+                </div>
+                <div>
+                  {renderMarkdownContent(summary.fullSummaryMarkdown, bodyFontClass)}
+                </div>
+              </div>
+          )}
+
+          {/* 4. Core Ideas & Themes Grid (Only when verified key ideas exist) */}
+          {summary?.keyIdeas && summary.keyIdeas.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
+                Key Themes & Insights
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {summary.keyIdeas.map((idea, idx) => (
+                  <div
                     key={idx}
-                    className="px-2.5 py-1 rounded-lg text-xs bg-vibe-card-subtle border border-vibe-border text-vibe-ink-secondary"
+                    className="rounded-2xl border border-vibe-border bg-vibe-card p-5 space-y-2 shadow-xs hover:border-vibe-accent/40 transition-colors"
                   >
-                    {subject}
-                  </span>
+                    <h4 className="font-sans text-sm font-medium text-vibe-ink">
+                      {idea.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed font-normal">
+                      {idea.description}
+                    </p>
+                  </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* 5. Notable Quotes Card (Only when verified quotes exist) */}
+          {summary?.notableQuotes && summary.notableQuotes.length > 0 && (
+            <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 shadow-soft space-y-4">
+              <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
+                <Quote className="w-4 h-4 text-vibe-accent" />
+                <span>Notable Quotes</span>
+              </h3>
+              <div className="space-y-3">
+                {summary.notableQuotes.map((quote, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-start justify-between gap-4 group"
+                  >
+                    <blockquote className="font-display italic text-xs sm:text-sm text-vibe-ink leading-relaxed font-normal">
+                      {quote}
+                    </blockquote>
+                    <button
+                      type="button"
+                      onClick={() => onShareBook({
+                        title: detailedBook.title,
+                        author: detailedBook.author,
+                        coverImageUrl: detailedBook.coverImageUrl,
+                        quoteText: quote,
+                      })}
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-colors flex-shrink-0 opacity-80 group-hover:opacity-100"
+                      title="Share this quote to community"
+                    >
+                      Share Quote
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 6. Direct Reading Timer Call to Action */}
+          <div className="rounded-3xl border border-vibe-border bg-vibe-card-subtle p-6 sm:p-8 text-center space-y-3">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-accent font-bold">
+              Begin Reading
+            </span>
+            <h4 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink">
+              Ready to immerse yourself in {detailedBook.title}?
+            </h4>
+            <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-md mx-auto">
+              Step into quiet, distraction-free reading mode with customizable chimes and ambient soundscapes.
+            </p>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => onStartTimer(detailedBook.title, detailedBook.author, detailedBook.coverImageUrl)}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95"
+              >
+                <Clock className="w-4 h-4" />
+                <span>Launch Reading Timer</span>
+              </button>
+            </div>
+          </div>
+
         </div>
       )}
 

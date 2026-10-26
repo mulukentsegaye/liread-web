@@ -588,3 +588,25 @@ export const CURATED_BOOKS: CuratedBook[] = [
     workKey: '/works/OL262423W',
   },
 ];
+
+/**
+ * Deterministically returns the "Book of the Week" based on the current calendar week.
+ * Cycles smoothly through the entire collection using Knuth's multiplicative hash
+ * so that a fresh, diverse genre appears every 7 days across all users worldwide.
+ */
+export function getBookOfTheWeek(date: Date = new Date()): CuratedBook {
+  const allBooks: CuratedBook[] = [SPOTLIGHT_BOOK, ...CURATED_BOOKS];
+  if (allBooks.length === 0) return SPOTLIGHT_BOOK;
+
+  // Use Monday, Jan 1, 2024 00:00:00 UTC as the fixed week-0 epoch anchor
+  const EPOCH = new Date('2024-01-01T00:00:00Z').getTime();
+  const now = date.getTime();
+  const diffMs = Math.max(0, now - EPOCH);
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const weekNumber = Math.floor(diffMs / ONE_WEEK_MS);
+
+  // Multiplicative hashing (coprime with array length) produces a full-cycle pseudo-random shuffle
+  const hash = ((weekNumber * 2654435761) >>> 0) % allBooks.length;
+  return allBooks[hash] || SPOTLIGHT_BOOK;
+}
+

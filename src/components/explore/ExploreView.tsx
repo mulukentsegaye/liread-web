@@ -30,7 +30,7 @@ import {
   CuratedCategory, 
   CATEGORY_CONFIGS, 
   CategoryConfig,
-  SPOTLIGHT_BOOK,
+  getBookOfTheWeek,
   CuratedBook 
 } from '../../data/curatedBooks';
 import { 
@@ -637,6 +637,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   onClearInitialSearch,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<CuratedCategory>('All');
+  const bookOfTheWeek = React.useMemo(() => getBookOfTheWeek(), []);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
@@ -1093,7 +1094,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                       onClick={handleClearSearch}
                       className="px-4 py-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-all cursor-pointer shadow-xs"
                     >
-                      Explore Curated Shelves
+                      Explore Library Shelves
                     </button>
                   </div>
                 </>
@@ -1117,7 +1118,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-vibe-accent/80" />
               <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
-                Curated Recommendations & Global Library
+                Featured Recommendations & Global Library
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-vibe-ink">
@@ -1125,15 +1126,15 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </h1>
           </div>
 
-          {/* Spotlight Hero Card */}
+          {/* Book of the Week Spotlight Card */}
           <div 
             onClick={() => onViewBookDetails({
-              title: SPOTLIGHT_BOOK.title,
-              author: SPOTLIGHT_BOOK.author,
-              coverImageUrl: SPOTLIGHT_BOOK.coverImageUrl,
-              firstPublishYear: SPOTLIGHT_BOOK.firstPublishYear,
-              workKey: SPOTLIGHT_BOOK.workKey,
-              description: SPOTLIGHT_BOOK.description || SPOTLIGHT_BOOK.tagline,
+              title: bookOfTheWeek.title,
+              author: bookOfTheWeek.author,
+              coverImageUrl: bookOfTheWeek.coverImageUrl,
+              firstPublishYear: bookOfTheWeek.firstPublishYear,
+              workKey: bookOfTheWeek.workKey,
+              description: bookOfTheWeek.description || bookOfTheWeek.tagline,
             })}
             className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-4 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
           >
@@ -1141,8 +1142,8 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               <div className="md:col-span-4 flex justify-center md:justify-start">
                 <div className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden shadow-md border border-vibe-border bg-vibe-card-subtle flex-shrink-0">
                   <img
-                    src={SPOTLIGHT_BOOK.coverImageUrl}
-                    alt={SPOTLIGHT_BOOK.title}
+                    src={bookOfTheWeek.coverImageUrl}
+                    alt={bookOfTheWeek.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -1152,36 +1153,36 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-medium bg-vibe-accent text-white shadow-xs">
                     <Sparkles className="w-3.5 h-3.5" />
-                    Curator's Spotlight
+                    Book of the Week
                   </span>
                   <span className="text-xs text-vibe-ink-muted">
-                    {SPOTLIGHT_BOOK.firstPublishYear} · {SPOTLIGHT_BOOK.categoryLabel}
+                    {bookOfTheWeek.firstPublishYear} · {bookOfTheWeek.categoryLabel}
                   </span>
                 </div>
 
                 <div className="space-y-1">
                   <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight group-hover:text-vibe-accent transition-colors">
-                    {SPOTLIGHT_BOOK.title}
+                    {bookOfTheWeek.title}
                   </h2>
                   <p className="text-sm sm:text-base text-vibe-ink-secondary font-medium">
-                    by {SPOTLIGHT_BOOK.author}
+                    by {bookOfTheWeek.author}
                   </p>
                 </div>
 
                 <p className="text-xs sm:text-sm text-vibe-ink-muted leading-relaxed max-w-lg">
-                  {SPOTLIGHT_BOOK.tagline}
+                  {bookOfTheWeek.tagline}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() => onViewBookDetails({
-                      title: SPOTLIGHT_BOOK.title,
-                      author: SPOTLIGHT_BOOK.author,
-                      coverImageUrl: SPOTLIGHT_BOOK.coverImageUrl,
-                      firstPublishYear: SPOTLIGHT_BOOK.firstPublishYear,
-                      workKey: SPOTLIGHT_BOOK.workKey,
-                      description: SPOTLIGHT_BOOK.description || SPOTLIGHT_BOOK.tagline,
+                      title: bookOfTheWeek.title,
+                      author: bookOfTheWeek.author,
+                      coverImageUrl: bookOfTheWeek.coverImageUrl,
+                      firstPublishYear: bookOfTheWeek.firstPublishYear,
+                      workKey: bookOfTheWeek.workKey,
+                      description: bookOfTheWeek.description || bookOfTheWeek.tagline,
                     })}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
                   >
@@ -1191,7 +1192,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => onStartTimer(SPOTLIGHT_BOOK.title, SPOTLIGHT_BOOK.author, SPOTLIGHT_BOOK.coverImageUrl)}
+                    onClick={() => onStartTimer(bookOfTheWeek.title, bookOfTheWeek.author, bookOfTheWeek.coverImageUrl)}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95 cursor-pointer"
                   >
                     <Clock className="w-4 h-4 text-vibe-accent" />
