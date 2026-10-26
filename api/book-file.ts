@@ -104,7 +104,7 @@ async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl?:
     const pdfUrl = formats['application/pdf'] || null;
     const epubUrl = 
       formats['application/epub+zip'] || 
-      (book.id ? `https://www.gutenberg.org/ebooks/${book.id}.epub3.images` : null);
+      (book.id ? `https://www.gutenberg.org/cache/epub/${book.id}/pg${book.id}.epub` : null);
 
     if (!pdfUrl && !epubUrl) return null;
 
@@ -133,6 +133,7 @@ async function streamFile(res: any, targetUrl: string, title: string, format: st
         'Accept': '*/*',
       },
       redirect: 'follow',
+      signal: AbortSignal.timeout(6000),
     });
 
     if (!fileRes.ok || !fileRes.body) {
