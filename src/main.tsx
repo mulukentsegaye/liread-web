@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import JSZip from 'jszip';
+import { Analytics } from '@vercel/analytics/react';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <ThemeProvider>
         <App />
+        <Analytics />
       </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>
