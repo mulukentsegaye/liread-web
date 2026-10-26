@@ -37,6 +37,7 @@ import { useNoticeStore } from './stores/noticeStore';
 import { WifiOff } from 'lucide-react';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useTimerStore } from './stores/timerStore';
+import { coReadingService } from './services/coReadingService';
 import { useAuthStore } from './stores/authStore';
 import { useFeedStore } from './stores/feedStore';
 import { useTheme } from './context/ThemeContext';
@@ -106,6 +107,48 @@ export const App: React.FC = () => {
   const { showAlertModal, openGoalModal } = useNoticeStore();
   const { fetchPosts } = useFeedStore();
   const isOnline = useOnlineStatus();
+
+  // Real-time Co-Reading Presence tracking
+  const isTimerRunning = useTimerStore((s) => s.isRunning);
+  const timerBookTitle = useTimerStore((s) => s.bookTitle);
+  const timerBookAuthor = useTimerStore((s) => s.bookAuthor);
+  const timerStartTime = useTimerStore((s) => s.startTime);
+
+  useEffect(() => {
+    if (isTimerRunning && timerBookTitle) {
+      coReadingService.track({
+        userId: user?.id || 'guest',
+        username: user?.username || 'reader',
+        fullName: user?.fullName || (isGuest ? 'Guest Explorer' : 'Quiet Reader'),
+        avatarUrl: user?.avatarUrl,
+        bookTitle: timerBookTitle,
+        bookAuthor: timerBookAuthor,
+        startedAt: timerStartTime || Date.now(),
+      });
+    } else {
+      coReadingService.untrack();
+    }
+  }, [
+    isTimerRunning,
+    timerBookTitle,
+    timerBookAuthor,
+    timerStartTime,
+    user?.id,
+    user?.username,
+    user?.fullName,
+    user?.avatarUrl,
+    isGuest,
+  ]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isTimerRunning) {
+        coReadingService.untrack();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isTimerRunning]);
 
   // Settle initial tranquil page entrance
   useEffect(() => {

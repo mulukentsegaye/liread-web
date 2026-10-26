@@ -14,6 +14,7 @@ import {
   Quote
 } from 'lucide-react';
 import { sanctuaryService } from '../../services/sanctuaryService';
+import { coReadingService } from '../../services/coReadingService';
 import { useAuthStore } from '../../stores/authStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { ConsistentReader, LiveCoReader, WeeklyCuratorInsight } from '../../types';
@@ -52,13 +53,11 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
 
     Promise.all([
       sanctuaryService.getConsistentReaders(user?.id),
-      sanctuaryService.getLiveCoReaders(),
       sanctuaryService.getWeeklyCurators(),
     ])
-      .then(([readersData, coReadersData, curatorsData]) => {
+      .then(([readersData, curatorsData]) => {
         if (!isMounted) return;
         setReaders(readersData || []);
-        setLiveCoReaders(coReadersData || []);
         setTopCurators(curatorsData || []);
       })
       .catch((err) => {
@@ -78,8 +77,24 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
     toast.success(`Daily reading commitment updated to ${minutes} mins/day.`, 'Plan Updated');
   };
 
-  // Add the current user to live co-readers list if their timer is running
-  const effectiveLiveCoReaders = isRunning && activeTimerBook
+  // Subscribe to live co-reading presence
+  useEffect(() => {
+    let isSubMounted = true;
+    const unsubscribe = coReadingService.subscribe((readersList) => {
+      if (isSubMounted) {
+        setLiveCoReaders(readersList);
+      }
+    });
+    return () => {
+      isSubMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  // Add the current user to live co-readers list if their timer is running locally and not yet synced
+  const isLocalInSanctuaryList = liveCoReaders.some((r) => r.isCurrentUser || (user?.id && r.userId === user.id));
+
+  const effectiveLiveCoReaders = isRunning && activeTimerBook && !isLocalInSanctuaryList
     ? [
         {
           userId: user?.id || 'you',
@@ -92,7 +107,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
           sessionStartedMinutesAgo: 1,
           isCurrentUser: true,
         },
-        ...liveCoReaders.filter((r) => r.userId !== user?.id),
+        ...liveCoReaders,
       ]
     : liveCoReaders;
 

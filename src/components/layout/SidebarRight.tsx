@@ -3,6 +3,7 @@ import { SlidersHorizontal, Flame, Check, ArrowRight, Sparkles, Bookmark, BookOp
 import { useAuthStore } from '../../stores/authStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { sanctuaryService } from '../../services/sanctuaryService';
+import { coReadingService } from '../../services/coReadingService';
 import { sessionsService } from '../../services/sessionsService';
 import { LiveCoReader, WeeklyCuratorInsight } from '../../types';
 
@@ -26,17 +27,23 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
 
   useEffect(() => {
     let mounted = true;
-    Promise.all([
-      sanctuaryService.getLiveCoReaders(),
-      sanctuaryService.getWeeklyCurators(),
-    ])
-      .then(([coReaders, curators]) => {
-        if (!mounted) return;
-        setLiveCoReaders(coReaders || []);
-        setWeeklyCurators(curators || []);
-      })
-      .catch(() => {});
-    return () => { mounted = false; };
+
+    // Fetch initial weekly curators
+    sanctuaryService.getWeeklyCurators().then((curators) => {
+      if (mounted) setWeeklyCurators(curators || []);
+    }).catch(() => {});
+
+    // Subscribe to real-time live co-reading presence across all devices
+    const unsubscribe = coReadingService.subscribe((readers) => {
+      if (mounted) {
+        setLiveCoReaders(readers);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // Build the 7-day streak strip from the user's actual logged sessions
@@ -71,8 +78,10 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (circumference * (progressPercent / 100));
 
-  // Merge current user if timer is active
-  const effectiveCoReaders = isRunning && activeTimerBook
+  // Merge current user if timer is active on this device and not already in presence state
+  const isLocalUserInList = liveCoReaders.some((r) => r.isCurrentUser || (user?.id && r.userId === user.id));
+
+  const effectiveCoReaders = isRunning && activeTimerBook && !isLocalUserInList
     ? [
         {
           userId: user?.id || 'you',
@@ -84,7 +93,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
           sessionStartedMinutesAgo: 1,
           isCurrentUser: true,
         },
-        ...liveCoReaders.filter((r) => r.userId !== user?.id),
+        ...liveCoReaders,
       ]
     : liveCoReaders;
 
