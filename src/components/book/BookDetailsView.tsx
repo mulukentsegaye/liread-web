@@ -27,12 +27,16 @@ import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore, toast } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { PostCard } from '../feed/PostCard';
+import { findPublicDomainBook } from '../../data/publicDomainRegistry';
 
 interface BookAvailability {
   available: boolean;
   primaryFormat?: 'PDF' | 'EPUB';
   hasPdf?: boolean;
   hasEpub?: boolean;
+  pdfUrl?: string;
+  epubUrl?: string;
+  source?: string;
 }
 
 interface BookDetailsViewProps {
@@ -250,6 +254,17 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     setIsCheckingAvailability(true);
     setAvailability(null);
 
+    // 1. Instant 0ms local registry resolution for classic literature
+    const localMatch = findPublicDomainBook(title, author);
+    if (localMatch && localMatch.available) {
+      setAvailability(localMatch);
+      if (localMatch.primaryFormat) {
+        setSelectedFormat(localMatch.primaryFormat);
+      }
+      setIsCheckingAvailability(false);
+      return;
+    }
+
     const abortController = new AbortController();
 
     async function checkAvailability() {
@@ -302,19 +317,26 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     const author = (detailedBook.author || '').trim();
     const formatParam = formatChoice.toLowerCase();
 
-    const queryParams = new URLSearchParams({
-      mode: 'download',
-      title,
-      author,
-      format: formatParam,
-    });
+    // Prefer direct CDN URL if resolved, otherwise fallback to serverless redirect endpoint
+    const directUrl = formatChoice === 'PDF' ? availability?.pdfUrl : availability?.epubUrl;
+    let downloadUrl = directUrl;
 
-    const downloadUrl = `/api/book-file?${queryParams.toString()}`;
+    if (!downloadUrl) {
+      const queryParams = new URLSearchParams({
+        mode: 'download',
+        title,
+        author,
+        format: formatParam,
+      });
+      downloadUrl = `/api/book-file?${queryParams.toString()}`;
+    }
 
     // Trigger download via hidden <a> tag so user stays on page
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.setAttribute('download', '');
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('download', `${title.replace(/[/\\?%*:|"<>]/g, '_')}.${formatParam}`);
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
@@ -324,7 +346,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
 
     setTimeout(() => {
       setIsDownloading(false);
-    }, 3000);
+    }, 2000);
   };
 
   // Editorial typography styling for synopsis and summary

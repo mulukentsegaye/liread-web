@@ -1,62 +1,71 @@
 import type { IncomingMessage, ServerResponse } from 'http';
+import { findPublicDomainBook } from '../src/data/publicDomainRegistry';
 
 interface AvailabilityResult {
   available: boolean;
   primaryFormat?: 'PDF' | 'EPUB';
   hasPdf?: boolean;
   hasEpub?: boolean;
+  pdfUrl?: string;
+  epubUrl?: string;
+  source?: string;
 }
 
-// Step A: Check Open Library for direct public domain scan with IA ID
-async function checkOpenLibrary(title: string, author?: string): Promise<{ iaId: string; pdfUrl: string } | null> {
+// Step A: Check Open Library for public domain scan with IA (Internet Archive) ID
+async function checkOpenLibrary(title: string, author?: string): Promise<{ pdfUrl?: string; epubUrl?: string } | null> {
   try {
     const cleanTitle = title.trim();
     const cleanAuthor = (author || '').trim();
     
-    let url = `https://openlibrary.org/search.json?title=${encodeURIComponent(cleanTitle)}&has_fulltext=true&limit=5&fields=key,title,author_name,public_scan_b,ia`;
+    // Build query with title and optional author, avoiding slow fulltext flag
+    let url = `https://openlibrary.org/search.json?title=${encodeURIComponent(cleanTitle)}&limit=5&fields=key,title,author_name,public_scan_b,ia`;
     if (cleanAuthor) {
       url += `&author=${encodeURIComponent(cleanAuthor)}`;
     }
 
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0 (contact: support@liread.app)',
+        'User-Agent': 'Mozilla/5.0 (compatible; Liread/1.0; +https://liread.app)',
         'Accept': 'application/json',
       },
-      signal: AbortSignal.timeout(8500),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!res.ok) return null;
     const data = await res.json();
-    const doc = data.docs?.find((d: any) => d.public_scan_b === true && Array.isArray(d.ia) && d.ia.length > 0);
     
-    if (doc && doc.ia && doc.ia[0]) {
-      const iaId = doc.ia[0];
+    // Prefer docs explicitly marked with public_scan_b and having an Internet Archive ID
+    const docs = Array.isArray(data.docs) ? data.docs : [];
+    const scanDoc = docs.find((d: any) => (d.public_scan_b === true || Array.isArray(d.ia)) && d.ia?.[0]) || docs.find((d: any) => d.ia?.[0]);
+    
+    if (scanDoc && scanDoc.ia && scanDoc.ia[0]) {
+      const iaId = scanDoc.ia[0];
       return {
-        iaId,
         pdfUrl: `https://archive.org/download/${iaId}/${iaId}.pdf`,
+        epubUrl: `https://archive.org/download/${iaId}/${iaId}.epub`,
       };
     }
 
-    // If searching with author didn't yield a scan, fallback to searching just by title
+    // Secondary fallback: general search query if title+author exact search didn't yield IA ID
     if (cleanAuthor) {
-      const fallbackUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(cleanTitle)}&has_fulltext=true&limit=5&fields=key,title,author_name,public_scan_b,ia`;
+      const fallbackUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(`${cleanTitle} ${cleanAuthor}`)}&limit=4&fields=key,title,author_name,public_scan_b,ia`;
       const fallbackRes = await fetch(fallbackUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0',
+          'User-Agent': 'Mozilla/5.0 (compatible; Liread/1.0; +https://liread.app)',
           'Accept': 'application/json',
         },
-        signal: AbortSignal.timeout(6500),
+        signal: AbortSignal.timeout(8000),
       });
 
       if (fallbackRes.ok) {
         const fallbackData = await fallbackRes.json();
-        const fallbackDoc = fallbackData.docs?.find((d: any) => d.public_scan_b === true && Array.isArray(d.ia) && d.ia.length > 0);
-        if (fallbackDoc && fallbackDoc.ia && fallbackDoc.ia[0]) {
+        const fallbackDocs = Array.isArray(fallbackData.docs) ? fallbackData.docs : [];
+        const fallbackDoc = fallbackDocs.find((d: any) => d.ia?.[0]);
+        if (fallbackDoc && fallbackDoc.ia?.[0]) {
           const iaId = fallbackDoc.ia[0];
           return {
-            iaId,
             pdfUrl: `https://archive.org/download/${iaId}/${iaId}.pdf`,
+            epubUrl: `https://archive.org/download/${iaId}/${iaId}.epub`,
           };
         }
       }
@@ -68,20 +77,22 @@ async function checkOpenLibrary(title: string, author?: string): Promise<{ iaId:
   }
 }
 
-// Step B: Check Gutendex API for PDF or EPUB formats
-async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl: string | null; epubUrl: string | null } | null> {
+// Step B: Check Gutendex API for Project Gutenberg public domain EPUB or PDF formats
+async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl?: string; epubUrl?: string } | null> {
   try {
     const cleanTitle = title.trim();
     const cleanAuthor = (author || '').trim();
     const searchQuery = cleanAuthor ? `${cleanTitle} ${cleanAuthor}` : cleanTitle;
-    const url = `https://gutendex.com/books?search=${encodeURIComponent(searchQuery)}`;
+    
+    // Note: Gutendex strictly requires the trailing slash before query parameters to avoid 301 redirects
+    const url = `https://gutendex.com/books/?search=${encodeURIComponent(searchQuery)}`;
 
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0',
+        'User-Agent': 'Mozilla/5.0 (compatible; Liread/1.0; +https://liread.app)',
         'Accept': 'application/json',
       },
-      signal: AbortSignal.timeout(4500),
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!res.ok) return null;
@@ -91,11 +102,16 @@ async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl: 
 
     const formats = book.formats;
     const pdfUrl = formats['application/pdf'] || null;
-    const epubUrl = formats['application/epub+zip'] || null;
+    const epubUrl = 
+      formats['application/epub+zip'] || 
+      (book.id ? `https://www.gutenberg.org/ebooks/${book.id}.epub3.images` : null);
 
     if (!pdfUrl && !epubUrl) return null;
 
-    return { pdfUrl, epubUrl };
+    return {
+      pdfUrl: pdfUrl || undefined,
+      epubUrl: epubUrl || undefined,
+    };
   } catch {
     return null;
   }
@@ -173,7 +189,34 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Title parameter is required', available: false });
   }
 
-  // Run Open Library & Gutendex checks in parallel
+  // 1. FAST REGISTRY LOOKUP: Zero-delay instant check for verified timeless classics
+  const registryMatch = findPublicDomainBook(title, author);
+  if (registryMatch && registryMatch.available) {
+    if (mode === 'check') {
+      res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=604800');
+      return res.status(200).json({
+        available: true,
+        primaryFormat: registryMatch.primaryFormat,
+        hasPdf: registryMatch.hasPdf,
+        hasEpub: registryMatch.hasEpub,
+        pdfUrl: registryMatch.pdfUrl,
+        epubUrl: registryMatch.epubUrl,
+        source: 'registry',
+      } as AvailabilityResult);
+    }
+
+    if (mode === 'download') {
+      const targetUrl = requestedFormat === 'epub' && registryMatch.epubUrl
+        ? registryMatch.epubUrl
+        : (registryMatch.pdfUrl || registryMatch.epubUrl);
+
+      if (targetUrl) {
+        return res.redirect(302, targetUrl);
+      }
+    }
+  }
+
+  // 2. DYNAMIC LIVE LOOKUP: Run Open Library & Gutendex checks in parallel
   const [olResult, gutenResult] = await Promise.allSettled([
     checkOpenLibrary(title, author),
     checkGutendex(title, author),
@@ -183,7 +226,7 @@ export default async function handler(req: any, res: any) {
   const gutenData = gutenResult.status === 'fulfilled' ? gutenResult.value : null;
 
   const pdfUrl = olData?.pdfUrl || gutenData?.pdfUrl || null;
-  const epubUrl = gutenData?.epubUrl || null;
+  const epubUrl = gutenData?.epubUrl || olData?.epubUrl || null;
 
   const hasPdf = Boolean(pdfUrl);
   const hasEpub = Boolean(epubUrl);
@@ -201,6 +244,9 @@ export default async function handler(req: any, res: any) {
       primaryFormat,
       hasPdf,
       hasEpub,
+      pdfUrl: pdfUrl || undefined,
+      epubUrl: epubUrl || undefined,
+      source: gutenData ? 'gutendex' : 'openlibrary',
     } as AvailabilityResult);
   }
 
@@ -212,70 +258,22 @@ export default async function handler(req: any, res: any) {
 
     // Determine target download URL & format
     let targetUrl = '';
-    let targetExt = 'pdf';
-    let mimeType = 'application/pdf';
-
     if (requestedFormat === 'epub' && epubUrl) {
       targetUrl = epubUrl;
-      targetExt = 'epub';
-      mimeType = 'application/epub+zip';
     } else if (requestedFormat === 'pdf' && pdfUrl) {
       targetUrl = pdfUrl;
-      targetExt = 'pdf';
-      mimeType = 'application/pdf';
     } else {
       // Default: prioritize PDF first, fallback to EPUB
-      if (pdfUrl) {
-        targetUrl = pdfUrl;
-        targetExt = 'pdf';
-        mimeType = 'application/pdf';
-      } else if (epubUrl) {
-        targetUrl = epubUrl;
-        targetExt = 'epub';
-        mimeType = 'application/epub+zip';
-      }
+      targetUrl = pdfUrl || epubUrl || '';
     }
 
     if (!targetUrl) {
       return res.status(404).json({ error: 'Requested format not available', available: false });
     }
 
-    const cleanTitle = title.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'book';
-    const filename = `${cleanTitle}.${targetExt}`;
-
-    try {
-      const fileRes = await fetch(targetUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0',
-        },
-        redirect: 'follow',
-      });
-
-      if (!fileRes.ok || !fileRes.body) {
-        return res.redirect(302, targetUrl);
-      }
-
-      res.setHeader('Content-Type', mimeType);
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
-      
-      const contentLength = fileRes.headers.get('content-length');
-      if (contentLength) {
-        res.setHeader('Content-Length', contentLength);
-      }
-
-      // Stream the response to the client
-      const { Readable } = await import('stream');
-      if (typeof Readable.fromWeb === 'function') {
-        Readable.fromWeb(fileRes.body as any).pipe(res);
-      } else {
-        const arrayBuffer = await fileRes.arrayBuffer();
-        res.end(Buffer.from(arrayBuffer));
-      }
-    } catch {
-      // Graceful fallback: redirect browser directly to target URL
-      return res.redirect(302, targetUrl);
-    }
-    return;
+    // Instant HTTP 302 Redirect directly to CDN / Archive.org / Gutenberg edge.
+    // Avoids Vercel 4.5MB serverless payload limit and connection timeouts on large 15-40MB book files.
+    return res.redirect(302, targetUrl);
   }
 
   // Unknown mode
