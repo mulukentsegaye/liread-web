@@ -119,55 +119,85 @@ async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl?:
 
 // Stream book file directly to browser with Content-Disposition: attachment
 // This prevents cross-origin navigation, avoids tab popups, and triggers a real native browser download immediately.
-async function streamFile(res: any, targetUrl: string, title: string, format: string) {
+async function streamFile(
+  res: any, 
+  targetUrl: string, 
+  title: string, 
+  format: string,
+  fallbackUrl?: string,
+  fallbackFormat?: string
+) {
   const isEpub = format.toLowerCase() === 'epub';
   const targetExt = isEpub ? 'epub' : 'pdf';
   const mimeType = isEpub ? 'application/epub+zip' : 'application/pdf';
   const cleanTitle = title.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'book';
   const filename = `${cleanTitle}.${targetExt}`;
 
-  try {
-    const fileRes = await fetch(targetUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0',
-        'Accept': '*/*',
-      },
-      redirect: 'follow',
-      signal: AbortSignal.timeout(6000),
-    });
+  async function tryStream(url: string, mime: string, fname: string): Promise<boolean> {
+    try {
+      const fileRes = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+          'Accept': '*/*',
+        },
+        redirect: 'follow',
+        signal: AbortSignal.timeout(12000),
+      });
 
-    if (!fileRes.ok || !fileRes.body) {
-      return res.redirect(302, targetUrl);
-    }
-
-    res.setHeader('Content-Type', mimeType);
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`
-    );
-
-    const contentLength = fileRes.headers.get('content-length');
-    if (contentLength) {
-      res.setHeader('Content-Length', contentLength);
-    }
-
-    // Stream chunks directly from CDN to browser without buffering in memory
-    const { Readable } = await import('stream');
-    if (typeof Readable.fromWeb === 'function') {
-      Readable.fromWeb(fileRes.body as any).pipe(res);
-    } else {
-      const reader = fileRes.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(Buffer.from(value));
+      if (!fileRes.ok || !fileRes.body) {
+        return false;
       }
-      res.end();
+
+      res.setHeader('Content-Type', mime);
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(fname)}"; filename*=UTF-8''${encodeURIComponent(fname)}`
+      );
+
+      const contentLength = fileRes.headers.get('content-length');
+      if (contentLength) {
+        res.setHeader('Content-Length', contentLength);
+      }
+
+      // Stream chunks directly from CDN to browser without buffering in memory
+      const { Readable } = await import('stream');
+      if (typeof Readable.fromWeb === 'function') {
+        Readable.fromWeb(fileRes.body as any).pipe(res);
+      } else {
+        const reader = fileRes.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(Buffer.from(value));
+        }
+        res.end();
+      }
+      return true;
+    } catch (err) {
+      console.warn(`Streaming failed for ${url}:`, err);
+      return false;
     }
-  } catch {
-    // Graceful fallback if streaming fails
-    return res.redirect(302, targetUrl);
   }
+
+  // 1. Try primary URL
+  const primarySuccess = await tryStream(targetUrl, mimeType, filename);
+  if (primarySuccess) return;
+
+  // 2. If primary failed, try fallback (e.g. Gutenberg EPUB)
+  if (fallbackUrl && fallbackUrl !== targetUrl) {
+    const fbIsEpub = (fallbackFormat || 'epub').toLowerCase() === 'epub';
+    const fbExt = fbIsEpub ? 'epub' : 'pdf';
+    const fbMime = fbIsEpub ? 'application/epub+zip' : 'application/pdf';
+    const fbFilename = `${cleanTitle}.${fbExt}`;
+    const fbSuccess = await tryStream(fallbackUrl, fbMime, fbFilename);
+    if (fbSuccess) return;
+  }
+
+  // 3. If both failed, NEVER 302 redirect to a dead URL which causes browser "Site wasn't available" error!
+  return res.status(502).json({
+    error: 'The book source file is temporarily unreachable from upstream archives. Please try again or request via Telegram.',
+    available: false,
+  });
 }
 
 // Helper: Ensure res has standard express/vercel methods (status, json, redirect)

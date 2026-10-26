@@ -476,11 +476,11 @@ export const PostCard: React.FC<PostCardProps> = ({
           {/* Heart / upvote with Spring Bounce & Animated Counter */}
           <button
             onClick={handleUpvote}
-            aria-label={post.upvotesCount > 0 ? `Liked by ${post.upvotesCount} readers` : 'No likes yet. Click to like'}
+            aria-label={`${post.upvotesCount || 0} likes`}
             title={
               post.upvotesCount > 0 
                 ? `${post.upvotesCount} reader${post.upvotesCount === 1 ? '' : 's'} liked this passage` 
-                : 'No likes yet — be the first to like this passage!'
+                : 'Like passage'
             }
             className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-95 cursor-pointer ${
               post.isUpvoted
@@ -496,19 +496,9 @@ export const PostCard: React.FC<PostCardProps> = ({
               />
             </span>
 
-            {/* Real Counter or Explicit "No likes yet" */}
-            {post.upvotesCount > 0 ? (
-              <span className="inline-flex items-center gap-1">
-                <AnimatedCounter value={post.upvotesCount} />
-                <span className="text-[11px] opacity-80 hidden xs:inline">
-                  {post.upvotesCount === 1 ? 'like' : 'likes'}
-                </span>
-              </span>
-            ) : (
-              <span className="text-[11px] font-normal text-vibe-ink-muted">
-                No likes yet
-              </span>
-            )}
+            <span className="font-mono text-xs">
+              <AnimatedCounter value={post.upvotesCount || 0} />
+            </span>
 
             {/* Floating +1 Pop Badge */}
             {showPlusOne && (
@@ -521,35 +511,29 @@ export const PostCard: React.FC<PostCardProps> = ({
           {/* Comment */}
           <button
             onClick={() => toast.info(`Community discussion threads for "${post.bookTitle}" are opening soon!`, 'Discussion')}
-            aria-label={post.commentsCount > 0 ? `${post.commentsCount} comments` : 'No comments yet'}
+            aria-label={`${post.commentsCount || 0} comments`}
             title={
               post.commentsCount > 0 
                 ? `${post.commentsCount} comment${post.commentsCount === 1 ? '' : 's'}` 
-                : 'No comments yet'
+                : 'Comment on passage'
             }
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-colors cursor-pointer"
           >
             <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />
-            {post.commentsCount > 0 ? (
-              <span className="inline-flex items-center gap-1">
-                <span>{post.commentsCount}</span>
-                <span className="text-[11px] opacity-80 hidden xs:inline">
-                  {post.commentsCount === 1 ? 'comment' : 'comments'}
-                </span>
-              </span>
-            ) : (
-              <span className="text-[11px] font-normal text-vibe-ink-muted">
-                No comments
-              </span>
-            )}
+            <span className="font-mono text-xs">{post.commentsCount || 0}</span>
           </button>
         </div>
 
-        {/* Save */}
+        {/* Bookmark / Save with Reader Count */}
         <button
           onClick={() => toggleSave(post.id, user?.id)}
-          aria-label="Save passage"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+          aria-label={post.isSaved ? 'Remove from saved' : 'Save passage'}
+          title={
+            (post.bookmarksCount ?? 0) > 0
+              ? `Saved by ${post.bookmarksCount} reader${post.bookmarksCount === 1 ? '' : 's'}`
+              : 'Save to library'
+          }
+          className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
             post.isSaved
               ? 'bg-vibe-accent-subtle text-vibe-accent font-semibold'
               : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
@@ -559,7 +543,7 @@ export const PostCard: React.FC<PostCardProps> = ({
             className={`w-3.5 h-3.5 ${post.isSaved ? 'fill-current' : ''}`}
             strokeWidth={1.75}
           />
-          <span>{post.isSaved ? 'Saved' : 'Save'}</span>
+          <span className="font-mono text-xs">{post.bookmarksCount ?? 0}</span>
         </button>
       </div>
 

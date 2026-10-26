@@ -220,7 +220,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
   // Zero Broken Promises: Instant Book Availability & Download State
   const [availability, setAvailability] = useState<BookAvailability | null>(null);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState<boolean>(true);
-  const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'EPUB'>('PDF');
+  const [selectedFormat, setSelectedFormat] = useState<'PDF' | 'EPUB'>('EPUB');
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const telegramBotUsername = (
@@ -262,6 +262,10 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       setAvailability(localMatch);
       if (localMatch.primaryFormat) {
         setSelectedFormat(localMatch.primaryFormat);
+      } else if (localMatch.hasEpub) {
+        setSelectedFormat('EPUB');
+      } else if (localMatch.hasPdf) {
+        setSelectedFormat('PDF');
       }
       setIsCheckingAvailability(false);
       return;
@@ -288,8 +292,14 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
         const data: BookAvailability = await res.json();
         if (isMounted) {
           setAvailability(data);
-          if (data.available && data.primaryFormat) {
-            setSelectedFormat(data.primaryFormat);
+          if (data.available) {
+            if (data.primaryFormat) {
+              setSelectedFormat(data.primaryFormat);
+            } else if (data.hasEpub) {
+              setSelectedFormat('EPUB');
+            } else if (data.hasPdf) {
+              setSelectedFormat('PDF');
+            }
           }
         }
       } catch (err: any) {

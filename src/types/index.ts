@@ -49,6 +49,7 @@ export interface Post {
   rating?: number;    // 1 - 5 stars
   upvotesCount: number;
   commentsCount: number;
+  bookmarksCount?: number;
   isUpvoted?: boolean;
   isSaved?: boolean;
   postType: PostType;

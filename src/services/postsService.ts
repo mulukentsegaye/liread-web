@@ -31,6 +31,9 @@ export const postsService = {
         ),
         post_comments (
           id
+        ),
+        saved_posts (
+          user_id
         )
       `);
 
@@ -93,10 +96,20 @@ export const postsService = {
         ? item.post_comments.length
         : 0;
 
+      const realBookmarksCount = Array.isArray(item.saved_posts)
+        ? item.saved_posts.length
+        : (savedPostIds.has(item.id) ? 1 : 0);
+
       const isUpvoted = options.currentUserId
         ? (Array.isArray(item.post_upvotes)
             ? item.post_upvotes.some((u: any) => u.user_id === options.currentUserId)
             : upvotedPostIds.has(item.id))
+        : false;
+
+      const isSaved = options.currentUserId
+        ? (Array.isArray(item.saved_posts)
+            ? item.saved_posts.some((s: any) => s.user_id === options.currentUserId)
+            : savedPostIds.has(item.id))
         : false;
 
       return {
@@ -116,8 +129,9 @@ export const postsService = {
         rating: item.rating || undefined,
         upvotesCount: realUpvotesCount,
         commentsCount: realCommentsCount,
+        bookmarksCount: realBookmarksCount,
         isUpvoted,
-        isSaved: savedPostIds.has(item.id),
+        isSaved,
         postType: item.post_type,
         createdAt: item.created_at,
       };
@@ -147,6 +161,9 @@ export const postsService = {
           ),
           post_comments (
             id
+          ),
+          saved_posts (
+            user_id
           )
         `)
         .eq('user_id', authorUserId)
@@ -196,6 +213,16 @@ export const postsService = {
               : upvotedPostIds.has(item.id))
           : false;
 
+        const realBookmarksCount = Array.isArray(item.saved_posts)
+          ? item.saved_posts.length
+          : (savedPostIds.has(item.id) ? 1 : 0);
+
+        const isSaved = currentUserId
+          ? (Array.isArray(item.saved_posts)
+              ? item.saved_posts.some((s: any) => s.user_id === currentUserId)
+              : savedPostIds.has(item.id))
+          : false;
+
         return {
           id: item.id,
           userId: item.user_id,
@@ -213,8 +240,9 @@ export const postsService = {
           rating: item.rating || undefined,
           upvotesCount: realUpvotesCount,
           commentsCount: realCommentsCount,
+          bookmarksCount: realBookmarksCount,
           isUpvoted,
-          isSaved: savedPostIds.has(item.id),
+          isSaved,
           postType: item.post_type,
           createdAt: item.created_at,
         };
@@ -275,6 +303,7 @@ export const postsService = {
       rating: data.rating || undefined,
       upvotesCount: 0,
       commentsCount: 0,
+      bookmarksCount: 0,
       isUpvoted: false,
       isSaved: false,
       postType: data.post_type,

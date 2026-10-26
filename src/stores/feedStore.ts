@@ -87,7 +87,13 @@ export const useFeedStore = create<FeedStore>()(
         set((state) => ({
           posts: state.posts.map((post) => {
             if (post.id === postId) {
-              return { ...post, isSaved: !post.isSaved };
+              const nextSaved = !post.isSaved;
+              const currentBookmarks = post.bookmarksCount ?? (post.isSaved ? 1 : 0);
+              return {
+                ...post,
+                isSaved: nextSaved,
+                bookmarksCount: Math.max(0, currentBookmarks + (nextSaved ? 1 : -1)),
+              };
             }
             return post;
           }),
