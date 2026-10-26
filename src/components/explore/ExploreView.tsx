@@ -22,7 +22,8 @@ import {
   Feather,
   ShieldAlert,
   ArrowLeft,
-  RefreshCw
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 import { 
   CURATED_CATEGORIES, 
@@ -726,14 +727,14 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         setIsOffline(false);
         setSearchError(null);
       } catch (err: any) {
-        if (err.name !== 'AbortError') {
-          const isConn = isOfflineOrNetworkError(err);
-          if (isConn) {
+        if (err.name !== 'AbortError' && !controller.signal.aborted) {
+          const isActuallyOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+          if (isActuallyOffline) {
             setIsOffline(true);
-            setSearchError(err.message || 'Connection problem connecting to book catalog. Check your internet connection.');
+            setSearchError('You are currently offline. Check your internet connection.');
           } else {
-            setSearchError('Could not load book results. Please try again.');
-            console.warn('Search error in ExploreView:', err);
+            setIsOffline(false);
+            setSearchError(err.message || 'Book catalog is taking longer than usual to respond.');
           }
           setSuggestions([]);
           setTotalFound(0);
@@ -849,12 +850,16 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </button>
           </div>
 
-          {/* Connection Error Banner */}
-          {(isOffline || searchError) && (
+          {/* Connection / Catalog Busy Banner (only after search has resolved) */}
+          {!isSearching && (isOffline || searchError) && (
             <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200">
               <div className="flex items-center gap-2 min-w-0">
-                <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                <span className="truncate">{searchError || 'Connection problem connecting to book catalog. Showing offline matches.'}</span>
+                {isOffline ? (
+                  <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                )}
+                <span className="truncate">{searchError || (isOffline ? 'You are offline. Showing offline matches.' : 'Book catalog is taking longer than usual to respond.')}</span>
               </div>
               <button
                 type="button"
@@ -997,12 +1002,16 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             <div className="py-16 text-center space-y-3 bg-vibe-card rounded-3xl border border-vibe-border p-8">
               {isOffline || searchError ? (
                 <>
-                  <WifiOff className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto" />
+                  {isOffline ? (
+                    <WifiOff className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto" />
+                  ) : (
+                    <AlertCircle className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto" />
+                  )}
                   <p className="font-serif text-lg font-semibold text-vibe-ink">
-                    Connection Problem
+                    {isOffline ? 'Offline Mode' : 'Catalog Busy'}
                   </p>
                   <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto leading-relaxed">
-                    {searchError || 'Unable to connect to the online book catalog. Please check your internet connection and try again.'}
+                    {searchError || (isOffline ? 'You are currently offline. Check your internet connection.' : 'The book catalog is taking longer than usual to respond. Please try again.')}
                   </p>
                   <div className="pt-2">
                     <button
@@ -1016,7 +1025,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                       className="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Retry Connection</span>
+                      <span>{isOffline ? 'Retry Connection' : 'Retry Search'}</span>
                     </button>
                   </div>
                 </>

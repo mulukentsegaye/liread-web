@@ -40,7 +40,8 @@ export class OfflineSearchError extends Error {
 }
 
 /**
- * Helper to identify whether an error originated from offline status, timeout, or broken network pipe.
+ * Helper to identify whether an error originated from offline status or broken network pipe.
+ * Does NOT classify remote server status errors (e.g. 500, 502, 503, 429) as offline if navigator is online.
  */
 export function isOfflineOrNetworkError(err: unknown): boolean {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -53,33 +54,6 @@ export function isOfflineOrNetworkError(err: unknown): boolean {
     if ((err as any).name === 'OfflineSearchError') {
       return true;
     }
-    const msg = ((err as any).message || '').toLowerCase();
-    if (
-      msg.includes('fetch') ||
-      msg.includes('network') ||
-      msg.includes('failed') ||
-      msg.includes('offline') ||
-      msg.includes('load') ||
-      msg.includes('internet') ||
-      msg.includes('timed out') ||
-      msg.includes('timeout') ||
-      msg.includes('status 5') ||
-      msg.includes('status 429') ||
-      msg.includes('cors')
-    ) {
-      return true;
-    }
-  }
-  if (err instanceof TypeError) {
-    const msg = err.message.toLowerCase();
-    return (
-      msg.includes('fetch') ||
-      msg.includes('network') ||
-      msg.includes('failed') ||
-      msg.includes('offline') ||
-      msg.includes('load') ||
-      msg.includes('internet')
-    );
   }
   return false;
 }
@@ -150,15 +124,18 @@ export const bookSearchService = {
       return cached.result;
     }
 
-    // 2. Build fast, compact URL selecting only required fields
+    // 2. Build multi-stage search endpoints:
+    // A) `title=` query: lightning fast, highly specific, immune to Solr 500 errors on stopwords ("in the", "the", "a")
+    // B) `q=` query: fallback for author names, subjects, and broad queries
     const fields = 'key,title,author_name,cover_i,cover_edition_key,first_publish_year,number_of_pages_median,subject';
-    const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&fields=${fields}&limit=${limit}&page=${page}`;
+    const titleUrl = `https://openlibrary.org/search.json?title=${encodeURIComponent(trimmed)}&fields=${fields}&limit=${limit}&page=${page}`;
+    const broadUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&fields=${fields}&limit=${limit}&page=${page}`;
 
-    // 3. Resilient 8-second timeout combined with caller signal
+    // 3. Patient 14-second timeout combined with caller abort signal
     const timeoutController = new AbortController();
     const timeoutId = setTimeout(() => {
       timeoutController.abort(new Error('Open Library search request timed out'));
-    }, 8000);
+    }, 14000);
 
     const onCallerAbort = () => {
       timeoutController.abort();
@@ -168,12 +145,44 @@ export const bookSearchService = {
     }
 
     try {
-      const response = await fetch(url, { signal: timeoutController.signal });
-      if (!response.ok) {
-        throw new Error(`Open Library search returned status ${response.status}`);
+      let data: any = null;
+
+      // Strategy 1: Try title-indexed search first (solves 500 crashes and stopwords like "in the")
+      try {
+        const titleRes = await fetch(titleUrl, { signal: timeoutController.signal });
+        if (titleRes.ok) {
+          const json = await titleRes.json();
+          if (json && Array.isArray(json.docs) && json.docs.length > 0) {
+            data = json;
+          }
+        }
+      } catch (innerErr: any) {
+        if (signal?.aborted) throw innerErr;
       }
 
-      const data = await response.json();
+      // Strategy 2: If title search returned 0 items (e.g. user typed an author or subject), try broad search
+      if (!data && !timeoutController.signal.aborted) {
+        try {
+          const broadRes = await fetch(broadUrl, { signal: timeoutController.signal });
+          if (broadRes.ok) {
+            data = await broadRes.json();
+          } else if (broadRes.status >= 500) {
+            // Solr crashed on broad search; re-try titleUrl once as a safe fallback
+            const fallbackRes = await fetch(titleUrl, { signal: timeoutController.signal });
+            if (fallbackRes.ok) {
+              data = await fallbackRes.json();
+            }
+          }
+        } catch (innerErr: any) {
+          if (signal?.aborted) throw innerErr;
+        }
+      }
+
+      // If neither request returned data and caller hasn't aborted, return empty results gracefully
+      if (!data) {
+        data = { docs: [], numFound: 0 };
+      }
+
       const docs: any[] = data.docs || [];
       const totalFound: number =
         typeof data.numFound === 'number'
@@ -228,15 +237,11 @@ export const bookSearchService = {
       if (err.name === 'AbortError' && signal?.aborted) {
         throw err;
       }
-      if (isOfflineOrNetworkError(err)) {
-        throw new OfflineSearchError(
-          err.message?.includes('timed out')
-            ? 'Open Library connection timed out. Showing available offline books.'
-            : 'Unable to connect to the book catalog. Check your internet connection.'
-        );
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        throw new OfflineSearchError('You are currently offline. Check your internet connection.');
       }
-      console.warn('Open Library search error:', err);
-      throw err;
+      // If client is online, this is an Open Library server delay, NOT a client connection error
+      throw new Error('Book catalog is taking longer than usual to respond. Please try again.');
     } finally {
       clearTimeout(timeoutId);
       if (signal) {

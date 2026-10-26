@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight, WifiOff, RefreshCw } from 'lucide-react';
+import { Search, Bell, BookOpen, Flame, X, Loader2, ChevronRight, WifiOff, RefreshCw, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { getUserAvatar } from '../../utils/avatar';
 import { VibeTriggerButton } from '../theme/VibeTriggerButton';
@@ -67,15 +67,16 @@ export const Header: React.FC<HeaderProps> = ({
       setIsOffline(false);
       setSearchError(null);
     } catch (err: any) {
-      if (err.name === 'AbortError') {
+      if (err.name === 'AbortError' || signal.aborted) {
         return;
       }
-      const isConn = isOfflineOrNetworkError(err);
-      if (isConn) {
+      const isActuallyOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+      if (isActuallyOffline) {
         setIsOffline(true);
-        setSearchError('Connection problem connecting to book catalog. Check your internet connection.');
+        setSearchError('You are currently offline. Check your internet connection.');
       } else {
-        setSearchError('Could not load books. Please try again.');
+        setIsOffline(false);
+        setSearchError(err.message || 'Book catalog is taking longer than usual to respond.');
       }
       setSuggestions([]);
       setTotalFound(0);
@@ -248,12 +249,18 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        {/* 2. Connection Problem / Offline Banner */}
-        {(isOffline || searchError) && (
+        {/* 2. Connection Problem / Catalog Busy Banner (only when search has completed) */}
+        {!isSearching && (isOffline || searchError) && (
           <div className="px-3.5 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-              <span className="truncate">{searchError || 'Connection problem reaching the book catalog.'}</span>
+              {isOffline ? (
+                <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              )}
+              <span className="truncate">
+                {searchError || (isOffline ? 'You are offline. Check your connection.' : 'Book catalog is taking longer than usual to respond.')}
+              </span>
             </div>
             <button
               type="button"
@@ -438,8 +445,10 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Center Search Bar (md+) */}
         <div className="hidden md:flex flex-1 max-w-lg mx-auto relative" ref={desktopSearchRef}>
           <div className="relative w-full flex items-center">
-            {isOffline ? (
+            {isOffline && typeof navigator !== 'undefined' && !navigator.onLine ? (
               <WifiOff className="absolute left-3.5 w-4 h-4 text-amber-500 pointer-events-none" strokeWidth={1.75} />
+            ) : isSearching ? (
+              <Loader2 className="absolute left-3.5 w-4 h-4 text-vibe-accent animate-spin pointer-events-none" strokeWidth={1.75} />
             ) : (
               <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
             )}
@@ -608,8 +617,10 @@ export const Header: React.FC<HeaderProps> = ({
       {isMobileSearchOpen && (
         <div className="md:hidden px-4 pb-3 border-t border-vibe-border-subtle relative" ref={mobileSearchRef}>
           <div className="relative flex items-center mt-2">
-            {isOffline ? (
+            {isOffline && typeof navigator !== 'undefined' && !navigator.onLine ? (
               <WifiOff className="absolute left-3.5 w-4 h-4 text-amber-500 pointer-events-none" strokeWidth={1.75} />
+            ) : isSearching ? (
+              <Loader2 className="absolute left-3.5 w-4 h-4 text-vibe-accent animate-spin pointer-events-none" strokeWidth={1.75} />
             ) : (
               <Search className="absolute left-3.5 w-4 h-4 text-vibe-ink-muted pointer-events-none" strokeWidth={1.75} />
             )}

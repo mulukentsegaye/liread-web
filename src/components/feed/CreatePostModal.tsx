@@ -108,7 +108,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         setIsOffline(false);
         setShowSuggestions(true);
       } catch (err: any) {
-        if (err.name !== 'AbortError') {
+        if (err.name !== 'AbortError' && !controller.signal.aborted) {
           if (isOfflineOrNetworkError(err)) {
             setIsOffline(true);
             setSuggestions([]);
