@@ -311,14 +311,15 @@ export default async function handler(req: any, res?: any) {
       const replyText =
         message.reply_to_message.text || message.reply_to_message.caption || '';
       const uidMatch = replyText.match(/UID:(\d+)/);
+      const bookMatch = replyText.match(/📖 Book:\s*(.+)/i);
+      const bookTitle = bookMatch ? bookMatch[1].trim() : 'book';
 
       if (uidMatch) {
         const targetUserId = uidMatch[1];
         const fileId = message.document.file_id;
 
-        // 1. Send the file to the waiting user via sendDocument
-        const deliveryCaption =
-          "🎉 Good news! Your requested book from LiRead is ready. Enjoy reading!\n\n🌐 https://liread.vercel.app/";
+        // 1. Send the file directly to the specific user who requested it
+        const deliveryCaption = `🎉 Good news! Your requested book "${bookTitle}" from LiRead is ready. Enjoy reading!\n\n🌐 https://liread.vercel.app/`;
 
         const delivered = await sendTelegramDocument(
           botToken,
@@ -338,10 +339,10 @@ export default async function handler(req: any, res?: any) {
           );
         }
 
-        // 3. Reply to Admin
+        // 3. Reply directly to Admin confirming which user and book were fulfilled
         const confirmationMessage = delivered
-          ? "✅ Book successfully delivered to the user and saved to the Vault!"
-          : `⚠️ Upload saved to Vault, but could not deliver to user UID:${targetUserId} (they may not have started the bot or blocked it).`;
+          ? `✅ "${bookTitle}" successfully delivered to user (UID:${targetUserId}) and archived in your Vault!`
+          : `⚠️ "${bookTitle}" was saved to Vault, but could not be delivered to user UID:${targetUserId} (they may have stopped the bot).`;
 
         await sendTelegramMessage(botToken, message.chat.id, confirmationMessage);
         return respondOk(res);
@@ -353,6 +354,25 @@ export default async function handler(req: any, res?: any) {
         );
         return respondOk(res);
       }
+    }
+
+    // Safety: If Admin sends a document directly without replying to a request
+    if (isAdmin && !message.reply_to_message && message.document) {
+      if (vaultChannelId) {
+        await backupToVault(
+          botToken,
+          vaultChannelId,
+          message.document.file_id,
+          message.chat.id,
+          message.message_id
+        );
+      }
+      await sendTelegramMessage(
+        botToken,
+        message.chat.id,
+        "📁 File saved to your Vault! To deliver this book to a waiting user, please tap 'Reply' on that user's '🔔 NEW BOOK REQUEST' notification and attach the file."
+      );
+      return respondOk(res);
     }
 
     // =========================================================================
