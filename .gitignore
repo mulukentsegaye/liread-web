@@ -24,8 +24,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment variables
+# Environment variables & secrets (NEVER COMMIT)
 .env
+.env.*
+.env*.local
 .env.local
 .env.production
 .env.development
+.env.example
+*.env
+*.env*

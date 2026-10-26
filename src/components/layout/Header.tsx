@@ -109,17 +109,31 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     const query = searchVal.trim();
 
-    if (query.length < 2) {
+    if (query.length < 1) {
       setSuggestions([]);
       setTotalFound(0);
       setIsSearching(false);
       setShowDropdown(false);
       setIsOffline(false);
+      setSearchError(null);
+      return;
+    }
+
+    // Immediately open dropdown and surface local matches in 0ms
+    setShowDropdown(true);
+    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+    if (localMatches.length > 0) {
+      setSuggestions(localMatches);
+      setTotalFound(localMatches.length);
+    }
+
+    // For single-letter queries, local matches are fast and sufficient
+    if (query.length < 2) {
+      setIsSearching(false);
       return;
     }
 
     setIsSearching(true);
-    setShowDropdown(true);
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -129,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
 
     const timer = setTimeout(() => {
       executeSearch(query, controller.signal);
-    }, 320);
+    }, 200);
 
     return () => {
       clearTimeout(timer);
@@ -192,6 +206,20 @@ export const Header: React.FC<HeaderProps> = ({
     const val = e.target.value;
     setSearchVal(val);
     onSearch?.(val);
+
+    const trimmed = val.trim();
+    if (trimmed.length >= 1) {
+      setShowDropdown(true);
+      const localMatches = bookSearchService.searchLocalCuratedBooks(trimmed);
+      if (localMatches.length > 0) {
+        setSuggestions(localMatches);
+        setTotalFound(localMatches.length);
+      }
+    } else {
+      setShowDropdown(false);
+      setSuggestions([]);
+      setTotalFound(0);
+    }
   };
 
   const handleClearSearch = () => {
@@ -241,7 +269,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const renderSuggestionsDropdown = () => {
-    if (!showDropdown || searchVal.trim().length < 2) return null;
+    if (!showDropdown || searchVal.trim().length < 1) return null;
 
     return (
       <div className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-[65vh] sm:max-h-96 overflow-y-auto overscroll-contain backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
@@ -427,7 +455,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full max-w-full overflow-hidden border-b border-vibe-border bg-vibe-card/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-vibe-border bg-vibe-card/95 backdrop-blur-md">
       <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-0 flex items-center h-14 sm:h-15 gap-2 sm:gap-4">
 
         {/* Brand / Logo */}
@@ -457,7 +485,7 @@ export const Header: React.FC<HeaderProps> = ({
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               onFocus={() => {
-                if (suggestions.length > 0 || searchVal.trim().length >= 2) {
+                if (suggestions.length > 0 || searchVal.trim().length >= 1) {
                   setShowDropdown(true);
                 }
               }}
@@ -628,7 +656,7 @@ export const Header: React.FC<HeaderProps> = ({
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               onFocus={() => {
-                if (suggestions.length > 0 || searchVal.trim().length >= 2) {
+                if (suggestions.length > 0 || searchVal.trim().length >= 1) {
                   setShowDropdown(true);
                 }
               }}

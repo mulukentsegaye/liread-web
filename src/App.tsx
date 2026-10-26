@@ -459,6 +459,11 @@ export const App: React.FC = () => {
       )}
 
       <Header
+        onSearch={(query) => {
+          if (activeTab === 'explore') {
+            setExploreSearchQuery(query);
+          }
+        }}
         onSeeAll={handleSeeAllBooks}
         onGoToLanding={handleGoToLanding}
         onGoToLogin={() => openAuthModal('signin')}

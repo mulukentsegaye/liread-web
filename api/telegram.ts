@@ -201,8 +201,8 @@ export default async function handler(req: any, res?: any) {
       ok: true,
       service: 'LiRead Telegram Bot Webhook (@lireadbooksbot)',
       configured: Boolean(process.env.TELEGRAM_BOT_TOKEN),
-      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594'),
-      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430'),
+      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID),
+      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID),
     };
     if (res && typeof res.status === 'function') {
       return res.status(200).json(info);
@@ -220,8 +220,8 @@ export default async function handler(req: any, res?: any) {
 
   try {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594').trim();
-    const vaultChannelId = (process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430').trim();
+    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
+    const vaultChannelId = String(process.env.TELEGRAM_VAULT_CHANNEL_ID || '').trim();
 
     if (!botToken) {
       console.warn('[telegram-webhook] Warning: TELEGRAM_BOT_TOKEN environment variable is not set.');
@@ -250,8 +250,10 @@ export default async function handler(req: any, res?: any) {
     const chatId = message.chat.id;
     const rawText = (message.text || message.caption || '').trim();
     const isAdmin =
-      String(message.chat.id) === adminChatId ||
-      (message.from && String(message.from.id) === adminChatId);
+      Boolean(adminChatId) && (
+        String(message.chat.id) === adminChatId ||
+        (message.from && String(message.from.id) === adminChatId)
+      );
 
     // =========================================================================
     // CASE A: ADMIN REPLIES TO A REQUEST NOTIFICATION WITH A DOCUMENT/PDF
@@ -362,7 +364,9 @@ export default async function handler(req: any, res?: any) {
       const username = message.from?.username ? `@${message.from.username}` : 'no_username';
       const adminNotice = `🔔 NEW BOOK REQUEST\n\n📖 Book: ${requestedBookTitle}\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`;
 
-      await sendTelegramMessage(botToken, adminChatId, adminNotice);
+      if (adminChatId) {
+        await sendTelegramMessage(botToken, adminChatId, adminNotice);
+      }
       return respondOk(res);
     }
   } catch (err) {
