@@ -68,7 +68,10 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const session = await authService.getSession();
           if (session?.user) {
-            const profile = await authService.getUserProfile(session.user.id);
+            let profile = await authService.getUserProfile(session.user.id);
+            if (!profile) {
+              profile = await authService.ensureProfileExists(session.user);
+            }
             if (profile) {
               const todayMins = await sessionsService.getTodayMinutes(session.user.id);
               set({
@@ -94,7 +97,10 @@ export const useAuthStore = create<AuthStore>()(
           authSubscription = authService.onAuthStateChange((updatedSession: any) => {
             setTimeout(async () => {
               if (updatedSession?.user) {
-                const profile = await authService.getUserProfile(updatedSession.user.id);
+                let profile = await authService.getUserProfile(updatedSession.user.id);
+                if (!profile) {
+                  profile = await authService.ensureProfileExists(updatedSession.user);
+                }
                 if (profile) {
                   const todayMins = await sessionsService.getTodayMinutes(updatedSession.user.id);
                   set({ user: profile, isAuthenticated: true, isGuest: false, todayMinutesRead: todayMins });
@@ -123,7 +129,10 @@ export const useAuthStore = create<AuthStore>()(
         try {
           const { user } = await authService.signIn(email, password);
           if (user) {
-            const profile = await authService.getUserProfile(user.id);
+            let profile = await authService.getUserProfile(user.id);
+            if (!profile) {
+              profile = await authService.ensureProfileExists(user);
+            }
             if (profile) {
               const todayMins = await sessionsService.getTodayMinutes(user.id);
               set({ user: profile, isAuthenticated: true, isGuest: false, todayMinutesRead: todayMins });

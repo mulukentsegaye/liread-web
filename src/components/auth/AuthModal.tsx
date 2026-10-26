@@ -290,7 +290,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   type="text"
                   required
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setStatusMessage(null);
+                  }}
                   className="w-full min-h-[40px] px-3.5 text-xs rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:outline-hidden focus:border-vibe-accent transition-colors"
                   placeholder="@virginia"
                 />
@@ -302,7 +305,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setStatusMessage(null);
+                  }}
                   className="w-full min-h-[40px] px-3.5 text-xs rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:outline-hidden focus:border-vibe-accent transition-colors"
                   placeholder="virginia@example.com"
                 />

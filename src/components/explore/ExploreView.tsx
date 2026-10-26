@@ -21,7 +21,8 @@ import {
   Palette,
   Feather,
   ShieldAlert,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCw
 } from 'lucide-react';
 import { 
   CURATED_BOOKS, 
@@ -646,6 +647,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -655,6 +657,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   useEffect(() => {
     if (typeof initialSearchQuery === 'string' && initialSearchQuery !== searchQuery) {
       setSearchQuery(initialSearchQuery);
+      setSearchError(null);
       pageCacheRef.current.clear();
       setCurrentPage(1);
       if (initialSearchQuery.trim().length >= 2) {
@@ -672,6 +675,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       pageCacheRef.current.clear();
       setIsSearching(false);
       setIsOffline(false);
+      setSearchError(null);
       return;
     }
 
@@ -679,10 +683,19 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     if (cachedPage && cachedPage.length > 0) {
       setSuggestions(cachedPage);
       setIsSearching(false);
+      setSearchError(null);
       return;
     }
 
+    // Seed with local curated catalog matches right away for 0ms instant display
+    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+    if (currentPage === 1 && localMatches.length > 0 && (!cachedPage || cachedPage.length === 0)) {
+      setSuggestions(localMatches);
+      setTotalFound(localMatches.length);
+    }
+
     setIsSearching(true);
+    setSearchError(null);
 
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -692,7 +705,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
-      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+      setSearchError('You are currently offline. Showing available offline books.');
       const start = (currentPage - 1) * PAGE_SIZE;
       const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
       setSuggestions(pageSlice);
@@ -708,27 +721,45 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           page: currentPage,
           signal: controller.signal,
         });
-        setSuggestions(books);
-        pageCacheRef.current.set(currentPage, books);
-        setTotalFound(count);
+
+        // Merge local matches with Open Library books if page 1
+        let combined = books;
+        if (currentPage === 1 && localMatches.length > 0) {
+          const seen = new Set<string>();
+          combined = [];
+          for (const b of [...localMatches, ...books]) {
+            const norm = b.title.toLowerCase().trim();
+            if (!seen.has(norm)) {
+              seen.add(norm);
+              combined.push(b);
+            }
+          }
+        }
+
+        setSuggestions(combined);
+        pageCacheRef.current.set(currentPage, combined);
+        setTotalFound(Math.max(count, combined.length));
         setIsOffline(false);
+        setSearchError(null);
       } catch (err: any) {
         if (err.name !== 'AbortError') {
-          if (isOfflineOrNetworkError(err)) {
+          const isConn = isOfflineOrNetworkError(err);
+          if (isConn) {
             setIsOffline(true);
-            const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+            setSearchError(err.message || 'Connection problem connecting to book catalog. Check your internet connection.');
             const start = (currentPage - 1) * PAGE_SIZE;
             const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
             setSuggestions(pageSlice);
             setTotalFound(localMatches.length);
           } else {
+            setSearchError('Could not load book results. Please try again.');
             console.warn('Search error in ExploreView:', err);
           }
         }
       } finally {
         setIsSearching(false);
       }
-    }, 300);
+    }, 280);
 
     return () => {
       clearTimeout(timer);
@@ -850,11 +881,16 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                 <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted">
                   Search Results
                 </span>
-                {totalFound > 0 && (
+                {isSearching ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-vibe-accent font-semibold font-mono animate-pulse">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Searching book catalog...
+                  </span>
+                ) : totalFound > 0 ? (
                   <span className="text-xs text-vibe-accent font-semibold font-mono">
                     · {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
                   </span>
-                )}
+                ) : null}
               </div>
               <h1 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink">
                 Results for "{searchQuery}"
@@ -870,6 +906,29 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               <span>Clear Search</span>
             </button>
           </div>
+
+          {/* Connection Error Banner */}
+          {(isOffline || searchError) && (
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                <span className="truncate">{searchError || 'Connection problem connecting to book catalog. Showing offline matches.'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  pageCacheRef.current.clear();
+                  setCurrentPage(1);
+                  setIsSearching(true);
+                  setSearchError(null);
+                }}
+                className="px-3 py-1 rounded-lg bg-amber-600 text-white font-semibold text-xs hover:bg-amber-700 transition-colors flex items-center gap-1 cursor-pointer flex-shrink-0 shadow-2xs"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Retry</span>
+              </button>
+            </div>
+          )}
 
           {/* Search Results Grid */}
           {isSearching && suggestions.length === 0 ? (
@@ -994,22 +1053,51 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             </div>
           ) : (
             <div className="py-16 text-center space-y-3 bg-vibe-card rounded-3xl border border-vibe-border p-8">
-              <BookOpen className="w-8 h-8 text-vibe-ink-muted mx-auto" />
-              <p className="font-serif text-lg font-semibold text-vibe-ink">
-                No books found for "{searchQuery}"
-              </p>
-              <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
-                We couldn't find matching titles in Open Library. Try searching with another keyword or author name.
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="px-4 py-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-all cursor-pointer shadow-xs"
-                >
-                  Explore Curated Shelves
-                </button>
-              </div>
+              {isOffline || searchError ? (
+                <>
+                  <WifiOff className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto" />
+                  <p className="font-serif text-lg font-semibold text-vibe-ink">
+                    Connection Problem
+                  </p>
+                  <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto leading-relaxed">
+                    {searchError || 'Unable to connect to the online book catalog. Please check your internet connection and try again.'}
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        pageCacheRef.current.clear();
+                        setCurrentPage(1);
+                        setIsSearching(true);
+                        setSearchError(null);
+                      }}
+                      className="px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Retry Connection</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <BookOpen className="w-8 h-8 text-vibe-ink-muted mx-auto" />
+                  <p className="font-serif text-lg font-semibold text-vibe-ink">
+                    No books found for "{searchQuery}"
+                  </p>
+                  <p className="text-xs text-vibe-ink-muted max-w-sm mx-auto">
+                    We couldn't find matching titles in Open Library. Try searching with another keyword or author name.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="px-4 py-2 rounded-xl bg-vibe-accent text-white text-xs font-semibold hover:bg-vibe-accent-hover transition-all cursor-pointer shadow-xs"
+                    >
+                      Explore Curated Shelves
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

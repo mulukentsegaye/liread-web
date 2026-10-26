@@ -40,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
@@ -47,10 +48,19 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Core search execution logic
   const executeSearch = useCallback(async (query: string, signal: AbortSignal) => {
-    // If the browser already knows it is offline, bypass network call immediately
+    setSearchError(null);
+
+    // Immediate local match for instant responsiveness (0ms)
+    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+    if (localMatches.length > 0) {
+      setSuggestions(localMatches);
+      setTotalFound(localMatches.length);
+    }
+
+    // If browser already knows it is offline, show local matches
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
-      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+      setSearchError('You are currently offline. Showing available offline books.');
       setSuggestions(localMatches);
       setTotalFound(localMatches.length);
       setIsSearching(false);
@@ -59,22 +69,36 @@ export const Header: React.FC<HeaderProps> = ({
 
     try {
       const { books, totalFound: count } = await bookSearchService.searchBooks(query, signal);
-      setSuggestions(books);
-      setTotalFound(count);
+      
+      // Combine local matches with remote results (deduplicating by title)
+      const seen = new Set<string>();
+      const combined: SuggestedBook[] = [];
+      for (const b of [...localMatches, ...books]) {
+        const norm = b.title.toLowerCase().trim();
+        if (!seen.has(norm)) {
+          seen.add(norm);
+          combined.push(b);
+        }
+      }
+
+      setSuggestions(combined);
+      setTotalFound(Math.max(count, combined.length));
       setIsOffline(false);
+      setSearchError(null);
     } catch (err: any) {
       if (err.name === 'AbortError') {
         return;
       }
-      if (isOfflineOrNetworkError(err)) {
+      const isConn = isOfflineOrNetworkError(err);
+      if (isConn) {
         setIsOffline(true);
-        const localMatches = bookSearchService.searchLocalCuratedBooks(query);
+        setSearchError(err.message || 'Connection problem connecting to book catalog. Please check your internet connection.');
         setSuggestions(localMatches);
         setTotalFound(localMatches.length);
       } else {
-        setSuggestions([]);
-        setTotalFound(0);
-        setIsOffline(false);
+        setSearchError('Unable to load book results. Please try again.');
+        setSuggestions(localMatches);
+        setTotalFound(localMatches.length);
       }
     } finally {
       setIsSearching(false);
@@ -176,6 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
     setTotalFound(0);
     setShowDropdown(false);
     setIsOffline(false);
+    setSearchError(null);
     onSearch?.('');
   };
 
@@ -220,50 +245,69 @@ export const Header: React.FC<HeaderProps> = ({
 
     return (
       <div className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-[65vh] sm:max-h-96 overflow-y-auto overscroll-contain backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
-        {/* Header bar */}
-        <div className="px-3.5 py-2.5 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-xs text-vibe-ink-muted font-medium">
-          {isOffline ? (
-            <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
-              <WifiOff className="w-4 h-4" />
-              Offline Search
-            </span>
-          ) : (
+        {/* 1. Live Searching Status Banner */}
+        {isSearching && (
+          <div className="px-3.5 py-2.5 bg-vibe-accent/10 border-b border-vibe-accent/20 flex items-center justify-between text-xs text-vibe-accent font-medium">
+            <div className="flex items-center gap-2 min-w-0">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-vibe-accent flex-shrink-0" />
+              <span className="truncate">Searching book catalog for <strong className="text-vibe-ink">"{searchVal}"</strong>...</span>
+            </div>
+            <span className="text-[10px] uppercase font-mono tracking-wider font-semibold text-vibe-accent/80 flex-shrink-0 ml-2">Searching</span>
+          </div>
+        )}
+
+        {/* 2. Connection Problem / Offline Banner */}
+        {(isOffline || searchError) && (
+          <div className="px-3.5 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <WifiOff className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <span className="truncate">{searchError || 'Connection problem reaching the book catalog.'}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleRetrySearch}
+              className="px-2 py-0.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-[11px] transition-colors flex items-center gap-1 flex-shrink-0 cursor-pointer shadow-2xs"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Retry</span>
+            </button>
+          </div>
+        )}
+
+        {/* 3. Dropdown Header bar (when not actively searching) */}
+        {!isSearching && !searchError && (
+          <div className="px-3.5 py-2.5 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-xs text-vibe-ink-muted font-medium">
             <span className="flex items-center gap-1.5 text-vibe-ink font-semibold">
               <BookOpen className="w-4 h-4 text-vibe-accent" />
               Book Suggestions
             </span>
-          )}
 
-          {isOffline ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-              {suggestions.length > 0
-                ? `${suggestions.length} offline ${suggestions.length === 1 ? 'match' : 'matches'}`
-                : 'Offline'}
-            </span>
-          ) : totalFound > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-vibe-ink-muted font-medium">
-                {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
-              </span>
-              <button
-                type="button"
-                onClick={handleSeeAll}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-95 cursor-pointer"
-                title={`See all ${totalFound.toLocaleString()} books for "${searchVal}"`}
-              >
-                <span>See all</span>
-                <ChevronRight className="w-3 h-3" />
-              </button>
-            </div>
-          ) : null}
-        </div>
+            {totalFound > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-vibe-ink-muted font-medium">
+                  {totalFound.toLocaleString()} {totalFound === 1 ? 'book' : 'books'} found
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSeeAll}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-95 cursor-pointer"
+                  title={`See all ${totalFound.toLocaleString()} books for "${searchVal}"`}
+                >
+                  <span>See all</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Loading state: subtle, tranquil skeleton placeholders without duplicate spinners */}
+        {/* 4. Body Content */}
         {isSearching && suggestions.length === 0 ? (
-          <div className="p-2 space-y-1">
+          /* Skeletons while fetching */
+          <div className="p-3 space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-2.5 flex items-center gap-3 animate-pulse">
-                <div className="w-9 h-12 rounded-md bg-vibe-border/60 flex-shrink-0" />
+              <div key={i} className="p-2.5 flex items-center gap-3 animate-pulse rounded-xl bg-vibe-card-subtle/50">
+                <div className="w-10 h-14 rounded-md bg-vibe-border/60 flex-shrink-0" />
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="h-3.5 bg-vibe-border/60 rounded-md w-3/5" />
                   <div className="h-2.5 bg-vibe-border/40 rounded-md w-2/5" />
@@ -271,105 +315,8 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             ))}
           </div>
-        ) : isOffline ? (
-          /* Offline Mode State */
-          suggestions.length > 0 ? (
-            <div>
-              {/* Informational notice when offline but local catalog matches */}
-              <div className="px-3.5 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5 min-w-0">
-                  <WifiOff className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                  <span className="truncate">You are offline. Showing matching offline books.</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={handleRetrySearch}
-                  className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1 flex-shrink-0 cursor-pointer"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  Retry
-                </button>
-              </div>
-
-              {/* Book cards */}
-              <div className="divide-y divide-vibe-border/50">
-                {suggestions.map((book) => (
-                  <div
-                    key={book.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleViewDetails(book)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleViewDetails(book);
-                      }
-                    }}
-                    className="p-3 hover:bg-vibe-card-subtle/80 flex items-center justify-between gap-3 transition-colors group cursor-pointer outline-none focus-visible:bg-vibe-card-subtle"
-                    title={`View dedicated book page for "${book.title}"`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
-                        {book.coverThumbnailUrl ? (
-                          <img
-                            src={book.coverThumbnailUrl}
-                            alt={book.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
-                          {book.title}
-                        </p>
-                        <p className="text-[11px] text-vibe-ink-muted truncate">
-                          by {book.author}
-                          {book.firstPublishYear && (
-                            <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
-                              {book.firstPublishYear}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex-shrink-0 pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            /* Offline and no local match: Inform user clearly that they are offline */
-            <div className="p-6 text-center text-xs space-y-3">
-              <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400 shadow-xs">
-                <WifiOff className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-vibe-ink text-sm">You are offline</p>
-                <p className="text-[11px] text-vibe-ink-muted max-w-xs mx-auto leading-relaxed">
-                  Connect to the internet to search for <span className="font-semibold text-vibe-ink">"{searchVal}"</span>.
-                </p>
-              </div>
-              <div className="pt-1 flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={handleRetrySearch}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-vibe-accent text-white hover:bg-vibe-accent/90 transition-all shadow-xs active:scale-95 cursor-pointer"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Retry Search
-                </button>
-              </div>
-            </div>
-          )
         ) : suggestions.length > 0 ? (
-          /* Normal online suggestions list */
+          /* Book Suggestions List */
           <div className="divide-y divide-vibe-border/50">
             {suggestions.map((book) => (
               <div
@@ -387,7 +334,6 @@ export const Header: React.FC<HeaderProps> = ({
                 title={`View dedicated book page for "${book.title}"`}
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  {/* Book cover thumbnail */}
                   <div className="w-10 h-14 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
                     {book.coverThumbnailUrl ? (
                       <img
@@ -401,7 +347,6 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                   </div>
 
-                  {/* Book metadata */}
                   <div className="min-w-0 flex-1">
                     <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
                       {book.title}
@@ -417,37 +362,64 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                 </div>
 
-                {/* Subtle affordance chevron indicating dedicated book page */}
-                <div className="flex-shrink-0 pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
-                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDropdown(false);
+                      onSelectBookForTimer?.(book.title, book.author, book.coverImageUrl);
+                    }}
+                    className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-vibe-border bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink text-[11px] font-medium transition-colors cursor-pointer"
+                    title={`Start reading timer for "${book.title}"`}
+                  >
+                    <span>Read</span>
+                  </button>
+                  <div className="pr-1 text-vibe-ink-muted group-hover:text-vibe-accent transition-colors">
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </div>
               </div>
             ))}
 
-            {/* Bottom "See all" action button for seamless UX navigation */}
-            {totalFound > suggestions.length && (
-              <div className="p-2 border-t border-vibe-border bg-vibe-card-subtle/80 sticky bottom-0 backdrop-blur-md">
-                <button
-                  type="button"
-                  onClick={handleSeeAll}
-                  className="w-full py-2 px-3 rounded-xl bg-vibe-accent/10 hover:bg-vibe-accent text-vibe-accent hover:text-white border border-vibe-accent/20 text-xs font-semibold flex items-center justify-between transition-all group cursor-pointer shadow-xs active:scale-[0.99]"
-                >
-                  <span className="truncate">
-                    See all <span className="font-bold underline decoration-vibe-accent/30">{totalFound.toLocaleString()}</span> books for "{searchVal}"
-                  </span>
-                  <span className="flex items-center gap-1 font-bold text-[11px] flex-shrink-0 ml-2">
-                    <span>View all</span>
-                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </span>
-                </button>
-              </div>
-            )}
+            {/* Bottom "See all" action button */}
+            <div className="p-2 border-t border-vibe-border bg-vibe-card-subtle/80 sticky bottom-0 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={handleSeeAll}
+                className="w-full py-2 px-3 rounded-xl bg-vibe-accent text-white hover:bg-vibe-accent-hover text-xs font-semibold flex items-center justify-between transition-all group cursor-pointer shadow-xs active:scale-[0.99]"
+              >
+                <span className="truncate">
+                  {totalFound > suggestions.length
+                    ? `See all ${totalFound.toLocaleString()} books for "${searchVal}"`
+                    : `View full results for "${searchVal}"`}
+                </span>
+                <span className="flex items-center gap-1 font-bold text-[11px] flex-shrink-0 ml-2">
+                  <span>Explore</span>
+                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </button>
+            </div>
           </div>
-        ) : (
+        ) : !isSearching && (
           /* Normal online: no books found */
-          <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-1">
+          <div className="p-6 text-center text-xs text-vibe-ink-muted space-y-2">
+            <div className="w-10 h-10 rounded-full bg-vibe-card-subtle flex items-center justify-center mx-auto text-vibe-ink-muted">
+              <BookOpen className="w-5 h-5" />
+            </div>
             <p className="font-semibold text-vibe-ink">No books found for "{searchVal}"</p>
-            <p className="text-[11px] text-vibe-ink-muted/80">Try checking the spelling or searching another title or author.</p>
+            <p className="text-[11px] text-vibe-ink-muted/80 max-w-xs mx-auto">
+              Check the spelling or try searching another title, author, or genre.
+            </p>
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={handleSeeAll}
+                className="px-3 py-1.5 rounded-lg border border-vibe-border bg-vibe-card text-xs font-medium text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
+              >
+                Search all catalogs
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -489,25 +461,40 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowDropdown(true);
                 }
               }}
-              placeholder={isOffline ? "Search offline books & authors..." : "Search books, authors, passages..."}
-              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2 rounded-xl border focus:outline-none transition-all ${
+              placeholder={isOffline ? "Search offline books & authors..." : "Search books by title, author..."}
+              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-22 py-2 rounded-xl border focus:outline-none transition-all ${
                 isOffline 
                   ? 'border-amber-500/40 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15'
                   : 'border-vibe-border focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/15'
               }`}
             />
-            {isSearching ? (
-              <Loader2 className="absolute right-3 w-4 h-4 text-vibe-accent animate-spin" />
-            ) : searchVal ? (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            ) : null}
+            <div className="absolute right-2 flex items-center gap-1.5">
+              {isSearching && (
+                <span title="Searching catalog...">
+                  <Loader2 className="w-4 h-4 text-vibe-accent animate-spin" />
+                </span>
+              )}
+              {searchVal && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {searchVal.trim().length >= 2 && (
+                <button
+                  type="button"
+                  onClick={handleSeeAll}
+                  className="px-2 py-0.5 rounded-lg bg-vibe-accent hover:bg-vibe-accent-hover text-white text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+                  title="Search catalog (Enter)"
+                >
+                  Search
+                </button>
+              )}
+            </div>
           </div>
 
           {renderSuggestionsDropdown()}
@@ -645,25 +632,40 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowDropdown(true);
                 }
               }}
-              placeholder={isOffline ? "Search offline books & authors..." : "Search books, authors, passages..."}
-              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-9 py-2.5 rounded-xl border focus:outline-none transition-all ${
+              placeholder={isOffline ? "Search offline books & authors..." : "Search books by title, author..."}
+              className={`w-full bg-vibe-bg text-sm text-vibe-ink placeholder:text-vibe-ink-muted pl-10 pr-22 py-2.5 rounded-xl border focus:outline-none transition-all ${
                 isOffline 
                   ? 'border-amber-500/40 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15'
                   : 'border-vibe-border focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/15'
               }`}
             />
-            {isSearching ? (
-              <Loader2 className="absolute right-3 w-4 h-4 text-vibe-accent animate-spin" />
-            ) : searchVal ? (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                className="absolute right-2.5 p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            ) : null}
+            <div className="absolute right-2 flex items-center gap-1.5">
+              {isSearching && (
+                <span title="Searching catalog...">
+                  <Loader2 className="w-4 h-4 text-vibe-accent animate-spin" />
+                </span>
+              )}
+              {searchVal && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="p-1 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {searchVal.trim().length >= 2 && (
+                <button
+                  type="button"
+                  onClick={handleSeeAll}
+                  className="px-2 py-0.5 rounded-lg bg-vibe-accent hover:bg-vibe-accent-hover text-white text-[11px] font-semibold transition-all cursor-pointer shadow-2xs"
+                  title="Search catalog (Enter)"
+                >
+                  Search
+                </button>
+              )}
+            </div>
           </div>
 
           {renderSuggestionsDropdown()}

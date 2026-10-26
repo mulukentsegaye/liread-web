@@ -39,7 +39,7 @@ export class OfflineSearchError extends Error {
 }
 
 /**
- * Helper to identify whether an error originated from offline status or broken network pipe.
+ * Helper to identify whether an error originated from offline status, timeout, or broken network pipe.
  */
 export function isOfflineOrNetworkError(err: unknown): boolean {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -50,6 +50,22 @@ export function isOfflineOrNetworkError(err: unknown): boolean {
       return true;
     }
     if ((err as any).name === 'OfflineSearchError') {
+      return true;
+    }
+    const msg = ((err as any).message || '').toLowerCase();
+    if (
+      msg.includes('fetch') ||
+      msg.includes('network') ||
+      msg.includes('failed') ||
+      msg.includes('offline') ||
+      msg.includes('load') ||
+      msg.includes('internet') ||
+      msg.includes('timed out') ||
+      msg.includes('timeout') ||
+      msg.includes('status 5') ||
+      msg.includes('status 429') ||
+      msg.includes('cors')
+    ) {
       return true;
     }
   }
@@ -113,12 +129,16 @@ export function sanitizeOpenLibraryCover(
   return url || undefined;
 }
 
+// In-memory cache for book search results (reduces latency & Open Library rate-limiting)
+const searchMemoryCache = new Map<string, { result: SearchBooksResult; timestamp: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 export const bookSearchService = {
   /**
    * Search Open Library by query string and return normalized book suggestions
    * with high-resolution and thumbnail cover image URLs, along with the accurate
    * total count of matching books (`totalFound`).
-   * Throws `OfflineSearchError` when offline so UI can accurately explain
+   * Throws `OfflineSearchError` when offline or on connection error so UI can accurately explain
    * that connection is missing instead of reporting "book not found".
    */
   async searchBooks(
@@ -148,10 +168,32 @@ export const bookSearchService = {
       }
     }
 
-    const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&limit=${limit}&page=${page}`;
+    // 1. Check cache first for instant 0ms retrieval
+    const cacheKey = `${trimmed.toLowerCase()}_${limit}_${page}`;
+    const cached = searchMemoryCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.result;
+    }
+
+    // 2. Build fast, compact URL selecting only required fields
+    const fields = 'key,title,author_name,cover_i,cover_edition_key,first_publish_year,number_of_pages_median,subject';
+    const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(trimmed)}&fields=${fields}&limit=${limit}&page=${page}`;
+
+    // 3. Resilient 8-second timeout combined with caller signal
+    const timeoutController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      timeoutController.abort(new Error('Open Library search request timed out'));
+    }, 8000);
+
+    const onCallerAbort = () => {
+      timeoutController.abort();
+    };
+    if (signal) {
+      signal.addEventListener('abort', onCallerAbort, { once: true });
+    }
 
     try {
-      const response = await fetch(url, { signal });
+      const response = await fetch(url, { signal: timeoutController.signal });
       if (!response.ok) {
         throw new Error(`Open Library search returned status ${response.status}`);
       }
@@ -200,19 +242,31 @@ export const bookSearchService = {
         };
       });
 
-      return {
+      const result: SearchBooksResult = {
         books,
         totalFound,
       };
+
+      searchMemoryCache.set(cacheKey, { result, timestamp: Date.now() });
+      return result;
     } catch (err: any) {
-      if (err.name === 'AbortError') {
+      if (err.name === 'AbortError' && signal?.aborted) {
         throw err;
       }
       if (isOfflineOrNetworkError(err)) {
-        throw new OfflineSearchError('Open Library search failed because you are offline');
+        throw new OfflineSearchError(
+          err.message?.includes('timed out')
+            ? 'Open Library connection timed out. Showing available offline books.'
+            : 'Unable to connect to the book catalog. Check your internet connection.'
+        );
       }
       console.warn('Open Library search error:', err);
-      return { books: [], totalFound: 0 };
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+      if (signal) {
+        signal.removeEventListener('abort', onCallerAbort);
+      }
     }
   },
 

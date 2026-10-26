@@ -173,6 +173,52 @@ export const authService = {
   },
 
   /**
+   * Ensures a profile exists in public.profiles for an authenticated user.
+   * Acts as a resilient fallback if the database trigger experienced a race condition.
+   */
+  async ensureProfileExists(user: any): Promise<UserProfile | null> {
+    if (!user?.id) return null;
+
+    // 1. Check if profile already exists
+    const existing = await this.getUserProfile(user.id);
+    if (existing) return existing;
+
+    // 2. Prepare profile metadata
+    const rawUsername = (user.user_metadata?.username as string) || `reader_${user.id.slice(0, 8)}`;
+    const cleanUsername = rawUsername.toLowerCase().replace(/^@/, '').trim() || `reader_${user.id.slice(0, 8)}`;
+    const fullName = (user.user_metadata?.full_name as string) || (user.email ? user.email.split('@')[0] : 'Avid Reader');
+
+    try {
+      const { error: insertError } = await supabase.from('profiles').insert({
+        id: user.id,
+        username: cleanUsername,
+        full_name: fullName,
+        avatar_url: DEFAULT_USER_AVATAR,
+        daily_goal_minutes: 60,
+        rank_tier: 'Novice Reader',
+      });
+
+      if (insertError) {
+        // Disambiguate with user id slice if another user took the username in the interim
+        if (insertError.code === '23505' || insertError.message.includes('unique') || insertError.message.includes('duplicate')) {
+          await supabase.from('profiles').insert({
+            id: user.id,
+            username: `${cleanUsername}_${user.id.slice(0, 4)}`,
+            full_name: fullName,
+            avatar_url: DEFAULT_USER_AVATAR,
+            daily_goal_minutes: 60,
+            rank_tier: 'Novice Reader',
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Fallback profile creation attempt:', err);
+    }
+
+    return await this.getUserProfile(user.id);
+  },
+
+  /**
    * Update profile metadata (e.g. dailyGoalMinutes, fullName, bio, avatar).
    */
   async updateProfile(userId: string, updates: Partial<{

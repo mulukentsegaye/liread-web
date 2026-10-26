@@ -294,6 +294,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                   setMode('signin');
                   setErrorMsg(null);
                   setSuccessMsg(null);
+                  clearPendingConfirmation();
                 }}
                 className={`flex-1 py-2 text-xs font-semibold rounded-full transition-all text-center ${
                   mode === 'signin'
@@ -309,6 +310,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                   setMode('signup');
                   setErrorMsg(null);
                   setSuccessMsg(null);
+                  clearPendingConfirmation();
                 }}
                 className={`flex-1 py-2 text-xs font-semibold rounded-full transition-all text-center ${
                   mode === 'signup'
@@ -446,7 +448,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                       <input
                         type="text"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => {
+                          setUsername(e.target.value);
+                          setErrorMsg(null);
+                        }}
                         placeholder="janedoe"
                         required={mode === 'signup'}
                         className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
@@ -466,7 +471,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      const newEmail = e.target.value;
+                      setEmail(newEmail);
+                      setErrorMsg(null);
+                      if (pendingConfirmationEmail && newEmail.trim().toLowerCase() !== pendingConfirmationEmail.trim().toLowerCase()) {
+                        clearPendingConfirmation();
+                      }
+                    }}
                     placeholder="reader@liread.app"
                     required
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
