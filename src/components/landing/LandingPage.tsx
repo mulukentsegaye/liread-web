@@ -180,8 +180,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
         {/* Lead Subtitle */}
         <p className="max-w-2xl text-sm sm:text-base lg:text-lg text-vibe-ink-secondary leading-relaxed font-normal mb-8 sm:mb-10">
-          Cultivate a calm, distraction-free reading habit with atmospheric generative soundscapes, 
-          curated multi-theme aesthetics inspired by Kinfolk and archival libraries, and mindful reflection tools.
+          A calm, distraction-free space to read your favorite books, listen to relaxing ambient sounds, and track your daily reading journey.
         </p>
 
         {/* Action Button Group */}
