@@ -158,37 +158,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
 
   const savedPosts = posts.filter((p) => p.isSaved);
 
-  const demoBooks = [
-    {
-      id: 'demo-1',
-      title: 'The Creative Act: A Way of Being',
-      author: 'Rick Rubin',
-      progress: 68,
-      status: 'Currently Reading',
-      statusCode: 'currently_reading' as const,
-      coverUrl: 'https://covers.openlibrary.org/b/id/13316390-L.jpg',
-    },
-    {
-      id: 'demo-2',
-      title: 'Atomic Habits',
-      author: 'James Clear',
-      progress: 100,
-      status: 'Finished',
-      statusCode: 'finished' as const,
-      coverUrl: 'https://covers.openlibrary.org/b/id/12539702-L.jpg',
-    },
-    {
-      id: 'demo-3',
-      title: 'Meditations',
-      author: 'Marcus Aurelius',
-      progress: 42,
-      status: 'Currently Reading',
-      statusCode: 'currently_reading' as const,
-      coverUrl: 'https://covers.openlibrary.org/b/isbn/9780812968255-L.jpg',
-    },
-  ];
-
-  const mappedBooks = dbBooks.length > 0 ? dbBooks.map((b) => ({
+  const mappedBooks = dbBooks.map((b) => ({
     id: b.id,
     title: b.title,
     author: b.author,
@@ -196,7 +166,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
     status: b.status === 'currently_reading' ? 'Currently Reading' : b.status === 'finished' ? 'Finished' : 'Want to Read',
     statusCode: b.status,
     coverUrl: sanitizeOpenLibraryCover(b.title, b.author, b.coverImageUrl) || '',
-  })) : (isGuest ? demoBooks : []);
+  }));
 
   // Shelf category counts
   const countAll = mappedBooks.length;

@@ -277,7 +277,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      logSessionMinutes: async (minutes, bookTitle = 'The Creative Act') => {
+      logSessionMinutes: async (minutes, bookTitle = 'Reading Session') => {
         const { user, todayMinutesRead, isAuthenticated, isGuest } = get();
         if (!user) return;
         const newToday = todayMinutesRead + minutes;

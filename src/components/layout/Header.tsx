@@ -569,7 +569,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onViewSanctuary || onViewProfile}
             aria-label={`Current streak: ${user?.currentStreak ?? 0} days`}
             className="flex sm:hidden items-center gap-1 px-2 py-1 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent active:scale-95 transition-transform cursor-pointer"
-            title="View reading streak in Sanctuary"
+            title="View reading streak in Community"
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
             <span className="font-mono text-xs font-semibold leading-none">{user?.currentStreak ?? 0}</span>
@@ -581,7 +581,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={onViewSanctuary || onViewProfile}
             aria-label={`Current streak: ${user?.currentStreak ?? 0} days`}
             className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-vibe-accent-subtle border border-vibe-accent/20 text-vibe-accent hover:border-vibe-accent/40 active:scale-95 transition-all cursor-pointer"
-            title="View reading streak in Sanctuary"
+            title="View reading streak in Community"
           >
             <Flame className="w-3.5 h-3.5 fill-current" />
             <span className="font-mono text-xs font-semibold">{user?.currentStreak ?? 0}d</span>

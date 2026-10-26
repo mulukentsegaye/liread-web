@@ -13,7 +13,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) 
     { id: 'explore', label: 'Explore', icon: Compass },
     { id: 'reader', label: 'Reader', icon: BookOpen },
     { id: 'bookshelf', label: 'Shelf', icon: Library },
-    { id: 'sanctuary', label: 'Sanctuary', icon: Users },
+    { id: 'sanctuary', label: 'Community', icon: Users },
   ];
 
   const isTabActive = (id: NavigationTab) => {

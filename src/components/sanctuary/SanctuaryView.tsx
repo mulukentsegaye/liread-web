@@ -124,11 +124,11 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               <span className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80">
-                Community Sanctuary
+                Reading Community
               </span>
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
-              Reading Sanctuary
+              Community & Habits
             </h1>
           </div>
 
@@ -144,7 +144,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Circle</span>
+              <span>Readers</span>
             </button>
             <button
               type="button"
@@ -156,7 +156,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
               }`}
             >
               <Bookmark className="w-3.5 h-3.5" />
-              <span>Curators</span>
+              <span>Top Notes</span>
             </button>
             <button
               type="button"
@@ -177,11 +177,11 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
       {/* Guest Notice */}
       {isGuest && (
         <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 flex items-center justify-between gap-4">
-          <span>Guest browsing — create a free account to set your personal daily commitment and join the Consistent Circle.</span>
+          <span>Guest browsing — create a free account to set your personal daily commitment and join the Reading Community.</span>
         </div>
       )}
 
-      {/* 1. Live Co-Reading Sanctuary Presence Widget */}
+      {/* 1. Live Reading Room Presence Widget */}
       <div className="rounded-3xl border border-vibe-border bg-vibe-card-subtle p-4 sm:p-5 shadow-soft">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
@@ -191,7 +191,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
             </span>
             <div>
               <h2 className="text-xs sm:text-sm font-semibold text-vibe-ink flex items-center gap-2">
-                <span>Live Co-Reading Sanctuary</span>
+                <span>Live Reading Room</span>
                 <span className="font-mono text-[11px] font-normal text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                   {effectiveLiveCoReaders.length} readers currently in session
                 </span>
@@ -204,7 +204,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
 
           <button
             type="button"
-            onClick={() => onStartTimer?.('The Creative Act: A Way of Being', 'Rick Rubin')}
+            onClick={() => onStartTimer?.(user?.currentlyReadingBook || 'Focus Session', user?.currentlyReadingAuthor || '')}
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white text-xs font-medium shadow-xs transition-all active:scale-95 cursor-pointer self-start sm:self-auto shrink-0"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
@@ -213,42 +213,48 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
         </div>
 
         {/* Live Reader Avatars & Current Books */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
-          {effectiveLiveCoReaders.map((coReader) => (
-            <div
-              key={coReader.userId}
-              className={`flex items-center gap-3 p-2.5 rounded-2xl border transition-all ${
-                coReader.isCurrentUser
-                  ? 'bg-vibe-accent-subtle/80 border-vibe-accent/30 shadow-2xs'
-                  : 'bg-vibe-card/80 border-vibe-border hover:border-vibe-border'
-              }`}
-            >
-              <div className="relative flex-shrink-0">
-                {coReader.avatarUrl ? (
-                  <img
-                    src={coReader.avatarUrl}
-                    alt={coReader.fullName}
-                    className="w-9 h-9 rounded-full object-cover border border-vibe-border"
-                  />
-                ) : (
-                  <div className="w-9 h-9 rounded-full bg-vibe-accent text-white flex items-center justify-center font-bold text-xs">
-                    {coReader.initials}
-                  </div>
-                )}
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-vibe-card" />
-              </div>
+        {effectiveLiveCoReaders.length === 0 ? (
+          <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border text-center text-xs text-vibe-ink-muted">
+            No co-readers currently in an active session. Click &ldquo;Start Focus Session&rdquo; to begin reading!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+            {effectiveLiveCoReaders.map((coReader) => (
+              <div
+                key={coReader.userId}
+                className={`flex items-center gap-3 p-2.5 rounded-2xl border transition-all ${
+                  coReader.isCurrentUser
+                    ? 'bg-vibe-accent-subtle/80 border-vibe-accent/30 shadow-2xs'
+                    : 'bg-vibe-card/80 border-vibe-border hover:border-vibe-border'
+                }`}
+              >
+                <div className="relative flex-shrink-0">
+                  {coReader.avatarUrl ? (
+                    <img
+                      src={coReader.avatarUrl}
+                      alt={coReader.fullName}
+                      className="w-9 h-9 rounded-full object-cover border border-vibe-border"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-vibe-accent text-white flex items-center justify-center font-bold text-xs">
+                      {coReader.initials}
+                    </div>
+                  )}
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-vibe-card" />
+                </div>
 
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-vibe-ink truncate">
-                  {coReader.fullName} {coReader.isCurrentUser && <span className="text-vibe-accent font-normal">(You)</span>}
-                </p>
-                <p className="text-[11px] text-vibe-ink-muted truncate">
-                  reading <span className="font-medium text-vibe-ink">{coReader.bookTitle}</span>
-                </p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-vibe-ink truncate">
+                    {coReader.fullName} {coReader.isCurrentUser && <span className="text-vibe-accent font-normal">(You)</span>}
+                  </p>
+                  <p className="text-[11px] text-vibe-ink-muted truncate">
+                    reading <span className="font-medium text-vibe-ink">{coReader.bookTitle}</span>
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 2. Personal Daily Commitment & Consistency Circle Banner */}
@@ -334,77 +340,83 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
         </div>
       </div>
 
-      {/* 3. Section Content: Consistent Circle OR Top Curators */}
+      {/* 3. Section Content: Readers Circle OR Top Shared Notes */}
       {activeTab === 'curators' ? (
-        /* Top Wisdom Curators Showcase */
+        /* Top Community Notes Showcase */
         <div className="space-y-4">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wider text-vibe-ink">
-              Wisdom Curators
+              Top Community Notes
             </h2>
             <p className="text-xs text-vibe-ink-muted mt-0.5">
               Readers whose shared quotes and reflections were saved most this week.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {topCurators.map((curator) => (
-              <div
-                key={curator.id}
-                className="bg-vibe-card border border-vibe-border rounded-2xl p-5 shadow-soft flex flex-col justify-between space-y-4 hover:shadow-float transition-all"
-              >
-                <div className="space-y-3">
-                  {/* Curator info */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <img
-                        src={curator.authorAvatar}
-                        alt={curator.authorName}
-                        className="w-7 h-7 rounded-full object-cover border border-vibe-border flex-shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</p>
-                        <p className="text-[10px] text-vibe-ink-muted truncate">@{curator.authorUsername}</p>
+          {topCurators.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-vibe-card border border-vibe-border text-center text-xs text-vibe-ink-muted">
+              No shared notes yet. Share your favourite book passages and insights to be featured!
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {topCurators.map((curator) => (
+                <div
+                  key={curator.id}
+                  className="bg-vibe-card border border-vibe-border rounded-2xl p-5 shadow-soft flex flex-col justify-between space-y-4 hover:shadow-float transition-all"
+                >
+                  <div className="space-y-3">
+                    {/* Curator info */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img
+                          src={curator.authorAvatar}
+                          alt={curator.authorName}
+                          className="w-7 h-7 rounded-full object-cover border border-vibe-border flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</p>
+                          <p className="text-[10px] text-vibe-ink-muted truncate">@{curator.authorUsername}</p>
+                        </div>
                       </div>
-                    </div>
-                    <span className="font-mono text-[11px] font-semibold tabular-nums text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 flex items-center gap-1">
-                      <Bookmark className="w-3 h-3 fill-current" />
-                      {curator.savedCount} saves
-                    </span>
-                  </div>
-
-                  {/* Quote */}
-                  <div className="p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle relative">
-                    <Quote className="w-4 h-4 text-vibe-accent/30 absolute top-2 right-2" />
-                    <p className="font-serif italic text-xs sm:text-sm text-vibe-ink leading-relaxed">
-                      "{curator.quoteOrInsight}"
-                    </p>
-                    <p className="text-[11px] text-vibe-ink-muted mt-2 font-medium">
-                      — {curator.bookTitle} ({curator.bookAuthor})
-                    </p>
-                  </div>
-
-                  {/* How I'm Applying This */}
-                  {curator.actionableApplication && (
-                    <div className="space-y-1">
-                      <span className="inline-flex items-center gap-1 text-[9.5px] font-mono uppercase tracking-wider font-bold text-vibe-accent">
-                        <Compass className="w-3 h-3" />
-                        How I'm Applying This
+                      <span className="font-mono text-[11px] font-semibold tabular-nums text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 flex items-center gap-1">
+                        <Bookmark className="w-3 h-3 fill-current" />
+                        {curator.savedCount} saves
                       </span>
-                      <p className="text-xs text-vibe-ink-secondary leading-snug">
-                        {curator.actionableApplication}
+                    </div>
+
+                    {/* Quote */}
+                    <div className="p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle relative">
+                      <Quote className="w-4 h-4 text-vibe-accent/30 absolute top-2 right-2" />
+                      <p className="font-serif italic text-xs sm:text-sm text-vibe-ink leading-relaxed">
+                        "{curator.quoteOrInsight}"
+                      </p>
+                      <p className="text-[11px] text-vibe-ink-muted mt-2 font-medium">
+                        — {curator.bookTitle} ({curator.bookAuthor})
                       </p>
                     </div>
-                  )}
-                </div>
 
-                <div className="pt-2 border-t border-vibe-border-subtle text-[11px] text-vibe-ink-muted flex items-center justify-between">
-                  <span>Shared {curator.createdAt}</span>
-                  <span className="text-vibe-accent font-medium">Curated Wisdom</span>
+                    {/* How I'm Applying This */}
+                    {curator.actionableApplication && (
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center gap-1 text-[9.5px] font-mono uppercase tracking-wider font-bold text-vibe-accent">
+                          <Compass className="w-3 h-3" />
+                          How I'm Applying This
+                        </span>
+                        <p className="text-xs text-vibe-ink-secondary leading-snug">
+                          {curator.actionableApplication}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-vibe-border-subtle text-[11px] text-vibe-ink-muted flex items-center justify-between">
+                    <span>Shared {curator.createdAt}</span>
+                    <span className="text-vibe-accent font-medium">Shared Note</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         /* The Consistent Readers (Committed Circle) Showcase */
@@ -430,7 +442,11 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
           </div>
 
           {isLoading ? (
-            <div className="py-16 text-center text-xs text-vibe-ink-muted">Loading sanctuary circle...</div>
+            <div className="py-16 text-center text-xs text-vibe-ink-muted">Loading community readers...</div>
+          ) : displayReaders.length === 0 ? (
+            <div className="py-12 text-center text-xs text-vibe-ink-muted">
+              No readers in this circle yet. Complete your daily reading commitment to be featured!
+            </div>
           ) : (
             <div className="divide-y divide-vibe-border-subtle">
               {displayReaders.map((reader) => (

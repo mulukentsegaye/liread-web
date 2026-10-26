@@ -317,36 +317,31 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     const author = (detailedBook.author || '').trim();
     const formatParam = formatChoice.toLowerCase();
 
-    // Prefer direct CDN URL if resolved, otherwise fallback to serverless redirect endpoint
-    const directUrl = formatChoice === 'PDF' ? availability?.pdfUrl : availability?.epubUrl;
-    let downloadUrl = directUrl;
+    // Route through same-origin endpoint with Content-Disposition: attachment
+    // This allows the browser to trigger a real native file download directly into the Downloads folder
+    // without navigating away, opening a new tab, or redirecting to third-party sites.
+    const queryParams = new URLSearchParams({
+      mode: 'download',
+      title,
+      author,
+      format: formatParam,
+    });
+    const downloadUrl = `/api/book-file?${queryParams.toString()}`;
 
-    if (!downloadUrl) {
-      const queryParams = new URLSearchParams({
-        mode: 'download',
-        title,
-        author,
-        format: formatParam,
-      });
-      downloadUrl = `/api/book-file?${queryParams.toString()}`;
-    }
-
-    // Trigger download via hidden <a> tag so user stays on page
+    // Trigger download via hidden <a> tag WITHOUT target="_blank"
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
     link.setAttribute('download', `${title.replace(/[/\\?%*:|"<>]/g, '_')}.${formatParam}`);
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    toast.success(`Preparing ${formatChoice} instant download for "${title}".`, 'Download Started');
+    toast.success(`Starting ${formatChoice} instant download for "${title}".`, 'Download Started');
 
     setTimeout(() => {
       setIsDownloading(false);
-    }, 2000);
+    }, 2500);
   };
 
   // Editorial typography styling for synopsis and summary
@@ -583,7 +578,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 </div>
               ) : availability?.available ? (
                 /* State 2: Instant Download Available */
-                <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2.5 sm:p-3 space-y-2">
+                <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2 sm:p-2.5">
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <button
                       type="button"
@@ -631,11 +626,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                         </button>
                       </div>
                     )}
-                  </div>
-
-                  <div className="flex items-center gap-1.5 text-[11px] text-vibe-ink-muted px-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-                    <span>Direct free copy ready in cloud. No broken links or waitlists.</span>
                   </div>
                 </div>
               ) : (detailedBook.telegramFileUrl || detailedBook.telegramMessageId) ? (

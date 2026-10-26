@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Post } from '../types';
-import { DEFAULT_USER_AVATAR, DEMO_POSTS } from '../data/defaults';
+import { DEFAULT_USER_AVATAR } from '../data/defaults';
 import { postsService } from '../services/postsService';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { useNoticeStore, toast } from './noticeStore';
@@ -28,7 +28,7 @@ interface FeedStore {
 export const useFeedStore = create<FeedStore>()(
   persist(
     (set, get) => ({
-      posts: DEMO_POSTS,
+      posts: [],
       feedTab: 'for_you',
       sortBy: 'latest',
       isCreateModalOpen: false,
@@ -50,15 +50,10 @@ export const useFeedStore = create<FeedStore>()(
             const { sortBy } = get();
             supabasePosts = await postsService.getPosts({ currentUserId, sortBy });
           }
-          if (supabasePosts.length > 0) {
-            set({ posts: supabasePosts });
-          } else {
-            // If database is empty or not yet seeded with seed.sql, display rich demo feed
-            set({ posts: DEMO_POSTS });
-          }
+          set({ posts: supabasePosts });
         } catch (err) {
-          console.warn('Failed to fetch posts from Supabase, using demo feed:', err);
-          set({ posts: DEMO_POSTS });
+          console.warn('Failed to fetch posts from Supabase:', err);
+          set({ posts: [] });
         } finally {
           set({ isLoading: false });
         }
@@ -208,28 +203,14 @@ export const useFeedStore = create<FeedStore>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Automatically sync demo posts to authentic Open Library book covers and fresh realistic avatars
         const currentPosts = state.posts || [];
-        // Filter out any ghost/empty posts that have no quote, reflection, or rating
-        state.posts = currentPosts
-          .filter((p) => {
-            const hasQuote = Boolean(p.quoteText && p.quoteText.trim().length > 0);
-            const hasRec = Boolean(p.recommendationText && p.recommendationText.trim().length > 0);
-            const hasRating = Boolean(p.rating);
-            return hasQuote || hasRec || hasRating;
-          })
-          .map((p) => {
-          if (p.id.startsWith('demo-post-')) {
-            const freshDemo = DEMO_POSTS.find((d) => d.id === p.id);
-            if (freshDemo) {
-              return {
-                ...p,
-                coverImageUrl: freshDemo.coverImageUrl,
-                authorAvatar: freshDemo.authorAvatar,
-              };
-            }
-          }
-          return p;
+        // Filter out any demo posts or ghost/empty posts that have no quote, reflection, or rating
+        state.posts = currentPosts.filter((p) => {
+          if (p.id.startsWith('demo-post-')) return false;
+          const hasQuote = Boolean(p.quoteText && p.quoteText.trim().length > 0);
+          const hasRec = Boolean(p.recommendationText && p.recommendationText.trim().length > 0);
+          const hasRating = Boolean(p.rating);
+          return hasQuote || hasRec || hasRating;
         });
       },
     }

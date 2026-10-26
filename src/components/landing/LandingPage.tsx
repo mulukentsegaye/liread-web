@@ -729,7 +729,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               </h2>
 
               <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Track your consistency with elegant circular gauges, 7-day and 30-day bar charts, and the calm Community Sanctuary designed to inspire rather than create burnout.
+                Track your consistency with elegant circular gauges, 7-day and 30-day bar charts, and the calm Reading Community designed to inspire rather than create burnout.
               </p>
 
               <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">

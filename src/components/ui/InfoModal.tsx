@@ -120,9 +120,9 @@ export const InfoModal: React.FC = () => {
                   <Users className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <h4 className="font-heading font-semibold text-vibe-ink text-sm">Reading Sanctuary & Consistency</h4>
+                  <h4 className="font-heading font-semibold text-vibe-ink text-sm">Reading Community & Consistency</h4>
                   <p className="text-xs text-vibe-ink-secondary mt-1">
-                    Calm, pressure-free community accountability. Meet your personal daily reading commitment and join the Consistent Circle.
+                    Calm, pressure-free community accountability. Meet your personal daily reading commitment and join the Reading Community.
                   </p>
                 </div>
               </div>

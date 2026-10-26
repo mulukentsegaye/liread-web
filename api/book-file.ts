@@ -117,6 +117,58 @@ async function checkGutendex(title: string, author?: string): Promise<{ pdfUrl?:
   }
 }
 
+// Stream book file directly to browser with Content-Disposition: attachment
+// This prevents cross-origin navigation, avoids tab popups, and triggers a real native browser download immediately.
+async function streamFile(res: any, targetUrl: string, title: string, format: string) {
+  const isEpub = format.toLowerCase() === 'epub';
+  const targetExt = isEpub ? 'epub' : 'pdf';
+  const mimeType = isEpub ? 'application/epub+zip' : 'application/pdf';
+  const cleanTitle = title.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'book';
+  const filename = `${cleanTitle}.${targetExt}`;
+
+  try {
+    const fileRes = await fetch(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Liread/1.0',
+        'Accept': '*/*',
+      },
+      redirect: 'follow',
+    });
+
+    if (!fileRes.ok || !fileRes.body) {
+      return res.redirect(302, targetUrl);
+    }
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`
+    );
+
+    const contentLength = fileRes.headers.get('content-length');
+    if (contentLength) {
+      res.setHeader('Content-Length', contentLength);
+    }
+
+    // Stream chunks directly from CDN to browser without buffering in memory
+    const { Readable } = await import('stream');
+    if (typeof Readable.fromWeb === 'function') {
+      Readable.fromWeb(fileRes.body as any).pipe(res);
+    } else {
+      const reader = fileRes.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(Buffer.from(value));
+      }
+      res.end();
+    }
+  } catch {
+    // Graceful fallback if streaming fails
+    return res.redirect(302, targetUrl);
+  }
+}
+
 // Helper: Ensure res has standard express/vercel methods (status, json, redirect)
 function wrapResponse(res: any) {
   if (!res.status) {
@@ -206,12 +258,13 @@ export default async function handler(req: any, res: any) {
     }
 
     if (mode === 'download') {
-      const targetUrl = requestedFormat === 'epub' && registryMatch.epubUrl
+      const isEpub = requestedFormat === 'epub' && registryMatch.epubUrl;
+      const targetUrl = isEpub
         ? registryMatch.epubUrl
         : (registryMatch.pdfUrl || registryMatch.epubUrl);
 
       if (targetUrl) {
-        return res.redirect(302, targetUrl);
+        return streamFile(res, targetUrl, title, isEpub ? 'epub' : 'pdf');
       }
     }
   }
@@ -257,23 +310,21 @@ export default async function handler(req: any, res: any) {
     }
 
     // Determine target download URL & format
+    const isEpub = requestedFormat === 'epub' && epubUrl;
     let targetUrl = '';
-    if (requestedFormat === 'epub' && epubUrl) {
-      targetUrl = epubUrl;
-    } else if (requestedFormat === 'pdf' && pdfUrl) {
+    if (isEpub) {
+      targetUrl = epubUrl!;
+    } else if (pdfUrl) {
       targetUrl = pdfUrl;
     } else {
-      // Default: prioritize PDF first, fallback to EPUB
-      targetUrl = pdfUrl || epubUrl || '';
+      targetUrl = epubUrl || '';
     }
 
     if (!targetUrl) {
       return res.status(404).json({ error: 'Requested format not available', available: false });
     }
 
-    // Instant HTTP 302 Redirect directly to CDN / Archive.org / Gutenberg edge.
-    // Avoids Vercel 4.5MB serverless payload limit and connection timeouts on large 15-40MB book files.
-    return res.redirect(302, targetUrl);
+    return streamFile(res, targetUrl, title, isEpub ? 'epub' : 'pdf');
   }
 
   // Unknown mode

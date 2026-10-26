@@ -1,10 +1,9 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { LeaderboardEntry } from '../types';
-import { DEMO_LEADERS } from '../data/defaults';
 
 export const leaderboardService = {
   /**
-   * Fetch leaderboard rankings from Supabase RPC functions with demo fallback
+   * Fetch leaderboard rankings from Supabase RPC functions
    */
   async getLeaderboard(
     period: 'daily' | 'weekly' | 'lifetime', 
@@ -12,7 +11,7 @@ export const leaderboardService = {
     limit = 20
   ): Promise<LeaderboardEntry[]> {
     if (!isSupabaseConfigured()) {
-      return DEMO_LEADERS.slice(0, limit);
+      return [];
     }
 
     let rpcName: 'get_daily_leaderboard' | 'get_weekly_leaderboard' | 'get_lifetime_leaderboard' = 'get_weekly_leaderboard';
@@ -30,7 +29,7 @@ export const leaderboardService = {
       const { data, error } = await supabase.rpc(rpcName, args);
 
       if (error || !data || !Array.isArray(data) || data.length === 0) {
-        return DEMO_LEADERS.slice(0, limit);
+        return [];
       }
 
       return data.map((item: any, idx: number) => {
@@ -65,7 +64,7 @@ export const leaderboardService = {
         };
       });
     } catch {
-      return DEMO_LEADERS.slice(0, limit);
+      return [];
     }
   },
 };

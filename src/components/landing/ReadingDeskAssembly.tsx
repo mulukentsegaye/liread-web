@@ -419,7 +419,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
             {/* Bottom Book Edge Bar */}
             <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between text-[10px] font-mono text-stone-500">
               <span>Private Offline Encrypted Storage</span>
-              <span className="text-emerald-800 dark:text-emerald-400 font-bold">Synced with Reading Sanctuary</span>
+              <span className="text-emerald-800 dark:text-emerald-400 font-bold">Synced with Reading Community</span>
             </div>
 
           </div>

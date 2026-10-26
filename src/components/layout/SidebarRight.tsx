@@ -188,32 +188,36 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
 
         {/* Readers List */}
         <div className="space-y-2 pt-1">
-          {effectiveCoReaders.slice(0, 4).map((reader) => (
-            <div
-              key={reader.userId}
-              className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-vibe-card-subtle transition-colors group"
-            >
-              {reader.avatarUrl ? (
-                <img
-                  src={reader.avatarUrl}
-                  alt={reader.fullName}
-                  className="w-6 h-6 rounded-full object-cover border border-vibe-border flex-shrink-0"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-vibe-accent text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">
-                  {reader.initials}
+          {effectiveCoReaders.length === 0 ? (
+            <p className="text-xs text-vibe-ink-muted py-2 italic">No readers co-reading right now.</p>
+          ) : (
+            effectiveCoReaders.slice(0, 4).map((reader) => (
+              <div
+                key={reader.userId}
+                className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-vibe-card-subtle transition-colors group"
+              >
+                {reader.avatarUrl ? (
+                  <img
+                    src={reader.avatarUrl}
+                    alt={reader.fullName}
+                    className="w-6 h-6 rounded-full object-cover border border-vibe-border flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-vibe-accent text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                    {reader.initials}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                    {reader.fullName}
+                  </p>
+                  <p className="text-[10px] text-vibe-ink-muted truncate">
+                    reading <span className="font-medium text-vibe-ink">{reader.bookTitle}</span>
+                  </p>
                 </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
-                  {reader.fullName}
-                </p>
-                <p className="text-[10px] text-vibe-ink-muted truncate">
-                  reading <span className="font-medium text-vibe-ink">{reader.bookTitle}</span>
-                </p>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -223,7 +227,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
           <div className="flex items-center gap-2">
             <Bookmark className="w-3.5 h-3.5 text-amber-500" />
             <h2 className="font-sans text-[11px] font-medium uppercase tracking-wider text-vibe-ink">
-              Top Weekly Curators
+              Top Community Notes
             </h2>
           </div>
           <span className="text-[10px] font-mono text-vibe-ink-muted">Most Saved</span>
@@ -231,26 +235,30 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
         <p className="text-[11px] text-vibe-ink-muted">Insights & takeaways bookmarked by the community</p>
 
         <div className="space-y-2.5 pt-1">
-          {weeklyCurators.slice(0, 2).map((curator) => (
-            <div
-              key={curator.id}
-              className="p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle space-y-1.5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</span>
-                <span className="font-mono text-[10px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                  <Bookmark className="w-3 h-3 fill-current" />
-                  {curator.savedCount}
-                </span>
+          {weeklyCurators.length === 0 ? (
+            <p className="text-xs text-vibe-ink-muted py-2 italic">No curated insights yet this week.</p>
+          ) : (
+            weeklyCurators.slice(0, 2).map((curator) => (
+              <div
+                key={curator.id}
+                className="p-3 rounded-xl bg-vibe-card-subtle border border-vibe-border-subtle space-y-1.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-vibe-ink truncate">{curator.authorName}</span>
+                  <span className="font-mono text-[10px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <Bookmark className="w-3 h-3 fill-current" />
+                    {curator.savedCount}
+                  </span>
+                </div>
+                <p className="font-serif italic text-xs text-vibe-ink-secondary line-clamp-2 leading-relaxed">
+                  "{curator.quoteOrInsight}"
+                </p>
+                <p className="text-[10px] text-vibe-ink-muted truncate">
+                  — {curator.bookTitle}
+                </p>
               </div>
-              <p className="font-serif italic text-xs text-vibe-ink-secondary line-clamp-2 leading-relaxed">
-                "{curator.quoteOrInsight}"
-              </p>
-              <p className="text-[10px] text-vibe-ink-muted truncate">
-                — {curator.bookTitle}
-              </p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="pt-2 border-t border-vibe-border-subtle">
@@ -259,7 +267,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
             onClick={onViewLeaderboard}
             className="w-full py-2 px-3 inline-flex items-center justify-center gap-1.5 text-xs font-medium text-vibe-accent hover:text-vibe-accent-hover hover:bg-vibe-accent-subtle/50 rounded-xl transition-all group cursor-pointer"
           >
-            <span>Enter Sanctuary</span>
+            <span>Join Community</span>
             <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>

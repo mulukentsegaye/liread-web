@@ -132,9 +132,9 @@ export const TabletSummaryBar: React.FC<TabletSummaryBarProps> = ({
           {/* Right: Top Weekly Readers */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="font-heading text-xs font-semibold text-vibe-ink">Reading Sanctuary</span>
+              <span className="font-heading text-xs font-semibold text-vibe-ink">Reading Community</span>
               <button onClick={onViewLeaderboard} className="text-xs font-semibold text-vibe-accent hover:underline flex items-center gap-1 cursor-pointer">
-                <span>Enter Sanctuary</span><ArrowRight className="w-3 h-3" />
+                <span>Join Community</span><ArrowRight className="w-3 h-3" />
               </button>
             </div>
             <div className="space-y-1.5 pt-0.5">

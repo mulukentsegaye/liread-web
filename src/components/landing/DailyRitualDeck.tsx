@@ -136,7 +136,7 @@ export const DailyRitualDeck: React.FC<DailyRitualDeckProps> = ({
       id: 'evening',
       time: '09:45 PM',
       period: 'Night Wind-Down',
-      title: 'Evening Sanctuary',
+      title: 'Evening Reflection',
       subtitle: 'Cedar Hearth + Post-Reading Reflection',
       description:
         'Close out the day under warm lamplight as cedarwood crackles in the hearth. Log your finished pages, distill one 1-sentence mindful takeaway, and watch your daily streak quietly compound.',

@@ -51,7 +51,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
       items: [
         { id: 'timer' as NavigationTab,     label: 'Timer',     icon: Clock },
         { id: 'analytics' as NavigationTab, label: 'Analytics', icon: BarChart3 },
-        { id: 'sanctuary' as NavigationTab, label: 'Sanctuary', icon: Users },
+        { id: 'sanctuary' as NavigationTab, label: 'Community', icon: Users },
       ],
     },
   ];

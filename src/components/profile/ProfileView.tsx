@@ -34,16 +34,25 @@ interface ProfileViewProps {
 }
 
 const AVAILABLE_GENRES = [
-  'Philosophy',
-  'Classic Lit',
-  'Science Fiction',
-  'Essays & Criticism',
+  'Technology & Coding',
+  'Science & Nature',
+  'Business & Finance',
   'Psychology',
-  'Design & Aesthetics',
+  'Self-Improvement',
+  'Habits & Focus',
+  'Philosophy',
+  'History & Society',
+  'Biography & Memoir',
+  'Classic Lit',
+  'Fiction & Novels',
+  'Science Fiction',
+  'Fantasy',
+  'Design & Art',
+  'Health & Wellness',
+  'Mystery & Thriller',
+  'Essays & Ideas',
   'Poetry',
-  'History',
-  'Memoir',
-  'Mindfulness'
+  'Mindfulness',
 ];
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ 
@@ -84,15 +93,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     if (user) {
       setEditFullName(user.fullName || '');
       setEditUsername(user.username || '');
-      setEditBio(user.bio || user.subtitle || 'Cultivating intentional reading habits. Exploring philosophy, essays, and classic literature.');
-      setEditLocation(user.location || 'Home Reading Nook');
-      setEditBookTitle(user.currentlyReadingBook || 'The Creative Act: A Way of Being');
-      setEditBookAuthor(user.currentlyReadingAuthor || 'Rick Rubin');
-      setEditBookProgress(user.currentlyReadingProgress ?? 68);
-      setEditDailyGoal(user.dailyGoalMinutes || 60);
+      setEditBio(user.bio || user.subtitle || '');
+      setEditLocation(user.location || '');
+      setEditBookTitle(user.currentlyReadingBook || '');
+      setEditBookAuthor(user.currentlyReadingAuthor || '');
+      setEditBookProgress(user.currentlyReadingProgress ?? 0);
+      setEditDailyGoal(user.dailyGoalMinutes || 30);
       setSelectedGenres(user.favoriteGenres && user.favoriteGenres.length > 0 
         ? user.favoriteGenres 
-        : ['Philosophy', 'Classic Lit', 'Essays & Criticism']
+        : []
       );
       setIsSharingActivity(user.isPrivate !== true);
     }
@@ -401,7 +410,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       </div>
                     ) : (
                       <p className="text-sm text-vibe-ink-secondary leading-relaxed font-sans italic">
-                        “{user.bio || user.subtitle || 'Cultivating daily reading rituals. Exploring philosophy, essays, and timeless classics.'}”
+                        {user.bio || user.subtitle ? `“${user.bio || user.subtitle}”` : 'No bio added yet.'}
                       </p>
                     )}
                   </div>
@@ -416,7 +425,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Followers</span>
                   </div>
                   <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
-                    {user.followersCount ?? 128}
+                    {user.followersCount ?? 0}
                   </span>
                   <span className="block text-xs text-vibe-ink-muted mt-1">readers</span>
                 </div>
@@ -456,50 +465,68 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               </div>
 
               {/* Currently Reading Book Card */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
-                <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
-                  <div className="flex items-center gap-2 text-vibe-accent">
-                    <BookOpen className="w-4 h-4" />
-                    <span className="text-sm font-bold">Currently Reading</span>
-                  </div>
-                  <span className="font-mono text-xs font-bold text-vibe-accent">
-                    {editBookProgress}% Complete
-                  </span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs sm:text-sm">
-                  <div className="min-w-0 pr-2">
-                    <h4 className="font-bold text-base text-vibe-ink truncate">{editBookTitle}</h4>
-                    <p className="text-xs text-vibe-ink-muted truncate mt-0.5">{editBookAuthor}</p>
-                  </div>
-                  <div className="flex items-center gap-2 self-start sm:self-auto">
-                    {onStartTimer && (
-                      <button
-                        type="button"
-                        onClick={() => onStartTimer({ title: editBookTitle, author: editBookAuthor })}
-                        className="px-3 py-1 rounded-full text-xs font-medium bg-vibe-accent/10 text-vibe-accent hover:bg-vibe-accent/20 transition-colors"
-                      >
-                        Read Now
-                      </button>
-                    )}
-                    <span className="text-xs font-mono text-vibe-ink-muted">
-                      Goal: {user.dailyGoalMinutes || 60}m / day
+              {editBookTitle ? (
+                <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
+                  <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
+                    <div className="flex items-center gap-2 text-vibe-accent">
+                      <BookOpen className="w-4 h-4" />
+                      <span className="text-sm font-bold">Currently Reading</span>
+                    </div>
+                    <span className="font-mono text-xs font-bold text-vibe-accent">
+                      {editBookProgress}% Complete
                     </span>
                   </div>
-                </div>
 
-                <div className="w-full h-2 rounded-full bg-vibe-card-subtle border border-vibe-border overflow-hidden p-0.5">
-                  <div 
-                    className="h-full bg-vibe-accent rounded-full transition-all duration-500"
-                    style={{ width: `${editBookProgress}%` }}
-                  />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs sm:text-sm">
+                    <div className="min-w-0 pr-2">
+                      <h4 className="font-bold text-base text-vibe-ink truncate">{editBookTitle}</h4>
+                      {editBookAuthor && <p className="text-xs text-vibe-ink-muted truncate mt-0.5">{editBookAuthor}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                      {onStartTimer && (
+                        <button
+                          type="button"
+                          onClick={() => onStartTimer({ title: editBookTitle, author: editBookAuthor })}
+                          className="px-3 py-1 rounded-full text-xs font-medium bg-vibe-accent/10 text-vibe-accent hover:bg-vibe-accent/20 transition-colors"
+                        >
+                          Read Now
+                        </button>
+                      )}
+                      <span className="text-xs font-mono text-vibe-ink-muted">
+                        Goal: {user.dailyGoalMinutes || 30}m / day
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="w-full h-2 rounded-full bg-vibe-card-subtle border border-vibe-border overflow-hidden p-0.5">
+                    <div 
+                      className="h-full bg-vibe-accent rounded-full transition-all duration-500"
+                      style={{ width: `${editBookProgress}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft flex items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-bold text-sm text-vibe-ink">No book currently selected</h4>
+                    <p className="text-xs text-vibe-ink-muted mt-0.5">Add a book from search or bookshelf to track reading progress.</p>
+                  </div>
+                  {onStartTimer && (
+                    <button
+                      type="button"
+                      onClick={() => onStartTimer({ title: 'Focus Session', author: '' })}
+                      className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-colors shrink-0"
+                    >
+                      Start Reading
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Favorite Genres & Reading Taste Chips */}
               <div className="p-5 sm:p-6 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft space-y-3">
                 <div className="flex items-center justify-between text-xs font-heading font-semibold text-vibe-ink">
-                  <span className="text-sm font-bold">Favorite Genres & Curations</span>
+                  <span className="text-sm font-bold">Favorite Genres</span>
                   <span className="text-xs font-mono text-vibe-ink-muted">Tap to toggle</span>
                 </div>
 
@@ -651,7 +678,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <div className="flex items-center justify-between pt-1">
                   <div className="space-y-0.5">
                     <p className="text-xs font-semibold text-vibe-ink">Appearance Mode</p>
-                    <p className="text-[11px] text-vibe-ink-muted">Switch between light and dark sanctuary</p>
+                    <p className="text-[11px] text-vibe-ink-muted">Switch between light and dark mode</p>
                   </div>
 
                   <button

@@ -240,7 +240,7 @@ export const ScrollTurnedBookExperience: React.FC<ScrollTurnedBookExperienceProp
                         Chapter I
                       </span>
                       <h4 className="font-display text-2xl font-bold tracking-tight text-stone-900">
-                        The Sanctuary of Pure Focus
+                        The Art of Pure Focus
                       </h4>
                     </div>
 
@@ -624,7 +624,7 @@ export const ScrollTurnedBookExperience: React.FC<ScrollTurnedBookExperienceProp
                 </div>
 
                 <div className="text-[10px] font-mono text-stone-500">
-                  Liread Sanctuary Archive
+                  Liread Reading Archive
                 </div>
               </div>
             </div>
@@ -777,7 +777,7 @@ export const ScrollTurnedBookExperience: React.FC<ScrollTurnedBookExperienceProp
                 </div>
 
                 <div className="text-[10px] font-mono text-stone-500">
-                  Liread Sanctuary Archive
+                  Liread Reading Archive
                 </div>
               </div>
             </div>
@@ -835,7 +835,7 @@ export const ScrollTurnedBookExperience: React.FC<ScrollTurnedBookExperienceProp
                     <BookOpen className="w-6 h-6 text-amber-300" />
                   </div>
                   <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-amber-200/80 font-bold block">
-                    An Intentional Reading Sanctuary
+                    An Intentional Reading Space
                   </span>
                 </div>
 

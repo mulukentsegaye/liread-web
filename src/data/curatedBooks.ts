@@ -9,6 +9,7 @@ export type BookCategory =
   | 'Biography'
   | 'Business'
   | 'Science'
+  | 'Technology'
   | 'Art'
   | 'Poetry'
   | 'Mystery';
@@ -35,14 +36,15 @@ export interface CuratedBook {
 export const CURATED_CATEGORIES = [
   'All',
   'Philosophy',
+  'Technology',
+  'Science & Nature',
   'Psychology',
   'Habits & Focus',
+  'Business & Strategy',
   'Masterpiece Fiction',
   'Sci-Fi & Fantasy',
   'History & Society',
   'Biography & Memoir',
-  'Business & Strategy',
-  'Science & Nature',
   'Art & Creativity',
   'Poetry',
   'Mystery & Thriller',

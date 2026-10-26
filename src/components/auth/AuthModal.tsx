@@ -253,7 +253,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full min-h-[42px] mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-                <span>Sign In to Sanctuary</span>
+                <span>Sign In to Liread</span>
               </button>
 
               <div className="pt-2 text-center text-xs text-vibe-ink-muted">
@@ -333,7 +333,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full min-h-[42px] mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-vibe-accent hover:bg-vibe-accent-hover disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-                <span>Join Liread Sanctuary</span>
+                <span>Join Liread Community</span>
               </button>
 
               <div className="pt-2 text-center text-xs text-vibe-ink-muted">

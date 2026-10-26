@@ -291,7 +291,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 </button>
               )}
 
-              {/* 4. Bookmark / Save to Sanctuary */}
+              {/* 4. Bookmark / Save Passage */}
               <button
                 type="button"
                 role="menuitem"
@@ -305,7 +305,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                       : 'text-vibe-ink-muted group-hover/item:text-vibe-ink'
                   }`}
                 />
-                <span className="truncate">{post.isSaved ? 'Remove from Saved' : 'Save to Sanctuary'}</span>
+                <span className="truncate">{post.isSaved ? 'Remove from Saved' : 'Save Passage'}</span>
               </button>
 
               {/* 5. Share Passage */}

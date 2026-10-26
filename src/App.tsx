@@ -319,7 +319,7 @@ export const App: React.FC = () => {
       showAlertModal({
         type: 'guest',
         title: 'Guest Mode is Read-Only',
-        message: 'Create a free Liread account to set daily reading goals, protect your reading streaks, and join the Reading Sanctuary.',
+        message: 'Create a free Liread account to set daily reading goals, protect your reading streaks, and join the Reading Community.',
         confirmLabel: 'Create Account',
         cancelLabel: 'Keep Browsing',
         onConfirm: () => openAuthModal('signup'),
