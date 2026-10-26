@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/layout/Header';
 import { SidebarLeft, NavigationTab } from './components/layout/SidebarLeft';
 import { SidebarRight } from './components/layout/SidebarRight';
@@ -42,9 +42,6 @@ import { useAuthStore } from './stores/authStore';
 import { useFeedStore } from './stores/feedStore';
 import { useTheme } from './context/ThemeContext';
 import { authService } from './services/authService';
-import { sanctuaryService } from './services/sanctuaryService';
-import { bookshelfService } from './services/bookshelfService';
-import { PullToRefresh } from './components/common/PullToRefresh';
 import { BookDetailsData } from './types';
 
 export const App: React.FC = () => {
@@ -110,45 +107,6 @@ export const App: React.FC = () => {
   const { showAlertModal, openGoalModal } = useNoticeStore();
   const { fetchPosts } = useFeedStore();
   const isOnline = useOnlineStatus();
-
-  // Scroll Container Ref & Live Pull-To-Refresh State
-  const mainViewportRef = useRef<HTMLDivElement>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleRefreshCurrentPage = useCallback(async () => {
-    try {
-      const minDelay = new Promise((resolve) => setTimeout(resolve, 850));
-      const tasks: Promise<any>[] = [minDelay];
-
-      // Refresh active user profile & streak if signed in
-      if (user?.id && !isGuest) {
-        tasks.push(
-          authService.getUserProfile(user.id).then((fresh) => {
-            if (fresh) updateUser(fresh);
-          }).catch(() => {})
-        );
-      }
-
-      // Tab-specific live refresh
-      if (activeTab === 'feed') {
-        tasks.push(fetchPosts(user?.id));
-      } else if (activeTab === 'bookshelf' || activeTab === 'saved') {
-        if (user?.id) {
-          tasks.push(bookshelfService.getBookshelf(user.id).catch(() => []));
-        }
-        tasks.push(fetchPosts(user?.id));
-      } else if (activeTab === 'sanctuary' || activeTab === 'leaderboard') {
-        tasks.push(sanctuaryService.getConsistentReaders(user?.id).catch(() => []));
-        tasks.push(sanctuaryService.getLiveCoReaders().catch(() => []));
-        tasks.push(sanctuaryService.getWeeklyCurators().catch(() => []));
-      }
-
-      await Promise.allSettled(tasks);
-      setRefreshKey((prev) => prev + 1);
-    } catch (err) {
-      console.warn('Pull-to-refresh execution error:', err);
-    }
-  }, [user?.id, isGuest, activeTab, fetchPosts, updateUser]);
 
   // Real-time Co-Reading Presence tracking
   const isTimerRunning = useTimerStore((s) => s.isRunning);
@@ -597,7 +555,6 @@ export const App: React.FC = () => {
         onSelectBookForTimer={handleSelectBookForTimer}
         onShareBook={(book) => handleOpenCreateModal(book)}
         onViewBookDetails={handleViewBookDetails}
-        onRefresh={handleRefreshCurrentPage}
       />
 
       <div 
@@ -615,19 +572,15 @@ export const App: React.FC = () => {
 
         <main
           id="main-viewport"
-          ref={mainViewportRef}
-          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3 sm:py-6 pb-[calc(env(safe-area-inset-bottom)+4.75rem)] md:pb-24 px-0.5 sm:px-1 w-full max-w-full relative"
+          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3 sm:py-6 pb-[calc(env(safe-area-inset-bottom)+4.75rem)] md:pb-24 px-0.5 sm:px-1 w-full max-w-full"
         >
-          <PullToRefresh
-            onRefresh={handleRefreshCurrentPage}
-            scrollContainerRef={mainViewportRef}
-          >
-            <TabletSummaryBar
-              onViewLeaderboard={() => handleTabChange('sanctuary')}
-              onAdjustGoal={handleAdjustGoal}
-            />
 
-            <div key={`${activeTab}-${refreshKey}`} className="tab-content-enter">
+          <TabletSummaryBar
+            onViewLeaderboard={() => handleTabChange('sanctuary')}
+            onAdjustGoal={handleAdjustGoal}
+          />
+
+          <div key={activeTab} className="tab-content-enter">
             {activeTab === 'feed' && (
               <FeedContainer
                 onOpenCreateModal={handleOpenCreateModal}
@@ -710,7 +663,6 @@ export const App: React.FC = () => {
               />
             )}
           </div>
-          </PullToRefresh>
         </main>
 
         <SidebarRight

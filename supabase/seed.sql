@@ -198,7 +198,8 @@ DROP POLICY IF EXISTS "Users can delete their own reading sessions" ON public.re
 CREATE POLICY "Users can delete their own reading sessions" ON public.reading_sessions FOR DELETE USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Users can view their own saved posts" ON public.saved_posts;
-CREATE POLICY "Users can view their own saved posts" ON public.saved_posts FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Saved posts are viewable by everyone" ON public.saved_posts;
+CREATE POLICY "Saved posts are viewable by everyone" ON public.saved_posts FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Users can save posts" ON public.saved_posts;
 CREATE POLICY "Users can save posts" ON public.saved_posts FOR INSERT WITH CHECK (auth.uid() = user_id);

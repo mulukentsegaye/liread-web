@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS public.posts (
     tag TEXT DEFAULT 'General', -- e.g. Creativity, Fiction, Philosophy, Memoir
     post_type TEXT NOT NULL DEFAULT 'passage' CHECK (post_type IN ('passage', 'recommendation', 'finished_book')),
     upvotes_count INTEGER NOT NULL DEFAULT 0 CHECK (upvotes_count >= 0),
+    bookmarks_count INTEGER NOT NULL DEFAULT 0 CHECK (bookmarks_count >= 0),
     comments_count INTEGER NOT NULL DEFAULT 0 CHECK (comments_count >= 0),
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
@@ -236,9 +237,10 @@ CREATE POLICY "Users can delete their own reading sessions"
 
 -- 4.5 SAVED POSTS POLICIES
 DROP POLICY IF EXISTS "Users can view their own saved posts" ON public.saved_posts;
-CREATE POLICY "Users can view their own saved posts" 
+DROP POLICY IF EXISTS "Saved posts are viewable by everyone" ON public.saved_posts;
+CREATE POLICY "Saved posts are viewable by everyone" 
     ON public.saved_posts FOR SELECT 
-    USING (auth.uid() = user_id);
+    USING (true);
 
 DROP POLICY IF EXISTS "Users can save posts" ON public.saved_posts;
 CREATE POLICY "Users can save posts" 
@@ -502,6 +504,35 @@ CREATE TRIGGER on_post_comment_removed
     AFTER DELETE ON public.post_comments
     FOR EACH ROW EXECUTE FUNCTION public.handle_post_comment_change();
 
+-- 5.5 AUTOMATIC SYNC: POST BOOKMARKS COUNT
+CREATE OR REPLACE FUNCTION public.handle_saved_post_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        UPDATE public.posts
+        SET bookmarks_count = bookmarks_count + 1
+        WHERE id = NEW.post_id;
+        RETURN NEW;
+    ELSIF (TG_OP = 'DELETE') THEN
+        UPDATE public.posts
+        SET bookmarks_count = GREATEST(0, bookmarks_count - 1)
+        WHERE id = OLD.post_id;
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_saved_post_added ON public.saved_posts;
+CREATE TRIGGER on_saved_post_added
+    AFTER INSERT ON public.saved_posts
+    FOR EACH ROW EXECUTE FUNCTION public.handle_saved_post_change();
+
+DROP TRIGGER IF EXISTS on_saved_post_removed ON public.saved_posts;
+CREATE TRIGGER on_saved_post_removed
+    AFTER DELETE ON public.saved_posts
+    FOR EACH ROW EXECUTE FUNCTION public.handle_saved_post_change();
+
 -- ==============================================================================
 -- 6. COMMUNITY LEADERBOARD AGGREGATION FUNCTIONS / RPC
 -- ==============================================================================
@@ -638,6 +669,7 @@ BEGIN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.posts;
     ALTER PUBLICATION supabase_realtime ADD TABLE public.post_upvotes;
     ALTER PUBLICATION supabase_realtime ADD TABLE public.post_comments;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.saved_posts;
 EXCEPTION WHEN OTHERS THEN
     -- If publication already includes table or does not exist, continue cleanly
     NULL;

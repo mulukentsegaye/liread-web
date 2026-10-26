@@ -96,9 +96,11 @@ export const postsService = {
         ? item.post_comments.length
         : 0;
 
-      const realBookmarksCount = Array.isArray(item.saved_posts)
-        ? item.saved_posts.length
-        : (savedPostIds.has(item.id) ? 1 : 0);
+      const realBookmarksCount = typeof item.bookmarks_count === 'number'
+        ? item.bookmarks_count
+        : (Array.isArray(item.saved_posts)
+            ? item.saved_posts.length
+            : (savedPostIds.has(item.id) ? 1 : 0));
 
       const isUpvoted = options.currentUserId
         ? (Array.isArray(item.post_upvotes)
@@ -213,9 +215,11 @@ export const postsService = {
               : upvotedPostIds.has(item.id))
           : false;
 
-        const realBookmarksCount = Array.isArray(item.saved_posts)
-          ? item.saved_posts.length
-          : (savedPostIds.has(item.id) ? 1 : 0);
+        const realBookmarksCount = typeof item.bookmarks_count === 'number'
+          ? item.bookmarks_count
+          : (Array.isArray(item.saved_posts)
+              ? item.saved_posts.length
+              : (savedPostIds.has(item.id) ? 1 : 0));
 
         const isSaved = currentUserId
           ? (Array.isArray(item.saved_posts)
