@@ -214,9 +214,10 @@ CREATE POLICY "Users can remove their upvote"
 
 -- 4.4 READING SESSIONS POLICIES
 DROP POLICY IF EXISTS "Users can view their own reading sessions" ON public.reading_sessions;
-CREATE POLICY "Users can view their own reading sessions" 
+DROP POLICY IF EXISTS "Anyone can view reading sessions" ON public.reading_sessions;
+CREATE POLICY "Anyone can view reading sessions" 
     ON public.reading_sessions FOR SELECT 
-    USING (auth.uid() = user_id);
+    USING (true);
 
 DROP POLICY IF EXISTS "Users can insert their own reading sessions" ON public.reading_sessions;
 CREATE POLICY "Users can insert their own reading sessions" 
