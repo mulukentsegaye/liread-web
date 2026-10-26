@@ -164,6 +164,5 @@ The output will be created in the `dist/` directory, ready to deploy to modern h
 
 ---
 
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
+    Name                 ID             Classroom Number
+Muluken Tsegaye   |  CTC-1002-26 |           005

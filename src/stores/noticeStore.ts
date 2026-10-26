@@ -64,9 +64,26 @@ export const useNoticeStore = create<NoticeState>((set, get) => ({
   toasts: [],
 
   showToast: (toastData) => {
+    // Defense-in-depth: Never expose internal rate limits, hourly limits, or quotas in toasts
+    let sanitizedMessage = toastData.message;
+    if (typeof sanitizedMessage === 'string') {
+      const lower = sanitizedMessage.toLowerCase();
+      if (
+        lower.includes('rate limit') ||
+        lower.includes('hourly limit') ||
+        lower.includes('limit reached') ||
+        lower.includes('limit exceeded') ||
+        lower.includes('over_email_send_rate_limit') ||
+        lower.includes('too many requests')
+      ) {
+        sanitizedMessage = 'Unable to access this service right now. Please try again later.';
+      }
+    }
+
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     const newToast: ToastItem = {
       ...toastData,
+      message: sanitizedMessage,
       id,
       duration: toastData.duration ?? 4500,
     };
