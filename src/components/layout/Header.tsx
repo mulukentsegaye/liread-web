@@ -16,7 +16,6 @@ interface HeaderProps {
   onSelectBookForTimer?: (title: string, author: string, cover?: string) => void;
   onShareBook?: (book: { title: string; author: string; coverImageUrl?: string }) => void;
   onViewBookDetails?: (book: SuggestedBook) => void;
-  onRefresh?: () => Promise<void> | void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -29,7 +28,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectBookForTimer,
   onShareBook,
   onViewBookDetails,
-  onRefresh,
 }) => {
   const { user, isAuthenticated, isGuest } = useAuthStore();
   const [searchVal, setSearchVal] = useState('');
@@ -43,17 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [isHeaderRefreshing, setIsHeaderRefreshing] = useState(false);
-
-  const handleHeaderRefresh = async () => {
-    if (!onRefresh || isHeaderRefreshing) return;
-    setIsHeaderRefreshing(true);
-    try {
-      await onRefresh();
-    } finally {
-      setIsHeaderRefreshing(false);
-    }
-  };
 
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
@@ -510,25 +497,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Theme Toggle */}
           <VibeTriggerButton variant="header" />
-
-          {/* Creative In-App Refresh Button */}
-          {onRefresh && (
-            <button
-              type="button"
-              onClick={handleHeaderRefresh}
-              disabled={isHeaderRefreshing}
-              aria-label="Refresh page"
-              title="Refresh pages (or pull down to refresh)"
-              className={`w-9 h-9 flex items-center justify-center rounded-xl text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-90 cursor-pointer ${
-                isHeaderRefreshing ? 'text-vibe-accent bg-vibe-accent-subtle shadow-xs' : ''
-              }`}
-            >
-              <RefreshCw
-                className={`w-4 h-4 transition-transform duration-700 ${isHeaderRefreshing ? 'animate-spin text-vibe-accent' : ''}`}
-                strokeWidth={1.75}
-              />
-            </button>
-          )}
 
           {!isAuthenticated && !isGuest && onGoToLogin && (
             <button
