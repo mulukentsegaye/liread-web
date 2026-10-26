@@ -616,113 +616,93 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   <span>Checking library availability...</span>
                 </div>
               ) : availability?.available ? (
-                /* State 2: Instant Download Available (with seamless Telegram Bot fallback for missing format) */
-                <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2 sm:p-2.5">
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    {/* Primary Action Button */}
-                    {isSelectedFormatInstant ? (
-                      <button
-                        type="button"
-                        onClick={() => handleDownload(selectedFormat)}
-                        disabled={isDownloading}
-                        className="flex-1 h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-80"
-                      >
-                        {isDownloading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Downloading {selectedFormat}...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Download className="w-4 h-4" />
-                            <span>Instant Download ({selectedFormat})</span>
-                          </>
-                        )}
-                      </button>
-                    ) : (
-                      <a
-                        href={selectedFormat === 'PDF' ? telegramPdfRequestUrl : telegramEpubRequestUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-[#229ED9] hover:bg-[#1f8ec4] text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <Send className="w-4 h-4" />
-                        <span>Request {selectedFormat} on Telegram</span>
-                      </a>
-                    )}
+                /* State 2: Instant Download Available (with seamless Telegram Bot option for other editions/languages/formats) */
+                <div className="space-y-2">
+                  <div className="w-full rounded-2xl bg-vibe-accent-subtle/30 border border-vibe-accent/30 p-2 sm:p-2.5">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                      {/* Primary Action Button */}
+                      {isSelectedFormatInstant ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDownload(selectedFormat)}
+                          disabled={isDownloading}
+                          className="flex-1 h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-80"
+                        >
+                          {isDownloading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Downloading {selectedFormat}...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-4 h-4" />
+                              <span>Instant Download ({selectedFormat})</span>
+                            </>
+                          )}
+                        </button>
+                      ) : (
+                        <a
+                          href={selectedFormat === 'PDF' ? telegramPdfRequestUrl : telegramEpubRequestUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 h-11 px-5 rounded-xl text-xs sm:text-sm font-semibold bg-[#229ED9] hover:bg-[#1f8ec4] text-white shadow-xs transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span>Request {selectedFormat} on Telegram</span>
+                        </a>
+                      )}
 
-                    {/* Format Selector Pills */}
-                    <div className="flex items-center gap-1 p-1 rounded-xl bg-vibe-card border border-vibe-border self-center sm:self-auto">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedFormat('PDF')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer flex items-center gap-1 ${
-                          selectedFormat === 'PDF'
-                            ? (isPdfInstant
-                                ? 'bg-vibe-accent text-white font-bold shadow-xs'
-                                : 'bg-[#229ED9] text-white font-bold shadow-xs')
-                            : 'text-vibe-ink-muted hover:text-vibe-ink'
-                        }`}
-                      >
-                        <span>PDF</span>
-                        {!isPdfInstant && (
-                          <span className="text-[10px] opacity-75 font-sans font-normal">(Bot)</span>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSelectedFormat('EPUB')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer flex items-center gap-1 ${
-                          selectedFormat === 'EPUB'
-                            ? (isEpubInstant
-                                ? 'bg-vibe-accent text-white font-bold shadow-xs'
-                                : 'bg-[#229ED9] text-white font-bold shadow-xs')
-                            : 'text-vibe-ink-muted hover:text-vibe-ink'
-                        }`}
-                      >
-                        <span>EPUB</span>
-                        {!isEpubInstant && (
-                          <span className="text-[10px] opacity-75 font-sans font-normal">(Bot)</span>
-                        )}
-                      </button>
+                      {/* Format Selector Pills */}
+                      <div className="flex items-center gap-1 p-1 rounded-xl bg-vibe-card border border-vibe-border self-center sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFormat('PDF')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer flex items-center gap-1 ${
+                            selectedFormat === 'PDF'
+                              ? (isPdfInstant
+                                  ? 'bg-vibe-accent text-white font-bold shadow-xs'
+                                  : 'bg-[#229ED9] text-white font-bold shadow-xs')
+                              : 'text-vibe-ink-muted hover:text-vibe-ink'
+                          }`}
+                        >
+                          <span>PDF</span>
+                          {!isPdfInstant && (
+                            <span className="text-[10px] opacity-75 font-sans font-normal">(Bot)</span>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFormat('EPUB')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer flex items-center gap-1 ${
+                            selectedFormat === 'EPUB'
+                              ? (isEpubInstant
+                                  ? 'bg-vibe-accent text-white font-bold shadow-xs'
+                                  : 'bg-[#229ED9] text-white font-bold shadow-xs')
+                              : 'text-vibe-ink-muted hover:text-vibe-ink'
+                          }`}
+                        >
+                          <span>EPUB</span>
+                          {!isEpubInstant && (
+                            <span className="text-[10px] opacity-75 font-sans font-normal">(Bot)</span>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Missing Format Notification & Quick Request */}
-                  {onlyOneFormatInstant && (
-                    <div className="mt-2 pt-2 border-t border-vibe-accent/20 flex flex-wrap items-center justify-between gap-1.5 text-xs px-1">
-                      {isSelectedFormatInstant ? (
-                        <>
-                          <span className="text-vibe-ink-secondary text-[11px] sm:text-xs">
-                            Prefer <strong className="text-vibe-ink font-semibold">{missingFormat}</strong> format instead?
-                          </span>
-                          <a
-                            href={missingFormat === 'PDF' ? telegramPdfRequestUrl : telegramEpubRequestUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 font-medium text-[11px] sm:text-xs text-[#229ED9] hover:underline"
-                          >
-                            <Send className="w-3 h-3" />
-                            <span>Request {missingFormat} via Telegram Bot</span>
-                          </a>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-vibe-ink-secondary text-[11px] sm:text-xs">
-                            {isPdfInstant ? 'PDF' : 'EPUB'} is verified & available for instant download.
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedFormat(isPdfInstant ? 'PDF' : 'EPUB')}
-                            className="inline-flex items-center gap-1 font-medium text-[11px] sm:text-xs text-vibe-accent hover:underline cursor-pointer"
-                          >
-                            <Download className="w-3 h-3" />
-                            <span>Switch to {isPdfInstant ? 'PDF' : 'EPUB'}</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
+                  {/* Permanent Telegram bot request option for another edition, language, or format */}
+                  <p className="text-center text-[11px] sm:text-xs text-vibe-ink-muted px-1">
+                    Looking for another edition, language, or file?{' '}
+                    <a
+                      href={telegramRequestUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-medium text-[#229ED9] hover:underline"
+                    >
+                      <Send className="w-3 h-3" />
+                      <span>Request on Telegram (@{telegramBotUsername})</span>
+                    </a>
+                  </p>
                 </div>
               ) : (detailedBook.telegramFileUrl || detailedBook.telegramMessageId) ? (
                 /* State 3A: Manual Telegram File / Message ID Available via Bot */
