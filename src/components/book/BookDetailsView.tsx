@@ -581,8 +581,16 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
           {/* Right: Book Metadata & Primary Action Stack */}
           <div className="md:col-span-8 space-y-5">
             <div>
-              {/* Category & Year Tags */}
-              <div className="flex flex-wrap items-center gap-2 mb-2.5">
+              {/* Title & Author */}
+              <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
+                {detailedBook.title}
+              </h1>
+              <p className="text-sm sm:text-base text-vibe-ink-secondary mt-1 font-normal">
+                by <span className="font-medium text-vibe-ink">{detailedBook.author}</span>
+              </p>
+
+              {/* Category, Publication Year & Community Rating Metadata */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-0.5">
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-vibe-accent-subtle text-vibe-accent border border-vibe-accent/20">
                   {detailedBook.subjects?.[0] || 'Literature'}
                 </span>
@@ -597,14 +605,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                   4.8 Community Rating
                 </span>
               </div>
-
-              {/* Title & Author */}
-              <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
-                {detailedBook.title}
-              </h1>
-              <p className="text-sm sm:text-base text-vibe-ink-secondary mt-1 font-normal">
-                by <span className="font-medium text-vibe-ink">{detailedBook.author}</span>
-              </p>
             </div>
 
             {/* Zero Broken Promises Smart Availability & Action Section */}
