@@ -9,7 +9,6 @@ import {
   Star, 
   Check, 
   Quote, 
-  CheckCircle2, 
   Loader2, 
   Plus, 
   ChevronDown,
@@ -321,39 +320,68 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
     };
   }, [detailedBook.title, detailedBook.author]);
 
-  const handleDownload = (formatChoice: 'PDF' | 'EPUB') => {
+  const handleDownload = async (formatChoice: 'PDF' | 'EPUB') => {
     if (isDownloading) return;
     setIsDownloading(true);
 
     const title = detailedBook.title.trim();
     const author = (detailedBook.author || '').trim();
     const formatParam = formatChoice.toLowerCase();
+    const directFileUrl = formatChoice === 'EPUB' ? availability?.epubUrl : (availability?.pdfUrl || availability?.epubUrl);
 
     // Route through same-origin endpoint with Content-Disposition: attachment
-    // This allows the browser to trigger a real native file download directly into the Downloads folder
-    // without navigating away, opening a new tab, or redirecting to third-party sites.
+    // Fetches the file blob and triggers immediate local file saving, completely eliminating
+    // browser "Site wasn't available" errors caused by severed navigation links.
     const queryParams = new URLSearchParams({
       mode: 'download',
       title,
       author,
       format: formatParam,
+      ...(directFileUrl ? { url: directFileUrl } : {}),
     });
     const downloadUrl = `/api/book-file?${queryParams.toString()}`;
+    const cleanFilename = `${title.replace(/[/\\?%*:|"<>]/g, '_')}.${formatParam}`;
 
-    // Trigger download via hidden <a> tag WITHOUT target="_blank"
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.setAttribute('download', `${title.replace(/[/\\?%*:|"<>]/g, '_')}.${formatParam}`);
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    toast.info(`Preparing ${formatChoice} instant download for "${title}"...`, 'Downloading');
 
-    toast.success(`Starting ${formatChoice} instant download for "${title}".`, 'Download Started');
+    try {
+      const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
 
-    setTimeout(() => {
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.setAttribute('download', cleanFilename);
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+      toast.success(`"${title}" has been saved to your Downloads!`, 'Download Complete');
+    } catch (err) {
+      console.warn('[InstantDownload] Proxy streaming encountered an issue, trying backup mirror:', err);
+
+      // Resilient fallback: If directFileUrl is known, trigger direct mirror download
+      if (directFileUrl) {
+        toast.info('Downloading directly from public domain mirror...', 'Direct Mirror');
+        const link = document.createElement('a');
+        link.href = directFileUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        toast.error('Instant download is temporarily unavailable for this title. You can request it via Telegram!', 'Download Failed');
+      }
+    } finally {
       setIsDownloading(false);
-    }, 2500);
+    }
   };
 
   // Editorial typography styling for overview and book description
@@ -430,13 +458,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       isMounted = false;
     };
   }, [detailedBook.title, detailedBook.author, detailedBook.description]);
-
-  const handleScrollToSummary = () => {
-    setActiveTab('about');
-    if (summarySectionRef.current) {
-      summarySectionRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   const handleBookshelfToggle = async (status: 'want_to_read' | 'currently_reading' | 'finished') => {
     if (isGuest || !user) {
@@ -543,12 +564,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Subtle Open Library Attribution */}
-            <span className="text-[10px] text-vibe-ink-muted mt-3 inline-flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-              Verified literary edition
-            </span>
           </div>
 
           {/* Right: Book Metadata & Primary Action Stack */}
@@ -676,18 +691,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
             </div>
 
             {/* Standard Unified Action Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-              
-              {/* Primary: Overview Button */}
-              <button
-                type="button"
-                onClick={handleScrollToSummary}
-                className="h-10 px-3 rounded-xl text-xs font-medium bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-xs transition-all active:scale-98 flex items-center justify-center gap-1.5 group"
-              >
-                <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">About Book</span>
-              </button>
-
+            <div className="grid grid-cols-3 gap-2 sm:gap-2.5 pt-1">
               {/* Start Reading Timer */}
               <button
                 type="button"

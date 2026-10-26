@@ -100,17 +100,19 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
       <div className="max-w-4xl mx-auto relative z-10">
         
         {/* Section Header */}
-        <div className="text-center space-y-1.5 max-w-xl mx-auto mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-display font-normal text-vibe-ink tracking-tight">
-            Small daily pages. <span className="italic text-vibe-accent">Massive compounding wisdom.</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-vibe-ink-secondary">
-            See the annual impact of a calm, distraction-free reading habit.
-          </p>
-        </div>
+        <ScrollRevealCard translateY={36}>
+          <div className="text-center space-y-1.5 max-w-xl mx-auto mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-display font-normal text-vibe-ink tracking-tight">
+              Small daily pages. <span className="italic text-vibe-accent">Massive compounding wisdom.</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-vibe-ink-secondary">
+              See the annual impact of a calm, distraction-free reading habit.
+            </p>
+          </div>
+        </ScrollRevealCard>
 
         {/* Main Interactive Calculator Card */}
-        <ScrollRevealCard delayMs={40}>
+        <ScrollRevealCard translateY={46} delayMs={100}>
           <div className="rounded-2xl sm:rounded-3xl bg-vibe-card border border-vibe-border shadow-sm p-4 sm:p-6 space-y-5 backdrop-blur-sm">
             
             {/* Unified Controls Header */}

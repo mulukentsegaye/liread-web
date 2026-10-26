@@ -221,14 +221,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           3. CORE PRODUCT ARCHITECTURE: INTRO BANNER
           ============================================================================== */}
       <section id="features" className="w-full scroll-mt-20 pt-16 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
-        <div className="max-w-3xl mx-auto text-center space-y-3">
-          <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-            Everything You Need to Read More Deeply
-          </h2>
-          <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed max-w-xl mx-auto">
-            No distracting ads, no infinite dopamine doom-scrolling. Just pure focus, literary connection, and timeless tools.
-          </p>
-        </div>
+        <ScrollRevealCard translateY={36}>
+          <div className="max-w-3xl mx-auto text-center space-y-3">
+            <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
+              Everything You Need to Read More Deeply
+            </h2>
+            <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed max-w-xl mx-auto">
+              No distracting ads, no infinite dopamine doom-scrolling. Just pure focus, literary connection, and timeless tools.
+            </p>
+          </div>
+        </ScrollRevealCard>
       </section>
 
       {/* ==============================================================================
@@ -239,7 +241,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Left: Text & Editorial Details */}
-            <div className="lg:col-span-6 space-y-6">
+            <div className="lg:col-span-6">
+              <ScrollRevealCard translateY={40} delayMs={0}>
+                <div className="space-y-6">
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Distraction-Free Immersion Timer
@@ -270,12 +274,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 </li>
               </ul>
 
-
+                </div>
+              </ScrollRevealCard>
             </div>
 
             {/* Right: Interactive Timer Visual Mockup */}
             <div className="lg:col-span-6">
-              <ScrollRevealCard delayMs={80}>
+              <ScrollRevealCard translateY={48} delayMs={120}>
                 <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 sm:p-8 shadow-lg space-y-6 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -350,7 +355,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
             {/* Left: Interactive Soundscape Player Lounge */}
             <div className="lg:col-span-6 order-2 lg:order-1">
-              <ScrollRevealCard delayMs={80}>
+              <ScrollRevealCard translateY={48} delayMs={120}>
                 <div className="p-6 sm:p-8 rounded-3xl bg-vibe-card border border-vibe-border shadow-lg space-y-6">
                 
                 <div className="flex items-center justify-between">
@@ -447,7 +452,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </div>
 
             {/* Right: Text & Editorial Details */}
-            <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
+            <div className="lg:col-span-6 order-1 lg:order-2">
+              <ScrollRevealCard translateY={40} delayMs={0}>
+                <div className="space-y-6">
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Atmospheric Soundscape Engine
@@ -477,6 +484,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <span>Lightweight audio synthesis with zero bandwidth lag</span>
                 </li>
               </ul>
+                </div>
+              </ScrollRevealCard>
             </div>
 
           </div>
@@ -491,7 +500,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
             {/* Left: Text & Editorial Details */}
-            <div className="lg:col-span-6 space-y-6">
+            <div className="lg:col-span-6">
+              <ScrollRevealCard translateY={40} delayMs={0}>
+                <div className="space-y-6">
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Digital Bookshelf & Saved Quotes
@@ -521,13 +532,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <span>Share insights with a community of serious readers</span>
                 </li>
               </ul>
+                </div>
+              </ScrollRevealCard>
             </div>
 
             {/* Right: Visual Bookshelf + Quote Cards */}
             <div className="lg:col-span-6 space-y-4">
               
               {/* Card 1: Bookshelf Queue Preview */}
-              <ScrollRevealCard delayMs={60}>
+              <ScrollRevealCard translateY={44} delayMs={80}>
                 <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-4">
                 <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
                   <div className="flex items-center gap-2">
@@ -579,7 +592,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               </ScrollRevealCard>
 
               {/* Card 2: Saved Literary Passage Preview */}
-              <ScrollRevealCard delayMs={160}>
+              <ScrollRevealCard translateY={44} delayMs={160}>
                 <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-3 relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-vibe-accent">
@@ -618,7 +631,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
             {/* Left: Visual Analytics Mockup */}
             <div className="lg:col-span-6 order-2 lg:order-1">
-              <ScrollRevealCard delayMs={80}>
+              <ScrollRevealCard translateY={48} delayMs={120}>
                 <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 sm:p-8 shadow-lg space-y-6">
                 
                 {/* Metric Summary Pills */}
@@ -712,7 +725,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </div>
 
             {/* Right: Text & Editorial Details */}
-            <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
+            <div className="lg:col-span-6 order-1 lg:order-2">
+              <ScrollRevealCard translateY={40} delayMs={0}>
+                <div className="space-y-6">
 
               <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
                 Gentle Analytics & Habit Streaks
@@ -742,6 +757,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                   <span>Privacy-first offline localStorage persistence</span>
                 </li>
               </ul>
+                </div>
+              </ScrollRevealCard>
             </div>
 
           </div>

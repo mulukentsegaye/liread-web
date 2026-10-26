@@ -705,9 +705,10 @@ async function streamFile(
       }
 
       res.setHeader('Content-Type', mime);
+      const safeAscii = fname.replace(/[^a-zA-Z0-9_\-\. ]/g, '').trim() || 'book';
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename="${encodeURIComponent(fname)}"; filename*=UTF-8''${encodeURIComponent(fname)}`
+        `attachment; filename="${safeAscii}"; filename*=UTF-8''${encodeURIComponent(fname)}`
       );
 
       const contentLength = fileRes.headers.get('content-length');
@@ -716,8 +717,11 @@ async function streamFile(
       }
 
       const { Readable } = await import('stream');
-      if (typeof Readable.fromWeb === 'function') {
-        Readable.fromWeb(fileRes.body as any).pipe(res);
+      const { pipeline } = await import('stream/promises');
+
+      if (typeof Readable.fromWeb === 'function' && typeof pipeline === 'function') {
+        // MUST await pipeline so serverless function does not exit/freeze before bytes finish streaming
+        await pipeline(Readable.fromWeb(fileRes.body as any), res);
       } else {
         const reader = fileRes.body.getReader();
         while (true) {
@@ -739,7 +743,7 @@ async function streamFile(
   if (primarySuccess) return;
 
   // 2. If primary failed, try fallback URL (e.g. Gutenberg EPUB)
-  if (fallbackUrl && fallbackUrl !== targetUrl) {
+  if (fallbackUrl && fallbackUrl !== targetUrl && !res.headersSent) {
     const fbIsEpub = (fallbackFormat || 'epub').toLowerCase() === 'epub';
     const fbExt = fbIsEpub ? 'epub' : 'pdf';
     const fbMime = fbIsEpub ? 'application/epub+zip' : 'application/pdf';
@@ -749,10 +753,12 @@ async function streamFile(
   }
 
   // 3. Both failed: Return clean 502 JSON error rather than a dead 302 redirect
-  return res.status(502).json({
-    error: 'The book source file is temporarily unreachable from upstream archives. Please try again or request via Telegram.',
-    available: false,
-  });
+  if (!res.headersSent) {
+    return res.status(502).json({
+      error: 'The book source file is temporarily unreachable from upstream archives. Please try again or request via Telegram.',
+      available: false,
+    });
+  }
 }
 
 function wrapResponse(res: any) {
@@ -830,7 +836,9 @@ export default async function handler(req: any, res: any) {
     // Direct URL streaming shortcut (if client already knows the direct CDN link)
     if (directUrl && mode === 'download') {
       const isEpub = requestedFormat === 'epub' || directUrl.endsWith('.epub');
-      return streamFile(res, directUrl, title || 'book', isEpub ? 'epub' : 'pdf');
+      const reg = title ? findPublicDomainBook(title, author) : null;
+      const fallback = reg?.epubUrl && reg.epubUrl !== directUrl ? reg.epubUrl : undefined;
+      return streamFile(res, directUrl, title || 'book', isEpub ? 'epub' : 'pdf', fallback, 'epub');
     }
 
     // 1. FAST REGISTRY LOOKUP
