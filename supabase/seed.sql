@@ -951,8 +951,8 @@ VALUES
         5.0,
         'Creativity',
         'passage',
-        18,
-        3,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '2 hours')
     ),
     (
@@ -967,8 +967,8 @@ VALUES
         5.0,
         'Classics',
         'passage',
-        34,
-        7,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '5 hours')
     ),
     (
@@ -983,8 +983,8 @@ VALUES
         4.8,
         'Philosophy',
         'passage',
-        29,
-        4,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '1 day')
     ),
     (
@@ -999,8 +999,8 @@ VALUES
         5.0,
         'Sci-Fi',
         'recommendation',
-        22,
-        2,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '2 days')
     ),
     (
@@ -1015,8 +1015,8 @@ VALUES
         4.5,
         'Fiction',
         'finished_book',
-        15,
-        1,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '3 days')
     );
 

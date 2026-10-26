@@ -1,5 +1,4 @@
 import { BookDetailsData } from '../types';
-import { CURATED_BOOKS, SPOTLIGHT_BOOK } from '../data/curatedBooks';
 
 export interface SuggestedBook {
   id: string;
@@ -11,6 +10,7 @@ export interface SuggestedBook {
   coverId?: number;
   workKey?: string;
   telegramMessageId?: number | string;
+  description?: string;
 }
 
 export interface SearchBooksResult {
@@ -245,49 +245,6 @@ export const bookSearchService = {
   },
 
   /**
-   * Search local curated catalog when offline so famous books still show up
-   * even without an internet connection. Matches by title, author, category, or keyword.
-   */
-  searchLocalCuratedBooks(query: string): SuggestedBook[] {
-    const trimmed = query.toLowerCase().trim();
-    if (!trimmed) return [];
-
-    const allCurated = [SPOTLIGHT_BOOK, ...CURATED_BOOKS];
-    const seen = new Set<string>();
-    const matches: SuggestedBook[] = [];
-
-    for (const b of allCurated) {
-      const normTitle = b.title.toLowerCase();
-      const normAuthor = b.author.toLowerCase();
-      const normCat = (b.category || '').toLowerCase();
-      const normCatLabel = (b.categoryLabel || '').toLowerCase();
-      if (seen.has(normTitle)) continue;
-
-      if (
-        normTitle.includes(trimmed) ||
-        normAuthor.includes(trimmed) ||
-        normCat.includes(trimmed) ||
-        normCatLabel.includes(trimmed) ||
-        trimmed.includes(normCat)
-      ) {
-        seen.add(normTitle);
-        matches.push({
-          id: b.id,
-          title: b.title,
-          author: b.author,
-          coverImageUrl: b.coverImageUrl,
-          coverThumbnailUrl: b.coverImageUrl,
-          firstPublishYear: b.firstPublishYear,
-          workKey: b.workKey,
-          telegramMessageId: b.telegramMessageId,
-        });
-      }
-    }
-
-    return matches;
-  },
-
-  /**
    * Fetch books for a specific category/subject with pagination and total count from Open Library.
    */
   async getBooksByCategory(
@@ -299,10 +256,9 @@ export const bookSearchService = {
     const signal = options?.signal;
 
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      const local = this.searchLocalCuratedBooks(subjectSlug);
       return {
-        books: local.slice((page - 1) * limit, page * limit),
-        totalFound: local.length,
+        books: [],
+        totalFound: 0,
       };
     }
 
@@ -369,17 +325,96 @@ export const bookSearchService = {
       };
     } catch (err: any) {
       if (err.name === 'AbortError') throw err;
-      console.warn('Category fetch fallback for subject:', subjectSlug, err);
-      const local = this.searchLocalCuratedBooks(subjectSlug);
+      console.warn('Category fetch error for subject:', subjectSlug, err);
       return {
-        books: local.slice((page - 1) * limit, page * limit),
-        totalFound: local.length > 0 ? local.length : 12,
+        books: [],
+        totalFound: 0,
       };
     }
   },
 
   /**
+   * Dynamically fetch the featured spotlight book directly from Open Library Works API.
+   * Resolves genuine title, author, description, and cover image from Open Library.
+   */
+  async getSpotlightBook(): Promise<SuggestedBook | null> {
+    const FEATURED_WORKS = [
+      { key: '/works/OL27955361W', fallbackTitle: 'The Creative Act: A Way of Being', fallbackAuthor: 'Rick Rubin', tagline: 'A luminous, meditative course on human presence, deep listening, and reconnecting with childlike wonder.' },
+      { key: '/works/OL17930368W', fallbackTitle: 'Atomic Habits', fallbackAuthor: 'James Clear', tagline: 'An operating manual for compounding 1% daily improvements through identity-based systems.' },
+      { key: '/works/OL30687578W', fallbackTitle: 'Meditations', fallbackAuthor: 'Marcus Aurelius', tagline: 'The private spiritual notebook of the Roman Emperor on inner serenity, duty, and the transience of all things.' },
+      { key: '/works/OL893415W', fallbackTitle: 'Dune', fallbackAuthor: 'Frank Herbert', tagline: 'An epic monumental triumph exploring ecology, religion, power, and human consciousness across Arrakis.' },
+      { key: '/works/OL16013627W', fallbackTitle: 'Steve Jobs', fallbackAuthor: 'Walter Isaacson', tagline: 'The definitive chronicle of the creative genius whose passion for perfection revolutionized six industries.' },
+      { key: '/works/OL17075811W', fallbackTitle: 'Sapiens: A Brief History of Humankind', fallbackAuthor: 'Yuval Noah Harari', tagline: 'How an insignificant ape became the master of planet Earth through the power of collective fiction.' },
+    ];
+
+    const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+    const featured = FEATURED_WORKS[weekNumber % FEATURED_WORKS.length];
+
+    try {
+      const res = await fetch(`https://openlibrary.org${featured.key}.json`);
+      if (res.ok) {
+        const workData = await res.json();
+        let coverId: number | undefined;
+        if (Array.isArray(workData.covers)) {
+          coverId = workData.covers.find((id: any) => typeof id === 'number' && id > 0);
+        }
+
+        let authorName = featured.fallbackAuthor;
+        if (Array.isArray(workData.authors) && workData.authors.length > 0) {
+          const authorRef = workData.authors[0].author?.key || workData.authors[0].key;
+          if (authorRef) {
+            try {
+              const aRes = await fetch(`https://openlibrary.org${authorRef}.json`);
+              if (aRes.ok) {
+                const aData = await aRes.json();
+                if (aData.name) authorName = aData.name;
+              }
+            } catch {}
+          }
+        }
+
+        let descText = featured.tagline;
+        if (workData.description) {
+          descText = typeof workData.description === 'string'
+            ? workData.description
+            : workData.description.value || featured.tagline;
+        }
+
+        const coverImageUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : undefined;
+        const coverThumbnailUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : undefined;
+
+        return {
+          id: featured.key,
+          title: workData.title || featured.fallbackTitle,
+          author: authorName,
+          coverImageUrl,
+          coverThumbnailUrl,
+          firstPublishYear: workData.first_publish_date ? parseInt(workData.first_publish_date, 10) : undefined,
+          workKey: featured.key,
+          description: descText,
+        };
+      }
+    } catch (err) {
+      console.warn('Could not fetch spotlight from Open Library works API:', err);
+    }
+
+    // Fallback: search Open Library dynamically for the featured title
+    try {
+      const searchRes = await this.searchBooks(featured.fallbackTitle, { limit: 1 });
+      if (searchRes.books.length > 0) {
+        return {
+          ...searchRes.books[0],
+          description: featured.tagline,
+        };
+      }
+    } catch {}
+
+    return null;
+  },
+
+  /**
    * Helper to retrieve books for horizontal shelf with dual in-memory / sessionStorage caching.
+   * Fetches authentic books directly from Open Library's Subjects API.
    */
   async getShelfBooks(subjectSlug: string, limit = 16): Promise<SuggestedBook[]> {
     const cacheKey = `liread_shelf_${subjectSlug}`;
@@ -403,7 +438,7 @@ export const bookSearchService = {
       console.warn(`Shelf fetch error for ${subjectSlug}:`, err);
     }
 
-    return this.searchLocalCuratedBooks(subjectSlug).slice(0, limit);
+    return [];
   },
 
   /**
@@ -491,19 +526,6 @@ export const bookSearchService = {
       }
     } catch (err) {
       console.warn('Could not fetch detailed book metadata from Open Library:', err);
-    }
-
-    // 3. Fallback to curated catalog ONLY for missing text/description if offline
-    if (!description) {
-      const exactCuratedMatch = [SPOTLIGHT_BOOK, ...CURATED_BOOKS].find(
-        (b) => b.title.toLowerCase() === cleanT
-      );
-      if (exactCuratedMatch) {
-        description = exactCuratedMatch.description || exactCuratedMatch.tagline;
-        if (!resolvedCover) resolvedCover = exactCuratedMatch.coverImageUrl;
-        if (!publishYear) publishYear = exactCuratedMatch.firstPublishYear;
-        if (subjects.length === 0) subjects = [exactCuratedMatch.categoryLabel, 'Literature', 'Essential Read'];
-      }
     }
 
     const finalCover = sanitizeOpenLibraryCover(title, author, resolvedCover);

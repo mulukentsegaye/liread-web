@@ -25,6 +25,12 @@ export const postsService = {
           username,
           full_name,
           avatar_url
+        ),
+        post_upvotes (
+          user_id
+        ),
+        post_comments (
+          id
         )
       `);
 
@@ -78,6 +84,21 @@ export const postsService = {
         timeAgo = `${timeDiffMinutes}m ago`;
       }
 
+      // Ensure real-time verified counts directly from actual user engagement
+      const realUpvotesCount = Array.isArray(item.post_upvotes)
+        ? item.post_upvotes.length
+        : 0;
+
+      const realCommentsCount = Array.isArray(item.post_comments)
+        ? item.post_comments.length
+        : 0;
+
+      const isUpvoted = options.currentUserId
+        ? (Array.isArray(item.post_upvotes)
+            ? item.post_upvotes.some((u: any) => u.user_id === options.currentUserId)
+            : upvotedPostIds.has(item.id))
+        : false;
+
       return {
         id: item.id,
         userId: item.user_id,
@@ -93,9 +114,9 @@ export const postsService = {
         pageNumber: item.page_number || undefined,
         recommendationText: item.recommendation_text || undefined,
         rating: item.rating || undefined,
-        upvotesCount: item.upvotes_count || 0,
-        commentsCount: item.comments_count || 0,
-        isUpvoted: upvotedPostIds.has(item.id),
+        upvotesCount: realUpvotesCount,
+        commentsCount: realCommentsCount,
+        isUpvoted,
         isSaved: savedPostIds.has(item.id),
         postType: item.post_type,
         createdAt: item.created_at,
@@ -120,6 +141,12 @@ export const postsService = {
             username,
             full_name,
             avatar_url
+          ),
+          post_upvotes (
+            user_id
+          ),
+          post_comments (
+            id
           )
         `)
         .eq('user_id', authorUserId)
@@ -155,6 +182,20 @@ export const postsService = {
           else timeAgo = `${Math.floor(diffHrs / 24)}d ago`;
         }
 
+        const realUpvotesCount = Array.isArray(item.post_upvotes)
+          ? item.post_upvotes.length
+          : 0;
+
+        const realCommentsCount = Array.isArray(item.post_comments)
+          ? item.post_comments.length
+          : 0;
+
+        const isUpvoted = currentUserId
+          ? (Array.isArray(item.post_upvotes)
+              ? item.post_upvotes.some((u: any) => u.user_id === currentUserId)
+              : upvotedPostIds.has(item.id))
+          : false;
+
         return {
           id: item.id,
           userId: item.user_id,
@@ -170,9 +211,9 @@ export const postsService = {
           pageNumber: item.page_number || undefined,
           recommendationText: item.recommendation_text || undefined,
           rating: item.rating || undefined,
-          upvotesCount: item.upvotes_count || 0,
-          commentsCount: item.comments_count || 0,
-          isUpvoted: upvotedPostIds.has(item.id),
+          upvotesCount: realUpvotesCount,
+          commentsCount: realCommentsCount,
+          isUpvoted,
           isSaved: savedPostIds.has(item.id),
           postType: item.post_type,
           createdAt: item.created_at,

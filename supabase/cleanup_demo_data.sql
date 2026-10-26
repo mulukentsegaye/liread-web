@@ -86,4 +86,9 @@ UPDATE auth.users
 SET email_confirmed_at = now()
 WHERE email_confirmed_at IS NULL;
 
-SELECT 'Demo cleanup complete & real accounts confirmed.' AS notice;
+-- 6. Recalculate real upvote and comment metrics for all remaining posts
+UPDATE public.posts p
+SET upvotes_count = (SELECT COUNT(*) FROM public.post_upvotes u WHERE u.post_id = p.id),
+    comments_count = (SELECT COUNT(*) FROM public.post_comments c WHERE c.post_id = p.id);
+
+SELECT 'Demo cleanup complete, real accounts confirmed, and live counts synchronized.' AS notice;

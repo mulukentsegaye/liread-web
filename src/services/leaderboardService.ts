@@ -58,9 +58,9 @@ export const leaderboardService = {
           dailyGoalMinutes: 30,
           todayMinutesRead: minutes,
           goalCompletionPercent: Math.min(100, Math.round((minutes / 30) * 100)),
-          currentStreak: 7 + idx,
-          isCurrentlyReading: idx === 0,
-          bookmarksReceived: 12 + idx,
+          currentStreak: Number(item.current_streak) || 0,
+          isCurrentlyReading: false,
+          bookmarksReceived: 0,
         };
       });
     } catch {

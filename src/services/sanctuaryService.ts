@@ -45,8 +45,8 @@ export const sanctuaryService = {
           todayMinutesRead: goal,
           goalCompletionPercent: 100,
           currentStreak: streak,
-          isCurrentlyReading: idx % 2 === 0,
-          bookmarksReceived: 10 + (idx * 3),
+          isCurrentlyReading: false,
+          bookmarksReceived: 0,
           isCurrentUser: currentUserId ? item.id === currentUserId : false,
         };
       });

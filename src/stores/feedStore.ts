@@ -195,7 +195,7 @@ export const useFeedStore = create<FeedStore>()(
       },
     }),
     {
-      name: 'liread_feed_state_v1',
+      name: 'liread_feed_state_v2',
       partialize: (state) => ({
         posts: state.posts,
         sortBy: state.sortBy,
@@ -206,13 +206,22 @@ export const useFeedStore = create<FeedStore>()(
         state.feedTab = 'for_you';
         const currentPosts = state.posts || [];
         // Filter out any demo posts or ghost/empty posts that have no quote, reflection, or rating
-        state.posts = currentPosts.filter((p) => {
-          if (p.id.startsWith('demo-post-')) return false;
-          const hasQuote = Boolean(p.quoteText && p.quoteText.trim().length > 0);
-          const hasRec = Boolean(p.recommendationText && p.recommendationText.trim().length > 0);
-          const hasRating = Boolean(p.rating);
-          return hasQuote || hasRec || hasRating;
-        });
+        // and sanitize any legacy hardcoded demo metrics
+        state.posts = currentPosts
+          .map((p) => {
+            const isDemoCount = [42, 38, 56, 18, 34, 51, 29, 43].includes(p.upvotesCount);
+            if (isDemoCount) {
+              return { ...p, upvotesCount: 0, commentsCount: 0 };
+            }
+            return p;
+          })
+          .filter((p) => {
+            if (p.id.startsWith('demo-post-')) return false;
+            const hasQuote = Boolean(p.quoteText && p.quoteText.trim().length > 0);
+            const hasRec = Boolean(p.recommendationText && p.recommendationText.trim().length > 0);
+            const hasRating = Boolean(p.rating);
+            return hasQuote || hasRec || hasRating;
+          });
       },
     }
   )

@@ -95,9 +95,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     // Check offline immediately
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
-      const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-      setSuggestions(localMatches);
-      setShowSuggestions(true);
+      setSuggestions([]);
+      setShowSuggestions(false);
       setIsSearching(false);
       return;
     }
@@ -112,9 +111,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
         if (err.name !== 'AbortError') {
           if (isOfflineOrNetworkError(err)) {
             setIsOffline(true);
-            const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-            setSuggestions(localMatches);
-            setShowSuggestions(true);
+            setSuggestions([]);
+            setShowSuggestions(false);
           } else {
             console.warn('Search error in CreatePostModal:', err);
           }

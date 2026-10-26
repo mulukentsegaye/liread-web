@@ -50,39 +50,20 @@ export const Header: React.FC<HeaderProps> = ({
   const executeSearch = useCallback(async (query: string, signal: AbortSignal) => {
     setSearchError(null);
 
-    // Immediate local match for instant responsiveness (0ms)
-    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-    if (localMatches.length > 0) {
-      setSuggestions(localMatches);
-      setTotalFound(localMatches.length);
-    }
-
-    // If browser already knows it is offline, show local matches
+    // If browser already knows it is offline, show notice
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
-      setSearchError('You are currently offline. Showing available offline books.');
-      setSuggestions(localMatches);
-      setTotalFound(localMatches.length);
+      setSearchError('You are currently offline. Check your internet connection.');
+      setSuggestions([]);
+      setTotalFound(0);
       setIsSearching(false);
       return;
     }
 
     try {
       const { books, totalFound: count } = await bookSearchService.searchBooks(query, signal);
-      
-      // Combine local matches with remote results (deduplicating by title)
-      const seen = new Set<string>();
-      const combined: SuggestedBook[] = [];
-      for (const b of [...localMatches, ...books]) {
-        const norm = b.title.toLowerCase().trim();
-        if (!seen.has(norm)) {
-          seen.add(norm);
-          combined.push(b);
-        }
-      }
-
-      setSuggestions(combined);
-      setTotalFound(Math.max(count, combined.length));
+      setSuggestions(books);
+      setTotalFound(count);
       setIsOffline(false);
       setSearchError(null);
     } catch (err: any) {
@@ -92,14 +73,12 @@ export const Header: React.FC<HeaderProps> = ({
       const isConn = isOfflineOrNetworkError(err);
       if (isConn) {
         setIsOffline(true);
-        setSearchError(err.message || 'Connection problem connecting to book catalog. Please check your internet connection.');
-        setSuggestions(localMatches);
-        setTotalFound(localMatches.length);
+        setSearchError('Connection problem connecting to book catalog. Check your internet connection.');
       } else {
-        setSearchError('Unable to load book results. Please try again.');
-        setSuggestions(localMatches);
-        setTotalFound(localMatches.length);
+        setSearchError('Could not load books. Please try again.');
       }
+      setSuggestions([]);
+      setTotalFound(0);
     } finally {
       setIsSearching(false);
     }
@@ -119,15 +98,9 @@ export const Header: React.FC<HeaderProps> = ({
       return;
     }
 
-    // Immediately open dropdown and surface local matches in 0ms
+    // Immediately open dropdown
     setShowDropdown(true);
-    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-    if (localMatches.length > 0) {
-      setSuggestions(localMatches);
-      setTotalFound(localMatches.length);
-    }
 
-    // For single-letter queries, local matches are fast and sufficient
     if (query.length < 2) {
       setIsSearching(false);
       return;
@@ -167,11 +140,7 @@ export const Header: React.FC<HeaderProps> = ({
 
     const handleOffline = () => {
       setIsOffline(true);
-      const query = searchVal.trim();
-      if (query.length >= 2) {
-        const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-        setSuggestions(localMatches);
-      }
+      setSearchError('You are currently offline. Check your internet connection.');
     };
 
     window.addEventListener('online', handleOnline);
@@ -210,11 +179,6 @@ export const Header: React.FC<HeaderProps> = ({
     const trimmed = val.trim();
     if (trimmed.length >= 1) {
       setShowDropdown(true);
-      const localMatches = bookSearchService.searchLocalCuratedBooks(trimmed);
-      if (localMatches.length > 0) {
-        setSuggestions(localMatches);
-        setTotalFound(localMatches.length);
-      }
     } else {
       setShowDropdown(false);
       setSuggestions([]);

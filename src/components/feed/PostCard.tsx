@@ -472,14 +472,19 @@ export const PostCard: React.FC<PostCardProps> = ({
 
       {/* Footer actions */}
       <div className="flex items-center justify-between px-3.5 sm:px-5 pt-2.5 sm:pt-3 pb-3 sm:pb-3.5 mt-1 border-t border-vibe-border-subtle">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Heart / upvote with Spring Bounce & Animated Counter */}
           <button
             onClick={handleUpvote}
-            aria-label="Like post"
-            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-90 ${
+            aria-label={post.upvotesCount > 0 ? `Liked by ${post.upvotesCount} readers` : 'No likes yet. Click to like'}
+            title={
+              post.upvotesCount > 0 
+                ? `${post.upvotesCount} reader${post.upvotesCount === 1 ? '' : 's'} liked this passage` 
+                : 'No likes yet — be the first to like this passage!'
+            }
+            className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-95 cursor-pointer ${
               post.isUpvoted
-                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400'
+                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-500 dark:text-rose-400 font-semibold'
                 : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
             }`}
           >
@@ -491,8 +496,19 @@ export const PostCard: React.FC<PostCardProps> = ({
               />
             </span>
 
-            {/* Animated Counter Transition */}
-            <AnimatedCounter value={post.upvotesCount} />
+            {/* Real Counter or Explicit "No likes yet" */}
+            {post.upvotesCount > 0 ? (
+              <span className="inline-flex items-center gap-1">
+                <AnimatedCounter value={post.upvotesCount} />
+                <span className="text-[11px] opacity-80 hidden xs:inline">
+                  {post.upvotesCount === 1 ? 'like' : 'likes'}
+                </span>
+              </span>
+            ) : (
+              <span className="text-[11px] font-normal text-vibe-ink-muted">
+                No likes yet
+              </span>
+            )}
 
             {/* Floating +1 Pop Badge */}
             {showPlusOne && (
@@ -505,21 +521,37 @@ export const PostCard: React.FC<PostCardProps> = ({
           {/* Comment */}
           <button
             onClick={() => toast.info(`Community discussion threads for "${post.bookTitle}" are opening soon!`, 'Discussion')}
-            aria-label="Comment"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-colors"
+            aria-label={post.commentsCount > 0 ? `${post.commentsCount} comments` : 'No comments yet'}
+            title={
+              post.commentsCount > 0 
+                ? `${post.commentsCount} comment${post.commentsCount === 1 ? '' : 's'}` 
+                : 'No comments yet'
+            }
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink transition-colors cursor-pointer"
           >
             <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />
-            <span>{post.commentsCount}</span>
+            {post.commentsCount > 0 ? (
+              <span className="inline-flex items-center gap-1">
+                <span>{post.commentsCount}</span>
+                <span className="text-[11px] opacity-80 hidden xs:inline">
+                  {post.commentsCount === 1 ? 'comment' : 'comments'}
+                </span>
+              </span>
+            ) : (
+              <span className="text-[11px] font-normal text-vibe-ink-muted">
+                No comments
+              </span>
+            )}
           </button>
         </div>
 
         {/* Save */}
         <button
-            onClick={() => toggleSave(post.id, user?.id)}
+          onClick={() => toggleSave(post.id, user?.id)}
           aria-label="Save passage"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
             post.isSaved
-              ? 'bg-vibe-accent-subtle text-vibe-accent'
+              ? 'bg-vibe-accent-subtle text-vibe-accent font-semibold'
               : 'text-vibe-ink-muted hover:bg-vibe-card-subtle hover:text-vibe-ink'
           }`}
         >

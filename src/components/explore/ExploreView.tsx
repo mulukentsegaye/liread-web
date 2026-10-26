@@ -25,13 +25,10 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { 
-  CURATED_BOOKS, 
   CURATED_CATEGORIES, 
   CuratedCategory, 
   CATEGORY_CONFIGS, 
-  CategoryConfig,
-  getBookOfTheWeek,
-  CuratedBook 
+  CategoryConfig 
 } from '../../data/curatedBooks';
 import { 
   bookSearchService, 
@@ -177,7 +174,6 @@ const HorizontalBookShelf: React.FC<{
   category: CuratedCategory;
   subjectSlug: string;
   icon: React.ReactNode;
-  initialBooks?: SuggestedBook[];
   onSeeAll: (category: CuratedCategory) => void;
   onViewBookDetails: ExploreViewProps['onViewBookDetails'];
   onStartTimer: ExploreViewProps['onStartTimer'];
@@ -186,34 +182,29 @@ const HorizontalBookShelf: React.FC<{
   category,
   subjectSlug,
   icon,
-  initialBooks = [],
   onSeeAll,
   onViewBookDetails,
   onStartTimer,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [books, setBooks] = useState<SuggestedBook[]>(initialBooks);
+  const [books, setBooks] = useState<SuggestedBook[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
     async function loadShelf() {
-      // Asynchronously fetch extra books to fill the shelf to 16+ titles
+      setIsLoading(true);
       try {
         const remote = await bookSearchService.getShelfBooks(subjectSlug, 16);
-        if (isMounted && remote.length > 0) {
-          const seen = new Set<string>();
-          const merged: SuggestedBook[] = [];
-          for (const b of [...initialBooks, ...remote]) {
-            const key = b.title.trim().toLowerCase();
-            if (!seen.has(key)) {
-              seen.add(key);
-              merged.push(b);
-            }
-          }
-          setBooks(merged);
+        if (isMounted) {
+          setBooks(remote || []);
         }
       } catch (err) {
         console.warn(`Could not load shelf for ${subjectSlug}:`, err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
 
@@ -282,7 +273,19 @@ const HorizontalBookShelf: React.FC<{
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto scroll-smooth py-2 scrollbar-none snap-x snap-mandatory"
       >
-        {books.map((b) => (
+        {isLoading && books.length === 0 ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-36 sm:w-44 flex-shrink-0 snap-start bg-vibe-card border border-vibe-border rounded-2xl p-3 shadow-soft space-y-3 animate-pulse"
+            >
+              <div className="aspect-[2/3] w-full rounded-xl bg-vibe-border/50" />
+              <div className="h-4 bg-vibe-border/60 rounded w-3/4" />
+              <div className="h-3 bg-vibe-border/40 rounded w-1/2" />
+            </div>
+          ))
+        ) : (
+          books.map((b) => (
           <div
             key={b.id}
             onClick={() => onViewBookDetails({
@@ -329,7 +332,8 @@ const HorizontalBookShelf: React.FC<{
               </button>
             </div>
           </div>
-        ))}
+        ))
+      )}
 
         {/* Trailing "Explore All" card in horizontal shelf */}
         <div
@@ -637,7 +641,29 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   onClearInitialSearch,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<CuratedCategory>('All');
-  const bookOfTheWeek = React.useMemo(() => getBookOfTheWeek(), []);
+  const [spotlightBook, setSpotlightBook] = useState<SuggestedBook | null>(null);
+  const [isSpotlightLoading, setIsSpotlightLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSpotlight() {
+      setIsSpotlightLoading(true);
+      try {
+        const book = await bookSearchService.getSpotlightBook();
+        if (isMounted && book) {
+          setSpotlightBook(book);
+        }
+      } catch (err) {
+        console.warn('Could not load spotlight book:', err);
+      } finally {
+        if (isMounted) setIsSpotlightLoading(false);
+      }
+    }
+    loadSpotlight();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery || '');
@@ -688,13 +714,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       return;
     }
 
-    // Seed with local curated catalog matches right away for 0ms instant display
-    const localMatches = bookSearchService.searchLocalCuratedBooks(query);
-    if (currentPage === 1 && localMatches.length > 0 && (!cachedPage || cachedPage.length === 0)) {
-      setSuggestions(localMatches);
-      setTotalFound(localMatches.length);
-    }
-
     setIsSearching(true);
     setSearchError(null);
 
@@ -706,11 +725,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
-      setSearchError('You are currently offline. Showing available offline books.');
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
-      setSuggestions(pageSlice);
-      setTotalFound(localMatches.length);
+      setSearchError('You are currently offline. Check your internet connection.');
+      setSuggestions([]);
+      setTotalFound(0);
       setIsSearching(false);
       return;
     }
@@ -723,23 +740,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           signal: controller.signal,
         });
 
-        // Merge local matches with Open Library books if page 1
-        let combined = books;
-        if (currentPage === 1 && localMatches.length > 0) {
-          const seen = new Set<string>();
-          combined = [];
-          for (const b of [...localMatches, ...books]) {
-            const norm = b.title.toLowerCase().trim();
-            if (!seen.has(norm)) {
-              seen.add(norm);
-              combined.push(b);
-            }
-          }
-        }
-
-        setSuggestions(combined);
-        pageCacheRef.current.set(currentPage, combined);
-        setTotalFound(Math.max(count, combined.length));
+        setSuggestions(books);
+        pageCacheRef.current.set(currentPage, books);
+        setTotalFound(count);
         setIsOffline(false);
         setSearchError(null);
       } catch (err: any) {
@@ -748,14 +751,12 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           if (isConn) {
             setIsOffline(true);
             setSearchError(err.message || 'Connection problem connecting to book catalog. Check your internet connection.');
-            const start = (currentPage - 1) * PAGE_SIZE;
-            const pageSlice = localMatches.slice(start, start + PAGE_SIZE);
-            setSuggestions(pageSlice);
-            setTotalFound(localMatches.length);
           } else {
             setSearchError('Could not load book results. Please try again.');
             console.warn('Search error in ExploreView:', err);
           }
+          setSuggestions([]);
+          setTotalFound(0);
         }
       } finally {
         setIsSearching(false);
@@ -827,46 +828,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     setShowResults(false);
     setIsSearching(false);
     onClearInitialSearch?.();
-  };
-
-  // Curated starter books for horizontal shelves
-  const getInitialShelfBooks = (category: CuratedCategory): SuggestedBook[] => {
-    let matches: CuratedBook[] = [];
-    if (category === 'Philosophy') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Philosophy');
-    } else if (category === 'Psychology') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Psychology');
-    } else if (category === 'Habits & Focus') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Habits');
-    } else if (category === 'Masterpiece Fiction') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Fiction');
-    } else if (category === 'Sci-Fi & Fantasy') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Sci-Fi');
-    } else if (category === 'History & Society') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'History');
-    } else if (category === 'Biography & Memoir') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Biography');
-    } else if (category === 'Business & Strategy') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Business');
-    } else if (category === 'Science & Nature') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Science');
-    } else if (category === 'Art & Creativity') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Art');
-    } else if (category === 'Poetry') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Poetry');
-    } else if (category === 'Mystery & Thriller') {
-      matches = CURATED_BOOKS.filter((b) => b.category === 'Mystery');
-    }
-
-    return matches.map((b) => ({
-      id: b.id,
-      title: b.title,
-      author: b.author,
-      coverImageUrl: b.coverImageUrl,
-      coverThumbnailUrl: b.coverImageUrl,
-      firstPublishYear: b.firstPublishYear,
-      workKey: b.workKey,
-    }));
   };
 
   return (
@@ -1127,81 +1088,106 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           </div>
 
           {/* Book of the Week Spotlight Card */}
-          <div 
-            onClick={() => onViewBookDetails({
-              title: bookOfTheWeek.title,
-              author: bookOfTheWeek.author,
-              coverImageUrl: bookOfTheWeek.coverImageUrl,
-              firstPublishYear: bookOfTheWeek.firstPublishYear,
-              workKey: bookOfTheWeek.workKey,
-              description: bookOfTheWeek.description || bookOfTheWeek.tagline,
-            })}
-            className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-4 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-center">
-              <div className="md:col-span-4 flex justify-center md:justify-start">
-                <div className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden shadow-md border border-vibe-border bg-vibe-card-subtle flex-shrink-0">
-                  <img
-                    src={bookOfTheWeek.coverImageUrl}
-                    alt={bookOfTheWeek.title}
-                    className="w-full h-full object-cover"
-                  />
+          {isSpotlightLoading && !spotlightBook ? (
+            <div className="rounded-3xl border border-vibe-border bg-vibe-card p-4 sm:p-8 shadow-soft animate-pulse">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-center">
+                <div className="md:col-span-4 flex justify-center md:justify-start">
+                  <div className="w-36 sm:w-44 aspect-[2/3] rounded-2xl bg-vibe-border/50" />
                 </div>
-              </div>
-
-              <div className="md:col-span-8 space-y-4 text-left">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-medium bg-vibe-accent text-white shadow-xs">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Book of the Week
-                  </span>
-                  <span className="text-xs text-vibe-ink-muted">
-                    {bookOfTheWeek.firstPublishYear} · {bookOfTheWeek.categoryLabel}
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight group-hover:text-vibe-accent transition-colors">
-                    {bookOfTheWeek.title}
-                  </h2>
-                  <p className="text-sm sm:text-base text-vibe-ink-secondary font-medium">
-                    by {bookOfTheWeek.author}
-                  </p>
-                </div>
-
-                <p className="text-xs sm:text-sm text-vibe-ink-muted leading-relaxed max-w-lg">
-                  {bookOfTheWeek.tagline}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    type="button"
-                    onClick={() => onViewBookDetails({
-                      title: bookOfTheWeek.title,
-                      author: bookOfTheWeek.author,
-                      coverImageUrl: bookOfTheWeek.coverImageUrl,
-                      firstPublishYear: bookOfTheWeek.firstPublishYear,
-                      workKey: bookOfTheWeek.workKey,
-                      description: bookOfTheWeek.description || bookOfTheWeek.tagline,
-                    })}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span>Read 5–10 Min Summary</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onStartTimer(bookOfTheWeek.title, bookOfTheWeek.author, bookOfTheWeek.coverImageUrl)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95 cursor-pointer"
-                  >
-                    <Clock className="w-4 h-4 text-vibe-accent" />
-                    <span>Start Timer</span>
-                  </button>
+                <div className="md:col-span-8 space-y-4">
+                  <div className="h-5 bg-vibe-border/60 rounded-full w-32" />
+                  <div className="h-8 bg-vibe-border/70 rounded-lg w-3/4" />
+                  <div className="h-4 bg-vibe-border/50 rounded w-1/2" />
+                  <div className="h-12 bg-vibe-border/40 rounded-xl w-full" />
                 </div>
               </div>
             </div>
-          </div>
+          ) : spotlightBook ? (
+            <div 
+              onClick={() => onViewBookDetails({
+                title: spotlightBook.title,
+                author: spotlightBook.author,
+                coverImageUrl: spotlightBook.coverImageUrl,
+                firstPublishYear: spotlightBook.firstPublishYear,
+                workKey: spotlightBook.workKey,
+                description: spotlightBook.description,
+              })}
+              className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-4 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-center">
+                <div className="md:col-span-4 flex justify-center md:justify-start">
+                  <div className="relative w-36 sm:w-44 aspect-[2/3] rounded-2xl overflow-hidden shadow-md border border-vibe-border bg-vibe-card-subtle flex-shrink-0">
+                    {spotlightBook.coverImageUrl ? (
+                      <img
+                        src={spotlightBook.coverImageUrl}
+                        alt={spotlightBook.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <BookCardCover
+                        title={spotlightBook.title}
+                        author={spotlightBook.author}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="md:col-span-8 space-y-4 text-left">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-medium bg-vibe-accent text-white shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Book of the Week
+                    </span>
+                    {spotlightBook.firstPublishYear && (
+                      <span className="text-xs text-vibe-ink-muted">
+                        Published {spotlightBook.firstPublishYear}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-vibe-ink tracking-tight group-hover:text-vibe-accent transition-colors">
+                      {spotlightBook.title}
+                    </h2>
+                    <p className="text-sm sm:text-base text-vibe-ink-secondary font-medium">
+                      by {spotlightBook.author}
+                    </p>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-vibe-ink-muted leading-relaxed max-w-lg line-clamp-3">
+                    {spotlightBook.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => onViewBookDetails({
+                        title: spotlightBook.title,
+                        author: spotlightBook.author,
+                        coverImageUrl: spotlightBook.coverImageUrl,
+                        firstPublishYear: spotlightBook.firstPublishYear,
+                        workKey: spotlightBook.workKey,
+                        description: spotlightBook.description,
+                      })}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>Read 5–10 Min Summary</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => onStartTimer(spotlightBook.title, spotlightBook.author, spotlightBook.coverImageUrl)}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95 cursor-pointer"
+                    >
+                      <Clock className="w-4 h-4 text-vibe-accent" />
+                      <span>Start Timer</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {/* Browse by Category Filter Pills Row */}
           <div className="space-y-3">
@@ -1237,11 +1223,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           </div>
 
           {/* =========================================================================
-              HORIZONTAL SHELVES: Rich, Scrollable, Not Restricted to 4 Books
+              HORIZONTAL SHELVES: Rich, Scrollable, Loaded Dynamically from Open Library
               ========================================================================= */}
           <div className="space-y-12 sm:space-y-14">
             {CATEGORY_CONFIGS.map((config) => {
-              const starterBooks = getInitialShelfBooks(config.name);
               return (
                 <HorizontalBookShelf
                   key={config.id}
@@ -1249,7 +1234,6 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                   category={config.name}
                   subjectSlug={config.subjectSlug}
                   icon={getCategoryIcon(config.iconName)}
-                  initialBooks={starterBooks}
                   onSeeAll={(cat) => setSelectedCategory(cat)}
                   onViewBookDetails={onViewBookDetails}
                   onStartTimer={onStartTimer}

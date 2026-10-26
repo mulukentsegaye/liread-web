@@ -321,8 +321,8 @@ VALUES
         5.0,
         'Creativity',
         'passage',
-        42,
-        6,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '1 day')
     ),
     (
@@ -337,8 +337,8 @@ VALUES
         5.0,
         'Focus',
         'passage',
-        38,
-        4,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '3 days')
     ),
     (
@@ -353,8 +353,8 @@ VALUES
         4.5,
         'Fiction',
         'finished_book',
-        27,
-        3,
+        0,
+        0,
         timezone('utc'::text, now() - INTERVAL '5 days')
     )
 ON CONFLICT (id) DO NOTHING;

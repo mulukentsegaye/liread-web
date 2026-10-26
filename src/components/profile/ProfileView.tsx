@@ -111,8 +111,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [editLocation, setEditLocation] = useState('');
   const [editBookTitle, setEditBookTitle] = useState('');
   const [editBookAuthor, setEditBookAuthor] = useState('');
-  const [editBookProgress, setEditBookProgress] = useState<number>(68);
-  const [editDailyGoal, setEditDailyGoal] = useState<number>(60);
+  const [editBookProgress, setEditBookProgress] = useState<number>(0);
+  const [editDailyGoal, setEditDailyGoal] = useState<number>(30);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [isPrivateProfile, setIsPrivateProfile] = useState(false);
 
