@@ -230,11 +230,24 @@ export default async function handler(req: any, res?: any) {
       );
       const tgData = await tgRes.json().catch(() => null);
 
+      // If Telegram returns 429 rate limit, check if the webhook is already set to our URL!
+      let currentInfo = null;
+      if (!tgData?.ok) {
+        const infoRes = await fetch(`https://api.telegram.org/bot${botToken}/getWebhookInfo`);
+        currentInfo = await infoRes.json().catch(() => null);
+      }
+
+      const alreadyActive = currentInfo?.result?.url === webhookUrl;
+
       return respondJson(res, {
-        ok: Boolean(tgData && tgData.ok),
+        ok: Boolean(tgData && tgData.ok) || alreadyActive,
         service: 'LiRead Telegram Bot Webhook Auto-Setup',
         webhookUrl,
         telegramResult: tgData,
+        currentWebhookStatus: currentInfo?.result,
+        statusMessage: (tgData && tgData.ok) || alreadyActive
+          ? '🎉 Webhook is active and working! You can now test the bot in Telegram.'
+          : 'Telegram rate limit active. Please wait 30 seconds and refresh this page.',
       });
     }
 
