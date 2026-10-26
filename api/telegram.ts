@@ -461,9 +461,17 @@ export default async function handler(req: any, res?: any) {
     let requestedBookTitle: string | null = null;
 
     if (/^\/start(?:@\w+)?\s+req_/i.test(rawText)) {
-      // 1. Deep link: /start req_Atomic_Habits
-      const slug = rawText.replace(/^\/start(?:@\w+)?\s+req_/i, '').trim();
-      requestedBookTitle = slug.replace(/_+/g, ' ').trim();
+      // 1. Deep link: /start req_Atomic_Habits or /start req_pdf_Meditations
+      let slug = rawText.replace(/^\/start(?:@\w+)?\s+req_/i, '').trim();
+      let formatTag = '';
+      if (/^pdf_/i.test(slug)) {
+        formatTag = ' (PDF)';
+        slug = slug.replace(/^pdf_/i, '');
+      } else if (/^epub_/i.test(slug)) {
+        formatTag = ' (EPUB)';
+        slug = slug.replace(/^epub_/i, '');
+      }
+      requestedBookTitle = slug.replace(/_+/g, ' ').trim() + formatTag;
     } else if (/^\/start(?:@\w+)?$/i.test(rawText)) {
       // 2. /start with no book payload
       await sendTelegramMessage(botToken, chatId, BOT_TEXTS.welcome);
