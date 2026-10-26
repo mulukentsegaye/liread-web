@@ -181,6 +181,23 @@ export const authService = {
       }
     } catch {}
 
+    let followersCount = 0;
+    let followingCount = 0;
+    try {
+      const [followersRes, followingRes] = await Promise.all([
+        supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', userId),
+        supabase
+          .from('follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', userId),
+      ]);
+      followersCount = typeof followersRes.count === 'number' ? followersRes.count : 0;
+      followingCount = typeof followingRes.count === 'number' ? followingRes.count : 0;
+    } catch {}
+
     return {
       id: data.id,
       username: data.username,
@@ -193,8 +210,9 @@ export const authService = {
       currentlyReadingBook: data.currently_reading_book || undefined,
       currentlyReadingAuthor: data.currently_reading_author || undefined,
       currentlyReadingProgress: typeof data.currently_reading_progress === 'number' ? data.currently_reading_progress : undefined,
-      followersCount: typeof data.followers_count === 'number' ? data.followers_count : 0,
-      followingCount: typeof data.following_count === 'number' ? data.following_count : 0,
+      followersCount,
+      followingCount,
+      isPrivate: Boolean(data.is_private),
       joinedDate: data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       totalMinutesRead: data.total_minutes_read,
       currentStreak: data.current_streak,
@@ -259,6 +277,7 @@ export const authService = {
     avatar_url: string;
     bio: string;
     daily_goal_minutes: number;
+    is_private: boolean;
   }>) {
     const { error } = await supabase
       .from('profiles')

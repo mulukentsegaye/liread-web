@@ -178,8 +178,10 @@ export const App: React.FC = () => {
   // Fetch posts when entering app, or when user changes (login/guest)
   useEffect(() => {
     if (currentView === 'app' && user?.id) {
+      useFeedStore.getState().setFeedTab('for_you');
       fetchPosts(user.id);
     } else if (currentView === 'app' && !user) {
+      useFeedStore.getState().setFeedTab('for_you');
       fetchPosts(undefined);
     }
   }, [currentView, user?.id]);
@@ -292,11 +294,13 @@ export const App: React.FC = () => {
   }, []);
 
   const handleEnterApp = () => {
+    useFeedStore.getState().setFeedTab('for_you');
     navigateWithTransition('app');
   };
 
   const handleGuestEnterApp = () => {
     // signInAsGuest already called by the calling page; just navigate
+    useFeedStore.getState().setFeedTab('for_you');
     navigateWithTransition('app');
   };
 

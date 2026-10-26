@@ -299,6 +299,7 @@ export const useAuthStore = create<AuthStore>()(
               avatar_url: partial.avatarUrl,
               bio: partial.bio || partial.subtitle,
               daily_goal_minutes: partial.dailyGoalMinutes,
+              is_private: partial.isPrivate,
             });
           } catch (err) {
             console.warn('Could not sync user profile to Supabase:', err);

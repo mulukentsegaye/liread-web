@@ -22,10 +22,22 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     last_read_date DATE,
     rank_tier TEXT NOT NULL DEFAULT 'Novice Reader',
     daily_goal_minutes INTEGER NOT NULL DEFAULT 60 CHECK (daily_goal_minutes > 0),
+    is_private BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
+
+-- 2.1b FOLLOWS TABLE
+-- Social connections between readers
+CREATE TABLE IF NOT EXISTS public.follows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    following_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    CONSTRAINT unique_follower_following UNIQUE (follower_id, following_id),
+    CONSTRAINT cannot_follow_self CHECK (follower_id <> following_id)
+);
 -- 2.2 POSTS TABLE
 -- Community feed for book recommendations, passage quotes, and ratings
 CREATE TABLE IF NOT EXISTS public.posts (
@@ -107,6 +119,8 @@ CREATE TABLE IF NOT EXISTS public.post_comments (
 -- 3. PERFORMANCE INDEXES
 -- ==============================================================================
 
+CREATE INDEX IF NOT EXISTS idx_follows_follower ON public.follows(follower_id);
+CREATE INDEX IF NOT EXISTS idx_follows_following ON public.follows(following_id);
 CREATE INDEX IF NOT EXISTS idx_profiles_username ON public.profiles(username);
 CREATE INDEX IF NOT EXISTS idx_profiles_total_minutes ON public.profiles(total_minutes_read DESC);
 
@@ -132,6 +146,7 @@ CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON public.post_comments(pos
 
 -- Enable RLS on all tables
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.follows ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_upvotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reading_sessions ENABLE ROW LEVEL SECURITY;
@@ -236,9 +251,17 @@ CREATE POLICY "Users can remove saved posts"
 
 -- 4.6 BOOKSHELF POLICIES
 DROP POLICY IF EXISTS "Users can view their own bookshelf" ON public.bookshelf;
-CREATE POLICY "Users can view their own bookshelf" 
+DROP POLICY IF EXISTS "Public bookshelves are viewable if not private" ON public.bookshelf;
+CREATE POLICY "Public bookshelves are viewable if not private" 
     ON public.bookshelf FOR SELECT 
-    USING (auth.uid() = user_id);
+    USING (
+        auth.uid() = user_id 
+        OR EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE public.profiles.id = public.bookshelf.user_id 
+            AND COALESCE(public.profiles.is_private, false) = false
+        )
+    );
 
 DROP POLICY IF EXISTS "Users can add books to bookshelf" ON public.bookshelf;
 CREATE POLICY "Users can add books to bookshelf" 
@@ -618,3 +641,21 @@ EXCEPTION WHEN OTHERS THEN
     -- If publication already includes table or does not exist, continue cleanly
     NULL;
 END $$;
+
+-- 4.8 FOLLOWS POLICIES
+DROP POLICY IF EXISTS "Anyone can view follows" ON public.follows;
+CREATE POLICY "Anyone can view follows" 
+    ON public.follows FOR SELECT 
+    USING (true);
+
+DROP POLICY IF EXISTS "Authenticated users can follow" ON public.follows;
+CREATE POLICY "Authenticated users can follow" 
+    ON public.follows FOR INSERT 
+    TO authenticated 
+    WITH CHECK (auth.uid() = follower_id);
+
+DROP POLICY IF EXISTS "Users can unfollow" ON public.follows;
+CREATE POLICY "Users can unfollow" 
+    ON public.follows FOR DELETE 
+    TO authenticated 
+    USING (auth.uid() = follower_id);

@@ -21,6 +21,11 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
   const { user, isGuest, isAuthenticated } = useAuthStore();
   const { posts, feedTab, setFeedTab, sortBy, setSortBy, isLoading } = useFeedStore();
 
+  // Always start feed from 'For you' whenever entering the feed
+  React.useEffect(() => {
+    setFeedTab('for_you');
+  }, [setFeedTab]);
+
   const filteredPosts = posts.filter((p) => {
     if (feedTab === 'following') {
       // "Following" = your own posts plus posts from authors you interact with.

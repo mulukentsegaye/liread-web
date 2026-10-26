@@ -198,11 +198,12 @@ export const useFeedStore = create<FeedStore>()(
       name: 'liread_feed_state_v1',
       partialize: (state) => ({
         posts: state.posts,
-        feedTab: state.feedTab,
         sortBy: state.sortBy,
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
+        // Always ensure feed tab starts from 'for_you' (never sticky on 'Mine')
+        state.feedTab = 'for_you';
         const currentPosts = state.posts || [];
         // Filter out any demo posts or ghost/empty posts that have no quote, reflection, or rating
         state.posts = currentPosts.filter((p) => {

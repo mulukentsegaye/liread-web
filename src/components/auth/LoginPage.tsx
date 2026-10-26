@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
+import { useFeedStore } from '../../stores/feedStore';
 import { supabase } from '../../lib/supabase';
 import { describeAuthError } from '../../lib/authErrors';
 
@@ -124,6 +125,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
           });
           return;
         }
+        useFeedStore.getState().setFeedTab('for_you');
         setSuccessMsg('Account created successfully! Welcome to Liread.');
         showToast({
           type: 'success',
@@ -133,6 +135,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
         setTimeout(() => onSuccess(), 800);
       } else {
         await signIn(email, password);
+        useFeedStore.getState().setFeedTab('for_you');
         setSuccessMsg('Signed in successfully! Opening your library...');
         showToast({
           type: 'success',
@@ -156,6 +159,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
   const handleGuest = () => {
     signInAsGuest();
+    useFeedStore.getState().setFeedTab('for_you');
     onGuest ? onGuest() : onSuccess();
   };
 

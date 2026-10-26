@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
+import { useFeedStore } from '../../stores/feedStore';
 import { describeAuthError } from '../../lib/authErrors';
 
 interface AuthModalProps {
@@ -130,6 +131,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setStatusMessage(null);
     try {
       await signIn(email, password);
+      useFeedStore.getState().setFeedTab('for_you');
       setStatusMessage({ type: 'success', text: 'Welcome back! Signed in successfully.' });
       showToast({
         type: 'success',
@@ -156,6 +158,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       await signUp(email, password, username, fullName);
+      useFeedStore.getState().setFeedTab('for_you');
       if (useAuthStore.getState().pendingConfirmationEmail) {
         setStatusMessage({
           type: 'info',

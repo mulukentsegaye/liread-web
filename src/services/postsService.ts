@@ -104,6 +104,87 @@ export const postsService = {
   },
 
   /**
+   * Fetch all posts created by a specific user (for viewing their public profile)
+   */
+  async getUserPosts(authorUserId: string, currentUserId?: string): Promise<Post[]> {
+    if (!isSupabaseConfigured() || !authorUserId) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('user_id', authorUserId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.warn('Failed to fetch user posts:', error.message);
+        return [];
+      }
+
+      if (!data || data.length === 0) return [];
+
+      let upvotedPostIds = new Set<string>();
+      let savedPostIds = new Set<string>();
+
+      if (currentUserId) {
+        const [upvotesRes, savesRes] = await Promise.all([
+          supabase.from('post_upvotes').select('post_id').eq('user_id', currentUserId),
+          supabase.from('saved_posts').select('post_id').eq('user_id', currentUserId),
+        ]);
+        if (upvotesRes.data) upvotedPostIds = new Set(upvotesRes.data.map((r) => r.post_id));
+        if (savesRes.data) savedPostIds = new Set(savesRes.data.map((r) => r.post_id));
+      }
+
+      return data.map((item: any) => {
+        const profile = item.profiles;
+        let timeAgo = 'recently';
+        if (item.created_at) {
+          const diffMs = Date.now() - new Date(item.created_at).getTime();
+          const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+          if (diffHrs < 1) timeAgo = 'just now';
+          else if (diffHrs < 24) timeAgo = `${diffHrs}h ago`;
+          else timeAgo = `${Math.floor(diffHrs / 24)}d ago`;
+        }
+
+        return {
+          id: item.id,
+          userId: item.user_id,
+          authorName: profile?.full_name || profile?.username || 'Fellow Reader',
+          authorAvatar: profile?.avatar_url || DEFAULT_USER_AVATAR,
+          actionText: item.post_type === 'finished_book' ? 'finished a book' : 'shared a passage',
+          timeAgo,
+          tag: item.tag || 'General',
+          bookTitle: item.book_title,
+          bookAuthor: item.book_author,
+          coverImageUrl: item.cover_image_url || undefined,
+          quoteText: item.quote_text || undefined,
+          pageNumber: item.page_number || undefined,
+          recommendationText: item.recommendation_text || undefined,
+          rating: item.rating || undefined,
+          upvotesCount: item.upvotes_count || 0,
+          commentsCount: item.comments_count || 0,
+          isUpvoted: upvotedPostIds.has(item.id),
+          isSaved: savedPostIds.has(item.id),
+          postType: item.post_type,
+          createdAt: item.created_at,
+        };
+      });
+    } catch (err) {
+      console.warn('getUserPosts error:', err);
+      return [];
+    }
+  },
+
+  /**
    * Create a new post in Supabase
    */
   async createPost(post: Partial<Post>, userId: string): Promise<Post> {
