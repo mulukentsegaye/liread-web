@@ -551,22 +551,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               </p>
             </div>
 
-            {/* Reading Pills Row */}
-            <div className="grid grid-cols-3 gap-2 py-2.5 border-y border-vibe-border">
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
-                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Est. Read</span>
-                <span className="text-xs font-mono font-medium text-vibe-ink">~5.5 Hours</span>
-              </div>
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
-                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Overview</span>
-                <span className="text-xs font-mono font-medium text-vibe-accent">6–8 Mins</span>
-              </div>
-              <div className="text-center p-2 rounded-xl bg-vibe-card-subtle border border-vibe-border/50">
-                <span className="block text-[9px] font-mono uppercase tracking-wider text-vibe-ink-muted">Pacing</span>
-                <span className="text-xs font-medium text-vibe-ink">Mindful Flow</span>
-              </div>
-            </div>
-
             {/* Zero Broken Promises Smart Availability & Action Section */}
             <div className="pt-0.5">
               {isCheckingAvailability ? (
