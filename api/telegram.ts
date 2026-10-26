@@ -13,6 +13,10 @@
  * 
  * CASE C: User clicks "/start <numericMessageId>" (from instant vault downloads):
  *         Copies the document from the Vault channel directly to the user.
+ *         If not found, gracefully notifies Admin as a request so the reader is never left waiting!
+ * 
+ * UTILITY: GET /api/telegram?setup=1 automatically calls Telegram's setWebhook API
+ *          using the configured TELEGRAM_BOT_TOKEN environment variable.
  */
 
 interface TelegramChat {
@@ -57,7 +61,8 @@ interface TelegramUpdate {
 const WELCOME_MESSAGE =
   "📚 Welcome to LiRead Bot!\n\nSend me the title and author of any book you want to request, or browse books at https://liread.vercel.app/";
 
-const NOT_AVAILABLE_MESSAGE = "Sorry, this book PDF isn't available yet.";
+const NOT_AVAILABLE_MESSAGE =
+  "📚 We are preparing this book for you! Our librarian has been notified and will send the file directly to you here as soon as it's uploaded. 🔔";
 
 // Helper to format channel ID for Telegram Bot API (-100 prefix for supergroups/channels)
 function formatVaultChatId(rawId: string | number): (string | number)[] {
@@ -184,33 +189,66 @@ async function backupToVault(
 }
 
 // Universal response helper supporting both Node (res.status().json()) and Web Response (Edge/Fetch API)
-function respondOk(res?: any) {
+function respondJson(res: any, data: any, status = 200) {
   if (res && typeof res.status === 'function') {
-    return res.status(200).json({ ok: true });
+    return res.status(status).json(data);
   }
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
     headers: { 'Content-Type': 'application/json' },
   });
 }
 
+function respondOk(res?: any) {
+  return respondJson(res, { ok: true });
+}
+
 export default async function handler(req: any, res?: any) {
-  // Support quick health-check via GET
+  // Support GET for diagnostic health-check and 1-click webhook registration (?setup=1)
   if (req.method === 'GET') {
+    const rawUrl = req.url || '';
+    const parsedUrl = new URL(rawUrl, 'https://liread.vercel.app');
+    const isSetupRequested =
+      parsedUrl.searchParams.get('setup') === '1' ||
+      parsedUrl.searchParams.get('set_webhook') === '1';
+
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+    // One-Click Webhook Registration
+    if (isSetupRequested) {
+      if (!botToken) {
+        return respondJson(res, {
+          ok: false,
+          error: 'TELEGRAM_BOT_TOKEN is not set on Vercel.',
+          hint: 'Go to Vercel Settings -> Environment Variables, add TELEGRAM_BOT_TOKEN, and redeploy.',
+        }, 400);
+      }
+
+      const webhookUrl = 'https://liread.vercel.app/api/telegram';
+      const tgRes = await fetch(
+        `https://api.telegram.org/bot${botToken}/setWebhook?url=${encodeURIComponent(webhookUrl)}`
+      );
+      const tgData = await tgRes.json().catch(() => null);
+
+      return respondJson(res, {
+        ok: Boolean(tgData && tgData.ok),
+        service: 'LiRead Telegram Bot Webhook Auto-Setup',
+        webhookUrl,
+        telegramResult: tgData,
+      });
+    }
+
     const info = {
       ok: true,
       service: 'LiRead Telegram Bot Webhook (@lireadbooksbot)',
-      configured: Boolean(process.env.TELEGRAM_BOT_TOKEN),
-      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID),
-      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID),
+      configured: Boolean(botToken),
+      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594'),
+      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430'),
+      setupHelper: Boolean(botToken)
+        ? 'Click https://liread.vercel.app/api/telegram?setup=1 to activate webhook with Telegram'
+        : 'TELEGRAM_BOT_TOKEN missing from Vercel deployment. Add it and redeploy.',
     };
-    if (res && typeof res.status === 'function') {
-      return res.status(200).json(info);
-    }
-    return new Response(JSON.stringify(info), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return respondJson(res, info);
   }
 
   // Telegram sends webhook updates via POST
@@ -220,8 +258,8 @@ export default async function handler(req: any, res?: any) {
 
   try {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
-    const vaultChannelId = String(process.env.TELEGRAM_VAULT_CHANNEL_ID || '').trim();
+    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594').trim();
+    const vaultChannelId = (process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430').trim();
 
     if (!botToken) {
       console.warn('[telegram-webhook] Warning: TELEGRAM_BOT_TOKEN environment variable is not set.');
@@ -250,10 +288,8 @@ export default async function handler(req: any, res?: any) {
     const chatId = message.chat.id;
     const rawText = (message.text || message.caption || '').trim();
     const isAdmin =
-      Boolean(adminChatId) && (
-        String(message.chat.id) === adminChatId ||
-        (message.from && String(message.from.id) === adminChatId)
-      );
+      String(message.chat.id) === adminChatId ||
+      (message.from && String(message.from.id) === adminChatId);
 
     // =========================================================================
     // CASE A: ADMIN REPLIES TO A REQUEST NOTIFICATION WITH A DOCUMENT/PDF
@@ -307,24 +343,33 @@ export default async function handler(req: any, res?: any) {
     }
 
     // =========================================================================
-    // CASE C: NUMERIC PAYLOAD (e.g., /start 12 from direct vault message)
+    // CASE C: NUMERIC PAYLOAD (e.g., /start 101 from direct vault message)
     // =========================================================================
     const numericMatch = rawText.match(/^\/start(?:@\w+)?\s+(\d+)$/i);
     if (numericMatch) {
       const messageId = Number(numericMatch[1]);
+      let copied = false;
+
       if (vaultChannelId) {
         const candidates = formatVaultChatId(vaultChannelId);
-        let copied = false;
         for (const chId of candidates) {
           copied = await copyTelegramMessage(botToken, chatId, chId, messageId);
           if (copied) break;
         }
-        if (!copied) {
-          await sendTelegramMessage(botToken, chatId, NOT_AVAILABLE_MESSAGE);
-        }
-      } else {
-        await sendTelegramMessage(botToken, chatId, NOT_AVAILABLE_MESSAGE);
       }
+
+      if (copied) {
+        return respondOk(res);
+      }
+
+      // If message ID not found in channel, gracefully convert to an Admin request!
+      await sendTelegramMessage(botToken, chatId, NOT_AVAILABLE_MESSAGE);
+
+      const firstName = message.from?.first_name || '';
+      const username = message.from?.username ? `@${message.from.username}` : 'no_username';
+      const adminNotice = `🔔 NEW BOOK REQUEST (ID #${messageId})\n\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`;
+      await sendTelegramMessage(botToken, adminChatId, adminNotice);
+
       return respondOk(res);
     }
 
@@ -364,9 +409,7 @@ export default async function handler(req: any, res?: any) {
       const username = message.from?.username ? `@${message.from.username}` : 'no_username';
       const adminNotice = `🔔 NEW BOOK REQUEST\n\n📖 Book: ${requestedBookTitle}\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`;
 
-      if (adminChatId) {
-        await sendTelegramMessage(botToken, adminChatId, adminNotice);
-      }
+      await sendTelegramMessage(botToken, adminChatId, adminNotice);
       return respondOk(res);
     }
   } catch (err) {

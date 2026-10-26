@@ -187,7 +187,6 @@ export const SPOTLIGHT_BOOK: CuratedBook = {
   ratingAverage: 4.9,
   readersCount: 3420,
   workKey: '/works/OL27955361W',
-  telegramMessageId: 101,
 };
 
 export const CURATED_BOOKS: CuratedBook[] = [
@@ -208,7 +207,6 @@ export const CURATED_BOOKS: CuratedBook[] = [
     ratingAverage: 4.9,
     readersCount: 8920,
     workKey: '/works/OL17930368W',
-    telegramMessageId: 102,
   },
   {
     id: 'deep-work',
@@ -226,7 +224,6 @@ export const CURATED_BOOKS: CuratedBook[] = [
     ratingAverage: 4.7,
     readersCount: 4210,
     workKey: '/works/OL17351607W',
-    telegramMessageId: 103,
   },
   {
     id: 'show-your-work',
