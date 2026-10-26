@@ -58,11 +58,51 @@ interface TelegramUpdate {
   channel_post?: TelegramMessage;
 }
 
-const WELCOME_MESSAGE =
-  "📚 Welcome to LiRead Bot!\n\nSend me the title and author of any book you want to request, or browse books at https://liread.vercel.app/";
+// ============================================================================
+// ✍️ EDITABLE BOT MESSAGES & TEMPLATES
+// You can edit any text, emoji, or links in this section below!
+// ============================================================================
+export const BOT_TEXTS = {
+  // 1. Sent to a user who starts the bot without a specific book
+  welcome:
+    "📚 Welcome to LiRead Bot!\n\nSend me the title and author of any book you want to request, or browse books at https://liread.vercel.app/",
 
-const NOT_AVAILABLE_MESSAGE =
-  "📚 We are preparing this book for you! Our librarian has been notified and will send the file directly to you here as soon as it's uploaded. 🔔";
+  // 2. Sent to a user immediately after they request a book
+  userRequestReceived: (bookTitle: string) =>
+    `📚 Request received for: *${bookTitle}*\n\nOur librarian has been notified! As soon as it's uploaded, I will send the file directly to you right here in this chat. 🔔`,
+
+  // 3. Sent to the Admin when a reader requests a book
+  adminNewRequestAlert: ({ bookTitle, firstName, username, chatId }: { bookTitle: string; firstName: string; username: string; chatId: number | string }) =>
+    `🔔 NEW BOOK REQUEST\n\n📖 Book: ${bookTitle}\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`,
+
+  // 4. Caption attached to the PDF/EPUB when delivered to the user
+  userDeliveryCaption: (bookTitle: string) =>
+    `🎉 Good news! Your requested book "${bookTitle}" from LiRead is ready. Enjoy reading!\n\n🌐 https://liread.vercel.app/`,
+
+  // 5. Caption attached to the book backup in your private Vault Channel
+  vaultBackupCaption: (bookTitle: string) =>
+    `📁 LiRead Archive Backup: ${bookTitle}`,
+
+  // 6. Confirmation message sent back to Admin after successful delivery
+  adminDeliverySuccess: ({ bookTitle, targetUserId }: { bookTitle: string; targetUserId: string }) =>
+    `✅ "${bookTitle}" successfully delivered to user (UID:${targetUserId}) and archived in your Vault!`,
+
+  // 7. Alert sent to Admin if Telegram couldn't deliver to the user
+  adminDeliveryUserFailed: ({ bookTitle, targetUserId }: { bookTitle: string; targetUserId: string }) =>
+    `⚠️ "${bookTitle}" was saved to Vault, but could not be delivered to user UID:${targetUserId} (they may have stopped the bot).`,
+
+  // 8. Reminder sent to Admin if they upload a file without tapping "Reply" to a request
+  adminUnlinkedFileReceived:
+    "📁 File saved to your Vault! To deliver this book to a waiting user, please tap 'Reply' on that user's '🔔 NEW BOOK REQUEST' notification and attach the file.",
+
+  // 9. Notice sent to Admin if replying to a message that has no UID:
+  adminMissingUidInReply:
+    "ℹ️ Document received, but no UID was found in the replied message. Make sure you reply directly to a '🔔 NEW BOOK REQUEST' notification.",
+
+  // 10. Status greeting sent to Admin when typing /start or /help
+  adminStatusGreeting: ({ username, adminChatId, vaultChannelId }: { username: string; adminChatId: string; vaultChannelId: string }) =>
+    `👋 Hello Admin (@${username})!\n\nLiRead Bot is active and listening.\n\n⚙️ Configuration:\n• Admin ID: ${adminChatId}\n• Vault Channel: ${vaultChannelId}\n\nWhen readers request books on the website, you will receive a notification here with their UID. Simply reply to that message with the PDF/EPUB to auto-deliver it!`,
+};
 
 // Helper to format channel ID for Telegram Bot API (-100 prefix for supergroups/channels)
 function formatVaultChatId(rawId: string | number): (string | number)[] {
@@ -172,16 +212,17 @@ async function backupToVault(
   token: string,
   vaultId: string,
   documentFileId: string,
+  caption: string,
   fromChatId?: number | string,
   messageId?: number
 ): Promise<boolean> {
   if (!vaultId) return false;
   const candidates = formatVaultChatId(vaultId);
   for (const targetId of candidates) {
-    const sent = await sendTelegramDocument(token, targetId, documentFileId, '📁 LiRead Archive Backup');
+    const sent = await sendTelegramDocument(token, targetId, documentFileId, caption);
     if (sent) return true;
     if (fromChatId && messageId) {
-      const copied = await copyTelegramMessage(token, targetId, fromChatId, messageId);
+      const copied = await copyTelegramMessage(token, targetId, fromChatId, messageId, caption);
       if (copied) return true;
     }
   }
@@ -319,7 +360,7 @@ export default async function handler(req: any, res?: any) {
         const fileId = message.document.file_id;
 
         // 1. Send the file directly to the specific user who requested it
-        const deliveryCaption = `🎉 Good news! Your requested book "${bookTitle}" from LiRead is ready. Enjoy reading!\n\n🌐 https://liread.vercel.app/`;
+        const deliveryCaption = BOT_TEXTS.userDeliveryCaption(bookTitle);
 
         const delivered = await sendTelegramDocument(
           botToken,
@@ -334,6 +375,7 @@ export default async function handler(req: any, res?: any) {
             botToken,
             vaultChannelId,
             fileId,
+            BOT_TEXTS.vaultBackupCaption(bookTitle),
             message.chat.id,
             message.message_id
           );
@@ -341,8 +383,8 @@ export default async function handler(req: any, res?: any) {
 
         // 3. Reply directly to Admin confirming which user and book were fulfilled
         const confirmationMessage = delivered
-          ? `✅ "${bookTitle}" successfully delivered to user (UID:${targetUserId}) and archived in your Vault!`
-          : `⚠️ "${bookTitle}" was saved to Vault, but could not be delivered to user UID:${targetUserId} (they may have stopped the bot).`;
+          ? BOT_TEXTS.adminDeliverySuccess({ bookTitle, targetUserId })
+          : BOT_TEXTS.adminDeliveryUserFailed({ bookTitle, targetUserId });
 
         await sendTelegramMessage(botToken, message.chat.id, confirmationMessage);
         return respondOk(res);
@@ -350,7 +392,7 @@ export default async function handler(req: any, res?: any) {
         await sendTelegramMessage(
           botToken,
           message.chat.id,
-          "ℹ️ Document received, but no UID was found in the replied message. Make sure you reply directly to a '🔔 NEW BOOK REQUEST' notification."
+          BOT_TEXTS.adminMissingUidInReply
         );
         return respondOk(res);
       }
@@ -363,6 +405,7 @@ export default async function handler(req: any, res?: any) {
           botToken,
           vaultChannelId,
           message.document.file_id,
+          '📁 LiRead Vault Direct Upload',
           message.chat.id,
           message.message_id
         );
@@ -370,7 +413,7 @@ export default async function handler(req: any, res?: any) {
       await sendTelegramMessage(
         botToken,
         message.chat.id,
-        "📁 File saved to your Vault! To deliver this book to a waiting user, please tap 'Reply' on that user's '🔔 NEW BOOK REQUEST' notification and attach the file."
+        BOT_TEXTS.adminUnlinkedFileReceived
       );
       return respondOk(res);
     }
@@ -396,11 +439,17 @@ export default async function handler(req: any, res?: any) {
       }
 
       // If message ID not found in channel, gracefully convert to an Admin request!
-      await sendTelegramMessage(botToken, chatId, NOT_AVAILABLE_MESSAGE);
+      const fallbackNotice = BOT_TEXTS.userRequestReceived(`Book #${messageId}`);
+      await sendTelegramMessage(botToken, chatId, fallbackNotice);
 
       const firstName = message.from?.first_name || '';
       const username = message.from?.username ? `@${message.from.username}` : 'no_username';
-      const adminNotice = `🔔 NEW BOOK REQUEST (ID #${messageId})\n\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`;
+      const adminNotice = BOT_TEXTS.adminNewRequestAlert({
+        bookTitle: `Catalog ID #${messageId}`,
+        firstName,
+        username,
+        chatId,
+      });
       await sendTelegramMessage(botToken, adminChatId, adminNotice);
 
       return respondOk(res);
@@ -417,30 +466,36 @@ export default async function handler(req: any, res?: any) {
       requestedBookTitle = slug.replace(/_+/g, ' ').trim();
     } else if (/^\/start(?:@\w+)?$/i.test(rawText)) {
       // 2. /start with no book payload
-      await sendTelegramMessage(botToken, chatId, WELCOME_MESSAGE);
+      await sendTelegramMessage(botToken, chatId, BOT_TEXTS.welcome);
       return respondOk(res);
     } else if (!isAdmin && rawText && !rawText.startsWith('/')) {
       // 3. Normal text from non-admin user
       requestedBookTitle = rawText.trim();
     } else if (isAdmin && /^\/help|^\/start/i.test(rawText)) {
       // Admin greeting / status
-      await sendTelegramMessage(
-        botToken,
-        message.chat.id,
-        `👋 Hello Admin (@${message.from?.username || 'admin'})!\n\nLiRead Bot is active and listening.\n\n⚙️ Configuration:\n• Admin ID: ${adminChatId}\n• Vault Channel: ${vaultChannelId}\n\nWhen readers request books on the website, you will receive a notification here with their UID. Simply reply to that message with the PDF/EPUB to auto-deliver it!`
-      );
+      const adminGreeting = BOT_TEXTS.adminStatusGreeting({
+        username: message.from?.username || 'admin',
+        adminChatId,
+        vaultChannelId,
+      });
+      await sendTelegramMessage(botToken, message.chat.id, adminGreeting);
       return respondOk(res);
     }
 
     if (requestedBookTitle) {
       // 1. Reply immediately to the user (message.chat.id)
-      const userReply = `📚 Request received for: *${requestedBookTitle}*\n\nOur librarian has been notified! As soon as it's uploaded, I will send the file directly to you right here in this chat. 🔔`;
+      const userReply = BOT_TEXTS.userRequestReceived(requestedBookTitle);
       await sendTelegramMessage(botToken, chatId, userReply, 'Markdown');
 
       // 2. Send notification message to Admin
       const firstName = message.from?.first_name || '';
       const username = message.from?.username ? `@${message.from.username}` : 'no_username';
-      const adminNotice = `🔔 NEW BOOK REQUEST\n\n📖 Book: ${requestedBookTitle}\n👤 User: ${firstName} (${username})\n🆔 UID:${chatId}\n\n👉 Reply directly to this message with the PDF/EPUB file to deliver it to the user automatically!`;
+      const adminNotice = BOT_TEXTS.adminNewRequestAlert({
+        bookTitle: requestedBookTitle,
+        firstName,
+        username,
+        chatId,
+      });
 
       await sendTelegramMessage(botToken, adminChatId, adminNotice);
       return respondOk(res);
