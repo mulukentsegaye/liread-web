@@ -900,29 +900,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
       {activeTab === 'about' && (
         <div ref={summarySectionRef} className="space-y-6">
 
-          {/* 1. Core Takeaway Banner (only when a genuine takeaway exists) */}
-          {summary?.oneSentenceTakeaway &&
-            !summary.oneSentenceTakeaway.startsWith('A notable work') &&
-            !summary.oneSentenceTakeaway.startsWith('An acclaimed work') && (
-              <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-7 shadow-soft space-y-2">
-                <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-vibe-accent">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Core Takeaway</span>
-                  </div>
-                  {summary.readTimeMinutes > 1 && (
-                    <span className="font-mono text-[11px] px-2.5 py-0.5 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
-                      {summary.readTimeMinutes} min overview
-                    </span>
-                  )}
-                </div>
-                <blockquote className="font-display italic text-base sm:text-xl text-vibe-ink leading-relaxed font-normal pt-1">
-                  “{summary.oneSentenceTakeaway}”
-                </blockquote>
-              </div>
-          )}
-
-          {/* 2. Main Editorial Description & Book Overview */}
+          {/* 1. Main Editorial Description & Book Overview */}
           <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
             <div className="pb-3 border-b border-vibe-border flex items-center justify-between">
               <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">

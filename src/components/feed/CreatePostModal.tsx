@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Star, ArrowLeft, Search, BookOpen, Loader2, CheckCircle2, WifiOff } from 'lucide-react';
+import { 
+  X, 
+  Sparkles, 
+  Star, 
+  ArrowLeft, 
+  Search, 
+  BookOpen, 
+  Loader2, 
+  CheckCircle2, 
+  WifiOff, 
+  Quote, 
+  Plus, 
+  Tag
+} from 'lucide-react';
 import { useFeedStore } from '../../stores/feedStore';
 import { useAuthStore } from '../../stores/authStore';
 import { toast } from '../../stores/noticeStore';
@@ -33,6 +46,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [recommendationText, setRecommendationText] = useState('');
   const [rating, setRating] = useState(5);
 
+  // Progressive disclosure controls for optional sections
+  const [showReflection, setShowReflection] = useState(false);
+  const [showManualAuthor, setShowManualAuthor] = useState(false);
+
   // Open Library Book Search & Auto-Suggest state
   const [suggestions, setSuggestions] = useState<SuggestedBook[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -43,7 +60,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Pre-fill initialBook if passed (e.g. from header search or feed action)
+  // Pre-fill initialBook if passed (e.g. from book details, timer, or feed action)
   useEffect(() => {
     if (isOpen && initialBook) {
       setBookTitle(initialBook.title);
@@ -66,33 +83,25 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     }
   }, [isOpen, initialBook]);
 
-  // Debounced search on bookTitle change
+  // Debounced search on bookTitle change (only when user actively types and hasn't picked a book yet)
   useEffect(() => {
     const query = bookTitle.trim();
 
-    // If query is empty or too short, reset suggestions
-    if (query.length < 2) {
+    if (query.length < 2 || (selectedBook && selectedBook.title.toLowerCase() === query.toLowerCase())) {
       setSuggestions([]);
       setIsSearching(false);
       setIsOffline(false);
       return;
     }
 
-    // If title matches currently selected book, don't trigger search
-    if (selectedBook && selectedBook.title.toLowerCase() === query.toLowerCase()) {
-      return;
-    }
-
     setIsSearching(true);
 
-    // Cancel previous request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    // Check offline immediately
     if (typeof navigator !== 'undefined' && !navigator.onLine) {
       setIsOffline(true);
       setSuggestions([]);
@@ -155,11 +164,15 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     setCoverImageUrl(book.coverImageUrl);
     setSelectedBook(book);
     setShowSuggestions(false);
+    setShowManualAuthor(false);
   };
 
-  const handleRemoveCover = () => {
-    setCoverImageUrl(undefined);
+  const handleClearSelectedBook = () => {
     setSelectedBook(null);
+    setBookTitle('');
+    setBookAuthor('');
+    setCoverImageUrl(undefined);
+    setShowManualAuthor(false);
   };
 
   const handleClose = () => {
@@ -167,44 +180,46 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     onClose();
   };
 
+  // Check if form is ready to publish
+  const cleanTitle = bookTitle.trim();
+  const cleanQuote = quoteText.trim();
+  const cleanRecommendation = recommendationText.trim();
+
+  const isPublishable = 
+    Boolean(cleanTitle) && (
+      (postType === 'passage' && Boolean(cleanQuote)) ||
+      (postType === 'finished_book' && (Boolean(rating) || Boolean(cleanRecommendation) || Boolean(cleanQuote))) ||
+      (postType === 'recommendation' && (Boolean(cleanRecommendation) || Boolean(cleanQuote)))
+    );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanTitle = bookTitle.trim();
-    const cleanQuote = quoteText.trim();
-    const cleanRecommendation = recommendationText.trim();
 
     if (!cleanTitle) {
-      toast.warning('Please enter a book title to publish your post.', 'Title Required');
+      toast.warning('Please tag a book title for your reading moment.', 'Book Title');
       return;
     }
 
-    if (postType === 'passage') {
-      if (!cleanQuote) {
-        toast.warning('The passage is empty. Please write or paste a quote to share.', 'Quote Required');
-        return;
-      }
-    } else if (postType === 'recommendation') {
-      if (!cleanRecommendation && !cleanQuote) {
-        toast.warning('Please write your thoughts or recommendation before publishing.', 'Thoughts Required');
-        return;
-      }
-    } else if (postType === 'finished_book') {
-      if (!rating && !cleanRecommendation && !cleanQuote) {
-        toast.warning('Please select a star rating or write a thought on your finished book.', 'Rating or Reflection Required');
-        return;
-      }
+    if (postType === 'passage' && !cleanQuote) {
+      toast.warning('Please enter a quote or passage to share.', 'Passage Empty');
+      return;
+    }
+
+    if (postType === 'recommendation' && !cleanRecommendation && !cleanQuote) {
+      toast.warning('Please share why you recommend this book.', 'Recommendation Empty');
+      return;
     }
 
     addPost(
       {
         postType,
-        bookTitle: bookTitle.trim(),
+        bookTitle: cleanTitle,
         bookAuthor: bookAuthor.trim() || 'Unknown Author',
         coverImageUrl: coverImageUrl || undefined,
-        quoteText: quoteText.trim() || undefined,
+        quoteText: cleanQuote || undefined,
         pageNumber: pageNumber ? parseInt(pageNumber, 10) : undefined,
-        tag,
-        recommendationText: recommendationText.trim() || undefined,
+        tag: tag || 'General',
+        recommendationText: cleanRecommendation || undefined,
         rating: postType === 'finished_book' ? rating : undefined,
         authorName: user?.fullName,
         authorAvatar: getUserAvatar(user),
@@ -212,6 +227,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       user?.id
     );
 
+    // Reset modal state
     setBookTitle('');
     setBookAuthor('');
     setCoverImageUrl(undefined);
@@ -221,57 +237,61 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     setQuoteText('');
     setPageNumber('');
     setRecommendationText('');
+    setShowReflection(false);
+    setShowManualAuthor(false);
     onClose();
   };
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={handleClose}
     >
       <div 
-        className="w-full h-full sm:h-auto sm:max-w-lg rounded-none sm:rounded-3xl p-4 sm:p-6 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))] bg-vibe-card border border-vibe-border text-vibe-ink shadow-vibe-elevated flex flex-col justify-between overflow-y-auto max-h-screen sm:max-h-[90vh] transition-all duration-500"
+        className="w-full max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 bg-vibe-card border border-vibe-border text-vibe-ink shadow-vibe-elevated flex flex-col justify-between overflow-y-auto max-h-[92vh] transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <div>
+        <div className="space-y-4">
+          
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-vibe-border pb-4 mb-4">
+          <div className="flex items-center justify-between pb-3 border-b border-vibe-border/70">
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={handleClose}
                 aria-label="Back"
-                className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs group"
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-vibe-border bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all active:scale-95 shadow-xs"
                 title="Back"
               >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                <ArrowLeft className="w-3.5 h-3.5" />
               </button>
 
               <div className="flex items-center gap-2 text-vibe-accent">
-                <Sparkles className="w-5 h-5 flex-shrink-0" />
-                <h2 className="font-heading text-lg sm:text-xl font-semibold text-vibe-ink">
+                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                <h2 className="font-heading text-base sm:text-lg font-semibold text-vibe-ink">
                   Share a Reading Moment
                 </h2>
               </div>
             </div>
+
             <button
               onClick={handleClose}
               aria-label="Close modal"
-              className="min-w-[40px] min-h-[40px] flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-full text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Post Type Selector */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          {/* Post Type Selector (Clean Pill Segmented Bar) */}
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-vibe-card-subtle border border-vibe-border/70 text-xs font-medium">
             <button
               type="button"
               onClick={() => setPostType('passage')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
+              className={`py-1.5 px-2 text-center rounded-lg transition-all ${
                 postType === 'passage'
-                  ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
-                  : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
+                  ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border/50'
+                  : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
               Passage Quote
@@ -279,10 +299,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setPostType('finished_book')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
+              className={`py-1.5 px-2 text-center rounded-lg transition-all ${
                 postType === 'finished_book'
-                  ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
-                  : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
+                  ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border/50'
+                  : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
               Finished Book
@@ -290,263 +310,251 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             <button
               type="button"
               onClick={() => setPostType('recommendation')}
-              className={`min-h-[44px] py-2 px-2 text-xs font-medium rounded-xl border transition-all ${
+              className={`py-1.5 px-2 text-center rounded-lg transition-all ${
                 postType === 'recommendation'
-                  ? 'bg-vibe-accent-subtle border-vibe-accent text-vibe-accent shadow-xs'
-                  : 'bg-vibe-card border-vibe-border text-vibe-ink-muted hover:text-vibe-ink'
+                  ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border/50'
+                  : 'text-vibe-ink-muted hover:text-vibe-ink'
               }`}
             >
               Recommend
             </button>
           </div>
 
-          <form id="create-post-form" onSubmit={handleSubmit} className="space-y-4">
-            
-            {/* Book Title & Author Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Book Title with Open Library Auto-Suggest */}
-              <div className="relative" ref={searchContainerRef}>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[10.5px] font-medium uppercase tracking-wider text-vibe-ink-muted/80">
-                    Book Title *
-                  </label>
-                  <span className="text-[10px] text-vibe-accent font-medium flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
-                    Auto-Suggest
-                  </span>
-                </div>
+          <form id="create-post-form" onSubmit={handleSubmit} className="space-y-4 pt-1">
 
+            {/* 1. PRIMARY CONTENT CANVAS (CONTENT FIRST) */}
+            {postType === 'passage' && (
+              <div className="space-y-1.5">
                 <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={bookTitle}
-                    onChange={(e) => {
-                      setBookTitle(e.target.value);
-                      if (selectedBook && e.target.value !== selectedBook.title) {
-                        setSelectedBook(null);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (suggestions.length > 0) {
-                        setShowSuggestions(true);
-                      }
-                    }}
-                    placeholder="Type title (e.g. The Creative Act)..."
-                    className="w-full text-xs sm:text-sm p-3 pr-9 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none transition-all"
-                    autoComplete="off"
+                  <Quote className="absolute left-3.5 top-3.5 w-4 h-4 text-vibe-accent/40 pointer-events-none" />
+                  <textarea
+                    rows={3}
+                    value={quoteText}
+                    onChange={(e) => setQuoteText(e.target.value)}
+                    placeholder="“What words stayed with you today? Type or paste a passage...”"
+                    className="w-full text-xs sm:text-sm pl-9 pr-3.5 py-3 rounded-2xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted/60 focus:border-vibe-accent focus:bg-vibe-card focus:outline-none font-display italic font-normal leading-relaxed resize-none transition-all shadow-inner/5"
+                    autoFocus
                   />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-vibe-ink-muted pointer-events-none">
-                    {isSearching ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-vibe-accent" />
-                    ) : selectedBook ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    ) : (
-                      <Search className="w-4 h-4 text-vibe-ink-muted" />
-                    )}
-                  </div>
                 </div>
+              </div>
+            )}
 
-                {/* Auto-suggest dropdown */}
-                {showSuggestions && bookTitle.trim().length >= 2 && (
-                  <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-72 overflow-y-auto">
-                    <div className="px-3 py-2 bg-vibe-card-subtle/90 border-b border-vibe-border flex items-center justify-between text-[11px] text-vibe-ink-muted font-medium">
-                      {isOffline ? (
-                        <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
-                          <WifiOff className="w-3.5 h-3.5" />
-                          Offline Search
-                        </span>
+            {/* Finished Book Star Rating */}
+            {postType === 'finished_book' && (
+              <div className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-vibe-card-subtle border border-vibe-border/70 space-y-1.5">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted font-medium">
+                  Your Rating
+                </span>
+                <div className="flex items-center gap-2 text-amber-500">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="p-1 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+                      title={`${star} Star${star > 1 ? 's' : ''}`}
+                    >
+                      <Star className={`w-6 h-6 ${star <= rating ? 'fill-current text-amber-500' : 'text-vibe-border stroke-[1.5]'}`} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Main Review / Reflection Canvas for Finished & Recommend Modes */}
+            {(postType === 'finished_book' || postType === 'recommendation') && (
+              <div className="space-y-1.5">
+                <textarea
+                  rows={3}
+                  value={recommendationText}
+                  onChange={(e) => setRecommendationText(e.target.value)}
+                  placeholder={
+                    postType === 'finished_book'
+                      ? 'What were your biggest takeaways or impressions?'
+                      : 'Why do you recommend this book to fellow readers?'
+                  }
+                  className="w-full text-xs sm:text-sm p-3.5 rounded-2xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted/60 focus:border-vibe-accent focus:bg-vibe-card focus:outline-none leading-relaxed resize-none transition-all"
+                  autoFocus
+                />
+              </div>
+            )}
+
+            {/* 2. STREAMLINED BOOK TAGGING (COMPACT, SMART, UNIFIED) */}
+            <div className="space-y-1.5">
+              {selectedBook || (bookTitle && !showSuggestions) ? (
+                /* Selected Book Badge Pill */
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border group">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-7 h-9 rounded bg-vibe-border/40 overflow-hidden flex-shrink-0 flex items-center justify-center border border-vibe-border/50">
+                      {coverImageUrl ? (
+                        <img src={coverImageUrl} alt={bookTitle} className="w-full h-full object-cover" />
                       ) : (
-                        <span className="flex items-center gap-1.5 text-vibe-ink">
-                          <BookOpen className="w-3.5 h-3.5 text-vibe-accent" />
-                          Book Suggestions
-                        </span>
+                        <BookOpen className="w-3.5 h-3.5 text-vibe-ink-muted" />
                       )}
-                      {isOffline ? (
-                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                          {suggestions.length > 0 ? `${suggestions.length} offline matches` : 'Offline'}
-                        </span>
-                      ) : suggestions.length > 0 ? (
-                        <span className="text-[10px] text-vibe-ink-muted">
-                          {suggestions.length} found
-                        </span>
-                      ) : null}
                     </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-vibe-ink truncate">{bookTitle}</p>
+                      <p className="text-[10px] text-vibe-ink-muted truncate">by {bookAuthor || 'Unknown Author'}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearSelectedBook}
+                    className="text-[11px] font-medium text-vibe-ink-muted hover:text-rose-500 px-2 py-1 rounded-md hover:bg-rose-500/10 transition-colors cursor-pointer"
+                  >
+                    Change
+                  </button>
+                </div>
+              ) : (
+                /* Single unified auto-suggest book input */
+                <div className="relative" ref={searchContainerRef}>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={bookTitle}
+                      onChange={(e) => {
+                        setBookTitle(e.target.value);
+                        setSelectedBook(null);
+                      }}
+                      onFocus={() => {
+                        if (suggestions.length > 0) setShowSuggestions(true);
+                      }}
+                      placeholder="📖 Tag book (e.g. Meditations, Rick Rubin...)"
+                      className="w-full text-xs sm:text-sm pl-3.5 pr-8 py-2.5 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted/65 focus:border-vibe-accent focus:bg-vibe-card focus:outline-none transition-all"
+                      autoComplete="off"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-vibe-ink-muted pointer-events-none">
+                      {isSearching ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-vibe-accent" />
+                      ) : (
+                        <Search className="w-3.5 h-3.5 text-vibe-ink-muted/70" />
+                      )}
+                    </div>
+                  </div>
 
-                    {/* Loading state: subtle, tranquil skeleton placeholders without duplicate spinners */}
-                    {isSearching && suggestions.length === 0 ? (
-                      <div className="p-2 space-y-1">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="p-2 flex items-center gap-3 animate-pulse">
-                            <div className="w-8 h-11 rounded-md bg-vibe-border/60 flex-shrink-0" />
-                            <div className="flex-1 min-w-0 space-y-1.5">
-                              <div className="h-3 bg-vibe-border/60 rounded-md w-3/5" />
-                              <div className="h-2 bg-vibe-border/40 rounded-md w-2/5" />
-                            </div>
-                          </div>
-                        ))}
+                  {/* Suggestions Dropdown */}
+                  {showSuggestions && bookTitle.trim().length >= 2 && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl border border-vibe-border bg-vibe-card shadow-2xl overflow-hidden max-h-56 overflow-y-auto">
+                      <div className="px-3 py-1.5 bg-vibe-card-subtle border-b border-vibe-border flex items-center justify-between text-[10px] text-vibe-ink-muted font-medium">
+                        <span className="flex items-center gap-1.5 text-vibe-ink">
+                          <BookOpen className="w-3 h-3 text-vibe-accent" />
+                          Suggested Editions
+                        </span>
+                        <span>{suggestions.length} found</span>
                       </div>
-                    ) : suggestions.length > 0 ? (
-                      <div className="divide-y divide-vibe-border/50">
+
+                      <div className="divide-y divide-vibe-border/40">
                         {suggestions.map((book) => (
                           <button
                             key={book.id}
                             type="button"
                             onClick={() => handleSelectBook(book)}
-                            className="w-full p-2.5 sm:p-3 text-left hover:bg-vibe-card-subtle flex items-center gap-3 transition-colors group cursor-pointer"
+                            className="w-full p-2 text-left hover:bg-vibe-card-subtle flex items-center gap-2.5 transition-colors cursor-pointer group"
                           >
-                            {/* Thumbnail */}
-                            <div className="w-9 h-12 rounded-md overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border shadow-xs flex items-center justify-center">
+                            <div className="w-6 h-8 rounded overflow-hidden bg-vibe-border/30 flex-shrink-0 border border-vibe-border flex items-center justify-center">
                               {book.coverThumbnailUrl ? (
-                                <img
-                                  src={book.coverThumbnailUrl}
-                                  alt={book.title}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                  loading="lazy"
-                                />
+                                <img src={book.coverThumbnailUrl} alt={book.title} className="w-full h-full object-cover" />
                               ) : (
-                                <BookOpen className="w-4 h-4 text-vibe-ink-muted" />
+                                <BookOpen className="w-3 h-3 text-vibe-ink-muted" />
                               )}
                             </div>
-
-                            {/* Details */}
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm font-semibold text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
+                              <p className="text-xs font-medium text-vibe-ink truncate group-hover:text-vibe-accent transition-colors">
                                 {book.title}
                               </p>
-                              <p className="text-[11px] text-vibe-ink-muted truncate">
-                                by {book.author}
-                                {book.firstPublishYear && (
-                                  <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-vibe-card-subtle border border-vibe-border">
-                                    {book.firstPublishYear}
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-
-                            {/* Cover status indicator */}
-                            <div className="flex-shrink-0 text-[10px] hidden sm:block">
-                              {book.coverImageUrl ? (
-                                <span className="text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                                  Cover
-                                </span>
-                              ) : (
-                                <span className="text-vibe-ink-muted">Text only</span>
-                              )}
+                              <p className="text-[10px] text-vibe-ink-muted truncate">by {book.author}</p>
                             </div>
                           </button>
                         ))}
                       </div>
-                    ) : isOffline ? (
-                      <div className="p-4 text-center text-xs space-y-2">
-                        <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-600 dark:text-amber-400">
-                          <WifiOff className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-vibe-ink">You are currently offline</p>
-                          <p className="text-[11px] mt-0.5 text-vibe-ink-muted leading-relaxed">
-                            Book auto-suggest is unavailable offline. You can still type the author manually below.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-4 text-center text-xs text-vibe-ink-muted">
-                        <p>No matching books found.</p>
-                        <p className="text-[11px] mt-1 text-vibe-ink-muted/80">You can type the author manually below.</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  )}
 
-              {/* Author Input */}
-              <div>
-                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
-                  Author
-                </label>
-                <input
-                  type="text"
-                  value={bookAuthor}
-                  onChange={(e) => setBookAuthor(e.target.value)}
-                  placeholder="e.g. Rick Rubin"
-                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none"
-                />
-              </div>
+                  {/* Subtle link to specify author manually if not picking an auto-suggest */}
+                  {bookTitle.trim().length > 0 && !selectedBook && !showManualAuthor && (
+                    <button
+                      type="button"
+                      onClick={() => setShowManualAuthor(true)}
+                      className="text-[10px] text-vibe-ink-muted hover:text-vibe-accent mt-1 inline-block transition-colors"
+                    >
+                      + Add author name manually
+                    </button>
+                  )}
+
+                  {showManualAuthor && (
+                    <input
+                      type="text"
+                      value={bookAuthor}
+                      onChange={(e) => setBookAuthor(e.target.value)}
+                      placeholder="Author name (e.g. Rick Rubin)"
+                      className="w-full text-xs p-2 mt-1.5 rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none"
+                    />
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Auto-Fetched Cover Preview Card */}
-            {coverImageUrl && (
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-vibe-card-subtle border border-vibe-border flex items-center justify-between gap-3 animate-in fade-in duration-200">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-12 h-16 rounded-lg overflow-hidden border border-vibe-border shadow-md flex-shrink-0 bg-vibe-card">
-                    <img
-                      src={coverImageUrl}
-                      alt={bookTitle}
-                      className="w-full h-full object-cover"
+            {/* 3. OPTIONAL PROGRESSIVE DISCLOSURE: REFLECTION IN PASSAGE MODE */}
+            {postType === 'passage' && (
+              <div>
+                {!showReflection ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowReflection(true)}
+                    className="text-xs text-vibe-ink-muted hover:text-vibe-accent flex items-center gap-1.5 py-1 transition-colors group cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-vibe-accent/70 group-hover:scale-110 transition-transform" />
+                    <span>Add your reflection or takeaway <span className="text-[10.5px] opacity-70">(optional)</span></span>
+                  </button>
+                ) : (
+                  <div className="space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10.5px] font-medium uppercase tracking-wider text-vibe-ink-muted">
+                        Your Thoughts <span className="text-[10px] text-vibe-ink-muted/70 font-normal lowercase">(optional)</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowReflection(false);
+                          setRecommendationText('');
+                        }}
+                        className="text-[10.5px] text-vibe-ink-muted hover:text-rose-500"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={recommendationText}
+                      onChange={(e) => setRecommendationText(e.target.value)}
+                      placeholder="What made this passage stay with you?"
+                      className="w-full text-xs sm:text-sm p-2.5 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none resize-none"
+                      autoFocus
                     />
                   </div>
-                  <div className="min-w-0">
-                    <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 mb-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span>Edition cover found</span>
-                    </div>
-                    <p className="text-xs font-bold text-vibe-ink truncate">{bookTitle || 'Selected Book'}</p>
-                    <p className="text-[11px] text-vibe-ink-muted truncate">by {bookAuthor || 'Unknown Author'}</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleRemoveCover}
-                  className="text-[11px] font-medium text-rose-500 hover:text-rose-600 hover:underline px-2.5 py-1.5 rounded-lg hover:bg-rose-500/10 transition-colors flex-shrink-0"
-                >
-                  Remove Cover
-                </button>
+                )}
               </div>
             )}
 
-            {/* Quote Section */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted">
-                  Favorite Passage or Quote {postType === 'passage' && <span className="text-rose-500">*</span>}
-                </label>
-                {postType === 'passage' && (
-                  <span className="text-[10px] text-vibe-accent font-medium">Required for passages</span>
-                )}
-              </div>
-              <textarea
-                rows={3}
-                value={quoteText}
-                onChange={(e) => setQuoteText(e.target.value)}
-                placeholder="“The object isn't to make art, it's to be in that wonderful state...”"
-                className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none font-display italic font-normal"
-              />
-            </div>
-
-            {/* Page Number & Tag */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
-                  Page #
-                </label>
+            {/* 4. COMPACT METADATA STRIP: PAGE # & TAG (MINIMALIST, HORIZONTAL) */}
+            <div className="flex items-center justify-between gap-3 pt-1 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-mono text-vibe-ink-muted">Page:</span>
                 <input
                   type="number"
                   value={pageNumber}
                   onChange={(e) => setPageNumber(e.target.value)}
-                  placeholder="e.g. 19"
-                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none font-mono"
+                  placeholder="opt."
+                  className="w-16 px-2 py-1 text-xs font-mono rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted/50 focus:border-vibe-accent focus:outline-none"
                 />
               </div>
 
-              <div>
-                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
-                  Genre / Tag
-                </label>
+              <div className="flex items-center gap-1.5">
+                <Tag className="w-3.5 h-3.5 text-vibe-ink-muted" />
                 <select
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
-                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink focus:border-vibe-accent focus:outline-none"
+                  className="px-2 py-1 text-xs rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink focus:border-vibe-accent focus:outline-none cursor-pointer"
                 >
                   <option value="Creativity">Creativity</option>
                   <option value="Fiction">Fiction</option>
@@ -554,60 +562,32 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                   <option value="Memoir">Memoir</option>
                   <option value="Non-Fiction">Non-Fiction</option>
                   <option value="Poetry">Poetry</option>
+                  <option value="General">General</option>
                 </select>
               </div>
             </div>
 
-            {/* Star Rating */}
-            {postType === 'finished_book' && (
-              <div>
-                <label className="block text-[10.5px] font-medium uppercase tracking-wider mb-1 text-vibe-ink-muted/80">
-                  Your Rating
-                </label>
-                <div className="flex items-center gap-2 text-vibe-secondary">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className="min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-110 transition-transform"
-                    >
-                      <Star className={`w-6 h-6 ${star <= rating ? 'fill-current' : 'opacity-25'}`} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Reflection / Thoughts */}
-            <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1 text-vibe-ink-muted">
-                Your Thoughts & Reflections
-              </label>
-              <textarea
-                rows={3}
-                value={recommendationText}
-                onChange={(e) => setRecommendationText(e.target.value)}
-                placeholder="What made this passage stay with you?"
-                className="w-full text-xs sm:text-sm p-3 rounded-xl border border-vibe-border bg-vibe-card-subtle text-vibe-ink placeholder:text-vibe-ink-muted focus:border-vibe-accent focus:outline-none"
-              />
-            </div>
           </form>
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-vibe-border mt-4">
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-vibe-border/70 mt-3">
           <button
             type="button"
             onClick={handleClose}
-            className="min-h-[44px] px-4 py-2.5 text-xs sm:text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+            className="px-4 py-2 text-xs sm:text-sm font-medium text-vibe-ink-muted hover:text-vibe-ink transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             form="create-post-form"
             type="submit"
-            className="min-h-[44px] px-6 py-2.5 text-xs sm:text-sm font-medium rounded-full bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-xs transition-colors active:scale-95"
+            disabled={!isPublishable}
+            className={`px-5 py-2 text-xs sm:text-sm font-medium rounded-full shadow-xs transition-all active:scale-95 cursor-pointer ${
+              isPublishable
+                ? 'bg-vibe-accent hover:bg-vibe-accent-hover text-white shadow-sm'
+                : 'bg-vibe-card-subtle text-vibe-ink-muted border border-vibe-border/60 opacity-60 cursor-not-allowed'
+            }`}
           >
             Publish Moment
           </button>
