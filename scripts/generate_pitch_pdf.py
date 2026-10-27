@@ -7,7 +7,7 @@ def build_presentation_html():
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Liread — Comprehensive Hackathon Pitch Deck (Light Theme)</title>
+<title>Liread — Product & Architecture Presentation Deck</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
@@ -272,9 +272,8 @@ def build_presentation_html():
        SLIDE 1: TITLE SLIDE
        ===================================================================== -->
   <div class="slide slide-accent">
-    <div class="slide-header">
-      <span class="pill-theme">✦ Hackathon Pitch Presentation</span>
-      <span class="slide-number">01 / 26</span>
+    <div class="slide-header" style="justify-content: flex-end;">
+      <span class="slide-number">01 / 27</span>
     </div>
     <div class="content-body">
       <h1 class="title-logo-large">Liread</h1>
@@ -282,7 +281,7 @@ def build_presentation_html():
         Small daily pages. Massive compounding wisdom.
       </p>
       <p style="font-size: 13pt; color: #475569; max-width: 7.5in; line-height: 1.6; margin-bottom: 24px;">
-        A serene, distraction-free reading sanctuary with deep-focus timers, procedural ambient soundscapes, offline reading, and mindful community accountability.
+        A serene, distraction-free reading sanctuary with deep-focus timers, procedural ambient soundscapes, active in-reader notification blocking, offline reading, and mindful community accountability.
       </p>
       <div style="display: flex; gap: 12px; margin-top: 10px;">
         <span class="tag-pill" style="background: #ecfdf5; border-color: #a7f3d0; color: #047857; font-weight: 700;">Web & PWA</span>
@@ -305,7 +304,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">The Vision & Purpose</span>
-      <span class="slide-number">02 / 26</span>
+      <span class="slide-number">02 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Liread Mission</h2>
@@ -315,12 +314,12 @@ def build_presentation_html():
           "We are starving for wisdom while drowning in algorithmic noise."
         </div>
         <p style="font-size: 12pt; color: #334155; line-height: 1.7;">
-          Liread is engineered to reverse attention fragmentation. Rather than competing with social feeds for fleeting dopamine, Liread provides a sacred digital space where readers cultivate uninterrupted focus, cherish classic literature, and build lifelong reading consistency.
+          Liread is engineered to reverse attention fragmentation. Rather than competing with social feeds for fleeting dopamine, Liread provides a sacred digital space where readers cultivate uninterrupted focus, silence distractions, cherish classic literature, and build lifelong reading consistency.
         </p>
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Core Philosophical Foundation</span>
     </div>
@@ -333,7 +332,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme" style="color: #e11d48; border-color: #fecdd3; background: #fff1f2;">The Problem: Attention Deficit</span>
-      <span class="slide-number">03 / 26</span>
+      <span class="slide-number">03 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Screen Time Displacement</h2>
@@ -356,7 +355,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Crisis Metric: Attention Economy</span>
     </div>
@@ -369,7 +368,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme" style="color: #d97706; border-color: #fde68a; background: #fffbeb;">The Problem: Friction & Attrition</span>
-      <span class="slide-number">04 / 26</span>
+      <span class="slide-number">04 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Abandonment Epidemic</h2>
@@ -378,12 +377,12 @@ def build_presentation_html():
         <div class="huge-stat" style="color: #d97706;">74%</div>
         <div class="huge-stat-label">Of Started Books Are Never Finished</div>
         <p class="huge-stat-desc" style="font-size: 12pt; max-width: 8.5in; margin-top: 10px;">
-          Without a structured daily focus timer, gentle milestone pacing, and a peaceful reading environment, 3 out of 4 books are abandoned around page 60. Notification interruptions break flow and destroy the cognitive bridge required to finish long-form masterworks.
+          Without a structured daily focus timer, gentle milestone pacing, and an environment shielded from notifications, 3 out of 4 books are abandoned around page 60. Notification interruptions break flow and destroy the cognitive bridge required to finish long-form masterworks.
         </p>
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Crisis Metric: Reader Drop-off</span>
     </div>
@@ -396,7 +395,7 @@ def build_presentation_html():
   <div class="slide slide-purple">
     <div class="slide-header">
       <span class="pill-theme" style="color: #7c3aed; border-color: #ddd6fe; background: #f5f3ff;">The Problem: Missing Accountability</span>
-      <span class="slide-number">05 / 26</span>
+      <span class="slide-number">05 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Solitary Reader Dilemma</h2>
@@ -414,7 +413,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Behavioral Science of Reading</span>
     </div>
@@ -427,7 +426,7 @@ def build_presentation_html():
   <div class="slide slide-sky">
     <div class="slide-header">
       <span class="pill-theme" style="color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">The Problem: Forgotten Knowledge</span>
-      <span class="slide-number">06 / 26</span>
+      <span class="slide-number">06 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Lost Marginalia Paradox</h2>
@@ -452,7 +451,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Knowledge Retention Challenge</span>
     </div>
@@ -465,7 +464,7 @@ def build_presentation_html():
   <div class="slide slide-accent">
     <div class="slide-header">
       <span class="pill-theme">The Solution</span>
-      <span class="slide-number">07 / 26</span>
+      <span class="slide-number">07 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Introducing Liread</h2>
@@ -476,27 +475,31 @@ def build_presentation_html():
             Focus in Private. Inspire in Public.
           </div>
           <p style="font-size: 11pt; color: #334155; line-height: 1.65;">
-            Liread provides an all-in-one distraction-free web sanctuary: an immersive reading HUD timer, zero-network procedural audio, browser-native EPUB/PDF reader, and a high-signal social feed built strictly around authentic reflections.
+            Liread provides an all-in-one distraction-free web sanctuary: an immersive reading HUD timer, active in-reader notification and app blocking, zero-network procedural audio, browser-native EPUB/PDF reader, and a high-signal social feed built strictly around authentic reflections.
           </p>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px;">
-            <div style="color: #047857; font-weight: 700; font-size: 10.5pt; margin-bottom: 2px;">✦ The Reading Sanctuary</div>
-            <div style="font-size: 9pt; color: #64748b;">Full-screen HUD timer with customizable daily goals and procedural soundscapes.</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
+            <div style="color: #047857; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ The Reading Sanctuary & HUD</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Full-screen timer with customizable daily goals and procedural soundscapes.</div>
           </div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px;">
-            <div style="color: #0284c7; font-weight: 700; font-size: 10.5pt; margin-bottom: 2px;">✦ The Open Library Reader</div>
-            <div style="font-size: 9pt; color: #64748b;">Read millions of public domain books offline in your browser with zero latency.</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
+            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ In-Reader App & Notification Blocker</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Mutes distractions, locks focus, and prevents app-switching during reading.</div>
           </div>
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px;">
-            <div style="color: #d97706; font-weight: 700; font-size: 10.5pt; margin-bottom: 2px;">✦ The Commonplace Feed</div>
-            <div style="font-size: 9pt; color: #64748b;">Publish verified marginalia and celebrate daily consistency with real readers.</div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
+            <div style="color: #0284c7; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ The Open Library & Offline Reader</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Read millions of public domain books offline in your browser with zero latency.</div>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
+            <div style="color: #d97706; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ The Commonplace Feed</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Publish verified marginalia and celebrate daily consistency with real readers.</div>
           </div>
         </div>
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Solution Architecture</span>
     </div>
@@ -509,7 +512,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Habit Science</span>
-      <span class="slide-number">08 / 26</span>
+      <span class="slide-number">08 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">The Philosophy of Compounding</h2>
@@ -532,7 +535,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Atomic Habits in Practice</span>
     </div>
@@ -545,7 +548,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Feature Spotlight 01</span>
-      <span class="slide-number">09 / 26</span>
+      <span class="slide-number">09 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Distraction-Free Reading Timer</h2>
@@ -565,7 +568,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Core Capability: Time Tracking</span>
     </div>
@@ -578,7 +581,7 @@ def build_presentation_html():
   <div class="slide slide-sky">
     <div class="slide-header">
       <span class="pill-theme" style="color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">Feature Spotlight 02</span>
-      <span class="slide-number">10 / 26</span>
+      <span class="slide-number">10 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Procedural Web Audio Engine</h2>
@@ -615,7 +618,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Web Audio API Engineering</span>
     </div>
@@ -628,7 +631,7 @@ def build_presentation_html():
   <div class="slide slide-amber">
     <div class="slide-header">
       <span class="pill-theme" style="color: #d97706; border-color: #fde68a; background: #fffbeb;">Feature Spotlight 03</span>
-      <span class="slide-number">11 / 26</span>
+      <span class="slide-number">11 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">ReadEra Offline Reader Engine</h2>
@@ -648,7 +651,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Client Storage & Reading Engine</span>
     </div>
@@ -656,12 +659,46 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 12: FEATURE 4 - BOOK DISCOVERY
+       SLIDE 12: FEATURE 4 - APP & NOTIFICATION BLOCKER
+       ===================================================================== -->
+  <div class="slide slide-accent">
+    <div class="slide-header">
+      <span class="pill-theme" style="color: #059669; border-color: #a7f3d0; background: #ecfdf5;">Feature Spotlight 04</span>
+      <span class="slide-number">12 / 27</span>
+    </div>
+    <div class="content-body">
+      <h2 class="slide-title">Deep Immersion Shield: App & Notification Blocker</h2>
+      <p class="slide-subtitle">Active distraction suppression locking focus and silencing digital noise in the e-reader</p>
+      <div class="hero-card" style="border-left: 6px solid #059669;">
+        <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+          Hardware-Level Distraction Shielding Directly in the Web Browser
+        </div>
+        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
+          Implemented in <code style="color: #047857; font-family: 'JetBrains Mono'; font-weight: 700;">FocusShieldModal.tsx</code> and <code style="color: #047857; font-family: 'JetBrains Mono'; font-weight: 700;">focusShieldStore.ts</code>, Liread actively eliminates the 23-minute cognitive penalty of micro-interruptions by turning standard browsers into dedicated distraction-free reading terminals.
+        </p>
+        <ul class="feature-points">
+          <li><strong>Notification Silencing Shield:</strong> Automatically silences in-app notifications, tab badges, and sound alerts while inside the reader to prevent breaking flow.</li>
+          <li><strong>Anti-Switching App Guard & Visibility Trap:</strong> Detects window blurring, pauses the active reading timer when users navigate away, and triggers a gentle refocus intervention upon return.</li>
+          <li><strong>Screen WakeLock & Kiosk Fullscreen:</strong> Utilizes the Screen WakeLock API to keep displays awake without sleep timeouts, plus fullscreen lock to hide OS taskbars.</li>
+          <li><strong>Accidental Exit Interceptor:</strong> Safeguards reading progress with navigation guards and confirmation dialogs against unintended page closures.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span></span>
+      <span class="brand">LIREAD</span>
+      <span>Cognitive Shield & Focus Lock</span>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       SLIDE 13: FEATURE 5 - BOOK DISCOVERY
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
-      <span class="pill-theme">Feature Spotlight 04</span>
-      <span class="slide-number">12 / 26</span>
+      <span class="pill-theme">Feature Spotlight 05</span>
+      <span class="slide-number">13 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Dynamic Literary Discovery</h2>
@@ -681,7 +718,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Open Library API Integration</span>
     </div>
@@ -689,12 +726,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 13: FEATURE 5 - COMMONPLACE FEED
+       SLIDE 14: FEATURE 6 - COMMONPLACE FEED
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
-      <span class="pill-theme">Feature Spotlight 05</span>
-      <span class="slide-number">13 / 26</span>
+      <span class="pill-theme">Feature Spotlight 06</span>
+      <span class="slide-number">14 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Social Marginalia & Commonplace Feed</h2>
@@ -714,7 +751,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Social Architecture: Real Engagement</span>
     </div>
@@ -722,12 +759,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 14: FEATURE 6 - LIVE SANCTUARY
+       SLIDE 15: FEATURE 7 - LIVE SANCTUARY
        ===================================================================== -->
   <div class="slide slide-purple">
     <div class="slide-header">
-      <span class="pill-theme" style="color: #7c3aed; border-color: #ddd6fe; background: #f5f3ff;">Feature Spotlight 06</span>
-      <span class="slide-number">14 / 26</span>
+      <span class="pill-theme" style="color: #7c3aed; border-color: #ddd6fe; background: #f5f3ff;">Feature Spotlight 07</span>
+      <span class="slide-number">15 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Live Co-Reading Sanctuary</h2>
@@ -747,7 +784,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Real-Time Presence System</span>
     </div>
@@ -755,12 +792,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 15: FEATURE 7 - BOOKSHELF & STREAKS
+       SLIDE 16: FEATURE 8 - BOOKSHELF & STREAKS
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
-      <span class="pill-theme">Feature Spotlight 07</span>
-      <span class="slide-number">15 / 26</span>
+      <span class="pill-theme">Feature Spotlight 08</span>
+      <span class="slide-number">16 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Digital Bookshelf & Streak Analytics</h2>
@@ -780,7 +817,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Personal Analytics & Bookshelf</span>
     </div>
@@ -788,12 +825,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 16: TECH ARCHITECTURE OVERVIEW
+       SLIDE 17: TECH ARCHITECTURE OVERVIEW
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Engineering Deep Dive</span>
-      <span class="slide-number">16 / 26</span>
+      <span class="slide-number">17 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">System Architecture Overview</h2>
@@ -803,7 +840,7 @@ def build_presentation_html():
           <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="color: #047857; font-weight: 700; font-size: 11pt; margin-bottom: 6px;">1. Client Tier</div>
             <p style="font-size: 9pt; color: #475569; line-height: 1.5;">
-              React 18 + TypeScript + Vite. Chunked asset distribution (<125kB gzip), Zustand state management, Web Audio synthesis, IndexedDB storage.
+              React 18 + TypeScript + Vite. Chunked asset distribution (&lt;125kB gzip), Zustand state management, Web Audio synthesis, IndexedDB storage.
             </p>
           </div>
           <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
@@ -822,7 +859,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Full-Stack Engineering Blueprint</span>
     </div>
@@ -830,12 +867,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 17: FRONTEND ENGINEERING
+       SLIDE 18: FRONTEND ENGINEERING
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Frontend Architecture</span>
-      <span class="slide-number">17 / 26</span>
+      <span class="slide-number">18 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Client-Side Architecture & Performance</h2>
@@ -855,7 +892,7 @@ def build_presentation_html():
         </div>
         <div class="code-box">
 <span class="comment">// Optimized persistent feed state with auto-sanitization</span>
-<span class="keyword">export const</span> <span class="field">useFeedStore</span> = create<FeedStore>()(
+<span class="keyword">export const</span> <span class="field">useFeedStore</span> = create&lt;FeedStore&gt;()(
   persist((set, get) => ({
     posts: [],
     sortBy: <span class="type">'latest'</span>,
@@ -872,7 +909,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Client Layer Engineering</span>
     </div>
@@ -880,12 +917,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 18: EDGE & SERVERLESS
+       SLIDE 19: EDGE & SERVERLESS
        ===================================================================== -->
   <div class="slide slide-sky">
     <div class="slide-header">
       <span class="pill-theme" style="color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">Edge Infrastructure</span>
-      <span class="slide-number">18 / 26</span>
+      <span class="slide-number">19 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Serverless Edge & CDN Proxying</h2>
@@ -905,7 +942,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Edge Serverless Layer</span>
     </div>
@@ -913,12 +950,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 19: DATABASE ENTITIES
+       SLIDE 20: DATABASE ENTITIES
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Database Architecture 01</span>
-      <span class="slide-number">19 / 26</span>
+      <span class="slide-number">20 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Relational Entity Model</h2>
@@ -961,7 +998,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>PostgreSQL Relational Schema</span>
     </div>
@@ -969,12 +1006,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 20: DATA INTEGRITY & REAL COUNTS
+       SLIDE 21: DATA INTEGRITY & REAL COUNTS
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Database Architecture 02</span>
-      <span class="slide-number">20 / 26</span>
+      <span class="slide-number">21 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Data Integrity: Verified Real Likes</h2>
@@ -994,7 +1031,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Relational Integrity Guarantees</span>
     </div>
@@ -1002,12 +1039,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 21: AUTOMATIONS & RLS
+       SLIDE 22: AUTOMATIONS & RLS
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Database Architecture 03</span>
-      <span class="slide-number">21 / 26</span>
+      <span class="slide-number">22 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Database Triggers & Row-Level Security</h2>
@@ -1036,7 +1073,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Database Automations & RLS</span>
     </div>
@@ -1044,12 +1081,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 22: ROADMAP 1 - AI MARGINALIA
+       SLIDE 23: ROADMAP 1 - AI MARGINALIA
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Future Roadmap 01</span>
-      <span class="slide-number">22 / 26</span>
+      <span class="slide-number">23 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Horizon 1: AI Contextual Marginalia</h2>
@@ -1070,7 +1107,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Strategic Horizon 1</span>
     </div>
@@ -1078,12 +1115,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 23: ROADMAP 2 - MICRO-CLUBS
+       SLIDE 24: ROADMAP 2 - MICRO-CLUBS
        ===================================================================== -->
   <div class="slide slide-sky">
     <div class="slide-header">
       <span class="pill-theme" style="color: #0284c7; border-color: #bae6fd; background: #f0f9ff;">Future Roadmap 02</span>
-      <span class="slide-number">23 / 26</span>
+      <span class="slide-number">24 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Horizon 2: Asynchronous Micro-Clubs</h2>
@@ -1104,7 +1141,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Strategic Horizon 2</span>
     </div>
@@ -1112,12 +1149,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 24: ROADMAP 3 - HARDWARE SYNC
+       SLIDE 25: ROADMAP 3 - HARDWARE SYNC
        ===================================================================== -->
   <div class="slide slide-amber">
     <div class="slide-header">
       <span class="pill-theme" style="color: #d97706; border-color: #fde68a; background: #fffbeb;">Future Roadmap 03</span>
-      <span class="slide-number">24 / 26</span>
+      <span class="slide-number">25 / 27</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Horizon 3: Native Mobile & E-Ink Hardware Sync</h2>
@@ -1138,7 +1175,7 @@ def build_presentation_html():
       </div>
     </div>
     <div class="slide-footer">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Strategic Horizon 3</span>
     </div>
@@ -1146,7 +1183,7 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 25: CLOSING THESIS
+       SLIDE 26: CLOSING THESIS
        ===================================================================== -->
   <div class="slide slide-accent" style="text-align: center; align-items: center; justify-content: center;">
     <div style="max-width: 9in;">
@@ -1156,11 +1193,11 @@ def build_presentation_html():
         It is simply waiting for a <span style="color: #059669; font-style: italic;">calm sanctuary</span> to call home."
       </div>
       <p style="font-size: 13pt; color: #334155; line-height: 1.7; max-width: 7.8in; margin: 0 auto 30px auto;">
-        By marrying distraction-free audio engineering, zero-friction library access, and honest human accountability, Liread empowers readers worldwide to reclaim their attention and build lifelong compounding wisdom.
+        By marrying distraction-free audio engineering, active in-reader notification and app blocking, zero-friction library access, and honest human accountability, Liread empowers readers worldwide to reclaim their attention and build lifelong compounding wisdom.
       </p>
     </div>
     <div class="slide-footer" style="width: 100%;">
-      <span>Liread Hackathon Deck</span>
+      <span></span>
       <span class="brand">LIREAD</span>
       <span>Philosophical Synthesis</span>
     </div>
@@ -1168,7 +1205,7 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 26: CALL TO ACTION & DEMO
+       SLIDE 27: CALL TO ACTION & DEMO
        ===================================================================== -->
   <div class="slide" style="text-align: center; align-items: center; justify-content: center;">
     <div style="max-width: 8.5in;">
@@ -1197,7 +1234,7 @@ def build_presentation_html():
     <div class="slide-footer" style="width: 100%;">
       <span>Creator: <strong>Muluken Tsegaye</strong></span>
       <span class="brand">LIREAD</span>
-      <span>Final Pitch Conclusion</span>
+      <span>Final Presentation Conclusion</span>
     </div>
   </div>
 
@@ -1214,7 +1251,7 @@ def main():
     
     os.makedirs(os.path.dirname(html_path), exist_ok=True)
     
-    print("[1/3] Generating 26-slide presentation markup (Light White Theme)...")
+    print("[1/3] Generating 27-slide presentation markup (Light White Theme)...")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(build_presentation_html())
     print(f"      HTML written to: {html_path}")
