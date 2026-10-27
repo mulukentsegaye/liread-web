@@ -27,6 +27,7 @@ import { AmbientSoundId } from '../../types/theme';
 import { useAuthStore } from '../../stores/authStore';
 import { ReadingImpactCalculator } from './ReadingImpactCalculator';
 import { ScrollRevealCard } from './ScrollRevealCard';
+import { HeroScrollAnimation } from './HeroScrollAnimation';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -213,6 +214,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
           </button>
         </div>
+
+        {/* Scroll-Linked Hero Multi-Layer Composition */}
+        <HeroScrollAnimation />
 
       </section>
 
