@@ -266,9 +266,14 @@ export default async function handler(req: any, res?: any) {
       }
 
       const webhookUrl = 'https://liread.vercel.app/api/telegram';
-      const tgRes = await fetch(
-        `https://api.telegram.org/bot${botToken}/setWebhook?url=${encodeURIComponent(webhookUrl)}`
-      );
+      const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+      const setWebhookUrl = new URL(`https://api.telegram.org/bot${botToken}/setWebhook`);
+      setWebhookUrl.searchParams.set('url', webhookUrl);
+      if (webhookSecret) {
+        setWebhookUrl.searchParams.set('secret_token', webhookSecret);
+      }
+
+      const tgRes = await fetch(setWebhookUrl.toString());
       const tgData = await tgRes.json().catch(() => null);
 
       // If Telegram returns 429 rate limit, check if the webhook is already set to our URL!
@@ -296,8 +301,9 @@ export default async function handler(req: any, res?: any) {
       ok: true,
       service: 'LiRead Telegram Bot Webhook (@lireadbooksbot)',
       configured: Boolean(botToken),
-      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594'),
-      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430'),
+      adminConfigured: Boolean(process.env.TELEGRAM_ADMIN_CHAT_ID),
+      vaultConfigured: Boolean(process.env.TELEGRAM_VAULT_CHANNEL_ID),
+      webhookSecretConfigured: Boolean(process.env.TELEGRAM_WEBHOOK_SECRET),
       setupHelper: Boolean(botToken)
         ? 'Click https://liread.vercel.app/api/telegram?setup=1 to activate webhook with Telegram'
         : 'TELEGRAM_BOT_TOKEN missing from Vercel deployment. Add it and redeploy.',
@@ -312,8 +318,20 @@ export default async function handler(req: any, res?: any) {
 
   try {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '8596590594').trim();
-    const vaultChannelId = (process.env.TELEGRAM_VAULT_CHANNEL_ID || '3684646430').trim();
+    const adminChatId = String(process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim();
+    const vaultChannelId = String(process.env.TELEGRAM_VAULT_CHANNEL_ID || '').trim();
+    const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+
+    // Verify webhook secret token if configured
+    if (webhookSecret) {
+      const incomingSecret =
+        req.headers?.['x-telegram-bot-api-secret-token'] ||
+        req.headers?.['X-Telegram-Bot-Api-Secret-Token'];
+      if (incomingSecret !== webhookSecret) {
+        console.warn('[telegram-webhook] Unauthorized: Secret token mismatch.');
+        return respondJson(res, { ok: false, error: 'Unauthorized webhook update' }, 401);
+      }
+    }
 
     if (!botToken) {
       console.warn('[telegram-webhook] Warning: TELEGRAM_BOT_TOKEN environment variable is not set.');

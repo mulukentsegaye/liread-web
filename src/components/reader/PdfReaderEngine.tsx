@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.js';
 import { useReaderStore } from '../../stores/readerStore';
 import { READER_THEMES } from './readerThemeStyles';
@@ -50,6 +50,7 @@ export const PdfReaderEngine: React.FC<PdfReaderEngineProps> = ({ onTapCenter })
           data: new Uint8Array(arrayBuffer),
           cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
           cMapPacked: true,
+          isEvalSupported: false,
         });
 
         const doc = await loadingTask.promise;

@@ -6,6 +6,40 @@ import type { IncomingMessage, ServerResponse } from 'http';
 // ==============================================================================
 
 /**
+ * SSRF & Open Proxy Protection: Allowed Hostnames for Direct File Streaming
+ */
+const ALLOWED_STREAM_HOSTS = new Set([
+  'archive.org',
+  'www.archive.org',
+  'gutenberg.org',
+  'www.gutenberg.org',
+  'openlibrary.org',
+  'www.openlibrary.org',
+  'covers.openlibrary.org',
+  'gutendex.com',
+  'www.gutendex.com',
+]);
+
+function isAllowedUrl(urlString: string): boolean {
+  try {
+    const parsed = new URL(urlString);
+    if (parsed.protocol !== 'https:') return false;
+    const hostname = parsed.hostname.toLowerCase();
+    if (ALLOWED_STREAM_HOSTS.has(hostname)) return true;
+    if (
+      hostname.endsWith('.archive.org') ||
+      hostname.endsWith('.gutenberg.org') ||
+      hostname.endsWith('.openlibrary.org')
+    ) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Verified Public Domain Registry for Instant 0ms Book Downloads
  * Maps timeless classics to reliable, high-speed public domain archives
  * (Internet Archive, Project Gutenberg CDN).
@@ -835,6 +869,12 @@ export default async function handler(req: any, res: any) {
 
     // Direct URL streaming shortcut (if client already knows the direct CDN link)
     if (directUrl && mode === 'download') {
+      if (!isAllowedUrl(directUrl)) {
+        return res.status(403).json({
+          error: 'Forbidden: Streaming from this URL origin is not permitted.',
+          available: false,
+        });
+      }
       const isEpub = requestedFormat === 'epub' || directUrl.endsWith('.epub');
       const reg = title ? findPublicDomainBook(title, author) : null;
       const fallback = reg?.epubUrl && reg.epubUrl !== directUrl ? reg.epubUrl : undefined;
