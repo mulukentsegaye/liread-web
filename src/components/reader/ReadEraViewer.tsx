@@ -10,7 +10,6 @@ import {
   Minimize2,
   Share2,
   Clock,
-  Sparkles,
   X,
   Plus,
   Trash2,

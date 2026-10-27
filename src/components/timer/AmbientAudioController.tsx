@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Volume2, 
+  Headphones,
   VolumeX, 
   Volume1, 
   Flame, 
   CloudRain, 
   Radio, 
   Bird, 
-  Sparkles, 
   Sliders, 
   Check,
   ChevronDown,
@@ -208,7 +208,7 @@ export const AmbientAudioController: React.FC<AmbientAudioControllerProps> = ({ 
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-vibe-ink-muted flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-vibe-accent" />
+                <Headphones className="w-3 h-3 text-vibe-accent" />
                 Theme Ambient Soundscapes
               </span>
               <button
@@ -221,7 +221,7 @@ export const AmbientAudioController: React.FC<AmbientAudioControllerProps> = ({ 
                 }`}
                 title="When enabled, changing your visual theme automatically changes the background ambient sound"
               >
-                {autoPairWithTheme ? '✨ Auto-Sync: ON' : 'Auto-Sync: OFF'}
+                {autoPairWithTheme ? 'Auto-Sync: ON' : 'Auto-Sync: OFF'}
               </button>
             </div>
 

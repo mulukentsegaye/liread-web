@@ -5,7 +5,6 @@ import {
   Star,
   Trash2,
   Clock,
-  Sparkles,
   Search,
   CheckCircle2,
   FolderOpen,

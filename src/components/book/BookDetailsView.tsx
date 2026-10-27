@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, 
-  Sparkles, 
   Clock, 
   BookOpen, 
   Bookmark, 
@@ -965,7 +964,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({
               <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 shadow-soft space-y-5">
                 <div className="pb-3 border-b border-vibe-border">
                   <h3 className="font-serif text-base sm:text-lg font-semibold text-vibe-ink flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-vibe-accent" />
+                    <BookOpen className="w-4 h-4 text-vibe-accent" />
                     <span>Summary & Chapter Overview</span>
                   </h3>
                 </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Sparkles, X, Flame } from 'lucide-react';
+import { Trophy, Check, X, Flame } from 'lucide-react';
 import { useCelebrationStore } from '../../stores/celebrationStore';
 
 export const CelebrationToast: React.FC = () => {
@@ -24,7 +24,7 @@ export const CelebrationToast: React.FC = () => {
               <Trophy className="w-5 h-5 text-amber-200 fill-amber-200/40 animate-bounce-subtle" />
             </div>
             <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center shadow-xs">
-              <Sparkles className="w-2.5 h-2.5 fill-current" />
+              <Check className="w-2.5 h-2.5 stroke-[3]" />
             </div>
           </div>
 

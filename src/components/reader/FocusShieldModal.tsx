@@ -11,7 +11,6 @@ import {
   X,
   CheckCircle2,
   AlertTriangle,
-  Sparkles,
   Maximize2,
   EyeOff,
   Flame,

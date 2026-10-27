@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   Eye, 
   EyeOff, 
-  Sparkles, 
   CheckCircle2, 
   AlertCircle, 
   ArrowLeft,
@@ -296,7 +295,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
             {/* Header Titles */}
             <div className="mb-6 sm:mb-8 text-center sm:text-left">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vibe-accent-subtle text-vibe-accent text-[11px] font-semibold mb-2 shadow-xs">
-                <Sparkles className="w-3 h-3" />
+                <BookOpen className="w-3 h-3" />
                 <span className="font-mono text-[10px] font-bold tracking-wider uppercase">Reader Account</span>
               </div>
               <h1 className="font-heading text-2xl sm:text-3xl font-bold text-vibe-ink tracking-tight">

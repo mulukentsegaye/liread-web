@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Sparkles, 
   Coffee, 
   Bookmark, 
   Heart, 
@@ -92,7 +91,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center shadow-xs">
-            <Sparkles className="w-4 h-4" />
+            <BookOpen className="w-4 h-4" />
           </div>
           <div>
             <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-vibe-ink">
@@ -100,7 +99,7 @@ export const ReadingDeskAssembly: React.FC<ReadingDeskAssemblyProps> = ({ onOpen
             </h4>
             <p className="text-[11px] text-vibe-ink-muted">
               {isAssembled 
-                ? '✦ Desk assembled in flow · Tap items to explore' 
+                ? 'Desk assembled in flow · Tap items to explore' 
                 : 'Scattered tools gather into place as you arrive'}
             </p>
           </div>

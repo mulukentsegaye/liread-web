@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SlidersHorizontal, Flame, Check, ArrowRight, Sparkles, Bookmark, BookOpen, Quote } from 'lucide-react';
+import { SlidersHorizontal, Flame, Check, ArrowRight, Bookmark, BookOpen, Quote } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { sanctuaryService } from '../../services/sanctuaryService';
@@ -133,7 +133,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
 
           <div className="text-center mt-2.5">
             <p className="text-xs font-medium text-vibe-ink">
-              {progressPercent >= 100 ? 'Daily plan completed! ✨' : `${minutesLeft} min remaining today`}
+              {progressPercent >= 100 ? 'Daily plan completed! 🎉' : `${minutesLeft} min remaining today`}
             </p>
             <p className="text-[11px] text-vibe-ink-muted mt-0.5 font-mono tabular-nums">
               {progressPercent >= 100 ? 'In the Consistent Circle' : `${progressPercent}% of personal target`}

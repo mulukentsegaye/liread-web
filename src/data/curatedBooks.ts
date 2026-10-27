@@ -58,7 +58,7 @@ export interface CategoryConfig {
   subjectSlug: string;
   shelfTitle: string;
   tagline: string;
-  iconName: 'Compass' | 'Sparkles' | 'TrendingUp' | 'BookOpen' | 'Flame' | 'Landmark' | 'User' | 'Briefcase' | 'Atom' | 'Palette' | 'Feather' | 'ShieldAlert';
+  iconName: 'Compass' | 'Brain' | 'TrendingUp' | 'BookOpen' | 'Flame' | 'Landmark' | 'User' | 'Briefcase' | 'Atom' | 'Palette' | 'Feather' | 'ShieldAlert';
   badgeLabel: string;
 }
 
@@ -78,7 +78,7 @@ export const CATEGORY_CONFIGS: CategoryConfig[] = [
     subjectSlug: 'psychology',
     shelfTitle: 'Psychology & Cognitive Science',
     tagline: 'Mental models, behavioral economics, subconscious impulses, and emotional clarity.',
-    iconName: 'Sparkles',
+    iconName: 'Brain',
     badgeLabel: 'Mind & Behavior',
   },
   {

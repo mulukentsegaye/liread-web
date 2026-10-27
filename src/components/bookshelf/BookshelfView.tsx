@@ -8,7 +8,6 @@ import {
   Trash2, 
   MoreVertical, 
   Compass, 
-  Sparkles,
   ChevronDown,
   Copy 
 } from 'lucide-react';
@@ -311,65 +310,35 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
         <div className="space-y-6">
           {/* Bookshelf Category Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button
-              type="button"
-              onClick={() => setShelfFilter('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                shelfFilter === 'all'
-                  ? 'bg-vibe-ink text-vibe-card shadow-xs'
-                  : 'bg-vibe-card border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle'
-              }`}
-            >
-              <span>All Books</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${shelfFilter === 'all' ? 'bg-white/20 text-white' : 'bg-vibe-card-subtle text-vibe-ink-muted'}`}>
-                {countAll}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShelfFilter('want_to_read')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                shelfFilter === 'want_to_read'
-                  ? 'bg-vibe-accent text-white shadow-xs'
-                  : 'bg-vibe-card border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle'
-              }`}
-            >
-              <span>Want to Read</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${shelfFilter === 'want_to_read' ? 'bg-white/20 text-white' : 'bg-vibe-card-subtle text-vibe-ink-muted'}`}>
-                {countWant}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShelfFilter('currently_reading')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                shelfFilter === 'currently_reading'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-vibe-card border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle'
-              }`}
-            >
-              <span>Currently Reading</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${shelfFilter === 'currently_reading' ? 'bg-white/20 text-white' : 'bg-vibe-card-subtle text-vibe-ink-muted'}`}>
-                {countReading}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShelfFilter('finished')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                shelfFilter === 'finished'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-vibe-card border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle'
-              }`}
-            >
-              <span>Finished</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${shelfFilter === 'finished' ? 'bg-white/20 text-white' : 'bg-vibe-card-subtle text-vibe-ink-muted'}`}>
-                {countFinished}
-              </span>
-            </button>
+            {[
+              { id: 'all' as const, label: 'All Books', count: countAll },
+              { id: 'want_to_read' as const, label: 'Want to Read', count: countWant },
+              { id: 'currently_reading' as const, label: 'Currently Reading', count: countReading },
+              { id: 'finished' as const, label: 'Finished', count: countFinished },
+            ].map((tab) => {
+              const isActive = shelfFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setShelfFilter(tab.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    isActive
+                      ? 'bg-vibe-accent text-white shadow-xs'
+                      : 'bg-vibe-card border border-vibe-border text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-vibe-card-subtle text-vibe-ink-muted'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {loading ? (
@@ -551,7 +520,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
                           onClick={() => onViewBookDetails?.(b.title, b.author, b.coverUrl)}
                           className="py-1.5 sm:py-2 px-1.5 sm:px-2 rounded-xl text-[10px] sm:text-xs font-medium bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink border border-vibe-border hover:border-vibe-accent transition-all duration-200 flex items-center justify-center gap-1 active:scale-95 shadow-xs truncate cursor-pointer"
                         >
-                          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-vibe-accent flex-shrink-0" />
+                          <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-vibe-accent flex-shrink-0" />
                           <span className="truncate">Overview</span>
                         </button>
                       </div>
@@ -642,7 +611,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
                         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink text-[11px] font-medium hover:bg-vibe-card hover:border-vibe-accent transition-all cursor-pointer shadow-2xs"
                         title="View book overview and summary"
                       >
-                        <Sparkles className="w-3 h-3 text-vibe-accent" />
+                        <BookOpen className="w-3 h-3 text-vibe-accent" />
                         <span>Book Info</span>
                       </button>
                     )}

@@ -5,7 +5,6 @@ import {
   Play,
   SlidersHorizontal,
   LogOut,
-  Sparkles,
   Heart
 } from 'lucide-react';
 import { useFocusShieldStore } from '../../stores/focusShieldStore';
@@ -42,8 +41,7 @@ export const FocusInterventionOverlay: React.FC = () => {
         </div>
 
         {/* Interception Notification Tag */}
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-3">
-          <Sparkles className="w-3 h-3 text-emerald-400" />
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-3">
           Distraction Intercepted
         </span>
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
-  Sparkles, 
   Star, 
   ArrowLeft, 
   Search, 
@@ -267,7 +266,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               </button>
 
               <div className="flex items-center gap-2 text-vibe-accent">
-                <Sparkles className="w-4 h-4 flex-shrink-0" />
+                <Quote className="w-4 h-4 flex-shrink-0" />
                 <h2 className="font-heading text-base sm:text-lg font-semibold text-vibe-ink">
                   Share a Reading Moment
                 </h2>

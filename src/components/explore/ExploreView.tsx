@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Compass, 
-  Sparkles, 
+  Brain,
   Clock, 
   BookOpen, 
   Star, 
@@ -73,8 +73,8 @@ function getCategoryIcon(iconName: string): React.ReactNode {
   switch (iconName) {
     case 'Compass':
       return <Compass className="w-4 h-4 text-sky-500" />;
-    case 'Sparkles':
-      return <Sparkles className="w-4 h-4 text-amber-500" />;
+    case 'Brain':
+      return <Brain className="w-4 h-4 text-amber-500" />;
     case 'TrendingUp':
       return <TrendingUp className="w-4 h-4 text-emerald-500" />;
     case 'BookOpen':
@@ -1103,8 +1103,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
               <div className="md:col-span-8 space-y-4 text-left">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-medium bg-vibe-accent text-white shadow-xs">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[10.5px] font-sans uppercase tracking-wider font-semibold bg-vibe-accent text-white shadow-xs">
                     Book of the Week
                   </span>
                   <span className="text-xs text-vibe-ink-muted">
@@ -1141,7 +1140,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                     })}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
                   >
-                    <Sparkles className="w-4 h-4" />
+                    <BookOpen className="w-4 h-4" />
                     <span>Read 5–10 Min Summary</span>
                   </button>
 
@@ -1214,7 +1213,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           {/* Looking for a specific book? Card with Integrated Search Bar */}
           <div className="rounded-3xl border border-vibe-border bg-vibe-card p-6 sm:p-8 md:p-10 text-center space-y-5 shadow-soft relative overflow-visible mt-8">
             <div className="space-y-2">
-              <Sparkles className="w-6 h-6 text-vibe-accent mx-auto" />
+              <Search className="w-6 h-6 text-vibe-accent mx-auto" />
               <h3 className="font-serif text-xl sm:text-2xl font-bold text-vibe-ink tracking-tight">
                 Looking for a specific book or author?
               </h3>

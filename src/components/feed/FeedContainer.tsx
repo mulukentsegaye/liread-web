@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Sparkles, TrendingUp, Clock, BookOpen } from 'lucide-react';
+import { Plus, TrendingUp, Clock, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { getUserAvatar } from '../../utils/avatar';
@@ -107,13 +107,12 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
         <div className="flex items-center gap-1 bg-vibe-card border border-vibe-border rounded-xl p-1 shadow-xs">
           <button
             onClick={() => setFeedTab('for_you')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               feedTab === 'for_you'
                 ? 'bg-vibe-accent text-white shadow-xs'
                 : 'text-vibe-ink-secondary hover:text-vibe-ink'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" strokeWidth={2} />
             <span>For you</span>
           </button>
           <button

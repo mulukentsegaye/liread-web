@@ -6,7 +6,6 @@ import {
   Play, 
   Pause, 
   Bookmark, 
-  Sparkles, 
   ChevronRight, 
   ArrowRight, 
   BookOpen, 

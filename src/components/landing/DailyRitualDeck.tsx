@@ -10,7 +10,6 @@ import {
   Pause, 
   Play, 
   ArrowRight, 
-  Sparkles, 
   Coffee, 
   Feather, 
   Check, 

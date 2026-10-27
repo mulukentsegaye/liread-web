@@ -4,7 +4,7 @@ import {
   AlertTriangle, 
   Info, 
   CheckCircle2, 
-  Sparkles, 
+  BookOpen,
   X, 
   ArrowRight 
 } from 'lucide-react';
@@ -101,7 +101,7 @@ export const AlertModal: React.FC = () => {
             }`}
           >
             {isGuest ? (
-              <Sparkles className="w-7 h-7 animate-bounce-subtle" />
+              <BookOpen className="w-7 h-7 animate-bounce-subtle" />
             ) : isError ? (
               <AlertCircle className="w-7 h-7" />
             ) : isWarning ? (

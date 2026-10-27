@@ -8,9 +8,9 @@ import {
   Library,
   Bookmark,
   BookOpen,
-  Sparkles,
   HelpCircle,
   ChevronsUpDown,
+  Quote,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
@@ -104,7 +104,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({ activeTab, onTabChange
         {/* Subtle Daily Thought (Integrated, minimal) */}
         <div className="hidden lg:block mx-2 mt-7 pt-4 border-t border-vibe-border/50">
           <div className="flex items-center gap-1.5 text-vibe-accent mb-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-vibe-accent" strokeWidth={1.5} />
+            <Quote className="w-3.5 h-3.5 text-vibe-accent" strokeWidth={1.5} />
             <span className="text-[10px] font-mono uppercase tracking-wider text-vibe-ink-muted/70">Daily Thought</span>
           </div>
           <p className="font-display italic text-xs text-vibe-ink/80 leading-relaxed font-normal">
