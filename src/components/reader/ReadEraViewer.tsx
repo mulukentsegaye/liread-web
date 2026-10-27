@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   BookOpen,
@@ -15,12 +15,17 @@ import {
   Plus,
   Trash2,
   Check,
-  Type
+  Type,
+  Shield,
+  ShieldCheck
 } from 'lucide-react';
 import { useReaderStore } from '../../stores/readerStore';
 import { useTimerStore } from '../../stores/timerStore';
 import { useFeedStore } from '../../stores/feedStore';
+import { useFocusShieldStore } from '../../stores/focusShieldStore';
 import { toast } from '../../stores/noticeStore';
+import { FocusShieldModal } from './FocusShieldModal';
+import { FocusInterventionOverlay } from './FocusInterventionOverlay';
 import { PdfReaderEngine } from './PdfReaderEngine';
 import { EpubReaderEngine } from './EpubReaderEngine';
 import { TxtReaderEngine } from './TxtReaderEngine';
@@ -69,6 +74,96 @@ export const ReadEraViewer: React.FC<ReadEraViewerProps> = ({ onOpenShareModal }
   const [sliderVal, setSliderVal] = useState<number>(currentPage);
 
   const activeTheme = READER_THEMES[settings.theme] || READER_THEMES.sepia;
+
+  const {
+    isShieldActive,
+    options: shieldOptions,
+    recordDistraction,
+    openSettingsModal: openFocusShieldModal,
+    activateShieldSession,
+    deactivateShieldSession,
+  } = useFocusShieldStore();
+
+  // Focus Shield session lifecycle
+  useEffect(() => {
+    if (isShieldActive) {
+      activateShieldSession();
+    }
+    return () => {
+      deactivateShieldSession();
+    };
+  }, [isShieldActive, activateShieldSession, deactivateShieldSession]);
+
+  // Sync fullscreen state with browser changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  // Listen for distraction triggers: tab switching, app switching, window blur
+  useEffect(() => {
+    if (!isShieldActive) return;
+
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        recordDistraction();
+      } else if (document.visibilityState === 'visible') {
+        if (shieldOptions.preventSleep) {
+          activateShieldSession();
+        }
+      }
+    };
+
+    const handleWindowBlur = () => {
+      // Debounce slightly to avoid false positives when interacting with system file pickers or dialogs
+      timeoutId = setTimeout(() => {
+        if (document.hidden) {
+          recordDistraction();
+        }
+      }, 150);
+    };
+
+    const handleWindowFocus = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [isShieldActive, shieldOptions.preventSleep, recordDistraction, activateShieldSession]);
+
+  // Accidental close & tab navigation protection
+  useEffect(() => {
+    if (!isShieldActive || !shieldOptions.accidentalExitGuard) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'Focus Shield is active. Are you sure you want to exit your reading session?';
+      return e.returnValue;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isShieldActive, shieldOptions.accidentalExitGuard]);
 
   if (!activeBook) return null;
 
@@ -200,6 +295,28 @@ export const ReadEraViewer: React.FC<ReadEraViewerProps> = ({ onOpenShareModal }
             title="Bookmarks"
           >
             <Bookmark className="w-4 h-4" />
+          </button>
+
+          {/* Deep Focus Shield */}
+          <button
+            type="button"
+            onClick={openFocusShieldModal}
+            className={`relative w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+              isShieldActive
+                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                : 'hover:opacity-75'
+            }`}
+            title={isShieldActive ? 'Deep Focus Shield Active (Click to manage)' : 'Enable Deep Focus Shield'}
+            aria-label={isShieldActive ? 'Deep Focus Shield Active' : 'Enable Deep Focus Shield'}
+          >
+            {isShieldActive ? (
+              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            ) : (
+              <Shield className="w-4 h-4 opacity-70" />
+            )}
+            {isShieldActive && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-stone-900 animate-pulse" />
+            )}
           </button>
 
           {/* Display & Typography Settings */}
@@ -548,6 +665,10 @@ export const ReadEraViewer: React.FC<ReadEraViewerProps> = ({ onOpenShareModal }
           </div>
         </div>
       )}
+
+      {/* 8. FOCUS SHIELD MODAL & INTERVENTION OVERLAY */}
+      <FocusShieldModal />
+      <FocusInterventionOverlay />
     </div>
   );
 };

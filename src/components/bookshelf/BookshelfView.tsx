@@ -9,7 +9,8 @@ import {
   MoreVertical, 
   Compass, 
   Sparkles,
-  ChevronDown 
+  ChevronDown,
+  Copy 
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useFeedStore } from '../../stores/feedStore';
@@ -131,7 +132,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
   const { user, isGuest, refreshProfile } = useAuthStore();
-  const { posts } = useFeedStore();
+  const { posts, toggleSave } = useFeedStore();
   const { prepareTimerForBook } = useTimerStore();
   const [dbBooks, setDbBooks] = useState<BookshelfItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -228,6 +229,21 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
       console.error(err);
       toast.error('Failed to remove book from bookshelf.');
     }
+  };
+
+  const handleCopyCitation = (quote: string, title: string, author: string, page?: number | string) => {
+    const citation = `"${quote}"\n— ${title} by ${author}${page ? ` (p. ${page})` : ''}`;
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(citation);
+      toast.success(`Copied passage to clipboard.`, 'Copied to Clipboard');
+    } else {
+      toast.info(citation, 'Passage');
+    }
+  };
+
+  const handleRemoveSaved = (postId: string, title: string) => {
+    toggleSave(postId, user?.id);
+    toast.info(`Removed passage from "${title}" from saved library.`, 'Saved Library');
   };
 
   return (
@@ -562,32 +578,85 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
             savedPosts.map((post) => (
               <div 
                 key={post.id} 
-                className="bg-vibe-card border border-vibe-border rounded-2xl p-5 sm:p-6 shadow-soft space-y-3 hover:border-vibe-border transition-all duration-300"
+                className="bg-vibe-card border border-vibe-border rounded-2xl p-5 sm:p-6 shadow-soft space-y-3.5 hover:border-vibe-accent/30 transition-all duration-300 group"
               >
+                {/* Header: Book reference & Actions */}
                 <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-                    <span className="font-semibold text-vibe-ink">{post.bookTitle}</span>
-                    <span className="text-vibe-ink-muted">by {post.bookAuthor}</span>
-                  </div>
-                  {post.pageNumber && (
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
-                      p. {post.pageNumber}
+                  <div 
+                    onClick={() => onViewBookDetails?.(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
+                    className="flex items-center gap-2 cursor-pointer group/title min-w-0 pr-2"
+                    title={`View "${post.bookTitle}" details`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent flex-shrink-0" />
+                    <span className="font-semibold text-vibe-ink group-hover/title:text-vibe-accent transition-colors truncate">
+                      {post.bookTitle}
                     </span>
-                  )}
+                    <span className="text-vibe-ink-muted truncate hidden sm:inline">by {post.bookAuthor}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {post.pageNumber && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
+                        p. {post.pageNumber}
+                      </span>
+                    )}
+
+                    {/* Bookmark Toggle (Unsave) */}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSaved(post.id, post.bookTitle)}
+                      className="p-1.5 rounded-lg text-vibe-accent hover:bg-rose-500/10 hover:text-rose-500 transition-colors cursor-pointer"
+                      title="Remove from saved library"
+                    >
+                      <Bookmark className="w-3.5 h-3.5 fill-current" />
+                    </button>
+                  </div>
                 </div>
+
+                {/* Quotation text */}
                 <blockquote className="font-display italic font-normal text-base sm:text-lg text-vibe-ink leading-relaxed border-l-2 border-vibe-accent pl-4 py-0.5">
                   “{post.quoteText}”
                 </blockquote>
-                <div className="pt-2 border-t border-vibe-border-subtle flex items-center justify-between text-xs text-vibe-ink-secondary">
+
+                {/* Footer contextual actions */}
+                <div className="pt-2.5 border-t border-vibe-border-subtle flex flex-wrap items-center justify-between gap-2 text-xs text-vibe-ink-secondary">
                   <span>Saved from <strong className="text-vibe-ink font-medium">{post.authorName}</strong></span>
-                  <button 
-                    onClick={() => handleStartTimerForBook(post.bookTitle, post.bookAuthor, post.coverImageUrl)} 
-                    className="inline-flex items-center gap-1 font-semibold text-vibe-accent hover:text-vibe-accent-hover transition-colors"
-                  >
-                    <Play className="w-3 h-3 fill-current" />
-                    <span>Time this book</span>
-                  </button>
+
+                  <div className="flex items-center gap-2">
+                    {/* Copy Citation */}
+                    <button
+                      type="button"
+                      onClick={() => handleCopyCitation(post.quoteText || '', post.bookTitle, post.bookAuthor, post.pageNumber)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink text-[11px] font-medium hover:bg-vibe-card hover:border-vibe-accent transition-all cursor-pointer shadow-2xs"
+                      title="Copy quote with citation"
+                    >
+                      <Copy className="w-3 h-3 text-vibe-ink-muted" />
+                      <span>Copy</span>
+                    </button>
+
+                    {/* View Book Details */}
+                    {onViewBookDetails && (
+                      <button
+                        type="button"
+                        onClick={() => onViewBookDetails(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-vibe-border bg-vibe-card-subtle text-vibe-ink text-[11px] font-medium hover:bg-vibe-card hover:border-vibe-accent transition-all cursor-pointer shadow-2xs"
+                        title="View book overview and summary"
+                      >
+                        <Sparkles className="w-3 h-3 text-vibe-accent" />
+                        <span>Book Info</span>
+                      </button>
+                    )}
+
+                    {/* Start Timer */}
+                    <button 
+                      onClick={() => handleStartTimerForBook(post.bookTitle, post.bookAuthor, post.coverImageUrl)} 
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-lg font-semibold bg-vibe-accent hover:bg-vibe-accent-hover text-white text-[11px] shadow-2xs transition-colors cursor-pointer"
+                      title="Start reading timer for this book"
+                    >
+                      <Play className="w-3 h-3 fill-current" />
+                      <span>Read</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

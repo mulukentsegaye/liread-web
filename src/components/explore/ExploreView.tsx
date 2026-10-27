@@ -164,6 +164,8 @@ const BookCardCover: React.FC<{
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
+      {/* Subtle spine shadow along the left edge for book realism */}
+      <div className="absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-r from-black/35 via-white/5 to-transparent pointer-events-none" />
     </div>
   );
 };
@@ -297,7 +299,7 @@ const HorizontalBookShelf: React.FC<{
               firstPublishYear: b.firstPublishYear,
               workKey: b.workKey,
             })}
-            className="w-36 sm:w-44 flex-shrink-0 snap-start bg-vibe-card border border-vibe-border rounded-2xl p-3 shadow-soft hover:shadow-float hover:border-vibe-border transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+            className="w-36 sm:w-44 flex-shrink-0 snap-start bg-vibe-card border border-vibe-border rounded-2xl p-3 shadow-soft hover:shadow-float hover:border-vibe-accent/40 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
           >
             <div>
               <BookCardCover

@@ -10,9 +10,9 @@ import {
 import { useNoticeStore, ToastItem } from '../../stores/noticeStore';
 
 export const ToastContainer: React.FC = () => {
-  const { toasts, removeToast } = useNoticeStore();
+  const { toasts, removeToast, isDndActive } = useNoticeStore();
 
-  if (toasts.length === 0) return null;
+  if (isDndActive || toasts.length === 0) return null;
 
   return (
     <div

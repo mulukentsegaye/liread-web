@@ -34,7 +34,7 @@ import { AlertModal } from './components/ui/AlertModal';
 import { GoalAdjustModal } from './components/ui/GoalAdjustModal';
 import { InfoModal } from './components/ui/InfoModal';
 import { useNoticeStore } from './stores/noticeStore';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, X } from 'lucide-react';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useTimerStore } from './stores/timerStore';
 import { coReadingService } from './services/coReadingService';
@@ -78,6 +78,7 @@ export const App: React.FC = () => {
   const [viewingProfileUserId, setViewingProfileUserId] = useState<string | null>(null);
   const [exploreSearchQuery, setExploreSearchQuery] = useState('');
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [isGuestBannerDismissed, setIsGuestBannerDismissed] = useState(false);
   const [preSelectedBook, setPreSelectedBook] = useState<{
     title: string;
     author: string;
@@ -535,9 +536,30 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {isGuest && (
-        <div className="w-full bg-amber-500 text-white text-xs font-medium text-center py-1.5 px-4">
-          You’re browsing as a guest — <button onClick={handleGoToLogin} className="underline font-semibold">create an account</button> to post, save, and track reading.
+      {isGuest && !isGuestBannerDismissed && (
+        <div className="w-full bg-amber-500/10 dark:bg-amber-500/15 border-b border-amber-500/20 text-amber-900 dark:text-amber-200 text-xs py-2 px-3 sm:px-6 flex items-center justify-between gap-3 shadow-2xs transition-all animate-in fade-in duration-200 select-none">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 animate-pulse" />
+            <span className="truncate">
+              You’re browsing as a guest. <span className="hidden sm:inline text-amber-800/80 dark:text-amber-300/80">Create a free account to save favorite passages, log reading timers, and protect streaks.</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={handleGoToLogin}
+              className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-[11px] transition-colors shadow-2xs cursor-pointer"
+            >
+              Sign Up Free
+            </button>
+            <button
+              onClick={() => setIsGuestBannerDismissed(true)}
+              aria-label="Dismiss guest notice"
+              className="p-1 rounded-lg text-amber-800/70 dark:text-amber-300/70 hover:text-amber-900 dark:hover:text-amber-100 hover:bg-amber-500/15 transition-colors cursor-pointer"
+              title="Dismiss notice"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -572,7 +594,11 @@ export const App: React.FC = () => {
 
         <main
           id="main-viewport"
-          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3 sm:py-6 pb-[calc(env(safe-area-inset-bottom)+4.75rem)] md:pb-24 px-0.5 sm:px-1 w-full max-w-full"
+          className={`flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3 sm:py-6 px-0.5 sm:px-1 w-full max-w-full ${
+            isTimerRunning 
+              ? 'pb-[calc(env(safe-area-inset-bottom)+7.5rem)] md:pb-24' 
+              : 'pb-[calc(env(safe-area-inset-bottom)+4.75rem)] md:pb-24'
+          }`}
         >
 
           <TabletSummaryBar

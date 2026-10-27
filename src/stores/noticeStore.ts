@@ -34,6 +34,8 @@ interface NoticeState {
   showToast: (toast: Omit<ToastItem, 'id'>) => string;
   removeToast: (id: string) => void;
   clearAllToasts: () => void;
+  isDndActive: boolean;
+  setDndActive: (active: boolean) => void;
 
   // Alert Modal
   alertModal: AlertModalOptions | null;
@@ -62,8 +64,15 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 
 export const useNoticeStore = create<NoticeState>((set, get) => ({
   toasts: [],
+  isDndActive: false,
+  setDndActive: (active: boolean) => set({ isDndActive: active }),
 
   showToast: (toastData) => {
+    // If Do Not Disturb (Focus Shield) is active, suppress all non-critical notifications
+    if (get().isDndActive) {
+      return '';
+    }
+
     // Defense-in-depth: Never expose internal rate limits, hourly limits, or quotas in toasts
     let sanitizedMessage = toastData.message;
     if (typeof sanitizedMessage === 'string') {
