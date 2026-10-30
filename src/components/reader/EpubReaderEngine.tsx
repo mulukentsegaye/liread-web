@@ -1,6 +1,7 @@
-﻿import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import ePub from 'epubjs';
 import { useReaderStore } from '../../stores/readerStore';
+import { readerStorageService } from '../../services/readerStorageService';
 import { READER_THEMES, getFontFamilyCss } from './readerThemeStyles';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { TocItem } from '../../types/reader';
@@ -25,18 +26,30 @@ export const EpubReaderEngine: React.FC<EpubReaderEngineProps> = ({ onTapCenter,
   // Initialize EPUB Book & Rendition
   useEffect(() => {
     let isMounted = true;
-    if (!activeBook?.fileBlob || !viewerRef.current) return;
+    if (!activeBook || !viewerRef.current) return;
 
     setIsLoading(true);
     setErrorMsg(null);
 
     async function loadEpub() {
       try {
+        let blob = activeBook?.fileBlob;
+
+        // If fileBlob is absent from state, retrieve it directly from persistent IndexedDB
+        if (!blob && activeBook?.id) {
+          const stored = await readerStorageService.getBook(activeBook.id);
+          blob = stored?.fileBlob;
+        }
+
+        if (!blob) {
+          throw new Error('EPUB file data could not be found in offline storage. Please re-import.');
+        }
+
         let arrayBuffer: ArrayBuffer;
-        if (activeBook!.fileBlob instanceof ArrayBuffer) {
-          arrayBuffer = activeBook!.fileBlob;
+        if (blob instanceof ArrayBuffer) {
+          arrayBuffer = blob;
         } else {
-          arrayBuffer = await (activeBook!.fileBlob as Blob).arrayBuffer();
+          arrayBuffer = await (blob as Blob).arrayBuffer();
         }
 
         const book = ePub(arrayBuffer);
@@ -78,6 +91,9 @@ export const EpubReaderEngine: React.FC<EpubReaderEngineProps> = ({ onTapCenter,
         await rendition.display(startLocation);
 
         if (!isMounted) return;
+
+        // Page is rendered and visible right now! End loading state immediately for instant opening
+        setIsLoading(false);
 
         // Listen for location changes
         rendition.on('relocated', (location: any) => {
@@ -127,14 +143,11 @@ export const EpubReaderEngine: React.FC<EpubReaderEngineProps> = ({ onTapCenter,
           }
         });
 
-        // Generate location index for accurate percentage calculation
+        // Generate location index in the background for accurate percentage calculation (non-blocking)
         book.ready.then(() => {
           return book.locations.generate(1000);
-        }).then(() => {
-          if (!isMounted) return;
-          setIsLoading(false);
-        }).catch(() => {
-          if (isMounted) setIsLoading(false);
+        }).catch((err: unknown) => {
+          console.warn('Background EPUB location generation notice:', err);
         });
 
       } catch (err: any) {

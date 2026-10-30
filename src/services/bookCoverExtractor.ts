@@ -62,7 +62,7 @@ export async function extractPdfCover(fileBlob: Blob | ArrayBuffer): Promise<Ext
 
     const loadingTask = pdfjsLib.getDocument({
       data: new Uint8Array(arrayBuffer),
-      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+      cMapUrl: '/cmaps/',
       cMapPacked: true,
     });
 
@@ -274,20 +274,26 @@ export async function extractBookCover(book: {
     }
   }
 
-  // 3. Open Library Cover Search by clean title
-  try {
-    const clean = book.title.replace(/\b(oceanofpdf\.com|pdf|epub|txt|free)\b/gi, '').trim();
-    if (clean.length >= 3) {
-      const searchRes = await bookSearchService.searchBooks(clean, { limit: 1 });
-      if (searchRes.books.length > 0 && searchRes.books[0].coverImageUrl) {
-        return {
-          coverUrl: searchRes.books[0].coverImageUrl,
-          title: searchRes.books[0].title,
-          author: searchRes.books[0].author,
-        };
+  // 3. Open Library Cover Search by clean title (strictly online with a 2-second timeout to prevent blocking)
+  if (typeof navigator !== 'undefined' && navigator.onLine) {
+    try {
+      const clean = book.title.replace(/\b(oceanofpdf\.com|pdf|epub|txt|free)\b/gi, '').trim();
+      if (clean.length >= 3) {
+        const timeoutPromise = new Promise<{ books: any[] }>((resolve) =>
+          setTimeout(() => resolve({ books: [] }), 2000)
+        );
+        const searchPromise = bookSearchService.searchBooks(clean, { limit: 1 });
+        const searchRes = await Promise.race([searchPromise, timeoutPromise]);
+        if (searchRes.books.length > 0 && searchRes.books[0].coverImageUrl) {
+          return {
+            coverUrl: searchRes.books[0].coverImageUrl,
+            title: searchRes.books[0].title,
+            author: searchRes.books[0].author,
+          };
+        }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
   // 4. Elegant Canvas Generation fallback
   const generatedCover = generateClassicCoverCanvas(book.title, book.author, book.format);

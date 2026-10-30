@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist/build/pdf.js';
 import { useReaderStore } from '../../stores/readerStore';
+import { readerStorageService } from '../../services/readerStorageService';
 import { READER_THEMES } from './readerThemeStyles';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { TocItem } from '../../types/reader';
@@ -32,23 +33,35 @@ export const PdfReaderEngine: React.FC<PdfReaderEngineProps> = ({ onTapCenter })
   // Load PDF Document
   useEffect(() => {
     let isMounted = true;
-    if (!activeBook || !activeBook.fileBlob) return;
+    if (!activeBook) return;
 
     setIsLoading(true);
     setErrorMsg(null);
 
     async function loadPdf() {
       try {
+        let blob = activeBook?.fileBlob;
+
+        // If fileBlob is absent from state, retrieve it directly from persistent IndexedDB
+        if (!blob && activeBook?.id) {
+          const stored = await readerStorageService.getBook(activeBook.id);
+          blob = stored?.fileBlob;
+        }
+
+        if (!blob) {
+          throw new Error('Book file data could not be found in offline storage. Please re-import.');
+        }
+
         let arrayBuffer: ArrayBuffer;
-        if (activeBook!.fileBlob instanceof ArrayBuffer) {
-          arrayBuffer = activeBook!.fileBlob;
+        if (blob instanceof ArrayBuffer) {
+          arrayBuffer = blob;
         } else {
-          arrayBuffer = await (activeBook!.fileBlob as Blob).arrayBuffer();
+          arrayBuffer = await (blob as Blob).arrayBuffer();
         }
 
         const loadingTask = pdfjsLib.getDocument({
           data: new Uint8Array(arrayBuffer),
-          cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+          cMapUrl: '/cmaps/',
           cMapPacked: true,
           isEvalSupported: false,
         });

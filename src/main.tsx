@@ -12,6 +12,15 @@ if (typeof window !== 'undefined') {
   (window as unknown as { JSZip: typeof JSZip }).JSZip = JSZip;
 }
 
+// Register offline Service Worker for zero-latency offline reading
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator && !window.location.hostname.includes('localhost')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.warn('Service worker registration info:', err);
+    });
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>

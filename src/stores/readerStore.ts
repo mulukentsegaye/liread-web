@@ -21,7 +21,7 @@ interface ReaderStore {
 
   // Actions
   loadBooks: () => Promise<void>;
-  openBook: (book: StoredBook) => void;
+  openBook: (book: StoredBook) => Promise<void> | void;
   closeBook: () => void;
   importBookFile: (file: File) => Promise<StoredBook>;
   updateProgress: (page: number, totalPages?: number, location?: string) => Promise<void>;
@@ -138,25 +138,35 @@ export const useReaderStore = create<ReaderStore>((set, get) => ({
     }
   },
 
-  openBook: (book: StoredBook) => {
+  openBook: async (book: StoredBook) => {
+    let targetBook = book;
+    if (!targetBook.fileBlob) {
+      try {
+        const fullBook = await readerStorageService.getBook(book.id);
+        if (fullBook) targetBook = fullBook;
+      } catch (err) {
+        console.warn('Could not load full book data from storage:', err);
+      }
+    }
+
     set({
-      activeBook: book,
+      activeBook: targetBook,
       isReaderOpen: true,
-      currentPage: book.currentPage || 1,
-      totalPages: book.totalPages || 1,
-      progressPercent: book.progressPercent || 0,
-      currentLocation: book.currentLocation || '',
+      currentPage: targetBook.currentPage || 1,
+      totalPages: targetBook.totalPages || 1,
+      progressPercent: targetBook.progressPercent || 0,
+      currentLocation: targetBook.currentLocation || '',
       isControlsVisible: true,
       isTocOpen: false,
       isSettingsOpen: false,
       isBookmarksOpen: false,
     });
     // Record last read timestamp
-    readerStorageService.updateBookProgress(book.id, {
-      currentPage: book.currentPage || 1,
-      totalPages: book.totalPages,
-      currentLocation: book.currentLocation,
-      progressPercent: book.progressPercent || 0,
+    readerStorageService.updateBookProgress(targetBook.id, {
+      currentPage: targetBook.currentPage || 1,
+      totalPages: targetBook.totalPages,
+      currentLocation: targetBook.currentLocation,
+      progressPercent: targetBook.progressPercent || 0,
     });
   },
 

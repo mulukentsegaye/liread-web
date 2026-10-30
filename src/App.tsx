@@ -159,6 +159,22 @@ export const App: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Pre-warm the Reader bundle and PDF worker during browser idle time
+  // This guarantees books open instantaneously with zero waiting and enables offline viewing
+  useEffect(() => {
+    const prewarmReader = () => {
+      import('./components/reader/ReadEraViewer').catch(() => {});
+      if (typeof window !== 'undefined') {
+        fetch('/pdf.worker.min.js', { cache: 'force-cache' }).catch(() => {});
+      }
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(prewarmReader, { timeout: 3500 });
+    } else {
+      setTimeout(prewarmReader, 1800);
+    }
+  }, []);
+
   // Ensure landing and login start in light mode; home page ('app') respects user's theme selection (light/dark)
   useEffect(() => {
     if (currentView === 'landing' || currentView === 'login') {
