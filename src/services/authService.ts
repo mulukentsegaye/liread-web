@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '../types';
 import { DEFAULT_USER_AVATAR } from '../data/defaults';
+import { emailValidationService } from './emailValidationService';
 
 const getAppOrigin = (): string => {
   if (typeof window === 'undefined') return '';
@@ -10,12 +11,20 @@ const getAppOrigin = (): string => {
 export const authService = {
   /**
    * Register a new user with Supabase Auth.
-   * Checks username availability first to surface a clear message instead of
-   * a cryptic database-trigger abort.
+   * Checks email validity, domain existence, and username availability first
+   * to avoid wasting hourly auth email quotas on misspelled or nonexistent addresses.
    */
   async signUp(email: string, password: string, username: string, fullName: string) {
+    const cleanEmail = email.trim();
     const cleanUsername = username.toLowerCase().replace(/^@/, '').trim();
 
+    // 1. Rigorous email verification & domain existence check before calling Supabase
+    const validation = await emailValidationService.validateForRegistration(cleanEmail);
+    if (!validation.valid) {
+      throw new Error(validation.error || 'Please enter a valid, active email address.');
+    }
+
+    // 2. Check if username is already claimed
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id, username')
@@ -26,8 +35,9 @@ export const authService = {
       throw new Error(`The username "@${cleanUsername}" is already taken. Please choose a different one, or sign in if this is your account.`);
     }
 
+    // 3. Initiate signup with Supabase
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: cleanEmail,
       password,
       options: {
         data: {
@@ -39,6 +49,13 @@ export const authService = {
     });
 
     if (error) throw error;
+
+    // 4. Supabase returns an empty identities array if an account with this email ALREADY exists
+    // (when email confirmation / user enumeration protection is enabled)
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      throw new Error(`An account with the email "${cleanEmail}" already exists. Please sign in instead.`);
+    }
+
     return data;
   },
 

@@ -25,6 +25,7 @@ import { useNoticeStore } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { supabase } from '../../lib/supabase';
 import { describeAuthError } from '../../lib/authErrors';
+import { emailValidationService, EmailTypoSuggestion } from '../../services/emailValidationService';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -55,6 +56,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
   // Status
   const [loading, setLoading] = useState(false);
+  const [typoSuggestion, setTypoSuggestion] = useState<EmailTypoSuggestion | null>(null);
   const [isResending, setIsResending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -111,6 +113,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
 
     try {
       if (mode === 'signup') {
+        const typo = emailValidationService.detectTypo(email);
+        if (typo.hasTypo && typo.suggestedEmail) {
+          setTypoSuggestion(typo);
+          setErrorMsg(`Did you mean "${typo.suggestedEmail}"? Please verify your email before submitting.`);
+          setLoading(false);
+          return;
+        }
+
         await signUp(email, password, username, fullName);
         // Read the fresh value from the store (the closure value is stale here)
         if (useAuthStore.getState().pendingConfirmationEmail) {
@@ -434,6 +444,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                     <span>Resend email</span>
                   </button>
                 </div>
+
+                {/* Direct helper if the email was mistyped */}
+                <div className="pt-2 border-t border-vibe-accent/20 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-vibe-ink-muted">
+                  <span>Didn't receive the email or made a typo?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearPendingConfirmation();
+                      setMode('signup');
+                      setEmail(pendingConfirmationEmail);
+                      setErrorMsg('Please double-check and correct your email address below.');
+                    }}
+                    className="font-semibold text-vibe-accent hover:underline cursor-pointer text-left sm:text-right"
+                  >
+                    Spelled wrong? Change email
+                  </button>
+                </div>
               </div>
             )}
 
@@ -500,12 +527,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onGoBack, onGue
                       if (pendingConfirmationEmail && newEmail.trim().toLowerCase() !== pendingConfirmationEmail.trim().toLowerCase()) {
                         clearPendingConfirmation();
                       }
+                      if (mode === 'signup') {
+                        const typo = emailValidationService.detectTypo(newEmail);
+                        setTypoSuggestion(typo.hasTypo ? typo : null);
+                      } else {
+                        setTypoSuggestion(null);
+                      }
                     }}
                     placeholder="reader@liread.app"
                     required
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-xs sm:text-sm text-vibe-ink placeholder:text-vibe-ink-muted focus:outline-none focus:border-vibe-accent focus:ring-2 focus:ring-vibe-accent/20 transition-all"
                   />
                 </div>
+                {mode === 'signup' && typoSuggestion?.hasTypo && typoSuggestion.suggestedEmail && (
+                  <div className="mt-1.5 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between gap-2 text-xs text-amber-900 dark:text-amber-200 animate-in fade-in duration-150">
+                    <span className="truncate">
+                      Did you mean <strong>{typoSuggestion.suggestedEmail}</strong>?
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmail(typoSuggestion.suggestedEmail!);
+                        setTypoSuggestion(null);
+                        setErrorMsg(null);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-[11px] whitespace-nowrap cursor-pointer transition-colors shadow-xs"
+                    >
+                      Use this
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Password */}

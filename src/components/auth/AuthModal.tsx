@@ -16,6 +16,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useNoticeStore } from '../../stores/noticeStore';
 import { useFeedStore } from '../../stores/feedStore';
 import { describeAuthError } from '../../lib/authErrors';
+import { emailValidationService, EmailTypoSuggestion } from '../../services/emailValidationService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isResending, setIsResending] = useState(false);
   const [isSendingReset, setIsSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [typoSuggestion, setTypoSuggestion] = useState<EmailTypoSuggestion | null>(null);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   useEffect(() => {
@@ -153,6 +155,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setStatusMessage(null);
     if (!username.trim() || !fullName.trim()) {
       setStatusMessage({ type: 'error', text: 'Please fill in both your username and full name.' });
+      return;
+    }
+
+    const typo = emailValidationService.detectTypo(email);
+    if (typo.hasTypo && typo.suggestedEmail) {
+      setTypoSuggestion(typo);
+      setStatusMessage({
+        type: 'error',
+        text: `Did you mean "${typo.suggestedEmail}"? Please verify your email before submitting.`,
+      });
       return;
     }
 
@@ -463,12 +475,33 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   required
                   value={email}
                   onChange={(e) => {
-                    setEmail(e.target.value);
+                    const newEmail = e.target.value;
+                    setEmail(newEmail);
                     setStatusMessage(null);
+                    const typo = emailValidationService.detectTypo(newEmail);
+                    setTypoSuggestion(typo.hasTypo ? typo : null);
                   }}
                   className="w-full min-h-[40px] px-3.5 text-xs rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink focus:outline-hidden focus:border-vibe-accent transition-colors"
                   placeholder="virginia@example.com"
                 />
+                {typoSuggestion?.hasTypo && typoSuggestion.suggestedEmail && (
+                  <div className="mt-1 p-2 rounded-lg bg-amber-500/10 border border-amber-500/25 flex items-center justify-between gap-2 text-[11px] text-amber-900 dark:text-amber-200 animate-in fade-in duration-150">
+                    <span className="truncate">
+                      Did you mean <strong>{typoSuggestion.suggestedEmail}</strong>?
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmail(typoSuggestion.suggestedEmail!);
+                        setTypoSuggestion(null);
+                        setStatusMessage(null);
+                      }}
+                      className="px-2 py-0.5 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-medium text-[10px] whitespace-nowrap cursor-pointer transition-colors shadow-xs"
+                    >
+                      Use this
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1">
