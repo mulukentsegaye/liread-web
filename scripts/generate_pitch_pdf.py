@@ -60,7 +60,6 @@ def build_presentation_html():
   .pill-theme {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
     padding: 5px 14px;
     border-radius: 9999px;
     font-size: 8.5pt;
@@ -191,7 +190,7 @@ def build_presentation_html():
     gap: 0.35in;
   }
 
-  /* Feature Checklist */
+  /* Feature Checklist with Clean Minimalist Bullets */
   .feature-points {
     list-style: none;
     margin-top: 14px;
@@ -199,7 +198,7 @@ def build_presentation_html():
 
   .feature-points li {
     position: relative;
-    padding-left: 26px;
+    padding-left: 22px;
     margin-bottom: 12px;
     font-size: 11pt;
     color: #334155;
@@ -207,12 +206,14 @@ def build_presentation_html():
   }
 
   .feature-points li::before {
-    content: "✦";
+    content: "";
     position: absolute;
-    left: 0;
-    color: #059669;
-    font-size: 12pt;
-    font-weight: bold;
+    left: 4px;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #059669;
   }
 
   /* Code / Schema box in clean minimalist mode */
@@ -281,7 +282,7 @@ def build_presentation_html():
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header" style="justify-content: flex-end;">
-      <span class="slide-number">01 / 27</span>
+      <span class="slide-number">01 / 26</span>
     </div>
     <div class="content-body">
       <h1 class="title-logo-large">Liread</h1>
@@ -289,13 +290,13 @@ def build_presentation_html():
         Read a few pages every day. Build wisdom that lasts.
       </p>
       <p style="font-size: 13pt; color: #475569; max-width: 7.5in; line-height: 1.6; margin-bottom: 24px;">
-        A quiet, distraction-free space to read books online. Features a gentle focus timer, relaxing background sounds, notification blocker, offline reading, and a friendly community.
+        A quiet, distraction-free reading app across web and mobile. Features a gentle focus timer, relaxing background sounds, notification blocker, offline reading, and a friendly community.
       </p>
       <div style="display: flex; gap: 12px; margin-top: 10px;">
-        <span class="tag-pill brand">Web & Mobile PWA</span>
+        <span class="tag-pill brand">Web • Android • iOS</span>
         <span class="tag-pill">React 18 + TypeScript</span>
         <span class="tag-pill">Supabase Cloud Database</span>
-        <span class="tag-pill">Relaxing Ambient Audio</span>
+        <span class="tag-pill">Built-in Ambient Audio</span>
       </div>
     </div>
     <div class="slide-footer">
@@ -312,7 +313,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Why We Built Liread</span>
-      <span class="slide-number">02 / 27</span>
+      <span class="slide-number">02 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Our Mission</h2>
@@ -340,7 +341,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">The Problem: Too Many Distractions</span>
-      <span class="slide-number">03 / 27</span>
+      <span class="slide-number">03 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Screens Are Stealing Our Reading Time</h2>
@@ -376,7 +377,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">The Problem: Finishing Books</span>
-      <span class="slide-number">04 / 27</span>
+      <span class="slide-number">04 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Why We Never Finish the Books We Start</h2>
@@ -403,7 +404,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">The Problem: Reading Alone</span>
-      <span class="slide-number">05 / 27</span>
+      <span class="slide-number">05 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Reading Alone Makes It Hard to Stay Motivated</h2>
@@ -413,10 +414,10 @@ def build_presentation_html():
           Good habits are easier to keep when you share them with others.
         </div>
         <p style="font-size: 11.5pt; color: #334155; line-height: 1.7; margin-bottom: 16px;">
-          Research shows that having a supportive community increases your chance of sticking to a habit by <strong>65%</strong>. But today, readers are stuck between reading alone with zero encouragement, or visiting noisy review sites filled with ads and heated arguments.
+          Research shows that having a supportive community increases your chance of sticking to a habit by <strong>65%</strong>. But today, readers are stuck between reading alone with zero encouragement, or visiting noisy commercial book sites with endless clutter.
         </p>
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 18px; color: #0f172a; font-size: 10pt;">
-          <strong style="color: #059669;">What's Missing:</strong> A friendly, quiet place where you can share daily progress and favorite lines without pressure or fake likes.
+          <strong style="color: #059669;">What's Missing:</strong> A friendly, quiet place where you can share daily progress and favorite lines with real readers.
         </div>
       </div>
     </div>
@@ -434,7 +435,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">The Problem: Lost Notes & Quotes</span>
-      <span class="slide-number">06 / 27</span>
+      <span class="slide-number">06 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Great Quotes and Ideas Get Forgotten</h2>
@@ -472,7 +473,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">The Solution</span>
-      <span class="slide-number">07 / 27</span>
+      <span class="slide-number">07 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Introducing Liread</h2>
@@ -483,25 +484,25 @@ def build_presentation_html():
             Focus in Private. Share in Public.
           </div>
           <p style="font-size: 11pt; color: #334155; line-height: 1.65;">
-            Liread brings together everything you need to read consistently: a full-screen focus timer, an in-reader notification and app blocker, calming background sounds, a free offline book reader, and a friendly feed to share quotes and thoughts.
+            Liread brings together everything you need to read consistently: a full-screen focus timer, an in-reader notification and app blocker, calming background sounds, a free offline book reader, and a friendly community to share quotes and thoughts.
           </p>
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
-            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ Clean Reading Timer</div>
+            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">Clean Reading Timer</div>
             <div style="font-size: 8.5pt; color: #64748b;">Full-screen timer with custom daily goals to keep your reading on track.</div>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
-            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ Notification & App Blocker</div>
+            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">Notification & App Blocker</div>
             <div style="font-size: 8.5pt; color: #64748b;">Silences alerts and keeps you focused inside the book without distractions.</div>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
-            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ Free Library & Offline Reader</div>
-            <div style="font-size: 8.5pt; color: #64748b;">Read thousands of classic books offline in your browser anytime, anywhere.</div>
+            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">Free Library & Offline Reader</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Read thousands of classic books offline across web and mobile.</div>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 16px;">
-            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">✦ Quote & Book Feed</div>
-            <div style="font-size: 8.5pt; color: #64748b;">Save your favorite lines and see what others are reading without ads or bots.</div>
+            <div style="color: #059669; font-weight: 700; font-size: 10pt; margin-bottom: 2px;">Quote & Community Feed</div>
+            <div style="font-size: 8.5pt; color: #64748b;">Save your favorite lines and see what fellow book lovers are reading.</div>
           </div>
         </div>
       </div>
@@ -520,7 +521,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Habits That Last</span>
-      <span class="slide-number">08 / 27</span>
+      <span class="slide-number">08 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Small Daily Reading Adds Up Fast</h2>
@@ -556,7 +557,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 01: Focus Timer</span>
-      <span class="slide-number">09 / 27</span>
+      <span class="slide-number">09 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Distraction-Free Reading Timer</h2>
@@ -566,7 +567,7 @@ def build_presentation_html():
           Full-Screen Focus Mode with Daily Goals
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          The timer gives you a gentle stopwatch that tracks your daily reading. It helps you stay in the zone without loud bells or intrusive countdowns.
+          The timer gives you a gentle stopwatch that tracks your daily reading. It helps you stay in the zone without loud bells or countdown anxiety.
         </p>
         <ul class="feature-points">
           <li><strong>Easy Daily Goals:</strong> Pick quick goals (15m, 30m, 45m, 60m) to grow your daily streak.</li>
@@ -589,7 +590,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 02: Calming Sounds</span>
-      <span class="slide-number">10 / 27</span>
+      <span class="slide-number">10 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Built-In Background Sounds for Focus</h2>
@@ -599,7 +600,7 @@ def build_presentation_html():
           Instant Ambient Audio Without Heavy Streaming
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Instead of loading heavy audio files that eat up your mobile data, Liread generates natural ambient sounds right inside your browser. They play smoothly, loop forever, and work completely offline.
+          Instead of loading heavy audio files that eat up your mobile data, Liread generates natural ambient sounds right inside your device. They play smoothly, loop forever, and work completely offline.
         </p>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-top: 14px;">
           <div style="background: #f8fafc; padding: 14px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0;">
@@ -639,20 +640,20 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 03: Offline Reader</span>
-      <span class="slide-number">11 / 27</span>
+      <span class="slide-number">11 / 26</span>
     </div>
     <div class="content-body">
-      <h2 class="slide-title">In-Browser Offline E-Reader</h2>
-      <p class="slide-subtitle">Open and read EPUB and PDF books right in your browser—no downloads or apps needed</p>
+      <h2 class="slide-title">In-App Offline E-Reader</h2>
+      <p class="slide-subtitle">Open and read EPUB and PDF books right in your browser or phone without external apps</p>
       <div class="hero-card">
         <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
-          Read Any Book Offline with Zero Extra Apps
+          Read Any Book Offline with Zero Extra Software
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Liread turns your web browser into a clean, comfortable e-reader. You can read uploaded files or free classics anywhere, even without an internet connection.
+          Liread turns your device into a clean, comfortable e-reader. You can read uploaded files or free classics anywhere, even without an internet connection.
         </p>
         <ul class="feature-points">
-          <li><strong>Saved on Your Device:</strong> Your books and exact page positions are saved securely in your browser.</li>
+          <li><strong>Saved on Your Device:</strong> Your books and exact page positions are saved securely in local storage.</li>
           <li><strong>Works 100% Offline:</strong> Read on airplanes, buses, or off-grid without needing Wi-Fi or mobile data.</li>
           <li><strong>Custom Reading Comfort:</strong> Easily adjust font size, line spacing, and switch between light and dark reading themes.</li>
         </ul>
@@ -672,23 +673,23 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 04: Focus Shield</span>
-      <span class="slide-number">12 / 27</span>
+      <span class="slide-number">12 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Focus Shield: Block Notifications & App Switching</h2>
       <p class="slide-subtitle">Keeps you focused inside your book by muting alerts and stopping accidental app-switching</p>
       <div class="hero-card">
         <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
-          A True Distraction Shield Inside Your Browser
+          A True Distraction Shield While You Read
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          The biggest reason people stop reading is a sudden phone alert or the temptation to check other apps. Liread's Focus Shield locks out distractions so your browser feels like a quiet, dedicated e-reader.
+          The biggest reason people stop reading is a sudden phone alert or the urge to check other apps. Liread's Focus Shield locks out distractions so your device becomes a dedicated reading terminal.
         </p>
         <ul class="feature-points">
           <li><strong>Automatic Notification Silencing:</strong> Mutes annoying sounds, popups, and tab badges while you are reading.</li>
-          <li><strong>App-Switching Guard:</strong> Pauses your timer if you switch tabs or leave the app, with a gentle reminder to get back to your book.</li>
-          <li><strong>Keeps Screen Awake:</strong> Stops your phone or laptop screen from falling asleep while you are reading a long page.</li>
-          <li><strong>Accidental Exit Protection:</strong> Asks for confirmation before closing, so you never lose your spot or reading progress.</li>
+          <li><strong>15-Second App-Switching Timer:</strong> When you attempt to switch to another app, a 15-second countdown prompts you that you are in the middle of reading, giving you time to stay in the book.</li>
+          <li><strong>Keeps Screen Awake:</strong> Automatically prevents your phone or laptop screen from turning off while you read a long page.</li>
+          <li><strong>Accidental Exit Protection:</strong> Asks for a quick confirmation before closing, protecting your reading streak and page spot.</li>
         </ul>
       </div>
     </div>
@@ -706,7 +707,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 05: Book Discovery</span>
-      <span class="slide-number">13 / 27</span>
+      <span class="slide-number">13 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Free Book Discovery & Exploration</h2>
@@ -739,22 +740,22 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 06: Community Quotes</span>
-      <span class="slide-number">14 / 27</span>
+      <span class="slide-number">14 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Share Favorite Quotes & Thoughts</h2>
-      <p class="slide-subtitle">Post memorable book quotes, reflections, and insights with real readers</p>
+      <p class="slide-subtitle">Post memorable book quotes, reflections, and insights with fellow readers</p>
       <div class="hero-card">
         <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
-          Real Thoughts from Real Readers—Zero Fake Numbers
+          Share Insights and Discover Great Books
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Unlike social networks that push ads and fake metrics, Liread's feed is strictly for sharing meaningful quotes and book takeaways. Every like and comment comes from an actual reader.
+          Liread gives book lovers a dedicated place to share favorite passages and chapter reflections with people who love the same books.
         </p>
         <ul class="feature-points">
-          <li><strong>Honest & Authentic:</strong> Posts show real counts. If nobody has liked a quote yet, it says "No likes yet" instead of fake numbers.</li>
-          <li><strong>One-Click Quote Saving:</strong> Bookmark any quote posted by another reader straight into your personal notebook.</li>
-          <li><strong>Smooth Reactions:</strong> Enjoy smooth animations and instant feedback when upvoting your favorite passages.</li>
+          <li><strong>One-Click Quote Saving:</strong> Save any sentence you read straight into your personal notebook with a single click.</li>
+          <li><strong>Chapter Notes & Takeaways:</strong> Share your favorite lines and chapter summaries with the reader community.</li>
+          <li><strong>Thoughtful Discussions:</strong> Connect with fellow readers by commenting on chapter takeaways, sharing recommendations, and exploring new genres.</li>
         </ul>
       </div>
     </div>
@@ -772,7 +773,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 07: Live Reading Room</span>
-      <span class="slide-number">15 / 27</span>
+      <span class="slide-number">15 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Live Quiet Reading Room</h2>
@@ -805,7 +806,7 @@ def build_presentation_html():
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme brand">Feature 08: Bookshelf & Streaks</span>
-      <span class="slide-number">16 / 27</span>
+      <span class="slide-number">16 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Your Personal Bookshelf & Reading Streaks</h2>
@@ -833,20 +834,119 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 17: TECH ARCHITECTURE OVERVIEW
+       SLIDE 17: FEATURE 9 - AI READING ASSISTANT
+       ===================================================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <span class="pill-theme brand">Feature 09: AI Assistant</span>
+      <span class="slide-number">17 / 26</span>
+    </div>
+    <div class="content-body">
+      <h2 class="slide-title">Smart In-Book AI Assistant</h2>
+      <p class="slide-subtitle">Instant explanations for difficult sentences and unfamiliar words without leaving your page</p>
+      <div class="hero-card">
+        <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+          Instant Explanations & Idea-Based Quote Search
+        </div>
+        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
+          Classic literature and philosophy can sometimes feel challenging. Liread includes a helpful, quiet AI companion built right into the reader:
+        </p>
+        <ul class="feature-points">
+          <li><strong>Clear 2-Sentence Explanations:</strong> Tap any complex paragraph to see a simple, spoiler-free explanation in everyday language.</li>
+          <li><strong>Search by Concept:</strong> Find saved quotes by idea (like <em>"quotes on handling worry"</em>) even if you don't remember the exact words.</li>
+          <li><strong>Instant Word Definitions:</strong> Understand old-fashioned or rare words instantly with a single tap.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span></span>
+      <span class="brand">LIREAD</span>
+      <span>In-Book AI Companion</span>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       SLIDE 18: FEATURE 10 - BOOK CLUBS
+       ===================================================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <span class="pill-theme brand">Feature 10: Book Clubs</span>
+      <span class="slide-number">18 / 26</span>
+    </div>
+    <div class="content-body">
+      <h2 class="slide-title">Read Together with Friends at Your Own Pace</h2>
+      <p class="slide-subtitle">Flexible group reading with spoiler-protected chapter discussions and voice notes</p>
+      <div class="hero-card">
+        <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+          Social Reading Without Pressure or Scheduling Conflicts
+        </div>
+        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
+          Traditional book clubs are difficult to schedule. Liread lets friends and reading groups read together comfortably:
+        </p>
+        <ul class="feature-points">
+          <li><strong>Spoiler-Safe Chapter Unlocks:</strong> Your friends' notes on Chapter 3 remain hidden until you finish reading Chapter 3 yourself.</li>
+          <li><strong>Short Voice Reflections:</strong> Leave quick 30-second audio thoughts on your favorite paragraphs for your group to hear.</li>
+          <li><strong>Private Reading Circles:</strong> Create private groups for your close friends, family, or book clubs with shared bookshelves.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span></span>
+      <span class="brand">LIREAD</span>
+      <span>Private Reading Circles</span>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       SLIDE 19: FEATURE 11 - MULTI-DEVICE SYNC
+       ===================================================================== -->
+  <div class="slide">
+    <div class="slide-header">
+      <span class="pill-theme brand">Feature 11: Multi-Device Sync</span>
+      <span class="slide-number">19 / 26</span>
+    </div>
+    <div class="content-body">
+      <h2 class="slide-title">Seamless Sync Across Phones, Tablets & E-Readers</h2>
+      <p class="slide-subtitle">Read wherever you want—your progress, streaks, and notes sync instantly</p>
+      <div class="hero-card">
+        <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+          One Unified Reading Experience on Every Screen
+        </div>
+        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
+          Whether you prefer reading on your Android phone, iPad, laptop, or dedicated Kindle e-reader:
+        </p>
+        <ul class="feature-points">
+          <li><strong>Universal Progress Sync:</strong> Put your phone down and pick up your laptop—your reading minutes and exact page are always ready.</li>
+          <li><strong>High-Contrast E-Ink Mode:</strong> Clean monochrome layout optimized for battery efficiency on e-ink devices like Boox and Kindle.</li>
+          <li><strong>Home Screen Streak Widgets:</strong> Quick glanceable widgets on your phone home screen showing today's reading goal.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span></span>
+      <span class="brand">LIREAD</span>
+      <span>Multi-Device Experience</span>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       SLIDE 20: TECH ARCHITECTURE OVERVIEW
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">How It's Built</span>
-      <span class="slide-number">17 / 27</span>
+      <span class="slide-number">20 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">How Liread Works Under the Hood</h2>
-      <p class="slide-subtitle">A fast, reliable web app designed to load instantly and work smoothly anywhere</p>
+      <p class="slide-subtitle">A fast, reliable app designed to load instantly and work smoothly anywhere</p>
       <div class="hero-card neutral">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 6px;">
           <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="color: #059669; font-weight: 700; font-size: 11pt; margin-bottom: 6px;">1. Front-End (Browser)</div>
+            <div style="color: #059669; font-weight: 700; font-size: 11pt; margin-bottom: 6px;">1. Client App (Web & Mobile)</div>
             <p style="font-size: 9pt; color: #475569; line-height: 1.5;">
               React 18, TypeScript, and Vite. Super fast load times (&lt;125kB download), smooth animations, background sound generator, and offline book storage.
             </p>
@@ -854,13 +954,13 @@ def build_presentation_html():
           <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="color: #0f172a; font-weight: 700; font-size: 11pt; margin-bottom: 6px;">2. Fast Cloud Edge</div>
             <p style="font-size: 9pt; color: #475569; line-height: 1.5;">
-              Vercel edge functions for streaming free classic books, handling book searches, and connecting with Telegram bots.
+              Serverless edge functions for streaming free classic books, handling book searches, and delivering fast catalog requests.
             </p>
           </div>
           <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="color: #0f172a; font-weight: 700; font-size: 11pt; margin-bottom: 6px;">3. Cloud Database</div>
             <p style="font-size: 9pt; color: #475569; line-height: 1.5;">
-              Supabase PostgreSQL database keeping user accounts, reading timers, streaks, and quotes safe, private, and synced.
+              Supabase PostgreSQL database keeping user accounts, reading timers, streaks, and quotes safe, private, and synced across devices.
             </p>
           </div>
         </div>
@@ -875,12 +975,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 18: FRONTEND ENGINEERING
+       SLIDE 21: FRONTEND ENGINEERING
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Front-End Technology</span>
-      <span class="slide-number">18 / 27</span>
+      <span class="slide-number">21 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Fast, Smooth User Experience</h2>
@@ -891,11 +991,11 @@ def build_presentation_html():
             Instant Updates with Clean State Management
           </div>
           <p style="font-size: 10.5pt; color: #334155; line-height: 1.6; margin-bottom: 14px;">
-            Using lightweight state stores (auth, timer, reader, and feed), the app updates instantly when you click a button or turn a page without freezing or unnecessary re-renders.
+            Using lightweight state stores (auth, timer, reader, and feed), the app updates instantly when you click a button or turn a page without freezing or unnecessary delays.
           </p>
           <ul class="feature-points">
             <li>Reliable code with strict TypeScript checks ensuring zero runtime crashes.</li>
-            <li>Smart code splitting so the browser only downloads what you need when you need it.</li>
+            <li>Smart code splitting so the device only downloads what you need when you need it.</li>
           </ul>
         </div>
         <div class="code-box">
@@ -925,12 +1025,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 19: EDGE & SERVERLESS
+       SLIDE 22: EDGE & SERVERLESS
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Fast Book Delivery</span>
-      <span class="slide-number">19 / 27</span>
+      <span class="slide-number">22 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Instant Book Downloads Without Blockers</h2>
@@ -940,12 +1040,12 @@ def build_presentation_html():
           Fast & Reliable Book Delivery (<code style="font-family: 'JetBrains Mono'; color: #059669; font-weight: 700;">/api/book-file.ts</code>)
         </div>
         <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          When readers open a classic book from Project Gutenberg or Internet Archive, browser security rules often block direct downloads. Liread uses fast edge servers to deliver the book smoothly in seconds.
+          When readers open a classic book from Project Gutenberg or Internet Archive, security rules often block direct downloads. Liread uses fast edge servers to deliver the book smoothly in seconds.
         </p>
         <ul class="feature-points">
           <li><strong>Automatic Backup Formats:</strong> If an EPUB version has an issue, it instantly tries a PDF copy.</li>
           <li><strong>Instant Library:</strong> A built-in catalog lets you open top classic books in 0 seconds.</li>
-          <li><strong>Telegram Book Bot:</strong> Connects with a Telegram bot to let users find books on the go.</li>
+          <li><strong>Reliable Caching:</strong> Frequently accessed books are cached to ensure immediate opening for readers worldwide.</li>
         </ul>
       </div>
     </div>
@@ -958,12 +1058,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 20: DATABASE ENTITIES
+       SLIDE 23: DATABASE ENTITIES
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Database Design</span>
-      <span class="slide-number">20 / 27</span>
+      <span class="slide-number">23 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Clean & Organized Data Structure</h2>
@@ -1014,45 +1114,12 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 21: DATA INTEGRITY & REAL COUNTS
-       ===================================================================== -->
-  <div class="slide">
-    <div class="slide-header">
-      <span class="pill-theme">Honest Numbers</span>
-      <span class="slide-number">21 / 27</span>
-    </div>
-    <div class="content-body">
-      <h2 class="slide-title">Real Interactions, Zero Fake Numbers</h2>
-      <p class="slide-subtitle">Every like, streak, and comment is backed by real human activity</p>
-      <div class="hero-card neutral">
-        <div style="font-size: 16pt; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
-          Guaranteed Real Human Engagement
-        </div>
-        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Unlike social platforms that inflate numbers to keep you hooked, Liread ensures every single metric is 100% honest and accurate:
-        </p>
-        <ul class="feature-points">
-          <li><strong>One User, One Upvote:</strong> The database strictly prevents anyone from upvoting a post more than once.</li>
-          <li><strong>Calculated from Real Likes:</strong> Post popularity is calculated directly from actual saved likes, never made-up numbers.</li>
-          <li><strong>No Bot Activity:</strong> If a quote has zero likes, it proudly says "No likes yet" instead of faking engagement.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <span></span>
-      <span class="brand">LIREAD</span>
-      <span>Honest Engagement</span>
-    </div>
-  </div>
-
-
-  <!-- =====================================================================
-       SLIDE 22: AUTOMATIONS & RLS
+       SLIDE 24: AUTOMATIONS & RLS
        ===================================================================== -->
   <div class="slide">
     <div class="slide-header">
       <span class="pill-theme">Privacy & Security</span>
-      <span class="slide-number">22 / 27</span>
+      <span class="slide-number">24 / 26</span>
     </div>
     <div class="content-body">
       <h2 class="slide-title">Automated Streaks & Strong Security</h2>
@@ -1089,119 +1156,16 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 23: ROADMAP 1 - AI MARGINALIA
-       ===================================================================== -->
-  <div class="slide">
-    <div class="slide-header">
-      <span class="pill-theme brand">Looking Ahead: Step 1</span>
-      <span class="slide-number">23 / 27</span>
-    </div>
-    <div class="content-body">
-      <h2 class="slide-title">Step 1: Smart AI Reading Assistant</h2>
-      <p class="slide-subtitle">Explain difficult passages and old words without leaving your page</p>
-      <div class="hero-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <div style="font-size: 17pt; font-weight: 700; color: #0f172a;">In-Book Explanations & Smart Quote Search</div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 9pt; background: #ecfdf5; color: #047857; font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0;">Early 2027</span>
-        </div>
-        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Classic books like Marcus Aurelius or Plato can sometimes feel difficult or confusing. Step 1 will introduce a smart, quiet reading companion right on your page:
-        </p>
-        <ul class="feature-points">
-          <li><strong>Quick 2-Sentence Explanations:</strong> Tap any difficult paragraph to see a simple, spoiler-free explanation in modern English.</li>
-          <li><strong>Search by Idea:</strong> Find quotes in your saved notes by concept (like <em>"quotes on overcoming worry"</em>) instead of exact words.</li>
-          <li><strong>Instant Old Word Meanings:</strong> Clear definitions for old-fashioned words and phrases at a single tap.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <span></span>
-      <span class="brand">LIREAD</span>
-      <span>Future Step 1</span>
-    </div>
-  </div>
-
-
-  <!-- =====================================================================
-       SLIDE 24: ROADMAP 2 - MICRO-CLUBS
-       ===================================================================== -->
-  <div class="slide">
-    <div class="slide-header">
-      <span class="pill-theme brand">Looking Ahead: Step 2</span>
-      <span class="slide-number">24 / 27</span>
-    </div>
-    <div class="content-body">
-      <h2 class="slide-title">Step 2: Friendly Book Clubs with Friends</h2>
-      <p class="slide-subtitle">Read books together with friends at your own pace without spoilers</p>
-      <div class="hero-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <div style="font-size: 17pt; font-weight: 700; color: #0f172a;">Read Together at Your Own Pace</div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 9pt; background: #ecfdf5; color: #047857; font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0;">Mid 2027</span>
-        </div>
-        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          Traditional book clubs are hard to schedule and coordinate. Step 2 brings relaxed, flexible book clubs directly to Liread:
-        </p>
-        <ul class="feature-points">
-          <li><strong>Spoiler-Free Chapter Locks:</strong> You will only see your friends' notes on Chapter 3 once you finish reading Chapter 3 yourself.</li>
-          <li><strong>Short Voice Notes:</strong> Leave quick 30-second voice thoughts on your favorite paragraphs for your friends to hear.</li>
-          <li><strong>Private Reading Circles:</strong> Create quiet groups for book clubs, classrooms, or your close circle of friends.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <span></span>
-      <span class="brand">LIREAD</span>
-      <span>Future Step 2</span>
-    </div>
-  </div>
-
-
-  <!-- =====================================================================
-       SLIDE 25: ROADMAP 3 - HARDWARE SYNC
-       ===================================================================== -->
-  <div class="slide">
-    <div class="slide-header">
-      <span class="pill-theme brand">Looking Ahead: Step 3</span>
-      <span class="slide-number">25 / 27</span>
-    </div>
-    <div class="content-body">
-      <h2 class="slide-title">Step 3: Mobile Apps & E-Reader Sync</h2>
-      <p class="slide-subtitle">Sync your reading streaks and notes with your phone and Kindle e-readers</p>
-      <div class="hero-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <div style="font-size: 17pt; font-weight: 700; color: #0f172a;">Connect with Kindles, Tablets, and Phones</div>
-          <span style="font-family: 'JetBrains Mono'; font-size: 9pt; background: #ecfdf5; color: #047857; font-weight: 700; padding: 4px 10px; border-radius: 6px; border: 1px solid #a7f3d0;">Late 2027</span>
-        </div>
-        <p style="font-size: 11pt; color: #334155; line-height: 1.65; margin-bottom: 16px;">
-          For readers who love physical e-ink readers or want home screen widgets on their phone:
-        </p>
-        <ul class="feature-points">
-          <li><strong>Kindle & E-Reader Sync:</strong> Sync your reading progress and notes between your Kindle or Kobo and Liread.</li>
-          <li><strong>Special E-Ink Display Mode:</strong> A super clean, black-and-white look made specifically for e-ink screens with zero battery drain.</li>
-          <li><strong>Phone Home Screen Widgets:</strong> See your daily reading streak right on your iPhone or Android lock screen.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="slide-footer">
-      <span></span>
-      <span class="brand">LIREAD</span>
-      <span>Future Step 3</span>
-    </div>
-  </div>
-
-
-  <!-- =====================================================================
-       SLIDE 26: CLOSING THESIS
+       SLIDE 25: CLOSING THESIS / BELIEF
        ===================================================================== -->
   <div class="slide" style="text-align: center; align-items: center; justify-content: center;">
     <div style="max-width: 9in;">
-      <span class="pill-theme brand" style="margin-bottom: 24px;">Our Belief</span>
+      <span class="pill-theme brand" style="margin-bottom: 24px;">Our Core Belief</span>
       <div style="font-family: 'Cinzel', Georgia, serif; font-size: 32pt; font-weight: 700; color: #0f172a; line-height: 1.35; margin-bottom: 28px;">
-        "Reading is not dying.<br />
-        It is simply waiting for a <span style="color: #059669; font-style: italic;">calm place</span> to call home."
+        "Reading is easy when nothing is pulling you away."
       </div>
       <p style="font-size: 13pt; color: #334155; line-height: 1.7; max-width: 7.8in; margin: 0 auto 30px auto;">
-        By combining a quiet focus timer, distraction blocking, free classic books, and an honest community, Liread helps people around the world reclaim their attention and fall in love with reading again.
+        Anyone can build a lifelong daily reading habit. When you remove notifications, stop phone distractions, and have a quiet place to read, finishing books becomes natural, peaceful, and enjoyable.
       </p>
     </div>
     <div class="slide-footer" style="width: 100%;">
@@ -1213,7 +1177,7 @@ def build_presentation_html():
 
 
   <!-- =====================================================================
-       SLIDE 27: CALL TO ACTION & DEMO
+       SLIDE 26: CALL TO ACTION & DEMO
        ===================================================================== -->
   <div class="slide" style="text-align: center; align-items: center; justify-content: center;">
     <div style="max-width: 8.5in;">
@@ -1221,12 +1185,12 @@ def build_presentation_html():
         Let's Make the World Read Again.
       </h2>
       <p style="font-size: 13pt; color: #475569; margin-bottom: 32px;">
-        Try Liread live right now on your phone, tablet, or laptop.
+        Try Liread today across web, Android, and iOS.
       </p>
 
       <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 36px;">
         <div style="background: #ecfdf5; border: 2px solid #059669; padding: 16px 28px; border-radius: 14px; text-align: left;">
-          <div style="font-size: 9pt; color: #047857; font-weight: 700; text-transform: uppercase;">Live Website</div>
+          <div style="font-size: 9pt; color: #047857; font-weight: 700; text-transform: uppercase;">Live Application</div>
           <div style="font-size: 14pt; color: #0f172a; font-weight: 700; font-family: 'JetBrains Mono'; margin-top: 4px;">liread.vercel.app</div>
         </div>
         <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; padding: 16px 28px; border-radius: 14px; text-align: left;">
@@ -1259,7 +1223,7 @@ def main():
     
     os.makedirs(os.path.dirname(html_path), exist_ok=True)
     
-    print("[1/3] Generating 27-slide presentation markup (Minimalist Monochrome & Brand Green)...")
+    print("[1/3] Generating 26-slide presentation markup (Clean Minimalist Theme)...")
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(build_presentation_html())
     print(f"      HTML written to: {html_path}")
