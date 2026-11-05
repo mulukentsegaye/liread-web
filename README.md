@@ -167,3 +167,7 @@ The output will be created in the `dist/` directory, ready to deploy to modern h
 Full Name:            Muluken Tsegaye
 ID Number:            CTC-1002-26
 Classroom Number:     005
+
+
+Presentation PDF link:
+Presentation Video link:
