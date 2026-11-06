@@ -168,6 +168,9 @@ Full Name:            Muluken Tsegaye
 ID Number:            CTC-1002-26
 Classroom Number:     005
 
+Website link: https://liread.vercel.app/
 
-Presentation PDF link:
+
+Presentation PDF link: https://drive.google.com/file/d/1GfLHHx_VAwRCw2arnnp2XdzuOSa8_WaW/view?usp=drivesdk
+
 Presentation Video link:
