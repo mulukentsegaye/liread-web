@@ -165,7 +165,9 @@ The output will be created in the `dist/` directory, ready to deploy to modern h
 ---
 
 Full Name:            Muluken Tsegaye
+
 ID Number:            CTC-1002-26
+
 Classroom Number:     005
 
 Website link: https://liread.vercel.app/
@@ -173,4 +175,4 @@ Website link: https://liread.vercel.app/
 
 Presentation PDF link: https://drive.google.com/file/d/1GfLHHx_VAwRCw2arnnp2XdzuOSa8_WaW/view?usp=drivesdk
 
-Presentation Video link:
+Presentation Video link: https://drive.google.com/file/d/1R1xNtTvN7RkDHWSPWkcPCiV_xax6YW7Z/view?usp=drive_link
