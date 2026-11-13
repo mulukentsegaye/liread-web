@@ -110,10 +110,23 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
       ]
     : liveCoReaders;
 
-  // Filter or sort based on active tab
-  const displayReaders = activeTab === 'streaks'
+  // Filter or sort based on active tab and merge real-time co-reading status
+  const displayReaders = (activeTab === 'streaks'
     ? [...readers].sort((a, b) => b.currentStreak - a.currentStreak)
-    : readers;
+    : readers
+  ).map((r) => {
+    const live = effectiveLiveCoReaders.find(
+      (cr) => (r.userId && cr.userId === r.userId) || (r.username && cr.username === r.username)
+    );
+    if (live) {
+      return {
+        ...r,
+        isCurrentlyReading: true,
+        currentlyReadingBook: live.bookTitle,
+      };
+    }
+    return r;
+  });
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-300 pb-20 px-2 sm:px-4">
