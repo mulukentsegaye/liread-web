@@ -62,18 +62,18 @@ export const FeedContainer: React.FC<FeedContainerProps> = ({
     <div className="w-full max-w-2xl mx-auto space-y-5 sm:space-y-6">
 
       {/* Page header */}
-      <div className="pt-1 pb-1">
+      <div className="pt-2 sm:pt-4 pb-1 sm:pb-2">
         <p className="font-sans text-[10.5px] font-medium tracking-wider uppercase text-vibe-ink-muted/80 mb-1">
           Today's Reading Feed
         </p>
-        <h1 className="font-display text-xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
+        <h1 className="font-display text-2xl sm:text-3xl font-normal tracking-tight text-vibe-ink leading-tight">
           A good day for a good book.
         </h1>
       </div>
 
       {/* Share bar / write prompt */}
       <div
-        className="bg-vibe-card border border-vibe-border rounded-2xl p-3 sm:p-4 shadow-soft flex items-center gap-2.5 sm:gap-3 hover:border-vibe-accent/30 transition-all group cursor-pointer"
+        className="bg-vibe-card border border-vibe-border rounded-2xl p-3.5 sm:p-4 shadow-soft flex items-center gap-3 hover:border-vibe-accent/30 transition-all group cursor-pointer"
         onClick={onOpenCreateModal}
       >
         <img

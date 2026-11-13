@@ -427,7 +427,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-vibe-border bg-vibe-card/95 backdrop-blur-md">
-      <div className="w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-0 flex items-center h-14 sm:h-15 gap-2 sm:gap-4">
+      <div className="w-full px-3.5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-0 flex items-center h-14 sm:h-15 gap-2 sm:gap-4">
 
         {/* Brand / Logo */}
         <button
@@ -615,8 +615,8 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile search drawer */}
       {isMobileSearchOpen && (
-        <div className="md:hidden px-4 pb-3 border-t border-vibe-border-subtle relative" ref={mobileSearchRef}>
-          <div className="relative flex items-center mt-2">
+        <div className="md:hidden px-3.5 sm:px-4 pb-3.5 pt-1 border-t border-vibe-border-subtle relative bg-vibe-card/95 backdrop-blur-md" ref={mobileSearchRef}>
+          <div className="relative flex items-center mt-1.5">
             {isOffline && typeof navigator !== 'undefined' && !navigator.onLine ? (
               <WifiOff className="absolute left-3.5 w-4 h-4 text-amber-500 pointer-events-none" strokeWidth={1.75} />
             ) : isSearching ? (

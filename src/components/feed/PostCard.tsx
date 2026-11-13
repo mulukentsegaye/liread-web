@@ -193,7 +193,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     >
 
       {/* Author header */}
-      <div className="flex items-center justify-between px-3.5 sm:px-5 pt-3.5 sm:pt-4 pb-0">
+      <div className="flex items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-0">
         <div 
           className={`flex items-center gap-3 min-w-0 ${onViewUserProfile && post.userId ? 'cursor-pointer group/author' : ''}`}
           onClick={(e) => {
@@ -368,17 +368,17 @@ export const PostCard: React.FC<PostCardProps> = ({
       </div>
 
       {/* Book + Quote block */}
-      <div className="px-3.5 sm:px-5 pt-3 sm:pt-4">
+      <div className="px-4 sm:px-5 pt-3.5 sm:pt-4">
         <div className="flex gap-3 sm:gap-4 items-stretch">
 
           {/* Book cover & info trigger */}
           <div
-            className="flex-shrink-0 w-[72px] cursor-pointer group/cover"
+            className="flex-shrink-0 w-[64px] sm:w-[72px] cursor-pointer group/cover"
             onClick={() => onViewBookDetails?.(post.bookTitle, post.bookAuthor, post.coverImageUrl)}
             title={`View "${post.bookTitle}" details`}
           >
             {post.coverImageUrl ? (
-              <div className="relative w-[72px] h-[100px] rounded-lg overflow-hidden shadow-md ring-1 ring-black/10 group-hover/cover:shadow-lg transition-shadow duration-300">
+              <div className="relative w-[64px] sm:w-[72px] h-[92px] sm:h-[100px] rounded-lg overflow-hidden shadow-md ring-1 ring-black/10 group-hover/cover:shadow-lg transition-shadow duration-300">
                 <img
                   src={post.coverImageUrl}
                   alt={post.bookTitle}
@@ -388,7 +388,7 @@ export const PostCard: React.FC<PostCardProps> = ({
               </div>
             ) : (
               <div
-                className="relative w-[72px] h-[100px] rounded-lg shadow-md ring-1 ring-black/10 flex flex-col items-center justify-between p-2.5 group-hover/cover:shadow-lg transition-shadow duration-300 overflow-hidden"
+                className="relative w-[64px] sm:w-[72px] h-[92px] sm:h-[100px] rounded-lg shadow-md ring-1 ring-black/10 flex flex-col items-center justify-between p-2 sm:p-2.5 group-hover/cover:shadow-lg transition-shadow duration-300 overflow-hidden"
                 style={{ backgroundColor: coverBg }}
               >
                 {/* Spine line */}
@@ -416,7 +416,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 <span className="font-display text-2xl leading-none text-vibe-accent/40 block -mb-1 select-none" aria-hidden>
                   "
                 </span>
-                <blockquote className="font-display italic font-normal text-base sm:text-[18px] text-vibe-ink leading-relaxed break-words">
+                <blockquote className="font-display italic font-normal text-[15px] sm:text-[18px] text-vibe-ink leading-relaxed break-words">
                   {post.quoteText}
                 </blockquote>
               </div>
@@ -471,7 +471,7 @@ export const PostCard: React.FC<PostCardProps> = ({
       )}
 
       {/* Footer actions */}
-      <div className="flex items-center justify-between px-3.5 sm:px-5 pt-2.5 sm:pt-3 pb-3 sm:pb-3.5 mt-1 border-t border-vibe-border-subtle">
+      <div className="flex items-center justify-between px-4 sm:px-5 pt-3 pb-3.5 sm:pb-4 mt-1 border-t border-vibe-border-subtle">
         <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Heart / upvote with Spring Bounce & Animated Counter */}
           <button

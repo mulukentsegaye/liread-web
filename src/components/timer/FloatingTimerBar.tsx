@@ -64,7 +64,7 @@ export const FloatingTimerBar: React.FC = () => {
   return (
     <div 
       onClick={() => setFullScreenOpen(true)}
-      className={`fixed ${isIdle ? 'hidden md:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+3.85rem)] md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] sm:w-[88%] md:max-w-xl rounded-full p-2 sm:p-2.5 px-3 sm:px-4 bg-vibe-card/95 backdrop-blur-md border border-vibe-border shadow-float items-center justify-between gap-2 sm:gap-3 cursor-pointer transition-all duration-300 group hover:border-vibe-accent/40 ${
+      className={`fixed ${isIdle ? 'hidden md:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+4.25rem)] md:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[94%] sm:w-[88%] md:max-w-xl rounded-full p-2 sm:p-2.5 px-3.5 sm:px-4 bg-vibe-card/95 backdrop-blur-md border border-vibe-border shadow-float items-center justify-between gap-2 sm:gap-3 cursor-pointer transition-all duration-300 group hover:border-vibe-accent/40 ${
         isFullScreenOpen ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'
       }`}
       title="Click to open full distraction-free reading timer"

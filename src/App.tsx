@@ -596,7 +596,7 @@ export const App: React.FC = () => {
       />
 
       <div 
-        className={`w-full px-2.5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 min-h-0 flex items-stretch gap-3 sm:gap-6 lg:gap-8 justify-between overflow-hidden transition-opacity duration-300 ease-out ${
+        className={`w-full px-3.5 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex-1 min-h-0 flex items-stretch gap-3 sm:gap-6 lg:gap-8 justify-between overflow-hidden transition-opacity duration-300 ease-out ${
           isFullScreenOpen ? 'opacity-30 pointer-events-none' : 'opacity-100'
         }`}
       >
@@ -610,10 +610,10 @@ export const App: React.FC = () => {
 
         <main
           id="main-viewport"
-          className={`flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3 sm:py-6 px-0.5 sm:px-1 w-full max-w-full ${
+          className={`flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden overscroll-contain py-3.5 sm:py-6 px-1 sm:px-2 w-full max-w-full ${
             isTimerRunning 
-              ? 'pb-[calc(env(safe-area-inset-bottom)+7.5rem)] md:pb-24' 
-              : 'pb-[calc(env(safe-area-inset-bottom)+4.75rem)] md:pb-24'
+              ? 'pb-[calc(env(safe-area-inset-bottom)+7.75rem)] md:pb-24' 
+              : 'pb-[calc(env(safe-area-inset-bottom)+5.25rem)] md:pb-24'
           }`}
         >
 

@@ -957,37 +957,37 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <span className="block text-xs text-vibe-ink-muted mt-1">passages</span>
                 </div>
 
-                <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
-                  <div className="flex items-center justify-center gap-1.5 text-amber-500 mb-2">
-                    <Flame className="w-4 h-4 fill-current" />
-                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Streak</span>
+                <div className="p-3 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                  <div className="flex items-center justify-center gap-1 text-amber-500 mb-1.5">
+                    <Flame className="w-3.5 h-3.5 fill-current" />
+                    <span className="text-[10px] xs:text-[11px] font-mono uppercase font-bold tracking-wider">Streak</span>
                   </div>
-                  <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  <span className="font-mono text-xl sm:text-3xl font-bold text-vibe-ink">
                     {user.currentStreak ?? 0}
                   </span>
-                  <span className="block text-xs text-vibe-ink-muted mt-1">days</span>
+                  <span className="block text-[11px] sm:text-xs text-vibe-ink-muted mt-0.5 sm:mt-1">days</span>
                 </div>
 
-                <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
-                  <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 mb-2">
-                    <BookOpen className="w-4 h-4" />
-                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Shelf</span>
+                <div className="p-3 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                  <div className="flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 mb-1.5">
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span className="text-[10px] xs:text-[11px] font-mono uppercase font-bold tracking-wider">Shelf</span>
                   </div>
-                  <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  <span className="font-mono text-xl sm:text-3xl font-bold text-vibe-ink">
                     {user.bookshelfCount ?? 0}
                   </span>
-                  <span className="block text-xs text-vibe-ink-muted mt-1">books</span>
+                  <span className="block text-[11px] sm:text-xs text-vibe-ink-muted mt-0.5 sm:mt-1">books</span>
                 </div>
 
-                <div className="p-4 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
-                  <div className="flex items-center justify-center gap-1.5 text-sky-500 mb-2">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-[11px] font-mono uppercase font-bold tracking-wider">Time</span>
+                <div className="p-3 sm:p-5 rounded-2xl bg-vibe-card border border-vibe-border shadow-soft text-center flex flex-col justify-between">
+                  <div className="flex items-center justify-center gap-1 text-sky-500 mb-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="text-[10px] xs:text-[11px] font-mono uppercase font-bold tracking-wider">Time</span>
                   </div>
-                  <span className="font-mono text-2xl sm:text-3xl font-bold text-vibe-ink">
+                  <span className="font-mono text-xl sm:text-3xl font-bold text-vibe-ink">
                     {user.totalMinutesRead ?? 0}
                   </span>
-                  <span className="block text-xs text-vibe-ink-muted mt-1">mins</span>
+                  <span className="block text-[11px] sm:text-xs text-vibe-ink-muted mt-0.5 sm:mt-1">mins</span>
                 </div>
               </div>
 

@@ -187,31 +187,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           {onGoToLogin && (
             <button
               onClick={onGoToLogin}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2.5"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer"
             >
               <span>Create Account / Sign In</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}
 
-          <button
-            onClick={handleGuest}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            <span>Continue as Guest</span>
-            <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
-          </button>
+          <div className="grid grid-cols-2 gap-2.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-3">
+            <button
+              onClick={handleGuest}
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
+            >
+              <span>Guest Mode</span>
+              <ChevronRight className="w-4 h-4 text-vibe-ink-muted hidden xs:inline-block" />
+            </button>
 
-          <button
-            onClick={() => {
-              const el = document.getElementById('features');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-full text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            <span>Explore Features</span>
-            <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
-          </button>
+            <button
+              onClick={() => {
+                const el = document.getElementById('features');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
+            >
+              <span>Features</span>
+              <ChevronRight className="w-4 h-4 text-vibe-ink-muted hidden xs:inline-block" />
+            </button>
+          </div>
         </div>
 
       </section>

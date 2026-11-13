@@ -149,11 +149,11 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
           </div>
 
           {/* Tab Filter Pills */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle shadow-xs shrink-0 self-start sm:self-auto">
+          <div className="w-full sm:w-auto grid grid-cols-3 sm:flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle shadow-xs shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('circle')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'circle'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -165,7 +165,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('curators')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'curators'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -177,7 +177,7 @@ export const SanctuaryView: React.FC<SanctuaryViewProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('streaks')}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+              className={`inline-flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'streaks'
                   ? 'bg-vibe-card text-vibe-accent font-semibold shadow-xs border border-vibe-border'
                   : 'text-vibe-ink-muted hover:text-vibe-ink'

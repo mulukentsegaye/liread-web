@@ -275,7 +275,7 @@ const HorizontalBookShelf: React.FC<{
       {/* Horizontal Scroll Track */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth py-2 scrollbar-none snap-x snap-mandatory"
+        className="flex gap-3.5 sm:gap-4 overflow-x-auto scroll-smooth py-2 -mx-3.5 px-3.5 sm:mx-0 sm:px-0 scrollbar-none snap-x snap-mandatory"
       >
         {isLoading && books.length === 0 ? (
           Array.from({ length: 6 }).map((_, i) => (
@@ -1088,7 +1088,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               workKey: bookOfTheWeek.workKey,
               description: bookOfTheWeek.description || bookOfTheWeek.tagline,
             })}
-            className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-4 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
+            className="group relative rounded-3xl border border-vibe-border bg-vibe-card p-4.5 sm:p-8 shadow-soft hover:border-vibe-accent/30 transition-colors duration-300 cursor-pointer overflow-hidden"
           >
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-center">
               <div className="md:col-span-4 flex justify-center md:justify-start">
@@ -1127,7 +1127,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                   {bookOfTheWeek.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2.5 sm:gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() => onViewBookDetails({
@@ -1138,7 +1138,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                       workKey: bookOfTheWeek.workKey,
                       description: bookOfTheWeek.description,
                     })}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover shadow-md transition-all active:scale-95 cursor-pointer"
                   >
                     <BookOpen className="w-4 h-4" />
                     <span>Read 5–10 Min Summary</span>
@@ -1147,7 +1147,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
                   <button
                     type="button"
                     onClick={() => onStartTimer(bookOfTheWeek.title, bookOfTheWeek.author, bookOfTheWeek.coverImageUrl)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card border border-vibe-border text-vibe-ink hover:border-vibe-accent transition-all active:scale-95 cursor-pointer"
                   >
                     <Clock className="w-4 h-4 text-vibe-accent" />
                     <span>Start Timer</span>
@@ -1169,7 +1169,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               </span>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-3.5 px-3.5 sm:mx-0 sm:px-0 scrollbar-none">
               {CURATED_CATEGORIES.map((cat) => {
                 const isSelected = selectedCategory === cat;
                 return (

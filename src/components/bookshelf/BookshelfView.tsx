@@ -273,10 +273,10 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
             </h1>
           </div>
 
-          <div className="flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle">
+          <div className="w-full sm:w-auto grid grid-cols-2 sm:flex items-center gap-1 p-1 rounded-full border border-vibe-border bg-vibe-card-subtle shadow-2xs">
             <button 
               onClick={() => setActiveSubTab('bookshelf')} 
-              className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 sm:py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer ${
                 activeSubTab === 'bookshelf' 
                   ? 'bg-vibe-card text-vibe-accent font-medium shadow-xs border border-vibe-border' 
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -287,7 +287,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
             </button>
             <button 
               onClick={() => setActiveSubTab('saved')} 
-              className={`flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full transition-all ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 sm:py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer ${
                 activeSubTab === 'saved' 
                   ? 'bg-vibe-card text-vibe-accent font-medium shadow-xs border border-vibe-border' 
                   : 'text-vibe-ink-muted hover:text-vibe-ink'
@@ -309,7 +309,7 @@ export const BookshelfView: React.FC<BookshelfViewProps> = ({
       {activeSubTab === 'bookshelf' ? (
         <div className="space-y-6">
           {/* Bookshelf Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 -mx-3.5 px-3.5 sm:mx-0 sm:px-0 scrollbar-none">
             {[
               { id: 'all' as const, label: 'All Books', count: countAll },
               { id: 'want_to_read' as const, label: 'Want to Read', count: countWant },
