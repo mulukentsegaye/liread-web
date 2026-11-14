@@ -4,9 +4,9 @@ import { ThemeMode, VibeConfig } from '../types/theme';
 export const LIGHT_THEME: VibeConfig = {
   id: 'light',
   name: 'Light Mode',
-  tagline: 'Whitey-Silver & Deep Emerald',
-  concept: 'Whitey-Silver reading aesthetic with Deep Emerald botanical highlights and crisp typography.',
-  description: 'Whitey-Silver (#F3F4F6) background, elevated pure white cards, Deep Emerald (#059669) accents, and Warm Amber (#D97706) streaks & ranks.',
+  tagline: 'Whitey-Silver & Forest Botanical',
+  concept: 'Whitey-Silver reading aesthetic with Forest Botanical highlights and crisp typography.',
+  description: 'Whitey-Silver (#F3F4F6) background, elevated pure white cards, Forest Botanical (#2D6A4F) accents, and Warm Amber (#D97706) streaks & ranks.',
   mode: 'light',
   isDefault: true,
   colors: {
@@ -19,14 +19,14 @@ export const LIGHT_THEME: VibeConfig = {
     ink: '#111827',
     inkSecondary: '#4B5563',
     inkMuted: '#9CA3AF',
-    accent: '#059669',
-    accentHover: '#047857',
-    accentSubtle: '#ECFDF5',
+    accent: '#2D6A4F',
+    accentHover: '#22533D',
+    accentSubtle: '#EBF2ED',
     secondary: '#D97706',
     secondaryHover: '#B45309',
     secondarySubtle: '#FEF3C7',
-    badgeBg: '#ECFDF5',
-    badgeText: '#059669',
+    badgeBg: '#EBF2ED',
+    badgeText: '#2D6A4F',
     ambientGlow: 'none',
   },
   typography: {
@@ -35,15 +35,15 @@ export const LIGHT_THEME: VibeConfig = {
     description: 'Avant-Garde Archivist (Cormorant Garamond, Syne, Inter, DM Mono)',
   },
   surfaceFeel: 'Clean 1px borders, subtle soft diffused shadows, and rounded tactile cards.',
-  swatches: ['#F3F4F6', '#FFFFFF', '#059669', '#D97706'],
+  swatches: ['#F3F4F6', '#FFFFFF', '#2D6A4F', '#D97706'],
 };
 
 export const DARK_THEME: VibeConfig = {
   id: 'dark',
   name: 'Dark Mode',
-  tagline: 'Deep Obsidian & Mint-Emerald',
-  concept: 'Deep Obsidian (#0B0F19) workspace with Luminous Mint-Emerald (#34D399) highlights and Bright Gold (#FBBF24) streak accents.',
-  description: 'Deep Obsidian background paired with Elevated Slate (#111827) cards, Luminous Mint-Emerald accents, and Bright Gold secondary details.',
+  tagline: 'Deep Obsidian & Moonlit Botanical',
+  concept: 'Deep Obsidian (#0B0F19) workspace with Moonlit Botanical (#52A882) highlights and Bright Gold (#FBBF24) streak accents.',
+  description: 'Deep Obsidian background paired with Elevated Slate (#111827) cards, Moonlit Botanical accents, and Bright Gold secondary details.',
   mode: 'dark',
   colors: {
     bg: '#0B0F19',
@@ -55,14 +55,14 @@ export const DARK_THEME: VibeConfig = {
     ink: '#F9FAFB',
     inkSecondary: '#CBD5E1',
     inkMuted: '#94A3B8',
-    accent: '#34D399',
-    accentHover: '#10B981',
-    accentSubtle: 'rgba(52, 211, 153, 0.15)',
+    accent: '#52A882',
+    accentHover: '#68BE98',
+    accentSubtle: 'rgba(82, 168, 130, 0.15)',
     secondary: '#FBBF24',
     secondaryHover: '#F59E0B',
     secondarySubtle: 'rgba(251, 191, 36, 0.15)',
-    badgeBg: 'rgba(52, 211, 153, 0.15)',
-    badgeText: '#34D399',
+    badgeBg: 'rgba(82, 168, 130, 0.15)',
+    badgeText: '#52A882',
     ambientGlow: 'none',
   },
   typography: {
@@ -71,7 +71,7 @@ export const DARK_THEME: VibeConfig = {
     description: 'Avant-Garde Archivist Midnight (Cormorant Garamond, Syne, Inter, DM Mono)',
   },
   surfaceFeel: 'OLED-friendly dark cards, elevated slate hierarchy, glowing emerald accents.',
-  swatches: ['#0B0F19', '#111827', '#34D399', '#FBBF24'],
+  swatches: ['#0B0F19', '#111827', '#52A882', '#FBBF24'],
 };
 
 export const VIBES: Record<ThemeMode, VibeConfig> = {
