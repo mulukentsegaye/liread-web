@@ -19,7 +19,11 @@ import {
   Quote,
   SlidersHorizontal,
   Flame,
-  Trophy
+  Trophy,
+  Sparkles,
+  Headphones,
+  ShieldCheck,
+  RotateCcw
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAmbientAudioStore } from '../../stores/ambientAudioStore';
@@ -85,7 +89,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       <header className="fixed top-0 left-0 right-0 z-50 w-full bg-vibe-bg/95 backdrop-blur-md border-b border-vibe-border px-4 sm:px-6 lg:px-12 py-3.5 transition-all duration-300 shadow-xs">
         <div className="w-full flex items-center justify-between gap-4">
           
-          {/* Logo & Manifesto link */}
+          {/* Logo & Brand Identity */}
           <div className="flex items-center gap-2.5">
             <LireadLogo size="md" className="transition-transform active:scale-95" />
             <div>
@@ -95,13 +99,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
             </div>
           </div>
 
-          {/* Center Navigation Links (Hidden on mobile) */}
+          {/* Center Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold tracking-wide text-vibe-ink-secondary">
             <a href="#features" className="hover:text-vibe-accent transition-colors">
-              Features
+              Philosophy
             </a>
             <a href="#timer" className="hover:text-vibe-accent transition-colors">
-              Timer
+              Zen Timer
             </a>
             <a href="#soundscapes" className="hover:text-vibe-accent transition-colors">
               Soundscapes
@@ -110,24 +114,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               Bookshelf
             </a>
             <a href="#analytics" className="hover:text-vibe-accent transition-colors">
-              Analytics
+              Habits
             </a>
             <a href="#calculator" className="hover:text-vibe-accent transition-colors">
               Impact
-            </a>
-            <a href="#quotes" className="hover:text-vibe-accent transition-colors">
-              Philosophy
             </a>
           </nav>
 
           {/* Right Action Stack: Login / Guest */}
           <div className="flex items-center gap-1.5 sm:gap-3">
-
-            {/* Desktop buttons */}
             <button
               type="button"
               onClick={handleGuest}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold text-vibe-ink-secondary hover:text-vibe-ink hover:bg-vibe-card-subtle transition-all border border-vibe-border shadow-xs active:scale-95 cursor-pointer"
             >
               <span>Continue as Guest</span>
             </button>
@@ -136,7 +135,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
               <button
                 type="button"
                 onClick={onGoToLogin}
-                className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-xs active:scale-95 cursor-pointer"
               >
                 <span>Sign In / Create Account</span>
               </button>
@@ -166,9 +165,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </header>
 
       {/* ==============================================================================
-          2. HERO SECTION: EDITORIAL HEADLINE & ATMOSPHERIC SHOWCASE
+          2. HERO SECTION: EDITORIAL HEADLINE & LIVE READING DESK
           ============================================================================== */}
-      <section className="relative w-full pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
+      <section className="relative w-full pt-28 sm:pt-36 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-12 flex flex-col items-center text-center">
+        
+        {/* Subtle pill badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-vibe-card border border-vibe-border text-xs text-vibe-ink-secondary mb-6 shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-vibe-accent" />
+          <span className="font-medium tracking-wide">The Sanctuary for Intentional Readers</span>
+        </div>
+
         {/* Editorial Title */}
         <h1 className="max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-display font-normal tracking-tight text-vibe-ink leading-[1.15] sm:leading-[1.12] mb-6">
           Where deep reading meets <br />
@@ -179,17 +185,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
 
         {/* Lead Subtitle */}
         <p className="max-w-2xl text-sm sm:text-base lg:text-lg text-vibe-ink-secondary leading-relaxed font-normal mb-8 sm:mb-10">
-          A calm, distraction-free space to read your favorite books, listen to relaxing ambient sounds, and track your daily reading journey.
+          A calm, borderless space to read timeless books, listen to synthesized binaural soundscapes, and build lifelong daily reading habits.
         </p>
 
         {/* Action Button Group */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto mb-12 sm:mb-16">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto mb-14 sm:mb-20">
           {onGoToLogin && (
             <button
               onClick={onGoToLogin}
               className="w-full sm:w-auto px-7 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md hover:shadow-lg active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer"
             >
-              <span>Create Account / Sign In</span>
+              <span>Begin Reading Free</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}
@@ -197,9 +203,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <div className="grid grid-cols-2 gap-2.5 w-full sm:flex sm:w-auto sm:items-center sm:gap-3">
             <button
               onClick={handleGuest}
-              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
+              className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink border border-vibe-border transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
             >
-              <span>Guest Mode</span>
+              <span>Instant Guest Mode</span>
               <ChevronRight className="w-4 h-4 text-vibe-ink-muted hidden xs:inline-block" />
             </button>
 
@@ -208,30 +214,243 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
                 const el = document.getElementById('features');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
+              className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-semibold bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink-secondary hover:text-vibe-ink border border-vibe-border-subtle transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 shadow-2xs cursor-pointer"
             >
-              <span>Features</span>
+              <span>Explore Features</span>
               <ChevronRight className="w-4 h-4 text-vibe-ink-muted hidden xs:inline-block" />
             </button>
           </div>
         </div>
 
+        {/* --------------------------------------------------------------------------
+            THE LIVE READING DESK (Hero Interactive Centerpiece)
+            -------------------------------------------------------------------------- */}
+        <ScrollRevealCard translateY={48} className="w-full max-w-5xl mx-auto text-left">
+          <div className="relative rounded-2xl sm:rounded-3xl border border-vibe-border/80 bg-vibe-card/90 backdrop-blur-md shadow-xl overflow-hidden transition-all duration-300">
+            
+            {/* Desk Top Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-7 py-3.5 border-b border-vibe-border/70 bg-vibe-card-subtle/50 text-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                  Live Reading Desk
+                </span>
+                <span className="hidden sm:inline text-vibe-ink-muted">·</span>
+                <span className="hidden sm:inline text-vibe-ink-secondary font-medium">
+                  Meditations by Marcus Aurelius
+                </span>
+              </div>
+
+              {/* Soundscape Quick Bar */}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-vibe-ink-muted hidden md:inline">Ambient:</span>
+                <div className="flex items-center gap-1.5">
+                  {soundOptions.map((s) => {
+                    const isLive = activeSoundId === s.id && isPlaying;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => handleSelectSound(s.id)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all flex items-center gap-1.5 border ${
+                          isLive 
+                            ? 'bg-vibe-accent text-white border-vibe-accent shadow-xs'
+                            : 'bg-vibe-bg text-vibe-ink-secondary border-vibe-border hover:text-vibe-ink hover:border-vibe-border'
+                        }`}
+                        title={s.label}
+                      >
+                        <span>{s.icon}</span>
+                        <span className="hidden lg:inline">{s.label.split(' ')[1] || s.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Desk Body: Broadside Reading Area & Zen Instrument */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-vibe-border/70">
+              
+              {/* Left (Col 1-7): The Literary Book Broadside */}
+              <div className="lg:col-span-7 p-6 sm:p-10 space-y-6">
+                <div className="flex items-center justify-between text-xs text-vibe-ink-muted">
+                  <span className="font-mono uppercase tracking-widest text-[11px]">Book IV · Chapter III</span>
+                  <div className="flex items-center gap-1.5 text-vibe-accent">
+                    <Bookmark className="w-3.5 h-3.5 fill-current" />
+                    <span className="font-mono text-[11px]">Page 48 of 184</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-display text-2xl sm:text-3xl text-vibe-ink font-normal leading-snug tracking-tight">
+                    “Nowhere can man find a quieter or more untroubled retreat than in his own soul.”
+                  </h3>
+                  
+                  <p className="font-serif text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
+                    Constantly give yourself this retreat, and renew yourself. Let your basic principles be brief and fundamental, so that at once, when you recur to them, they will be sufficient to cleanse the soul completely.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex items-center justify-between border-t border-vibe-border/50 text-[11px] text-vibe-ink-muted font-mono">
+                  <span>Gregory Hays Translation</span>
+                  <span>Focus State: 100% · No Ads</span>
+                </div>
+              </div>
+
+              {/* Right (Col 8-12): The Zen Immersion Dashboard */}
+              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-vibe-card-subtle/30 space-y-6">
+                
+                {/* Big Zen Stopwatch */}
+                <div className="space-y-2 text-center lg:text-left">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono uppercase tracking-wider text-[11px] text-vibe-ink-muted">Active Session</span>
+                    <span className="inline-flex items-center gap-1 text-[11px] text-vibe-accent font-medium">
+                      <Clock className="w-3 h-3" />
+                      25m Chime In 07:45
+                    </span>
+                  </div>
+                  <div className="font-mono text-4xl sm:text-5xl font-light tracking-tight text-vibe-ink">
+                    00:42:15
+                  </div>
+                  <p className="text-xs text-vibe-ink-secondary">
+                    42 of 60 min daily goal fulfilled (70%)
+                  </p>
+                </div>
+
+                {/* Daily Progress Gauge */}
+                <div className="space-y-2">
+                  <div className="w-full h-2 rounded-full bg-vibe-border/60 overflow-hidden">
+                    <div className="h-full rounded-full bg-vibe-accent transition-all duration-500 w-[70%]" />
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] font-mono text-vibe-ink-muted">
+                    <span>Goal: 60 mins</span>
+                    <span className="text-vibe-accent font-semibold">18m to target</span>
+                  </div>
+                </div>
+
+                {/* Audio Status pill */}
+                <div className="p-3 rounded-xl bg-vibe-bg border border-vibe-border/80 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0">
+                      <Headphones className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-vibe-ink truncate text-xs">
+                        {isPlaying ? soundOptions.find(s => s.id === activeSoundId)?.label : 'Atmospheric Engine'}
+                      </p>
+                      <p className="text-[10px] text-vibe-ink-muted truncate">
+                        {isPlaying ? 'Synthesized binaural loop' : 'Tap any sound to listen'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isPlaying) pause();
+                      else play('rain');
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink text-xs font-medium border border-vibe-border transition-colors flex items-center gap-1.5 flex-shrink-0"
+                  >
+                    {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                    <span>{isPlaying ? 'Pause' : 'Play Rain'}</span>
+                  </button>
+                </div>
+
+                {/* Desk CTA */}
+                <button
+                  type="button"
+                  onClick={onEnterApp}
+                  className="w-full py-3 rounded-xl bg-vibe-ink text-vibe-bg font-semibold text-xs tracking-wide uppercase hover:opacity-90 transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Open Your Library</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </ScrollRevealCard>
+
       </section>
 
       {/* ==============================================================================
-          3. CORE PRODUCT ARCHITECTURE: INTRO BANNER
+          3. EDITORIAL MANIFESTO: 3 BORDERLESS ARCHITECTURAL PILLARS
           ============================================================================== */}
-      <section id="features" className="w-full scroll-mt-20 pt-16 sm:pt-24 pb-4 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
-        <ScrollRevealCard translateY={36}>
-          <div className="max-w-3xl mx-auto text-center space-y-3">
+      <section id="features" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+        <div className="max-w-6xl mx-auto space-y-14">
+          
+          <ScrollRevealCard translateY={24} className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+              The Philosophy
+            </span>
             <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-              Everything You Need to Read More Deeply
+              Crafted for contemplation, not clicks.
             </h2>
-            <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed max-w-xl mx-auto">
-              No distracting ads, no infinite dopamine doom-scrolling. Just pure focus, literary connection, and timeless tools.
+            <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
+              Modern digital reading is plagued by intrusive push alerts, algorithmic feeds, and endless noise. Liread returns to the quiet dignity of a private personal study.
             </p>
+          </ScrollRevealCard>
+
+          {/* 3 Borderless Columns with Hairline Dividers */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-0 md:divide-x divide-vibe-border">
+            
+            {/* Pillar 1 */}
+            <ScrollRevealCard translateY={32} delayMs={0} className="px-0 md:px-8 first:pl-0 last:pr-0 space-y-4">
+              <div className="w-10 h-10 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
+                <Clock className="w-5 h-5" />
+              </div>
+              <h3 className="font-display text-xl text-vibe-ink font-normal">
+                Distraction-Free Immersion
+              </h3>
+              <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
+                Full-screen zen reading states, subtle interval pacing chimes, and automatic session logging keep your attention rooted entirely in the prose.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-vibe-accent">
+                <span>Gentle 25-minute intervals</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+            </ScrollRevealCard>
+
+            {/* Pillar 2 */}
+            <ScrollRevealCard translateY={32} delayMs={80} className="px-0 md:px-8 space-y-4">
+              <div className="w-10 h-10 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
+                <Volume2 className="w-5 h-5" />
+              </div>
+              <h3 className="font-display text-xl text-vibe-ink font-normal">
+                Binaural Ambient Engine
+              </h3>
+              <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
+                Built-in real-time Web Audio synthesis. Layer rain droplets, library hearths, or morning forest breeze with zero bandwidth cost and zero ads.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-vibe-accent">
+                <span>Pure client-side audio</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+            </ScrollRevealCard>
+
+            {/* Pillar 3 */}
+            <ScrollRevealCard translateY={32} delayMs={160} className="px-0 md:px-8 first:pl-0 last:pr-0 space-y-4">
+              <div className="w-10 h-10 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
+                <Bookmark className="w-5 h-5" />
+              </div>
+              <h3 className="font-display text-xl text-vibe-ink font-normal">
+                Wisdom & Habit Compounding
+              </h3>
+              <p className="text-xs sm:text-sm text-vibe-ink-secondary leading-relaxed">
+                Capture marginalia passages with beautiful typography plaques. Measure consistency over years without competitive guilt or gamified burnout.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-vibe-accent">
+                <span>Personal knowledge archive</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+            </ScrollRevealCard>
+
           </div>
-        </ScrollRevealCard>
+
+        </div>
       </section>
 
       {/* ==============================================================================
@@ -242,104 +461,114 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Left: Text & Editorial Details */}
-            <div className="lg:col-span-6">
-              <ScrollRevealCard translateY={40} delayMs={0}>
-                <div className="space-y-6">
+            <div className="lg:col-span-6 space-y-6">
+              <ScrollRevealCard translateY={40}>
+                <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+                  Focus Engineering
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight mt-2 mb-4">
+                  Distraction-Free Immersion Timer
+                </h2>
+                <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed mb-6">
+                  Step into a deep, sustained reading state with a gentle stopwatch, customizable interval chimes, and instant session logging. Every second spent in a book quietly compounds into your daily goals.
+                </p>
 
-              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-                Distraction-Free Immersion Timer
-              </h2>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-vibe-ink-secondary">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Full-screen Zen mode with dark room compatibility and zero interface clutter</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Gentle interval chimes that encourage natural pauses without breaking deep flow</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Instant automatic session logging saved directly into your personal offline storage</span>
+                  </li>
+                </ul>
 
-              <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Step into a full-screen reading state with a gentle stopwatch, customizable interval chimes, and instant session logging. Every second spent in a book quietly adds to your daily goals.
-              </p>
-
-              <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Full-screen Zen mode with dark room compatibility</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Persistent mini HUD bar while browsing the feed</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Integrated with ambient background audio loops</span>
-                </li>
-              </ul>
-
+                <div className="pt-4">
+                  <button
+                    type="button"
+                    onClick={onOpenTimer || onEnterApp}
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-vibe-accent hover:text-vibe-accent-hover transition-colors"
+                  >
+                    <span>Launch the Zen Timer demo</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </ScrollRevealCard>
             </div>
 
-            {/* Right: Interactive Timer Visual Mockup */}
+            {/* Right: Borderless Minimalist Zen Clockwork */}
             <div className="lg:col-span-6">
               <ScrollRevealCard translateY={48} delayMs={120}>
-                <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 sm:p-8 shadow-lg space-y-6 relative overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-mono uppercase tracking-wider font-semibold text-emerald-600 dark:text-emerald-400">
-                      Active Reading Session
+                <div className="relative p-6 sm:p-10 rounded-2xl sm:rounded-3xl border border-vibe-border bg-vibe-card-subtle/40 backdrop-blur-sm space-y-6">
+                  
+                  {/* Active Header */}
+                  <div className="flex items-center justify-between text-xs pb-4 border-b border-vibe-border">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-mono uppercase tracking-wider text-[11px] font-semibold text-vibe-ink">
+                        Deep Reading Session
+                      </span>
+                    </div>
+                    <span className="font-mono text-[11px] text-vibe-ink-muted">
+                      Interval Chime: Every 25m
                     </span>
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted">
-                    Zen HUD Active
-                  </span>
-                </div>
 
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-mono uppercase tracking-wider text-vibe-ink-muted">Currently Reading</p>
-                  <h4 className="text-base sm:text-lg font-heading font-bold text-vibe-ink flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-vibe-accent flex-shrink-0" />
-                    <span>The Creative Act: A Way of Being</span>
-                  </h4>
-                  <p className="text-xs text-vibe-ink-secondary">Rick Rubin · Chapter 14: Intention</p>
-                </div>
+                  {/* Book Reference */}
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted">Currently Engaged</p>
+                    <h4 className="text-lg sm:text-xl font-display font-medium text-vibe-ink">
+                      The Creative Act: A Way of Being
+                    </h4>
+                    <p className="text-xs text-vibe-ink-secondary">Rick Rubin · Page 142 of 210</p>
+                  </div>
 
-                {/* Big Clock Display */}
-                <div className="py-6 px-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border text-center space-y-2 relative">
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-vibe-ink-muted">
-                    Session Duration
-                  </span>
-                  <div className="font-mono text-4xl sm:text-5xl font-bold tracking-tight text-vibe-ink">
-                    00:42:15
+                  {/* Monospace Clock Display */}
+                  <div className="py-8 px-4 text-center space-y-2 border-y border-vibe-border/70">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-vibe-ink-muted">
+                      Elapsed Time
+                    </span>
+                    <div className="font-mono text-5xl sm:text-6xl font-light tracking-tight text-vibe-ink">
+                      00:42:15
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-xs text-vibe-accent font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
+                      <span>Next chime in 07:45 · 70% of 60m daily goal</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-xs text-vibe-accent font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-vibe-accent" />
-                    <span>Interval chime in 07:45 · 25m interval</span>
-                  </div>
-                </div>
 
-                {/* Progress bar toward daily goal */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-vibe-ink-secondary">Daily Goal Progress</span>
-                    <span className="font-mono font-semibold text-vibe-ink">42 / 60 min (70%)</span>
+                  {/* Linear Pacing Strip */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-vibe-ink-secondary">
+                      <span>Daily Rhythm Progress</span>
+                      <span className="font-bold text-vibe-ink">42m / 60m</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
+                      <div className="h-full rounded-full bg-vibe-accent w-[70%]" />
+                    </div>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-vibe-border overflow-hidden">
-                    <div className="h-full rounded-full bg-vibe-accent transition-all duration-500 w-[70%]" />
-                  </div>
-                </div>
 
-                {/* Mock session controls */}
-                <div className="flex items-center justify-between gap-3 pt-2 text-xs">
-                  <span className="px-3 py-1.5 rounded-xl bg-vibe-card-subtle border border-vibe-border text-vibe-ink-muted flex items-center gap-1.5">
-                    <Volume2 className="w-3.5 h-3.5 text-vibe-accent" />
-                    Hearth Fireplace (Playing)
-                  </span>
-                  <span className="text-[11px] text-vibe-ink-muted">
-                    Logs automatically on pause
-                  </span>
+                  {/* Controls preview */}
+                  <div className="flex items-center justify-between text-xs text-vibe-ink-muted pt-2">
+                    <span className="flex items-center gap-1.5">
+                      <Volume2 className="w-3.5 h-3.5 text-vibe-accent" />
+                      Hearth Fireplace in background
+                    </span>
+                    <span className="font-mono text-[11px]">Auto-saved</span>
+                  </div>
+
                 </div>
-              </div>
               </ScrollRevealCard>
             </div>
 
@@ -354,138 +583,134 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
-            {/* Left: Interactive Soundscape Player Lounge */}
+            {/* Left: The Tactile Soundboard */}
             <div className="lg:col-span-6 order-2 lg:order-1">
               <ScrollRevealCard translateY={48} delayMs={120}>
-                <div className="p-6 sm:p-8 rounded-3xl bg-vibe-card border border-vibe-border shadow-lg space-y-6">
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-2xl bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center">
-                      <Volume2 className="w-5 h-5" />
-                    </div>
+                <div className="p-6 sm:p-9 rounded-2xl sm:rounded-3xl border border-vibe-border bg-vibe-card-subtle/30 space-y-6">
+                  
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm sm:text-base font-heading font-bold text-vibe-ink">Interactive Audio Lounge</h4>
-                      <p className="text-[11px] text-vibe-ink-muted">Tap any vibe to preview in real-time</p>
+                      <h4 className="font-display text-lg text-vibe-ink font-medium">Tactile Soundboard</h4>
+                      <p className="text-xs text-vibe-ink-muted">Tap to preview soundscapes live</p>
                     </div>
+
+                    {isPlaying && (
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-500/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Live Synthesizer
+                        </span>
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          title={isMuted ? 'Unmute' : 'Mute'}
+                          className="p-1.5 rounded-lg text-vibe-ink-muted hover:text-vibe-ink transition-colors"
+                        >
+                          {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {isPlaying && (
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        Live Audio
+                  {/* 4 Interactive Audio Tracks */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {soundOptions.map((sound) => {
+                      const isThisPlaying = activeSoundId === sound.id && isPlaying;
+                      return (
+                        <button
+                          key={sound.id}
+                          type="button"
+                          onClick={() => handleSelectSound(sound.id)}
+                          className={`p-3.5 rounded-xl text-left transition-all flex items-center justify-between gap-3 active:scale-98 cursor-pointer border ${
+                            isThisPlaying
+                              ? 'border-vibe-accent bg-vibe-card text-vibe-accent ring-1 ring-vibe-accent shadow-xs'
+                              : 'border-vibe-border bg-vibe-card hover:bg-vibe-card-subtle text-vibe-ink'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-2xl">{sound.icon}</span>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold">{sound.label}</p>
+                              <p className="text-[10px] text-vibe-ink-muted truncate">{sound.desc}</p>
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {isThisPlaying ? (
+                              <div className="w-7 h-7 rounded-full bg-vibe-accent text-white flex items-center justify-center">
+                                <Pause className="w-3.5 h-3.5" />
+                              </div>
+                            ) : (
+                              <div className="w-7 h-7 rounded-full border border-vibe-border bg-vibe-bg flex items-center justify-center text-vibe-ink-muted hover:text-vibe-ink">
+                                <Play className="w-3 h-3 ml-0.5" />
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Volume Slider when active */}
+                  {isPlaying ? (
+                    <div className="flex items-center gap-3 pt-4 border-t border-vibe-border text-xs text-vibe-ink-muted">
+                      <span className="text-[11px] font-mono">Master Volume</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => setVolume(parseFloat(e.target.value))}
+                        className="w-full accent-vibe-accent cursor-pointer h-1.5 bg-vibe-border rounded-lg"
+                      />
+                      <span className="font-mono text-[11px] font-semibold text-vibe-ink min-w-[32px] text-right">
+                        {Math.round((isMuted ? 0 : volume) * 100)}%
                       </span>
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        title={isMuted ? 'Unmute' : 'Mute'}
-                        className="p-1.5 rounded-lg text-vibe-ink-muted hover:text-vibe-ink hover:bg-vibe-card-subtle transition-colors"
-                      >
-                        {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
-                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 text-[11px] text-vibe-ink-muted pt-2">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>100% native Web Audio · Zero audio files to download</span>
                     </div>
                   )}
-                </div>
 
-                {/* 4 Interactive Audio Tracks */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {soundOptions.map((sound) => {
-                    const isThisPlaying = activeSoundId === sound.id && isPlaying;
-                    return (
-                      <button
-                        key={sound.id}
-                        type="button"
-                        onClick={() => handleSelectSound(sound.id)}
-                        className={`p-3 rounded-2xl text-left border text-xs transition-all flex items-center justify-between gap-2 active:scale-98 ${
-                          isThisPlaying
-                            ? 'border-vibe-accent bg-vibe-accent-subtle text-vibe-accent font-semibold ring-1 ring-vibe-accent/30 shadow-xs'
-                            : 'border-vibe-border bg-vibe-card-subtle hover:bg-vibe-card text-vibe-ink hover:border-vibe-border'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="text-xl">{sound.icon}</span>
-                          <div className="min-w-0">
-                            <p className="truncate text-xs font-bold leading-tight">{sound.label}</p>
-                            <p className="text-[10px] text-vibe-ink-muted truncate">{sound.desc}</p>
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0">
-                          {isThisPlaying ? (
-                            <div className="w-7 h-7 rounded-full bg-vibe-accent text-white flex items-center justify-center shadow-xs">
-                              <Pause className="w-3.5 h-3.5" />
-                            </div>
-                          ) : (
-                            <div className="w-7 h-7 rounded-full border border-vibe-border bg-vibe-card flex items-center justify-center text-vibe-ink-muted hover:text-vibe-ink shadow-xs">
-                              <Play className="w-3 h-3 ml-0.5" />
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
                 </div>
-
-                {/* Volume Slider when active */}
-                {isPlaying ? (
-                  <div className="flex items-center gap-3 pt-3 border-t border-vibe-border text-xs text-vibe-ink-muted">
-                    <span className="text-[11px] font-mono">Volume</span>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={isMuted ? 0 : volume}
-                      onChange={(e) => setVolume(parseFloat(e.target.value))}
-                      className="w-full accent-vibe-accent cursor-pointer h-1.5 bg-vibe-border rounded-lg"
-                    />
-                    <span className="font-mono text-[11px] font-semibold text-vibe-ink min-w-[32px] text-right">
-                      {Math.round((isMuted ? 0 : volume) * 100)}%
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-center text-vibe-ink-muted pt-1">
-                    Free looping Web Audio synthesis · Zero external ads or network lag
-                  </p>
-                )}
-              </div>
               </ScrollRevealCard>
             </div>
 
             {/* Right: Text & Editorial Details */}
-            <div className="lg:col-span-6 order-1 lg:order-2">
-              <ScrollRevealCard translateY={40} delayMs={0}>
-                <div className="space-y-6">
+            <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
+              <ScrollRevealCard translateY={40}>
+                <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+                  Acoustic Design
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight mt-2 mb-4">
+                  Atmospheric Soundscapes
+                </h2>
+                <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed mb-6">
+                  Drown out distracting street noise, buzzing notifications, and open office chatter with binaural audio. Whether you prefer the warmth of crackling cedar or rainy windowpanes.
+                </p>
 
-              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-                Atmospheric Soundscape Engine
-              </h2>
-
-              <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Drown out modern notifications with seamlessly looping binaural audio. Whether you prefer the crackle of a private library hearth or raindrops on a Shibuya coffee shop window.
-              </p>
-
-              <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Auto-paired soundscapes for each aesthetic theme</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Independent volume controls & mute hotkey</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Lightweight audio synthesis with zero bandwidth lag</span>
-                </li>
-              </ul>
-                </div>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-vibe-ink-secondary">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Procedural noise generators synthesize authentic sounds infinitely without looping seams</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Runs locally in your browser with zero network streaming latency or heavy data usage</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Seamlessly transitions and plays in the background while browsing your bookshelf</span>
+                  </li>
+                </ul>
               </ScrollRevealCard>
             </div>
 
@@ -494,127 +719,107 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
-          FEATURE 3: DIGITAL BOOKSHELF & SAVED QUOTES
+          FEATURE 3: DIGITAL BOOKSHELF & MARGINALIA
           ============================================================================== */}
       <section id="bookshelf" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
             {/* Left: Text & Editorial Details */}
-            <div className="lg:col-span-6">
-              <ScrollRevealCard translateY={40} delayMs={0}>
-                <div className="space-y-6">
+            <div className="lg:col-span-6 space-y-6">
+              <ScrollRevealCard translateY={40}>
+                <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+                  Personal Library
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight mt-2 mb-4">
+                  Digital Bookshelf & Saved Marginalia
+                </h2>
+                <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed mb-6">
+                  Preserve memorable lines, epiphanies, and marginalia as literary serif broadsides. Organize your reading queues, track completion percentages, and revisit kept wisdom anytime.
+                </p>
 
-              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-                Digital Bookshelf & Saved Quotes
-              </h2>
-
-              <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Preserve memorable lines and marginalia with literary serif cards. Build your digital personal library, track reading progress percentages, and revisit kept quotes anytime.
-              </p>
-
-              <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Formatted passage cards with page numbers & book jackets</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>One-click bookmarking into your private saved stash</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Share insights with a community of serious readers</span>
-                </li>
-              </ul>
-                </div>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-vibe-ink-secondary">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Beautiful passage cards with page references and authentic literary typography</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Personal reading queue with instant percentage and page completion trackers</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Export or share highlights with fellow serious readers without noise or ads</span>
+                  </li>
+                </ul>
               </ScrollRevealCard>
             </div>
 
-            {/* Right: Visual Bookshelf + Quote Cards */}
-            <div className="lg:col-span-6 space-y-4">
+            {/* Right: Broadside Quote & Shelf Preview */}
+            <div className="lg:col-span-6 space-y-5">
               
-              {/* Card 1: Bookshelf Queue Preview */}
+              {/* Literary Broadside Passage */}
               <ScrollRevealCard translateY={44} delayMs={80}>
-                <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-vibe-border">
-                  <div className="flex items-center gap-2">
-                    <Library className="w-4 h-4 text-vibe-accent" />
-                    <span className="text-xs font-heading font-bold uppercase tracking-wider text-vibe-ink">Active Reading Shelf</span>
-                  </div>
-                  <span className="text-[11px] font-mono text-vibe-ink-muted">3 Books in Progress</span>
-                </div>
-
-                <div className="space-y-3">
-                  {/* Book 1 */}
-                  <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div>
-                        <span className="font-heading font-bold text-vibe-ink">The Creative Act</span>
-                        <span className="text-vibe-ink-muted"> · Rick Rubin</span>
-                      </div>
-                      <span className="font-mono text-[11px] font-bold text-vibe-accent">68%</span>
+                <div className="p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-vibe-border bg-vibe-card shadow-md space-y-4 relative">
+                  <div className="flex items-center justify-between text-xs text-vibe-accent">
+                    <div className="flex items-center gap-1.5 font-semibold">
+                      <Quote className="w-4 h-4" />
+                      <span>Saved Passage</span>
                     </div>
-                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
-                      <div className="h-full bg-vibe-accent rounded-full w-[68%]" />
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
-                      <span className="font-mono">Page 142 of 210</span>
-                      <span>Updated 2 hours ago</span>
-                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-vibe-accent-subtle border border-vibe-accent/20 text-[11px] font-medium">
+                      In Your Stash
+                    </span>
                   </div>
 
-                  {/* Book 2 */}
-                  <div className="p-3 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div>
-                        <span className="font-heading font-bold text-vibe-ink">Meditations</span>
-                        <span className="text-vibe-ink-muted"> · Marcus Aurelius</span>
-                      </div>
-                      <span className="font-mono text-[11px] font-bold text-vibe-accent">42%</span>
-                    </div>
-                    <div className="w-full h-1.5 rounded-full bg-vibe-border overflow-hidden">
-                      <div className="h-full bg-vibe-accent rounded-full w-[42%]" />
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-vibe-ink-muted">
-                      <span className="font-mono">Book IV · Gregory Hays translation</span>
-                      <span>Yesterday</span>
-                    </div>
+                  <blockquote className="font-display italic text-base sm:text-lg text-vibe-ink leading-relaxed">
+                    “The art of reading is in great part that of acquiring a better, deeper understanding of life through the words of others.”
+                  </blockquote>
+
+                  <div className="pt-2 border-t border-vibe-border/60 flex items-center justify-between text-xs text-vibe-ink-muted">
+                    <span className="font-medium text-vibe-ink-secondary">Virginia Woolf · To the Lighthouse</span>
+                    <span className="font-mono text-[11px]">Page 84</span>
                   </div>
                 </div>
-              </div>
-
               </ScrollRevealCard>
 
-              {/* Card 2: Saved Literary Passage Preview */}
+              {/* Minimalist Bookshelf Queue */}
               <ScrollRevealCard translateY={44} delayMs={160}>
-                <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 shadow-md space-y-3 relative overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-vibe-accent">
-                    <Quote className="w-4 h-4" />
-                    <span>Saved Passage</span>
+                <div className="p-5 sm:p-6 rounded-2xl border border-vibe-border bg-vibe-card-subtle/30 space-y-3">
+                  <div className="flex items-center justify-between text-xs text-vibe-ink-muted pb-1">
+                    <span className="font-mono uppercase tracking-widest text-[11px]">Active Library</span>
+                    <span className="font-mono text-[11px]">2 Books In Progress</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-vibe-accent font-medium px-2 py-0.5 rounded-full bg-vibe-accent-subtle border border-vibe-accent/20">
-                    <Bookmark className="w-3 h-3 fill-current" />
-                    <span>In Your Stash</span>
+
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-bold text-vibe-ink">The Creative Act</span>
+                        <span className="text-vibe-ink-muted"> · Rick Rubin</span>
+                      </div>
+                      <span className="font-mono font-bold text-vibe-accent">68%</span>
+                    </div>
+                    <div className="w-full h-1 rounded-full bg-vibe-border overflow-hidden">
+                      <div className="h-full bg-vibe-accent w-[68%]" />
+                    </div>
+
+                    <div className="pt-1 flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-bold text-vibe-ink">Meditations</span>
+                        <span className="text-vibe-ink-muted"> · Marcus Aurelius</span>
+                      </div>
+                      <span className="font-mono font-bold text-vibe-accent">42%</span>
+                    </div>
+                    <div className="w-full h-1 rounded-full bg-vibe-border overflow-hidden">
+                      <div className="h-full bg-vibe-accent w-[42%]" />
+                    </div>
                   </div>
                 </div>
-
-                <blockquote className="font-display italic text-sm sm:text-base text-vibe-ink leading-relaxed font-normal">
-                  “The art of reading is in great part that of acquiring a better, deeper understanding of life through the words of others.”
-                </blockquote>
-
-                <div className="flex items-center justify-between text-[11px] text-vibe-ink-muted pt-1">
-                  <span>Virginia Woolf · To the Lighthouse</span>
-                  <span className="font-mono">Page 84</span>
-                </div>
-              </div>
               </ScrollRevealCard>
 
             </div>
@@ -624,141 +829,116 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
-          FEATURE 4: GENTLE ANALYTICS & HABIT STREAKS
+          FEATURE 4: GENTLE ANALYTICS & HABIT RHYTHM
           ============================================================================== */}
       <section id="analytics" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
 
-            {/* Left: Visual Analytics Mockup */}
+            {/* Left: Minimalist Habit Rhythm Visualizer */}
             <div className="lg:col-span-6 order-2 lg:order-1">
               <ScrollRevealCard translateY={48} delayMs={120}>
-                <div className="rounded-3xl bg-vibe-card border border-vibe-border p-6 sm:p-8 shadow-lg space-y-6">
-                
-                {/* Metric Summary Pills */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs text-amber-500 font-heading font-bold">
-                      <Flame className="w-4 h-4 fill-current" />
-                      <span>Reading Streak</span>
-                    </div>
-                    <div className="text-2xl font-mono font-bold text-vibe-ink">7 Days</div>
-                    <p className="text-[10px] text-vibe-ink-muted">Personal record this month</p>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs text-vibe-accent font-heading font-bold">
-                      <Clock className="w-4 h-4" />
-                      <span>Today's Time</span>
-                    </div>
-                    <div className="text-2xl font-mono font-bold text-vibe-ink">52m <span className="text-xs font-normal text-vibe-ink-muted">/ 60m</span></div>
-                    <p className="text-[10px] text-vibe-ink-muted">87% of daily goal</p>
-                  </div>
-                </div>
-
-                {/* 7-Day Gentle Habit Activity Chart */}
-                <div className="p-4 rounded-2xl bg-vibe-card-subtle border border-vibe-border space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-heading font-bold text-vibe-ink">7-Day Reading Rhythm</span>
-                    <span className="font-mono text-[11px] text-vibe-ink-muted">Total: 6.8 hrs</span>
-                  </div>
-
-                  <div className="flex items-end justify-between gap-2 h-24 pt-4">
-                    {[
-                      { day: 'M', mins: 45, height: '60%' },
-                      { day: 'T', mins: 60, height: '80%' },
-                      { day: 'W', mins: 30, height: '40%' },
-                      { day: 'T', mins: 75, height: '100%' },
-                      { day: 'F', mins: 50, height: '65%' },
-                      { day: 'S', mins: 90, height: '100%' },
-                      { day: 'S', mins: 52, height: '70%', today: true },
-                    ].map((item, idx) => (
-                      <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                        <div 
-                          className={`w-full rounded-md transition-all ${
-                            item.today 
-                              ? 'bg-vibe-accent shadow-xs' 
-                              : 'bg-vibe-accent/65 hover:bg-vibe-accent/85'
-                          }`}
-                          style={{ height: item.height }}
-                          title={`${item.mins} minutes`}
-                        />
-                        <span className={`text-[10px] font-mono ${item.today ? 'font-bold text-vibe-accent' : 'text-vibe-ink-muted'}`}>
-                          {item.day}
-                        </span>
+                <div className="p-6 sm:p-9 rounded-2xl sm:rounded-3xl border border-vibe-border bg-vibe-card-subtle/30 space-y-6">
+                  
+                  {/* Streak & Today's Metric */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold">
+                        <Flame className="w-4 h-4 fill-current" />
+                        <span>Reading Streak</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="text-3xl font-mono font-bold text-vibe-ink">7 Days</div>
+                      <p className="text-[11px] text-vibe-ink-muted">Personal record this month</p>
+                    </div>
 
-                {/* Friendly Community Consistent Circle Preview */}
-                <div className="space-y-2 pt-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-heading font-bold text-vibe-ink flex items-center gap-1.5">
-                      <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      Consistent Readers Circle
-                    </span>
-                    <span className="text-[11px] text-vibe-ink-muted">Self-paced & Equal</span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-vibe-accent font-bold">
+                        <Clock className="w-4 h-4" />
+                        <span>Today's Time</span>
+                      </div>
+                      <div className="text-3xl font-mono font-bold text-vibe-ink">52m</div>
+                      <p className="text-[11px] text-vibe-ink-muted">87% of 60m daily goal</p>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    {[
-                      { goal: '100% of plan', name: 'Elena Rostova', streak: '28d streak', badge: '🏆' },
-                      { goal: '100% of plan', name: 'Julian Reed', streak: '19d streak', badge: '🏆' },
-                      { goal: '100% of plan', name: 'Sophia Chen', streak: '21d streak', badge: '🏆' },
-                    ].map((reader) => (
-                      <div key={reader.name} className="flex items-center justify-between p-2 rounded-xl bg-vibe-card-subtle text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{reader.badge}</span>
-                          <span className="font-medium text-vibe-ink">{reader.name}</span>
+                  {/* 7-Day Consistency Bars */}
+                  <div className="pt-4 border-t border-vibe-border space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-vibe-ink">7-Day Reading Rhythm</span>
+                      <span className="font-mono text-[11px] text-vibe-ink-muted">Total: 6.8 hrs</span>
+                    </div>
+
+                    <div className="flex items-end justify-between gap-2.5 h-24 pt-3">
+                      {[
+                        { day: 'Mon', mins: 45, height: '60%' },
+                        { day: 'Tue', mins: 60, height: '80%' },
+                        { day: 'Wed', mins: 30, height: '40%' },
+                        { day: 'Thu', mins: 75, height: '100%' },
+                        { day: 'Fri', mins: 50, height: '65%' },
+                        { day: 'Sat', mins: 90, height: '100%' },
+                        { day: 'Sun', mins: 52, height: '70%', today: true },
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                          <div 
+                            className={`w-full rounded-md transition-all ${
+                              item.today 
+                                ? 'bg-vibe-accent shadow-xs' 
+                                : 'bg-vibe-accent/60 hover:bg-vibe-accent/80'
+                            }`}
+                            style={{ height: item.height }}
+                            title={`${item.mins} minutes`}
+                          />
+                          <span className={`text-[10px] font-mono ${item.today ? 'font-bold text-vibe-accent' : 'text-vibe-ink-muted'}`}>
+                            {item.day}
+                          </span>
                         </div>
-                        <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">{reader.goal}</span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-vibe-ink-muted pt-1">
-                    Every reader who fulfills their personal daily plan is celebrated equally.
-                  </p>
-                </div>
 
-              </div>
+                  {/* Philosophy Footnote */}
+                  <div className="pt-2 flex items-center gap-2 text-xs text-vibe-ink-muted">
+                    <Feather className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0" />
+                    <span>Designed for calm personal mastery without toxic gamification.</span>
+                  </div>
+
+                </div>
               </ScrollRevealCard>
             </div>
 
             {/* Right: Text & Editorial Details */}
-            <div className="lg:col-span-6 order-1 lg:order-2">
-              <ScrollRevealCard translateY={40} delayMs={0}>
-                <div className="space-y-6">
+            <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
+              <ScrollRevealCard translateY={40}>
+                <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+                  Sustained Consistency
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight mt-2 mb-4">
+                  Gentle Analytics & Habit Streaks
+                </h2>
+                <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed mb-6">
+                  Build a sustainable lifelong relationship with books. Track reading velocity, visualize weekly rhythms, and celebrate quiet consistency without shame or burnout.
+                </p>
 
-              <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
-                Gentle Analytics & Habit Streaks
-              </h2>
-
-              <p className="text-sm sm:text-base text-vibe-ink-secondary leading-relaxed">
-                Track your consistency with elegant circular gauges, 7-day and 30-day bar charts, and the calm Reading Community designed to inspire rather than create burnout.
-              </p>
-
-              <ul className="space-y-3 pt-2 text-xs sm:text-sm text-vibe-ink-secondary">
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Customizable daily minute goals (30m, 60m, 90m)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Weekly reading rankings with fellow literature lovers</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Privacy-first offline localStorage persistence</span>
-                </li>
-              </ul>
-                </div>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-vibe-ink-secondary">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Flexible daily minute targets tailored to your schedule (20m, 45m, or 60m)</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Streak protection and calm insights that encourage steady return to pages</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-vibe-accent-subtle text-vibe-accent flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5" />
+                    </div>
+                    <span>Zero public judgment: your reading rhythm is entirely your own private affair</span>
+                  </li>
+                </ul>
               </ScrollRevealCard>
             </div>
 
@@ -772,21 +952,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       <ReadingImpactCalculator onStartHabit={onEnterApp} onContinueGuest={handleGuest} />
 
       {/* ==============================================================================
-          5. PHILOSOPHY & LITERARY QUOTES
+          5. PHILOSOPHY & LITERARY QUOTE
           ============================================================================== */}
-      <section id="quotes" className="w-full scroll-mt-20 py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
+      <section id="quotes" className="w-full scroll-mt-20 py-20 sm:py-28 px-4 sm:px-6 lg:px-12 border-t border-vibe-border">
         <ScrollRevealCard delayMs={80} className="max-w-4xl mx-auto text-center space-y-8">
           
           <div className="w-10 h-10 rounded-full bg-vibe-accent-subtle text-vibe-accent mx-auto flex items-center justify-center">
             <Feather className="w-5 h-5" />
           </div>
 
-          <blockquote className="font-display italic text-xl sm:text-2xl lg:text-3xl text-vibe-ink leading-relaxed max-w-3xl mx-auto font-normal">
+          <blockquote className="font-display italic text-2xl sm:text-3xl lg:text-4xl text-vibe-ink leading-relaxed max-w-3xl mx-auto font-normal">
             “When I think of all the books still left for me to read, I have the certainty of being still happy.”
           </blockquote>
 
           <div className="space-y-1">
-            <p className="text-sm font-heading font-bold text-vibe-ink tracking-wide">Jules Renard</p>
+            <p className="text-sm font-bold text-vibe-ink tracking-wide">Jules Renard</p>
             <p className="text-xs text-vibe-ink-muted">French Author & Dramatist</p>
           </div>
 
@@ -794,79 +974,78 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp, onOpenTime
       </section>
 
       {/* ==============================================================================
-          7. FINAL HIGH-IMPACT CALL TO ACTION
+          6. FINAL HIGH-IMPACT INVITATION
           ============================================================================== */}
-      <section className="w-full py-16 sm:py-24 px-4 sm:px-6 lg:px-12 border-t border-vibe-border relative overflow-hidden">
-        <ScrollRevealCard delayMs={80} className="max-w-3xl mx-auto">
-          <div className="rounded-3xl border border-vibe-border bg-vibe-card p-8 sm:p-14 text-center shadow-xl space-y-6">
+      <section className="w-full py-20 sm:py-28 px-4 sm:px-6 lg:px-12 border-t border-vibe-border text-center">
+        <ScrollRevealCard delayMs={80} className="max-w-3xl mx-auto space-y-6">
 
-          <h2 className="text-2xl sm:text-4xl font-display font-normal text-vibe-ink tracking-tight">
+          <span className="font-mono text-xs uppercase tracking-widest text-vibe-accent font-semibold">
+            Begin Your Sanctuary
+          </span>
+
+          <h2 className="text-3xl sm:text-5xl font-display font-normal text-vibe-ink tracking-tight">
             Reclaim your attention. <br />
             <span className="italic font-display font-normal text-vibe-accent">One page at a time.</span>
           </h2>
 
-          <p className="text-xs sm:text-sm text-vibe-ink-secondary max-w-lg mx-auto leading-relaxed">
-            A quiet, distraction-free space to turn your daily reading into an intentional art form. 
-            Free, private, and distraction-free forever.
+          <p className="text-sm sm:text-base text-vibe-ink-secondary max-w-lg mx-auto leading-relaxed">
+            A quiet, distraction-free sanctuary to turn your daily reading into an intentional art form. Free, private, and distraction-free forever.
           </p>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             {onGoToLogin && (
               <button
                 onClick={onGoToLogin}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-vibe-accent text-white hover:bg-vibe-accent-hover transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Create Account / Sign In</span>
+                <span>Create Free Account</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
             <button
               onClick={handleGuest}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-white text-vibe-ink border border-vibe-border hover:bg-vibe-card-subtle transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-vibe-card text-vibe-ink border border-vibe-border hover:bg-vibe-card-subtle transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Continue as Guest</span>
               <ChevronRight className="w-4 h-4 text-vibe-ink-muted" />
             </button>
           </div>
 
-          <p className="text-[11px] text-vibe-ink-muted">
-            No credit card required · Zero algorithms · Immediate access
+          <p className="text-xs text-vibe-ink-muted pt-2">
+            No credit card required · Zero algorithms · Immediate offline access
           </p>
-        </div>
         </ScrollRevealCard>
-
       </section>
 
       {/* ==============================================================================
-          8. EDITORIAL FOOTER
+          7. EDITORIAL FOOTER
           ============================================================================== */}
-      <footer className="w-full py-10 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-bg text-xs text-vibe-ink-muted transition-colors duration-500">
+      <footer className="w-full py-12 px-4 sm:px-6 lg:px-12 border-t border-vibe-border bg-vibe-bg text-xs text-vibe-ink-muted transition-colors duration-500">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           
           <div className="flex items-center gap-2.5">
             <LireadLogo size="xs" />
             <span className="font-display text-base font-bold text-vibe-ink">Liread</span>
-            <span className="text-[11px]">© 2026 Liread Inc. All rights reserved.</span>
+            <span className="text-[11px]">© 2026 Liread. All rights reserved.</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-[11px]">
-            <a href="#features" className="hover:text-vibe-ink transition-colors">Features</a>
+            <a href="#features" className="hover:text-vibe-ink transition-colors">Philosophy</a>
             <a href="#timer" className="hover:text-vibe-ink transition-colors">Timer</a>
             <a href="#soundscapes" className="hover:text-vibe-ink transition-colors">Soundscapes</a>
             <a href="#bookshelf" className="hover:text-vibe-ink transition-colors">Bookshelf</a>
-            <a href="#analytics" className="hover:text-vibe-ink transition-colors">Analytics</a>
+            <a href="#analytics" className="hover:text-vibe-ink transition-colors">Habits</a>
             <a href="#calculator" className="hover:text-vibe-ink transition-colors">Impact</a>
-            <a href="#quotes" className="hover:text-vibe-ink transition-colors">Philosophy</a>
             <button 
               onClick={handleGuest} 
-              className="hover:text-vibe-ink transition-colors font-medium"
+              className="hover:text-vibe-ink transition-colors font-medium cursor-pointer"
             >
-              Continue as Guest
+              Guest Mode
             </button>
             {onGoToLogin && (
               <button 
                 onClick={onGoToLogin} 
-                className="hover:text-vibe-ink transition-colors font-medium"
+                className="hover:text-vibe-ink transition-colors font-medium cursor-pointer"
               >
                 Sign In
               </button>

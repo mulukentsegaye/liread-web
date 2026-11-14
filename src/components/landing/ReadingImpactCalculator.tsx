@@ -111,19 +111,19 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
           </div>
         </ScrollRevealCard>
 
-        {/* Main Interactive Calculator Card */}
+        {/* Main Interactive Calculator */}
         <ScrollRevealCard translateY={46} delayMs={100}>
-          <div className="rounded-2xl sm:rounded-3xl bg-vibe-card border border-vibe-border shadow-sm p-4 sm:p-6 space-y-5 backdrop-blur-sm">
+          <div className="py-6 sm:py-8 px-5 sm:px-8 space-y-8 rounded-3xl border border-vibe-border/70 bg-vibe-card shadow-soft">
             
             {/* Unified Controls Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-vibe-border">
-              <div className="flex items-center gap-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-vibe-border/60">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <span className="text-xs font-semibold text-vibe-ink-muted uppercase tracking-wider">Daily Reading:</span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-vibe-accent text-white font-mono text-xs font-bold shadow-xs">
-                  <Clock className="w-3 h-3" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vibe-accent text-white font-mono text-xs font-bold shadow-xs">
+                  <Clock className="w-3.5 h-3.5" />
                   {minutes} min / day
                 </span>
-                <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${milestone.bg} ${milestone.color}`}>
+                <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${milestone.bg} ${milestone.color}`}>
                   ✦ {milestone.tag}
                 </span>
               </div>
@@ -137,10 +137,10 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
                       key={val}
                       type="button"
                       onClick={() => setMinutes(val)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-mono transition-all border cursor-pointer active:scale-95 ${
+                      className={`px-3 py-1 rounded-full text-xs font-mono transition-all border cursor-pointer active:scale-95 ${
                         isActive
                           ? 'bg-vibe-accent text-white border-vibe-accent font-bold shadow-xs'
-                          : 'bg-vibe-card-subtle text-vibe-ink-secondary border-vibe-border hover:text-vibe-ink hover:bg-vibe-border/40'
+                          : 'bg-transparent text-vibe-ink-secondary border-vibe-border hover:text-vibe-ink hover:bg-vibe-card-subtle'
                       }`}
                     >
                       {val}m
@@ -151,7 +151,7 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
             </div>
 
             {/* Range Slider */}
-            <div>
+            <div className="space-y-2">
               <input
                 id="reading-minutes-slider"
                 type="range"
@@ -160,83 +160,83 @@ export const ReadingImpactCalculator: React.FC<ReadingImpactCalculatorProps> = (
                 step="1"
                 value={minutes}
                 onChange={(e) => setMinutes(parseInt(e.target.value, 10))}
-                className="w-full accent-vibe-accent cursor-pointer h-2 bg-vibe-card-subtle rounded-lg border border-vibe-border transition-all"
+                className="w-full accent-vibe-accent cursor-pointer h-2 bg-vibe-border/50 rounded-lg transition-all"
                 aria-label="Daily reading minutes target"
               />
+              <div className="flex justify-between text-[11px] font-mono text-vibe-ink-muted">
+                <span>10 mins</span>
+                <span>25 mins (Pomodoro)</span>
+                <span>45 mins</span>
+                <span>60 mins (Mastery)</span>
+              </div>
             </div>
 
-            {/* Minimalist Metrics: 3-column Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            {/* Minimalist Metrics: 3 Clean Columns with Hairline Dividers */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 divide-y sm:divide-y-0 sm:divide-x divide-vibe-border/60">
               
               {/* Metric 1: Books */}
-              <div className="rounded-xl p-4 bg-vibe-card-subtle border border-vibe-border flex items-center sm:flex-col sm:items-start justify-between sm:justify-start gap-2.5">
-                <div className="flex items-center gap-2.5 sm:w-full">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-4 h-4" />
+              <div className="pt-4 sm:pt-0 sm:pl-4 first:pl-0 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-medium text-vibe-ink-muted sm:hidden">Books / year</span>
+                  <span className="text-xs font-medium text-vibe-ink-muted">Books Finished</span>
                 </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1">
-                    <span>{animatedBooks}</span>
-                    <span className="text-xs font-sans font-medium text-vibe-ink-muted">books</span>
-                  </div>
-                  <div className="hidden sm:block text-[11px] font-medium text-vibe-ink-muted mt-0.5">
-                    Completed masterworks / yr
-                  </div>
+                <div className="text-3xl sm:text-4xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1.5">
+                  <span>{animatedBooks}</span>
+                  <span className="text-xs font-sans font-medium text-vibe-ink-muted">books / yr</span>
                 </div>
+                <p className="text-[11px] text-vibe-ink-muted">
+                  Completed masterworks read cover to cover
+                </p>
               </div>
 
               {/* Metric 2: Hours */}
-              <div className="rounded-xl p-4 bg-vibe-card-subtle border border-vibe-border flex items-center sm:flex-col sm:items-start justify-between sm:justify-start gap-2.5">
-                <div className="flex items-center gap-2.5 sm:w-full">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4" />
+              <div className="pt-4 sm:pt-0 sm:pl-6 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-medium text-vibe-ink-muted sm:hidden">Focus time</span>
+                  <span className="text-xs font-medium text-vibe-ink-muted">Deep Focus Time</span>
                 </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1">
-                    <span>{animatedHours}</span>
-                    <span className="text-xs font-sans font-medium text-vibe-ink-muted">hours</span>
-                  </div>
-                  <div className="hidden sm:block text-[11px] font-medium text-vibe-ink-muted mt-0.5">
-                    Distraction-free focus / yr
-                  </div>
+                <div className="text-3xl sm:text-4xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1.5">
+                  <span>{animatedHours}</span>
+                  <span className="text-xs font-sans font-medium text-vibe-ink-muted">hours / yr</span>
                 </div>
+                <p className="text-[11px] text-vibe-ink-muted">
+                  Quiet contemplative immersion away from screens
+                </p>
               </div>
 
               {/* Metric 3: Words */}
-              <div className="rounded-xl p-4 bg-vibe-card-subtle border border-vibe-border flex items-center sm:flex-col sm:items-start justify-between sm:justify-start gap-2.5">
-                <div className="flex items-center gap-2.5 sm:w-full">
-                  <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0">
-                    <Brain className="w-4 h-4" />
+              <div className="pt-4 sm:pt-0 sm:pl-6 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center flex-shrink-0">
+                    <Brain className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-medium text-vibe-ink-muted sm:hidden">Words read</span>
+                  <span className="text-xs font-medium text-vibe-ink-muted">Words Absorbed</span>
                 </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1">
-                    <span>{animatedWords}M</span>
-                    <span className="text-xs font-sans font-medium text-vibe-ink-muted">words</span>
-                  </div>
-                  <div className="hidden sm:block text-[11px] font-medium text-vibe-ink-muted mt-0.5">
-                    Ideas & vocabulary absorbed
-                  </div>
+                <div className="text-3xl sm:text-4xl font-mono font-bold text-vibe-ink tracking-tight flex items-baseline gap-1.5">
+                  <span>{animatedWords}M</span>
+                  <span className="text-xs font-sans font-medium text-vibe-ink-muted">words / yr</span>
                 </div>
+                <p className="text-[11px] text-vibe-ink-muted">
+                  Vocabulary, mental frameworks, and perspective
+                </p>
               </div>
 
             </div>
 
-            {/* Single Compact Milestone Quote */}
-            <div className="rounded-xl px-3.5 py-2.5 bg-vibe-card-subtle/80 border border-vibe-border flex items-center justify-between gap-3 text-xs">
+            {/* Compounding Milestone Quote Footnote */}
+            <div className="pt-4 border-t border-vibe-border/60 flex items-center justify-between gap-4 text-xs">
               <div className="flex items-center gap-2 min-w-0">
-                <Bookmark className="w-3.5 h-3.5 text-vibe-accent flex-shrink-0 fill-current" />
-                <p className="text-xs text-vibe-ink-secondary truncate italic font-display">
+                <Bookmark className="w-4 h-4 text-vibe-accent flex-shrink-0 fill-current" />
+                <p className="text-xs text-vibe-ink-secondary italic font-display">
                   “{milestone.quote}”
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-vibe-ink-muted flex-shrink-0">
-                365 days
+              <span className="text-[10px] font-mono text-vibe-ink-muted flex-shrink-0 hidden sm:inline-block">
+                Annual Compounding Insight
               </span>
             </div>
 
