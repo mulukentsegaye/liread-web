@@ -293,16 +293,39 @@ export const useAuthStore = create<AuthStore>()(
 
         if (isGuest) return; // guest: local only
         if (isAuthenticated) {
+          const profileUpdates: Parameters<typeof authService.updateProfile>[1] = {};
+
+          if (partial.username !== undefined) {
+            profileUpdates.username = partial.username.trim().toLowerCase().replace(/^@/, '');
+          }
+          if (partial.fullName !== undefined) {
+            profileUpdates.full_name = partial.fullName.trim();
+          }
+          if (partial.avatarUrl !== undefined) {
+            profileUpdates.avatar_url = partial.avatarUrl;
+          }
+          if (partial.bio !== undefined || partial.subtitle !== undefined) {
+            profileUpdates.bio = (partial.bio ?? partial.subtitle ?? '').trim();
+          }
+          if (partial.dailyGoalMinutes !== undefined) {
+            profileUpdates.daily_goal_minutes = partial.dailyGoalMinutes;
+          }
+          if (partial.isPrivate !== undefined) {
+            profileUpdates.is_private = partial.isPrivate;
+          }
+
           try {
-            await authService.updateProfile(user.id, {
-              full_name: partial.fullName,
-              avatar_url: partial.avatarUrl,
-              bio: partial.bio || partial.subtitle,
-              daily_goal_minutes: partial.dailyGoalMinutes,
-              is_private: partial.isPrivate,
-            });
-          } catch (err) {
-            console.warn('Could not sync user profile to Supabase:', err);
+            await authService.updateProfile(user.id, profileUpdates);
+            // Refresh from database to guarantee verified state synchronization
+            const refreshed = await authService.getUserProfile(user.id);
+            if (refreshed) {
+              set({ user: refreshed });
+            }
+          } catch (err: any) {
+            console.error('Could not sync user profile to Supabase:', err);
+            // Roll back optimistic state on failure
+            set({ user });
+            throw err;
           }
         }
       },

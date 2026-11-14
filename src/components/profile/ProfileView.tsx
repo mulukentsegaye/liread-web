@@ -115,6 +115,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [editDailyGoal, setEditDailyGoal] = useState<number>(30);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [isPrivateProfile, setIsPrivateProfile] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
@@ -271,10 +272,33 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const handleSaveProfileChanges = async () => {
     if (!user) return;
+
+    const cleanFullName = editFullName.trim();
+    const cleanUsername = editUsername.trim().toLowerCase().replace(/^@/, '');
+
+    if (!cleanFullName) {
+      toast.error('Display name cannot be empty.', 'Name Required');
+      setStatusMessage({ type: 'error', text: 'Display name cannot be empty.' });
+      return;
+    }
+
+    if (!cleanUsername) {
+      toast.error('Username cannot be empty.', 'Username Required');
+      setStatusMessage({ type: 'error', text: 'Username cannot be empty.' });
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_.-]+$/.test(cleanUsername)) {
+      toast.error('Username can only contain letters, numbers, underscores, and dashes.', 'Invalid Username');
+      setStatusMessage({ type: 'error', text: 'Username can only contain letters, numbers, underscores, and dashes.' });
+      return;
+    }
+
+    setIsSaving(true);
     try {
       await updateUser({
-        fullName: editFullName.trim() || user.fullName,
-        username: editUsername.trim().replace(/^@/, '') || user.username,
+        fullName: cleanFullName,
+        username: cleanUsername,
         bio: editBio.trim(),
         subtitle: editBio.trim(),
         location: editLocation.trim(),
@@ -286,10 +310,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         isPrivate: isPrivateProfile,
       });
       setIsInlineEditingBio(false);
-      setStatusMessage({ type: 'success', text: 'Profile & reading preferences saved!' });
-      toast.success('Your social reader profile is updated.', 'Profile Saved');
-    } catch {
-      setStatusMessage({ type: 'error', text: 'Failed to update profile.' });
+      setStatusMessage({ type: 'success', text: `Profile updated! Name: ${cleanFullName}, Username: @${cleanUsername}` });
+      toast.success('Your name and username have been successfully updated and synced.', 'Profile Saved');
+    } catch (err: any) {
+      const errMsg = err?.message || 'Failed to update profile.';
+      if (err?.code === '23505' || errMsg.includes('unique') || errMsg.includes('duplicate')) {
+        toast.error(`The username "@${cleanUsername}" is already taken by another reader.`, 'Username Taken');
+        setStatusMessage({ type: 'error', text: `Username "@${cleanUsername}" is already taken by another reader.` });
+      } else {
+        toast.error(errMsg, 'Update Failed');
+        setStatusMessage({ type: 'error', text: errMsg });
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -878,8 +911,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       </div>
                     </div>
 
-                    {/* Quick edit photo buttons */}
-                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                    {/* Quick edit photo and profile buttons */}
+                    <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                       <label
                         htmlFor="page-avatar-file-input"
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink transition-colors cursor-pointer shadow-xs"
@@ -898,6 +931,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
+
+                      <button
+                        type="button"
+                        onClick={() => setAccountView('settings')}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-vibe-card border border-vibe-border hover:bg-vibe-card-subtle text-vibe-ink transition-colors cursor-pointer shadow-xs"
+                        title="Edit name, username, and reading preferences"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-vibe-accent" />
+                        <span>Edit Profile</span>
+                      </button>
                     </div>
                   </div>
 
@@ -928,10 +971,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           <span>{editBio.length} / 240 characters</span>
                           <button
                             type="button"
+                            disabled={isSaving}
                             onClick={handleSaveProfileChanges}
-                            className="px-4 py-1.5 rounded-full bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer"
+                            className="px-4 py-1.5 rounded-full bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
                           >
-                            Save Bio
+                            {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                            <span>{isSaving ? 'Saving...' : 'Save Bio'}</span>
                           </button>
                         </div>
                       </div>
@@ -1188,10 +1233,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
                 <button
                   type="button"
+                  disabled={isSaving}
                   onClick={handleSaveProfileChanges}
-                  className="w-full py-2.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-vibe-accent text-white font-semibold text-xs hover:bg-vibe-accent-hover transition-colors shadow-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
                 >
-                  Save Profile Updates
+                  {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{isSaving ? 'Saving Profile Updates...' : 'Save Profile Updates'}</span>
                 </button>
               </div>
 

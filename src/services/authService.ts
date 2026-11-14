@@ -287,21 +287,51 @@ export const authService = {
   },
 
   /**
-   * Update profile metadata (e.g. dailyGoalMinutes, fullName, bio, avatar).
+   * Update profile metadata (e.g. username, fullName, dailyGoalMinutes, bio, avatar).
    */
   async updateProfile(userId: string, updates: Partial<{
+    username: string;
     full_name: string;
     avatar_url: string;
     bio: string;
     daily_goal_minutes: number;
     is_private: boolean;
   }>) {
+    // 1. Clean updates object: strip undefined keys so PostgREST only updates provided fields
+    const payload: Record<string, any> = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        payload[key] = value;
+      }
+    }
+
+    if (Object.keys(payload).length === 0) return;
+
     const { error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update(payload)
       .eq('id', userId);
 
     if (error) throw error;
+
+    // 2. Synchronize Supabase Auth user_metadata so auth session token and JWT match
+    if (payload.full_name !== undefined || payload.username !== undefined) {
+      try {
+        const metadataUpdates: Record<string, any> = {};
+        if (payload.full_name !== undefined) {
+          metadataUpdates.full_name = payload.full_name;
+          metadataUpdates.name = payload.full_name;
+        }
+        if (payload.username !== undefined) {
+          metadataUpdates.username = payload.username;
+        }
+        await supabase.auth.updateUser({
+          data: metadataUpdates,
+        });
+      } catch (authErr) {
+        console.warn('Could not sync user_metadata in Supabase Auth:', authErr);
+      }
+    }
   },
 
   /**
